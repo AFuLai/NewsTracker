@@ -16,6 +16,18 @@
 <h1>Tracker ChangeLog</h1>
 <p class="meta">本檔由 <code>tracker pack</code> 自動維護；每次打包前由本地 ollama 生成版本重點並 prepend 於下方。</p>
 <!-- CHANGELOG_INSERTION_POINT -->
+<section class="release" id="v0.3">
+  <h2>v0.3 — 2026-05-29</h2>
+<ul>
+    <li><strong>【新功能/CLI】</strong> 增強摘要功能，新增 `--since` 和 `--until` 參數，允許使用者在 CLI 執行時對新聞來源日期進行精準的預過濾與後過濾。</li>
+    <li><strong>【來源優化/覆蓋率】</strong> 提升新聞抓取穩定性與覆蓋率：優化 `sources/site.py` 邏輯，新增更嚴格的 URL 篩選機制，有效排除 `/category/`、`/tag/` 或 `/page/N/` 等非文章頁面，確保抓取內容的準確性。</li>
+    <li><strong>【新功能/Prompting】</strong> 引入「類別感知提示」（Category-aware Prompting）機制。系統現在能從配置中讀取各類別的描述，並將這些定義資訊傳遞給 LLM，使摘要內容更具上下文相關性。</li>
+    <li><strong>【效能/穩定性】</strong> 修正了 `sources/stealth.py` 中的執行緒鎖定問題，確保在多執行緒環境下執行 `curl_cffi` 時的穩定性，提升爬取流程的可靠性。</li>
+    <li><strong>【模型部署】</strong> 更新了 README 文件，新增了關於 `OLLAMA_NUM_PARALLEL` 的部署指南，方便使用者在不同環境下優化 Ollama 模型的運行資源。</li>
+    <li><strong>【修補/優化】</strong> 改善了重複資料檢測（deduplication）邏輯，現在可以持久化儲存已跳過的窗口狀態（`skipped_window`），避免在重新執行時重複處理已處理的資料。</li>
+</ul>
+</section>
+
 <section class="release" id="v0.2">
   <h2>v0.2 — 2026-05-29</h2>
 <ul>
