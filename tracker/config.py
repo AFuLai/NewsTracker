@@ -63,6 +63,12 @@ def _parse_entry_row(row: str) -> Entry | None:
     return entry
 
 
+def _apply_builtins(entries: list[Entry]) -> None:
+    from .builtins import enrich
+    for e in entries:
+        enrich(e.domain, e)
+
+
 def load_searchinfo(path: Path) -> SearchInfo:
     raw = path.read_text(encoding="utf-8")
     title_m = re.search(r"^TITLE:\s*(.+)$", raw, re.M)
@@ -95,4 +101,5 @@ def load_searchinfo(path: Path) -> SearchInfo:
             tags = re.findall(r"\[(#[\w-]+)\]", line)
             keys.append(Key(text=text, tags=tags))
 
+    _apply_builtins(entries)
     return SearchInfo(title=title, entries=entries, categories=categories, keys=keys)

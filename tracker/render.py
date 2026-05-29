@@ -1,17 +1,25 @@
 """Jinja2 → data-YYYYMMDD.js + manifest chain."""
 from __future__ import annotations
 
+import json
 import re
 from datetime import date as _date
 from pathlib import Path
 
 from jinja2 import Environment, PackageLoader, select_autoescape
 
+
+def _tojson_unicode(value):
+    """tojson that preserves CJK characters (no \\uXXXX escape)."""
+    return json.dumps(value, ensure_ascii=False)
+
+
 _env = Environment(
     loader=PackageLoader("tracker", "templates"),
     autoescape=select_autoescape(disabled_extensions=("j2",), default=False),
     keep_trailing_newline=True,
 )
+_env.filters["tojson"] = _tojson_unicode
 
 
 def _write(path: Path, text: str) -> Path:

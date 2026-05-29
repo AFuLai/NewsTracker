@@ -7,8 +7,18 @@ from ..config import Entry
 
 
 def feeds_for(entries: list[Entry]) -> list[tuple[str, str]]:
-    return [(e.name, e.feed_url) for e in entries
-            if (e.method or "").upper() == "FEED" and e.feed_url]
+    """Returns (source_name, feed_url) pairs, deduplicated by feed_url so the same
+    feed is not fetched twice when multiple entries share a domain."""
+    seen: set[str] = set()
+    out: list[tuple[str, str]] = []
+    for e in entries:
+        if (e.method or "").upper() != "FEED" or not e.feed_url:
+            continue
+        if e.feed_url in seen:
+            continue
+        seen.add(e.feed_url)
+        out.append((e.name, e.feed_url))
+    return out
 
 
 def path_entries(entries: list[Entry]) -> list[Entry]:
