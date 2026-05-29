@@ -16,6 +16,17 @@
 <h1>Tracker ChangeLog</h1>
 <p class="meta">本檔由 <code>tracker pack</code> 自動維護；每次打包前由本地 ollama 生成版本重點並 prepend 於下方。</p>
 <!-- CHANGELOG_INSERTION_POINT -->
+<section class="release" id="v0.4">
+  <h2>v0.4 — 2026-05-29</h2>
+<ul>
+    <li><strong>【介面/展示】</strong>優化每日報表排序邏輯：內容將依據預設的「分類優先級」（重大事件 → 法規 → 漏洞 → 供應鏈 → 前瞻）進行排序，讓用戶能更快速掌握重要資訊。</li>
+    <li><strong>【資料處理】</strong>強化分類（Category）處理機制：新增了 LLM 輸出驗證與分類強制轉換（Coercion）邏輯，確保即使資料庫存在過時或不準確的分類記錄，系統也能自動修正並正確歸類。</li>
+    <li><strong>【核心功能】</strong>提升內容聚類（Clustering）的召回率與準確性：降低了聚類閾值，並新增了「同來源資料防合併」機制，除非有明確的 CVE 橋接，否則不會將來自同一來源的資料誤判為同一事件。</li>
+    <li><strong>【穩定性/修補】</strong>增強資料寫入的健壯性：在摘要文章寫入資料庫前，會先對 LLM 輸出的分類結果進行嚴格驗證，防止因模型輸出錯誤導致資料庫污染。</li>
+    <li><strong>【效能/API】</strong>整體後端邏輯優化：修補了多個層級的分類處理流程，提升了資料處理的穩定性與資料一致性。</li>
+</ul>
+</section>
+
 <section class="release" id="v0.3">
   <h2>v0.3 — 2026-05-29</h2>
 <ul>
