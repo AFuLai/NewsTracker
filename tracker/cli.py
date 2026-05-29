@@ -91,8 +91,11 @@ def fetch(
     feeds = dispatch.feeds_for(info.entries)
     if source:
         feeds = [(n, u) for n, u in feeds if source in u]
-    if not feeds and not site_search:
-        console.print("[yellow]No FEED sources matched.[/yellow]"); raise typer.Exit(1)
+    # We can proceed if any of FEED / PATH / SITE will fire.
+    has_path = any(source in (e.domain or "") if source else True
+                   for e in dispatch.path_entries(info.entries))
+    if not feeds and not site_search and not has_path:
+        console.print("[yellow]No sources matched.[/yellow]"); raise typer.Exit(1)
 
     store = None if dry_run else Store(db)
     new_count = total_count = 0
@@ -123,8 +126,14 @@ def fetch(
             "cra", "cyber resilience", "cyber-resilience",
             "regulation", "directive", "harmonised", "harmonized",
             "compliance", "conformity", "cybersecurity",
-            "サイバー", "規制", "網路韌性", "歐盟", "EU ",
-            "ENISA", "ETSI", "CEN", "JPCERT", "NISC", "CSA",
+            # JP markers
+            "サイバー", "規制",
+            # ZH-TW markers
+            "網路韌性", "歐盟", "EU ", "資安",
+            # KR markers
+            "사이버", "유럽", "보안", "규제",
+            # specialist body names
+            "ENISA", "ETSI", "CEN", "JPCERT", "NISC", "CSA", "KISA",
             "standardisation", "standardization",
         ) if tracker == "eu_cra" else ()
         console.print(f"[{tracker}] PATH-scanning {len(paths)} listing entries")
@@ -380,16 +389,31 @@ def write(
 
 @app.command("cross-scan")
 def cross_scan(
-    date: str = typer.Option(..., help="YYYY-MM-DD"),
+    date: str = typer.Option("", help="YYYY-MM-DD; if empty, scan ALL ready/written articles"),
     db: Path = typer.Option(DEFAULT_DB),
+    reverse: bool = typer.Option(False, "--reverse",
+                                 help="Also REMOVE tracker memberships that no longer match "
+                                      "(false-positive cleanup)"),
 ) -> None:
-    """Re-evaluate cross-tracker belongings for all ready articles on a date."""
+    """Re-evaluate cross-tracker belongings.
+
+    Forward pass (default): add missing trackers for articles that newly match
+    other trackers' criteria.
+    Reverse pass (--reverse): remove tracker memberships whose criteria the
+    article no longer satisfies (and source isn't a narrow-domain specialist).
+    Refuses to leave trackers list empty.
+    """
     from .cross import NARROW_DOMAINS, belongs_to
 
     store = Store(db)
-    rows = store.list_ready_by_date(date)
+    if date:
+        rows = store.list_ready_by_date(date)
+    else:
+        rows = list(store.conn.execute(
+            "SELECT * FROM articles WHERE status IN ('ready','written') ORDER BY id"))
     if not rows:
-        console.print(f"[yellow]No ready articles for {date}.[/yellow]"); raise typer.Exit(0)
+        console.print(f"[yellow]No ready/written articles{' for ' + date if date else ''}.[/yellow]")
+        raise typer.Exit(0)
 
     infos = {}
     for name in SEARCHINFOS:
@@ -397,11 +421,14 @@ def cross_scan(
             infos[name] = load_tracker(name)
         except Exception as exc:
             console.print(f"[red]skip {name}: {exc}[/red]")
-    added = 0
+
+    added = removed = 0
     for r in rows:
-        current = set((r["trackers"] or "").split(","))
+        current = set(t for t in (r["trackers"] or "").split(",") if t)
         title = r["title"] or ""
         tags = (r["tags"] or "").split(",")
+
+        # Forward: add missing trackers if they match.
         for name, info in infos.items():
             if name in current:
                 continue
@@ -410,8 +437,29 @@ def cross_scan(
                           narrow_domains=NARROW_DOMAINS.get(name)):
                 if store.add_tracker(r["id"], name):
                     added += 1
-                    console.print(f"  +{name}: {title[:60]}")
-    console.print(f"[green]Added {added} cross-tracker memberships[/green]")
+                    current.add(name)
+                    console.print(f"  +{name}: {title[:55]}")
+
+        # Reverse: remove trackers that no longer match (unless source is
+        # narrow-domain specialist for that tracker — those keep their
+        # original assignment).
+        if reverse:
+            for name in list(current):
+                info = infos.get(name)
+                if not info:
+                    continue
+                if belongs_to(article_url=r["url"], article_title=title,
+                              article_tags=tags, other=info, other_name=name,
+                              narrow_domains=NARROW_DOMAINS.get(name)):
+                    continue  # still matches
+                # No match. Try to demote.
+                if store.remove_tracker(r["id"], name):
+                    removed += 1
+                    console.print(f"  -{name}: {title[:55]}")
+    msg = f"[green]+{added} memberships added"
+    if reverse:
+        msg += f", -{removed} demoted"
+    console.print(msg + "[/green]")
 
 
 @app.command("migrate-v2")

@@ -126,6 +126,24 @@ class Store:
         self.conn.commit()
         return True
 
+    def remove_tracker(self, article_id: int, tracker: str) -> bool:
+        """Remove tracker from an article's trackers list.
+        Refuses to leave the list empty — returns False if it would."""
+        row = self.conn.execute(
+            "SELECT trackers FROM articles WHERE id=?", (article_id,)).fetchone()
+        if not row:
+            return False
+        current = [t for t in (row["trackers"] or "").split(",") if t]
+        if tracker not in current:
+            return False
+        if len(current) == 1:
+            return False  # would orphan
+        current.remove(tracker)
+        self.conn.execute("UPDATE articles SET trackers=? WHERE id=?",
+                          (",".join(sorted(set(current))), article_id))
+        self.conn.commit()
+        return True
+
     def list_ready_by_date(self, date: str) -> list[sqlite3.Row]:
         """All ready articles for a date, regardless of tracker. Used by cross-scan."""
         return list(self.conn.execute(

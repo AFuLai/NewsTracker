@@ -56,6 +56,7 @@ BUILTIN: dict[str, dict[str, str]] = {
     "cyber.gouv.fr": {"method": "PATH"},
     "nisc.go.jp": {"method": "PATH"},
     "csa.gov.sg": {"method": "PATH"},
+    "boannews.com": {"method": "PATH"},
     "jpcert.or.jp": {"method": "FEED",
                      "feed": "https://www.jpcert.or.jp/rss/jpcert.rdf"},
 }

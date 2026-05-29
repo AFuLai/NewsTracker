@@ -109,6 +109,9 @@ NARROW_DOMAINS: dict[str, set[str]] = {
                "ssi.gouv.fr", "cyber.gouv.fr", "linuxfoundation.org",
                # APAC regulator domains — specialists for the 亞太對應 angle.
                "nisc.go.jp", "jpcert.or.jp", "csa.gov.sg"},
+               # Boannews and similar APAC media are deliberately NOT here —
+               # they cover everything, not just CRA, so narrow-domain bypass
+               # would create false positives.
     "security": {"cisa.gov", "nvd.nist.gov", "krebsonsecurity.com",
                  "googleprojectzero.blogspot.com", "googleblog.com"},
 }
