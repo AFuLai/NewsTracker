@@ -16,6 +16,18 @@
 <h1>Tracker ChangeLog</h1>
 <p class="meta">本檔由 <code>tracker pack</code> 自動維護；每次打包前由本地 ollama 生成版本重點並 prepend 於下方。</p>
 <!-- CHANGELOG_INSERTION_POINT -->
+<section class="release" id="v0.2">
+  <h2>v0.2 — 2026-05-29</h2>
+<ul>
+    <li><strong>【新功能/來源】</strong>擴充內建來源支援，新增多個主題的 RSS/FEED 來源（如 DR、iThome、資安人、Elastic、Ubuntu），並優化來源解析，提升資料擷取範圍。</li>
+    <li><strong>【內容擷取/效能】</strong>優化文章內容抓取流程，新增全文本（Full-text）擷取模式，並結合 `trafilatura` 提取文章日期，確保資料的完整性與時效性。</li>
+    <li><strong>【資料處理/API】</strong>升級資料整合能力，引入基於 Jaccard 或共享 CVE 的標題聚類（Clustering）機制，能夠自動跨來源合併重複或相關的文章，提升資料的覆蓋率。</li>
+    <li><strong>【CLI/效能】</strong>優化 CLI 流程：`summarize` 指令現在採用「分階段處理」機制，第一階段採用多執行緒並行抓取內容，第二階段則串行呼叫 Ollama 模型進行摘要生成。</li>
+    <li><strong>【CLI/功能】</strong>新增強大的搜尋與寫入功能：CLI 支援透過 DuckDuckGo 進行站點限定搜尋（`--site-search`），同時 `write` 指令增加寫入保護機制，防止無意間覆蓋資料。</li>
+    <li><strong>【資料完整性】</strong>提升資料寫入的健壯性，新增寫入防護機制，若未明確使用 `--force` 參數，系統將拒絕覆蓋現有資料，確保資料庫的穩定性。</li>
+</ul>
+</section>
+
 <section class="release" id="v0.1">
   <h2>v0.1 — 2026-05-29</h2>
 <ul>
