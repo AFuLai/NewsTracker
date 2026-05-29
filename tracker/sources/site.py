@@ -90,13 +90,19 @@ def _looks_like_article(url: str) -> bool:
 
 def site_keyword_search(domain: str, keyword: str, *,
                         since: str | None = None, until: str | None = None,
-                        max_results: int = 8) -> list[Hit]:
-    """Build a `kw site:domain after:since before:until` query."""
-    q = f"{keyword} site:{domain}"
+                        max_results: int = 8,
+                        query_prefix: str = "") -> list[Hit]:
+    """Build a `[prefix] kw site:domain after:since before:until` query."""
+    parts = []
+    if query_prefix:
+        parts.append(query_prefix)
+    parts.append(keyword)
+    parts.append(f"site:{domain}")
     if since:
-        q += f" after:{since}"
+        parts.append(f"after:{since}")
     if until:
-        q += f" before:{until}"
+        parts.append(f"before:{until}")
+    q = " ".join(parts)
     return [h for h in search(q, max_results=max_results)
             if domain in urlparse(h.url).netloc and _looks_like_article(h.url)]
 

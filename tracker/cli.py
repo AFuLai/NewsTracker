@@ -82,6 +82,8 @@ def fetch(
     concurrency: int = typer.Option(8),
     site_search: bool = typer.Option(False, "--site-search"),
     site_keys: int = typer.Option(2, help="Keywords per SITE entry (when --site-search)"),
+    query_prefix: str = typer.Option("", "--query-prefix",
+                                     help='Prepend to every DDG query (e.g. "CRA" or "\"Cyber Resilience Act\"")'),
 ) -> None:
     """Fetch FEED sources in parallel; optionally DDG-search SITE entries."""
     info = _info_for(tracker, searchinfo)
@@ -122,7 +124,8 @@ def fetch(
             site_total = site_new = 0
             for e in sites:
                 for kw in keys:
-                    hits = ddg.site_keyword_search(e.domain, kw, since=since, until=until)
+                    hits = ddg.site_keyword_search(e.domain, kw, since=since, until=until,
+                                                   query_prefix=query_prefix)
                     ddg.throttle()
                     for h in hits:
                         site_total += 1
