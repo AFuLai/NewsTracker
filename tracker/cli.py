@@ -116,10 +116,10 @@ def summarize(
     if self_test:
         try:
             out = _selftest()
-            console.print(f"[green]ollama OK:[/green] {out[:80]}")
-            raise typer.Exit(0)
         except Exception as exc:
             console.print(f"[red]ollama failed:[/red] {exc}"); raise typer.Exit(2)
+        console.print(f"[green]ollama OK:[/green] {out[:80]}")
+        raise typer.Exit(0)
 
     info = load_searchinfo(searchinfo)
     store = Store(db)

@@ -83,7 +83,8 @@ def load_searchinfo(path: Path) -> SearchInfo:
     for line in _section("CATEGORY").splitlines():
         if line.startswith("|") and "|" in line[1:]:
             cells = [c.strip() for c in line.strip().strip("|").split("|")]
-            if cells and cells[0] not in ("category 值", "---") and not cells[0].startswith(":-"):
+            if cells and cells[0] not in ("category 值", "---") \
+                    and not cells[0].startswith((":-", "---", "==")):
                 categories.append(cells[0])
 
     keys: list[Key] = []
