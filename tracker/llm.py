@@ -41,12 +41,20 @@ def _strip_code_fence(s: str) -> str:
     return re.sub(r"^\s*```\w*\s*\n?", "", s).strip()
 
 
-def summarize_article(*, url: str, raw_text: str, categories: list[str]) -> dict[str, Any]:
-    """Returns {title, summary, category, tags}. Falls back to safe defaults on parse error."""
+def summarize_article(*, url: str, raw_text: str, categories: list[str],
+                      category_defs: list[Any] | None = None) -> dict[str, Any]:
+    """Returns {title, summary, category, tags}. Falls back to safe defaults on parse error.
+
+    category_defs: optional list of objects with .name and .description attrs;
+                   when present, sent to the prompt for disambiguation."""
     tmpl = _prompt("summary.txt")
+    if category_defs:
+        cat_block = "\n".join(f"- {c.name}：{c.description}" for c in category_defs)
+    else:
+        cat_block = " / ".join(categories)
     prompt = tmpl.format(
         url=url,
-        categories=" / ".join(categories),
+        category_defs=cat_block,
         body=raw_text[:6000],
     )
     response = call(prompt, format_json=True)

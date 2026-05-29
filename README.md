@@ -48,3 +48,30 @@ Override with `tracker write --out PATH`.
 2. Write new `VERSION`
 3. `git add -A && git commit && git tag v{M}.{N}`
 4. `git archive` → `D:/Claude/Track Security/tarball/Tracker-{M}.{N}.zip`
+
+## Performance tuning
+
+`summarize` is bottlenecked by serial ollama calls (~15–20s per article on
+`gemma4:e4b`). The `fetch_body` phase already runs in parallel via a
+ThreadPoolExecutor; to also parallelize ollama, set `OLLAMA_NUM_PARALLEL`
+on the ollama server **before** starting it:
+
+```bash
+# 2× parallel — needs roughly 2× VRAM (~12 GB total for gemma4:e4b)
+OLLAMA_NUM_PARALLEL=2 ollama serve
+
+# Or persist via systemd drop-in:
+sudo mkdir -p /etc/systemd/system/ollama.service.d
+cat <<'EOF' | sudo tee /etc/systemd/system/ollama.service.d/parallel.conf
+[Service]
+Environment="OLLAMA_NUM_PARALLEL=2"
+EOF
+sudo systemctl daemon-reload && sudo systemctl restart ollama
+```
+
+Then run with `tracker summarize --concurrency 2` (or higher). Ollama
+queues additional requests, so going above `OLLAMA_NUM_PARALLEL` gives
+no further speedup but won't error.
+
+VRAM budget for `gemma4:e4b` is ~6 GB at concurrency 1. With 16 GB VRAM
+you can safely set `OLLAMA_NUM_PARALLEL=2`; with 8 GB stay at 1.

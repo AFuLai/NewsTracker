@@ -18,6 +18,14 @@ UA = ("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
 ENDPOINT = "https://html.duckduckgo.com/html/"
 THROTTLE_SEC = 1.5  # be polite — DDG will rate-limit otherwise
 
+# Path segments / patterns that indicate a non-article URL.
+NON_ARTICLE_RE = re.compile(
+    r"^/?(category|categories|tag|tags|topics?|author|page|search|archive|feed|rss|atom|"
+    r"index\.html?|home|about|contact|privacy|terms)/?$|"
+    r"^/?(category|tag|topic|author|page)/[^/]+/?$",
+    re.I,
+)
+
 
 @dataclass
 class Hit:
@@ -65,6 +73,21 @@ def search(query: str, *, max_results: int = 10, timeout: float = 20.0) -> list[
     return hits
 
 
+def _looks_like_article(url: str) -> bool:
+    p = urlparse(url)
+    path = p.path or "/"
+    if path in ("", "/"):
+        return False
+    if NON_ARTICLE_RE.match(path):
+        return False
+    # Require at least one slug-like segment with a hyphen or numeric id.
+    segments = [s for s in path.strip("/").split("/") if s]
+    if not segments:
+        return False
+    last = segments[-1]
+    return "-" in last or any(c.isdigit() for c in last) or last.endswith((".html", ".htm"))
+
+
 def site_keyword_search(domain: str, keyword: str, *,
                         since: str | None = None, until: str | None = None,
                         max_results: int = 8) -> list[Hit]:
@@ -75,7 +98,7 @@ def site_keyword_search(domain: str, keyword: str, *,
     if until:
         q += f" before:{until}"
     return [h for h in search(q, max_results=max_results)
-            if domain in urlparse(h.url).netloc]
+            if domain in urlparse(h.url).netloc and _looks_like_article(h.url)]
 
 
 def throttle() -> None:

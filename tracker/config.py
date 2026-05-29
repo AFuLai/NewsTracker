@@ -29,11 +29,18 @@ class Key:
 
 
 @dataclass
+class Category:
+    name: str
+    description: str = ""
+
+
+@dataclass
 class SearchInfo:
     title: str
     entries: list[Entry]
-    categories: list[str]
+    categories: list[str]            # backward-compat: list of names
     keys: list[Key]
+    category_defs: list[Category] = field(default_factory=list)
 
 
 def _domain(url: str) -> str:
@@ -86,12 +93,16 @@ def load_searchinfo(path: Path) -> SearchInfo:
                 entries.append(e)
 
     categories: list[str] = []
+    category_defs: list[Category] = []
     for line in _section("CATEGORY").splitlines():
         if line.startswith("|") and "|" in line[1:]:
             cells = [c.strip() for c in line.strip().strip("|").split("|")]
             if cells and cells[0] not in ("category 值", "---") \
                     and not cells[0].startswith((":-", "---", "==")):
-                categories.append(cells[0])
+                name = cells[0]
+                desc = cells[1] if len(cells) > 1 else ""
+                categories.append(name)
+                category_defs.append(Category(name=name, description=desc))
 
     keys: list[Key] = []
     for line in _section("KEY").splitlines():
@@ -102,4 +113,5 @@ def load_searchinfo(path: Path) -> SearchInfo:
             keys.append(Key(text=text, tags=tags))
 
     _apply_builtins(entries)
-    return SearchInfo(title=title, entries=entries, categories=categories, keys=keys)
+    return SearchInfo(title=title, entries=entries, categories=categories,
+                      keys=keys, category_defs=category_defs)

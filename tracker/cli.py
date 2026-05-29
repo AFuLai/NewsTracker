@@ -145,6 +145,8 @@ def summarize(
     fetch_full: bool = typer.Option(True, "--fetch-full/--no-fetch-full",
                                     help="Fetch full article body when RSS summary is short"),
     min_body: int = typer.Option(800, help="Only fetch full text when raw_text shorter than this"),
+    since: str = typer.Option("", help="Skip articles whose extracted date is before this (YYYY-MM-DD)"),
+    until: str = typer.Option("", help="Skip articles whose extracted date is after this (YYYY-MM-DD)"),
 ) -> None:
     """Call local ollama (gemma4:e4b) to summarize pending articles."""
     from .llm import self_test as _selftest
@@ -189,20 +191,32 @@ def summarize(
                         extracted_dates[aid] = mdate
 
     # Phase B: serial ollama (single-instance bottleneck).
-    done = 0
+    done = skipped_window = 0
     for r in rows:
         body = bodies[r["id"]]
+        # Window filter: prefer extracted date, fall back to feed date.
+        effective_date = extracted_dates[r["id"]] or r["date"]
+        if (since and effective_date and effective_date < since) or \
+           (until and effective_date and effective_date > until):
+            store.mark_status(r["id"], "skipped_window", date=extracted_dates[r["id"]])
+            skipped_window += 1
+            continue
         if not body:
             store.log_error(r["source"], "empty body after fetch", r["url"]); continue
         try:
-            result = summarize_article(url=r["url"], raw_text=body, categories=info.categories)
+            result = summarize_article(url=r["url"], raw_text=body,
+                                       categories=info.categories,
+                                       category_defs=info.category_defs)
             store.update_summary(r["id"], title=result["title"] or r["title"],
                                  summary=result["summary"], category=result["category"],
                                  tags=result["tags"], date=extracted_dates[r["id"]])
             done += 1
         except Exception as exc:
             store.log_error(r["source"], f"summarize: {exc}", r["url"])
-    console.print(f"[green]Summarized {done}/{len(rows)}[/green] (full-text fetched: {fetched})")
+    msg = f"[green]Summarized {done}/{len(rows)}[/green] (full-text fetched: {fetched}"
+    if skipped_window:
+        msg += f", out-of-window skipped: {skipped_window}"
+    console.print(msg + ")")
 
 
 @app.command()

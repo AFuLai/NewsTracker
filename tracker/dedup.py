@@ -106,6 +106,16 @@ class Store:
         )
         self.conn.commit()
 
+    def mark_status(self, article_id: int, status: str, *, date: str | None = None) -> None:
+        if date:
+            self.conn.execute(
+                "UPDATE articles SET status=?, date=COALESCE(date, ?) WHERE id=?",
+                (status, date, article_id),
+            )
+        else:
+            self.conn.execute("UPDATE articles SET status=? WHERE id=?", (status, article_id))
+        self.conn.commit()
+
     def log_error(self, source: str, error: str, url: str | None = None) -> None:
         self.conn.execute(
             "INSERT INTO fetch_errors (source, url, error, occurred_at) VALUES (?, ?, ?, ?)",
