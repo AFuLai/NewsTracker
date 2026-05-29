@@ -71,31 +71,65 @@ def fetch(
     source: str | None = typer.Option(None, help="Limit to a single domain"),
     dry_run: bool = typer.Option(False, "--dry-run"),
     concurrency: int = typer.Option(8),
+    site_search: bool = typer.Option(False, "--site-search",
+                                     help="Also run DuckDuckGo site: search for SITE-method entries"),
+    site_keys: int = typer.Option(2, help="Keywords per SITE entry (when --site-search)"),
 ) -> None:
-    """Fetch FEED sources in parallel; insert candidates into SQLite."""
+    """Fetch FEED sources in parallel; optionally DDG-search SITE entries."""
     info = load_searchinfo(searchinfo)
     s_date, u_date = _parse_date(since), _parse_date(until)
     feeds = dispatch.feeds_for(info.entries)
     if source:
         feeds = [(n, u) for n, u in feeds if source in u]
-    if not feeds:
+    if not feeds and not site_search:
         console.print("[yellow]No FEED sources matched.[/yellow]"); raise typer.Exit(1)
-    console.print(f"Fetching {len(feeds)} feeds, {since}..{until}, concurrency={concurrency}")
-    results = asyncio.run(fetch_feeds(feeds, since=s_date, until=u_date, concurrency=concurrency))
 
     store = None if dry_run else Store(db)
     new_count = total_count = 0
-    for src, items in results.items():
-        total_count += len(items)
-        for it in items:
-            if dry_run:
-                console.print(f"  [{src}] {it.published} {it.title[:80]}  {it.url}")
-            else:
-                if store.upsert_candidate(url=it.url, source=src, title=it.title,
-                                          date=it.published, raw_text=it.summary or ""):
+
+    # ── Phase 1: FEED parallel fetch ─────────────────────────────────────────
+    if feeds:
+        console.print(f"Fetching {len(feeds)} feeds, {since}..{until}, concurrency={concurrency}")
+        results = asyncio.run(fetch_feeds(feeds, since=s_date, until=u_date, concurrency=concurrency))
+        for src, items in results.items():
+            total_count += len(items)
+            for it in items:
+                if dry_run:
+                    console.print(f"  [{src}] {it.published} {it.title[:80]}  {it.url}")
+                elif store.upsert_candidate(url=it.url, source=src, title=it.title,
+                                            date=it.published, raw_text=it.summary or ""):
                     new_count += 1
+
+    # ── Phase 2: SITE DuckDuckGo search ──────────────────────────────────────
+    if site_search:
+        from .sources import site as ddg
+        sites = dispatch.site_entries(info.entries)
+        if source:
+            sites = [e for e in sites if source in e.domain]
+        keys = [k.text for k in info.keys][:site_keys] if info.keys else []
+        if not keys:
+            console.print("[yellow]No KEYs in searchinfo; skipping site search.[/yellow]")
+        else:
+            console.print(f"DDG-searching {len(sites)} SITE entries × {len(keys)} keys "
+                          f"(throttle {ddg.THROTTLE_SEC}s)")
+            site_total = site_new = 0
+            for e in sites:
+                for kw in keys:
+                    hits = ddg.site_keyword_search(e.domain, kw, since=since, until=until)
+                    ddg.throttle()
+                    for h in hits:
+                        site_total += 1
+                        if dry_run:
+                            console.print(f"  [{e.name}] {h.title[:70]}  {h.url}")
+                        elif store.upsert_candidate(url=h.url, source=e.name,
+                                                    title=h.title, raw_text=h.snippet):
+                            site_new += 1
+            new_count += site_new
+            total_count += site_total
+            console.print(f"  SITE: {site_new} new / {site_total} seen")
+
     if dry_run:
-        console.print(f"[green]dry-run:[/green] total {total_count} candidates across {len(feeds)} feeds")
+        console.print(f"[green]dry-run:[/green] total {total_count} candidates")
     else:
         console.print(f"[green]Inserted {new_count} new candidates[/green] (total seen={total_count})")
 
@@ -115,7 +149,7 @@ def summarize(
     """Call local ollama (gemma4:e4b) to summarize pending articles."""
     from .llm import self_test as _selftest
     from .llm import summarize_article
-    from .sources.article import fetch_body
+    from .sources.article import fetch_body_with_date
 
     if self_test:
         try:
@@ -133,21 +167,38 @@ def summarize(
     console.print(f"Summarizing {len(rows)} articles via ollama "
                   f"(fetch_full={fetch_full}, concurrency={concurrency})...")
 
-    done = fetched = 0
+    # Phase A: parallel fetch_body (+ extracted date) for rows that need it.
+    bodies: dict[int, str] = {r["id"]: (r["raw_text"] or "").strip() for r in rows}
+    extracted_dates: dict[int, str | None] = {r["id"]: None for r in rows}
+    fetched = 0
+    if fetch_full:
+        from concurrent.futures import ThreadPoolExecutor
+
+        targets = [(r["id"], r["url"]) for r in rows
+                   if r["url"] and (len(bodies[r["id"]]) < min_body or not r["date"])]
+        if targets:
+            console.print(f"  fetching {len(targets)} full bodies in parallel "
+                          f"(workers={concurrency})...")
+            with ThreadPoolExecutor(max_workers=max(concurrency, 2)) as pool:
+                results = pool.map(lambda t: (t[0], *fetch_body_with_date(t[1])), targets)
+                for aid, full, mdate in results:
+                    if len(full) > len(bodies[aid]):
+                        bodies[aid] = full
+                        fetched += 1
+                    if mdate:
+                        extracted_dates[aid] = mdate
+
+    # Phase B: serial ollama (single-instance bottleneck).
+    done = 0
     for r in rows:
-        body = (r["raw_text"] or "").strip()
-        if fetch_full and len(body) < min_body and r["url"]:
-            full = fetch_body(r["url"])
-            if len(full) > len(body):
-                body = full
-                fetched += 1
+        body = bodies[r["id"]]
         if not body:
             store.log_error(r["source"], "empty body after fetch", r["url"]); continue
         try:
             result = summarize_article(url=r["url"], raw_text=body, categories=info.categories)
             store.update_summary(r["id"], title=result["title"] or r["title"],
                                  summary=result["summary"], category=result["category"],
-                                 tags=result["tags"])
+                                 tags=result["tags"], date=extracted_dates[r["id"]])
             done += 1
         except Exception as exc:
             store.log_error(r["source"], f"summarize: {exc}", r["url"])

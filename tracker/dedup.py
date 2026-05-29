@@ -82,11 +82,21 @@ class Store:
             "SELECT * FROM articles WHERE date = ? AND status = 'ready' ORDER BY id", (date,)))
 
     def update_summary(self, article_id: int, *, title: str, summary: str,
-                       category: str, tags: list[str]) -> None:
-        self.conn.execute(
-            "UPDATE articles SET title=?, summary=?, category=?, tags=?, status='ready', summarized_at=? WHERE id=?",
-            (title, summary, category, ",".join(tags), datetime.utcnow().isoformat(), article_id),
-        )
+                       category: str, tags: list[str], date: str | None = None) -> None:
+        if date:
+            self.conn.execute(
+                "UPDATE articles SET title=?, summary=?, category=?, tags=?, "
+                "date=COALESCE(date, ?), status='ready', summarized_at=? WHERE id=?",
+                (title, summary, category, ",".join(tags), date,
+                 datetime.utcnow().isoformat(), article_id),
+            )
+        else:
+            self.conn.execute(
+                "UPDATE articles SET title=?, summary=?, category=?, tags=?, "
+                "status='ready', summarized_at=? WHERE id=?",
+                (title, summary, category, ",".join(tags),
+                 datetime.utcnow().isoformat(), article_id),
+            )
         self.conn.commit()
 
     def mark_written(self, article_ids: list[int]) -> None:

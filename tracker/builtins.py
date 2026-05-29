@@ -35,6 +35,21 @@ BUILTIN: dict[str, dict[str, str]] = {
                     "feed": "https://openssf.org/feed/"},
     "security.googleblog.com": {"method": "FEED",
                                 "feed": "https://security.googleblog.com/feeds/posts/default?alt=rss"},
+    # Verified by HTTP probe 2026-05-29:
+    "darkreading.com": {"method": "FEED",
+                        "feed": "https://www.darkreading.com/rss.xml"},
+    "ithome.com.tw": {"method": "FEED",
+                      "feed": "https://www.ithome.com.tw/rss/security"},
+    "informationsecurity.com.tw": {"method": "FEED",
+                                   "feed": "https://www.informationsecurity.com.tw/feed"},
+    "elastic.co": {"method": "FEED",
+                   "feed": "https://www.elastic.co/security-labs/rss/feed.xml"},
+    "ubuntu.com": {"method": "FEED",
+                   "feed": "https://ubuntu.com/security/notices/rss.xml"},
+    # Cloudflare-protected, only stealth fetch works — keep SITE for now.
+    "securityweek.com": {"method": "SITE"},
+    # No public RSS endpoint found; will be handled by SITE/DuckDuckGo.
+    "enisa.europa.eu": {"method": "SITE"},
 }
 
 

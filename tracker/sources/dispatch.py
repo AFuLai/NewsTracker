@@ -30,6 +30,5 @@ def api_entries(entries: list[Entry]) -> list[Entry]:
 
 
 def site_entries(entries: list[Entry]) -> list[Entry]:
-    """SITE-method entries — fallback uses gemini-style search.
-    With local-only mode, these are skipped unless a manual url-list is provided."""
+    """SITE-method entries — handled via DuckDuckGo `site:domain kw` search."""
     return [e for e in entries if (e.method or "SITE").upper() == "SITE"]
