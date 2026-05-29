@@ -16,5 +16,17 @@
 <h1>Tracker ChangeLog</h1>
 <p class="meta">本檔由 <code>tracker pack</code> 自動維護；每次打包前由本地 ollama 生成版本重點並 prepend 於下方。</p>
 <!-- CHANGELOG_INSERTION_POINT -->
+<section class="release" id="v0.1">
+  <h2>v0.1 — 2026-05-29</h2>
+html
+<ul>
+    <li><strong>核心架構建立與 CLI 介面：</strong> 首次發布了完整的專案骨架，包含命令行介面 (CLI)、配置管理、資料提取、內容去重等核心模組，讓使用者能透過統一的介面操作所有功能。</li>
+    <li><strong>多樣化資料來源支援：</strong> 支援多種資料擷取來源，包括 API 介面、RSS Feed、本地檔案路徑 (Path) 以及更進階的 Stealth 來源，大幅提升資訊抓取能力。</li>
+    <li><strong>內容處理與 LLM 整合：</strong> 引入了資料去重 (deduplication) 邏輯，並整合了 LLM 處理模組，用於內容摘要、分析與結構化處理。</li>
+    <li><strong>打包流程建立：</strong> 完善了內容的打包與渲染機制，能夠將抓取到的多源資料轉換為標準化的輸出格式。 <span style="color: red;">[✨ 標註：打包流程相關]</span></li>
+    <li><strong>錯誤處理與穩定性修復：</strong> 修復了自測試的退出處理邏輯，並強化了內容分類 (CATEGORY) 分隔符號的過濾條件，提升系統穩定性。</li>
+</ul>
+</section>
+
 </body>
 </html>
