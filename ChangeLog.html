@@ -16,6 +16,17 @@
 <h1>Tracker ChangeLog</h1>
 <p class="meta">本檔由 <code>tracker pack</code> 自動維護；每次打包前由本地 ollama 生成版本重點並 prepend 於下方。</p>
 <!-- CHANGELOG_INSERTION_POINT -->
+<section class="release" id="v0.8">
+  <h2>v0.8 — 2026-05-29</h2>
+<ul>
+    <li><strong>✨ 新增功能：</strong> 引入 <code>cross-scan --reverse</code> 參數，用於執行「過時追蹤器清理」。此功能能移除那些文章內容已不再符合其設定標準的追蹤器成員，有效清理假陽性（false-positive）的追蹤記錄。</li>
+    <li><strong>🌐 來源擴充與覆蓋率提升：</strong> 成功新增韓國 Boannews (KR) 來源，並擴展 EU CRA 搜尋篩選器，納入更多關鍵字（如韓國、中文資安、KISA marker），持續維持高水準的歐盟資安新聞覆蓋率。</li>
+    <li><strong>⚙️ CLI 效能與彈性改進：</strong> <code>cross-scan</code> 的日期參數（date arg）現已可選，若不指定日期，預設將掃描整個資料庫的完整追蹤記錄集。</li>
+    <li><strong>🛠️ CLI 穩定性修補：</strong> <code>fetch</code> 指令的早期退出保護機制（early-exit guard）現在接受僅包含路徑（PATH-only）的來源，提高了支援的來源類型彈性。</li>
+    <li><strong>🧹 數據清理優化：</strong> 透過 `--reverse` 模式，成功移除多個假陽性追蹤成員，顯著提升了追蹤資料庫的準確性與健康度。</li>
+</ul>
+</section>
+
 <section class="release" id="v0.7">
   <h2>v0.7 — 2026-05-29</h2>
 <ul>
