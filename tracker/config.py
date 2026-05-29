@@ -76,6 +76,14 @@ def _apply_builtins(entries: list[Entry]) -> None:
         enrich(e.domain, e)
 
 
+def load_tracker(name: str):
+    """Load searchinfo by tracker name (e.g. 'security', 'eu_cra')."""
+    from . import SEARCHINFOS
+    if name not in SEARCHINFOS:
+        raise ValueError(f"Unknown tracker: {name!r}. Known: {list(SEARCHINFOS)}")
+    return load_searchinfo(SEARCHINFOS[name])
+
+
 def load_searchinfo(path: Path) -> SearchInfo:
     raw = path.read_text(encoding="utf-8")
     title_m = re.search(r"^TITLE:\s*(.+)$", raw, re.M)

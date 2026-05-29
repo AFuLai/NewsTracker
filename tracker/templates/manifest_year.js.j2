@@ -1,10 +1,11 @@
-// manifest-{{ year }}.js — {{ year }}
+// manifest-{{ year }}.js — {{ year }} ({{ tracker }})
 window.TRACKER_YEAR = window.TRACKER_YEAR || {};
-window.TRACKER_YEAR[{{ year | tojson }}] = {
+window.TRACKER_YEAR[{{ tracker | tojson }}] = window.TRACKER_YEAR[{{ tracker | tojson }}] || {};
+window.TRACKER_YEAR[{{ tracker | tojson }}][{{ year | tojson }}] = {
   months: {{ months | tojson }},
   monthFiles: {
 {%- for m in months %}
-    {{ m | tojson }}: {{ ("data/manifest-" ~ m | replace('-', '') ~ ".js") | tojson }}{% if not loop.last %},{% endif %}
+    {{ m | tojson }}: {{ ("manifest-" ~ m | replace('-', '') ~ ".js") | tojson }}{% if not loop.last %},{% endif %}
 {%- endfor %}
   },
   lastUpdated: {{ last_updated | tojson }}

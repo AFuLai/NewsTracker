@@ -1,12 +1,24 @@
-// manifest.js — 頂層索引
-const TRACKER_MANIFEST = {
-  title: {{ title | tojson }},
-  categories: {{ categories | tojson }},
-  years: {{ years | tojson }},
-  yearFiles: {
-{%- for y in years %}
-    {{ y | tojson }}: {{ ("data/manifest-" ~ y ~ ".js") | tojson }}{% if not loop.last %},{% endif %}
+// manifest.js — 多 tracker 頂層索引
+const TRACKER_MANIFESTS = {
+{%- for name, t in trackers.items() %}
+  {{ name | tojson }}: {
+    title: {{ t.title | tojson }},
+    categories: {{ t.categories | tojson }},
+    years: {{ t.years | tojson }},
+    yearFiles: {
+      {%- for y in t.years %}
+      {{ y | tojson }}: {{ t.yearFiles[y] | tojson }}{% if not loop.last %},{% endif %}
+      {%- endfor %}
+    }
+  }{% if not loop.last %},{% endif %}
 {%- endfor %}
-  },
-  lastUpdated: {{ last_updated | tojson }}
 };
+const TRACKER_LIST = {{ trackers.keys() | list | tojson }};
+const TRACKER_TITLES = {
+{%- for name, t in trackers.items() %}
+  {{ name | tojson }}: {{ t.title | tojson }}{% if not loop.last %},{% endif %}
+{%- endfor %}
+};
+const TRACKER_LAST_UPDATED = {{ last_updated | tojson }};
+// Back-compat shim for the legacy single-tracker UI loader.
+const TRACKER_MANIFEST = TRACKER_MANIFESTS[TRACKER_LIST[0]];

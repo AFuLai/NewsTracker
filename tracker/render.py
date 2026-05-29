@@ -39,14 +39,32 @@ def _parse_sources(row: dict) -> list[dict]:
 
 
 # Display order — most actionable categories first within each day.
+# Includes both Security and EU CRA category names.
 CATEGORY_PRIORITY = {
+    # Security tracker
     "重大事件": 0,
     "法規與標準": 1,
     "漏洞與威脅情報": 2,
     "供應鏈與開源安全": 3,
     "前瞻技術": 4,
+    # EU CRA tracker
+    "法令更新": 0,
+    "調和標準": 1,
+    "合規指引": 2,
+    "開源影響": 3,
+    "產業動態": 4,
+    "研討活動": 5,
     "uncategorized": 99,
 }
+
+
+def _trackers_of(row: dict) -> list[str]:
+    t = row.get("trackers")
+    if isinstance(t, list):
+        return [str(x) for x in t if x]
+    if isinstance(t, str) and t:
+        return [s.strip() for s in t.split(",") if s.strip()]
+    return ["security"]  # back-compat default
 
 
 def render_day(*, day: str, rows: list[dict], out_dir: Path,
@@ -68,6 +86,7 @@ def render_day(*, day: str, rows: list[dict], out_dir: Path,
     for i, r in enumerate(sorted_rows, 1):
         items.append({
             "id": f"{day.replace('-', '')}-{i:03d}",
+            "trackers": _trackers_of(r),
             "category": r.get("category") or "uncategorized",
             "title": r.get("title") or "",
             "summary": r.get("summary") or "",
@@ -79,60 +98,88 @@ def render_day(*, day: str, rows: list[dict], out_dir: Path,
     return _write(out_dir / f"data-{day.replace('-', '')}.js", text)
 
 
-def _scan_month(out_dir: Path, month: str) -> tuple[list[dict], int]:
-    """Walk data-YYYYMMDD.js files in out_dir matching given YYYY-MM."""
+_DATA_ITEM_RE = re.compile(r"^\s*id:\s*\"", re.M)
+_TRACKERS_FIELD_RE = re.compile(r'^\s*trackers:\s*\[([^\]]*)\]', re.M)
+
+
+def _count_items_for_tracker(body: str, tracker: str) -> int:
+    """Count items in a data-YYYYMMDD.js whose `trackers` array contains tracker.
+
+    Falls back to total item count if no trackers field is present (back-compat
+    for files written before v0.5 — all such items are implicit 'security')."""
+    total_items = len(_DATA_ITEM_RE.findall(body))
+    trackers_matches = _TRACKERS_FIELD_RE.findall(body)
+    if not trackers_matches:
+        return total_items if tracker == "security" else 0
+    return sum(1 for arr in trackers_matches if f'"{tracker}"' in arr)
+
+
+def _scan_month(data_root: Path, month: str, tracker: str) -> tuple[list[dict], int]:
+    """Walk data-YYYYMMDD.js files in data_root (shared) for given YYYY-MM,
+    counting only items that belong to `tracker`."""
     prefix = month.replace("-", "")
     dates: list[dict] = []
     total = 0
     pattern = re.compile(rf"^data-({prefix}\d\d)\.js$")
-    for p in sorted(out_dir.glob(f"data-{prefix}*.js"), reverse=True):
+    for p in sorted(data_root.glob(f"data-{prefix}*.js"), reverse=True):
         m = pattern.match(p.name)
         if not m:
             continue
         ymd = m.group(1)
         day_iso = f"{ymd[:4]}-{ymd[4:6]}-{ymd[6:8]}"
         body = p.read_text(encoding="utf-8", errors="replace")
-        count = body.count("    id:")
+        count = _count_items_for_tracker(body, tracker)
         if count == 0:
-            count = body.count("id:") - body.count("// ")
-        dates.append({"date": day_iso, "file": f"data/{p.name}", "count": max(count, 0)})
-        total += max(count, 0)
+            continue
+        dates.append({"date": day_iso, "file": f"../{p.name}", "count": count})
+        total += count
     return dates, total
 
 
-def update_month_manifest(*, month: str, out_dir: Path) -> Path:
-    dates, total = _scan_month(out_dir, month)
+def update_month_manifest(*, month: str, data_root: Path, tracker: str) -> Path:
+    """Write data_root/<tracker>/manifest-YYYYMM.js scanning shared data files."""
+    dates, total = _scan_month(data_root, month, tracker)
     last_updated = _date.today().isoformat()
     text = _env.get_template("manifest_month.js.j2").render(
-        month=month, dates=dates, total=total, last_updated=last_updated)
-    return _write(out_dir / f"manifest-{month.replace('-', '')}.js", text)
+        month=month, dates=dates, total=total, last_updated=last_updated, tracker=tracker)
+    return _write(data_root / tracker / f"manifest-{month.replace('-', '')}.js", text)
 
 
-def _scan_year(out_dir: Path, year: str) -> list[str]:
+def _scan_year(data_root: Path, year: str, tracker: str) -> list[str]:
     months: set[str] = set()
-    for p in out_dir.glob(f"manifest-{year}??.js"):
+    for p in (data_root / tracker).glob(f"manifest-{year}??.js"):
         stem = p.stem.replace("manifest-", "")
         months.add(f"{stem[:4]}-{stem[4:6]}")
     return sorted(months, reverse=True)
 
 
-def update_year_manifest(*, year: str, out_dir: Path) -> Path:
-    months = _scan_year(out_dir, year)
+def update_year_manifest(*, year: str, data_root: Path, tracker: str) -> Path:
+    months = _scan_year(data_root, year, tracker)
     last_updated = _date.today().isoformat()
     text = _env.get_template("manifest_year.js.j2").render(
-        year=year, months=months, last_updated=last_updated)
-    return _write(out_dir / f"manifest-{year}.js", text)
+        year=year, months=months, last_updated=last_updated, tracker=tracker)
+    return _write(data_root / tracker / f"manifest-{year}.js", text)
 
 
-def update_root_manifest(*, root_html: Path, title: str, categories: list[str]) -> Path:
+def update_root_manifest(*, root_html: Path,
+                         trackers: dict[str, dict]) -> Path:
+    """Write TRACKER_MANIFESTS root file. `trackers` maps name → {title, categories}."""
     data_dir = root_html / "data"
-    years: list[str] = []
-    for p in data_dir.glob("manifest-????.js"):
-        y = p.stem.replace("manifest-", "")
-        if y.isdigit() and len(y) == 4:
-            years.append(y)
-    years.sort(reverse=True)
+    blocks: dict[str, dict] = {}
     last_updated = _date.today().isoformat()
+    for tname, meta in trackers.items():
+        years: list[str] = []
+        for p in (data_dir / tname).glob("manifest-????.js"):
+            y = p.stem.replace("manifest-", "")
+            if y.isdigit() and len(y) == 4:
+                years.append(y)
+        years.sort(reverse=True)
+        blocks[tname] = {
+            "title": meta.get("title") or tname,
+            "categories": meta.get("categories") or [],
+            "years": years,
+            "yearFiles": {y: f"data/{tname}/manifest-{y}.js" for y in years},
+        }
     text = _env.get_template("manifest_root.js.j2").render(
-        title=title, categories=categories, years=years, last_updated=last_updated)
+        trackers=blocks, last_updated=last_updated)
     return _write(root_html / "manifest.js", text)

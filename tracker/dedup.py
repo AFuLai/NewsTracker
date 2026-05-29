@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS articles (
   tags         TEXT,
   status       TEXT NOT NULL DEFAULT 'pending',
   raw_text     TEXT,
+  trackers     TEXT NOT NULL DEFAULT 'security',  -- comma-separated, e.g. 'security' or 'security,eu_cra'
   fetched_at   TEXT NOT NULL,
   summarized_at TEXT,
   written_at   TEXT
@@ -36,6 +37,16 @@ CREATE TABLE IF NOT EXISTS fetch_errors (
   occurred_at TEXT NOT NULL
 );
 """
+
+
+def _ensure_trackers_column(conn) -> None:
+    """Idempotent ALTER for legacy DBs created before v0.5."""
+    cols = [r[1] for r in conn.execute("PRAGMA table_info(articles)").fetchall()]
+    if "trackers" not in cols:
+        conn.execute(
+            "ALTER TABLE articles ADD COLUMN trackers TEXT NOT NULL DEFAULT 'security'")
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_articles_trackers ON articles(trackers)")
+        conn.commit()
 
 _TRACKING_PARAMS = re.compile(r"^(utm_|fbclid|gclid|mc_eid|mc_cid|_hsenc|_hsmi)", re.I)
 
@@ -57,29 +68,79 @@ class Store:
         self.conn = sqlite3.connect(db_path)
         self.conn.row_factory = sqlite3.Row
         self.conn.executescript(SCHEMA)
+        _ensure_trackers_column(self.conn)
         self.conn.commit()
 
     def upsert_candidate(self, *, url: str, source: str, title: str | None = None,
-                         date: str | None = None, raw_text: str | None = None) -> bool:
+                         date: str | None = None, raw_text: str | None = None,
+                         tracker: str = "security") -> bool:
+        """Insert a new candidate; if URL already exists, leave trackers alone.
+
+        Cross-tracker membership is determined later by `tracker cross-scan`
+        (using cross.belongs_to() — domain/tags/title evidence). Merely seeing
+        the same URL appear in two trackers' feed lists is not enough to claim
+        it belongs to both topics.
+        """
         h = url_hash(url)
         cur = self.conn.execute("SELECT 1 FROM articles WHERE url_hash = ?", (h,))
         if cur.fetchone():
             return False
         self.conn.execute(
-            "INSERT INTO articles (url_hash, url, source, title, date, raw_text, fetched_at) "
-            "VALUES (?, ?, ?, ?, ?, ?, ?)",
-            (h, normalize_url(url), source, title, date, raw_text, datetime.utcnow().isoformat()),
+            "INSERT INTO articles (url_hash, url, source, title, date, raw_text, trackers, fetched_at) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            (h, normalize_url(url), source, title, date, raw_text, tracker,
+             datetime.utcnow().isoformat()),
         )
         self.conn.commit()
         return True
 
-    def list_pending(self, limit: int = 100) -> list[sqlite3.Row]:
+    def list_pending(self, limit: int = 100, *, tracker: str | None = None) -> list[sqlite3.Row]:
+        if tracker:
+            return list(self.conn.execute(
+                "SELECT * FROM articles WHERE status='pending' AND "
+                "(','||trackers||',') LIKE '%,'||?||',%' ORDER BY id LIMIT ?",
+                (tracker, limit)))
         return list(self.conn.execute(
             "SELECT * FROM articles WHERE status = 'pending' ORDER BY id LIMIT ?", (limit,)))
 
-    def list_by_date(self, date: str) -> list[sqlite3.Row]:
+    def list_by_date(self, date: str, *, tracker: str | None = None) -> list[sqlite3.Row]:
+        if tracker:
+            return list(self.conn.execute(
+                "SELECT * FROM articles WHERE date=? AND status='ready' AND "
+                "(','||trackers||',') LIKE '%,'||?||',%' ORDER BY id",
+                (date, tracker)))
         return list(self.conn.execute(
             "SELECT * FROM articles WHERE date = ? AND status = 'ready' ORDER BY id", (date,)))
+
+    def add_tracker(self, article_id: int, tracker: str) -> bool:
+        row = self.conn.execute(
+            "SELECT trackers FROM articles WHERE id=?", (article_id,)).fetchone()
+        if not row:
+            return False
+        current = [t for t in (row["trackers"] or "").split(",") if t]
+        if tracker in current:
+            return False
+        current.append(tracker)
+        self.conn.execute("UPDATE articles SET trackers=? WHERE id=?",
+                          (",".join(sorted(set(current))), article_id))
+        self.conn.commit()
+        return True
+
+    def list_ready_by_date(self, date: str) -> list[sqlite3.Row]:
+        """All ready articles for a date, regardless of tracker. Used by cross-scan."""
+        return list(self.conn.execute(
+            "SELECT * FROM articles WHERE date=? AND status IN ('ready','written') ORDER BY id",
+            (date,)))
+
+    def list_writable_for_day(self, date: str) -> list[sqlite3.Row]:
+        """All articles for a date that have been summarized (ready or written).
+        Used by `tracker write` to compose the shared per-day data file —
+        the file must contain every tracker's items so switching trackers in
+        the UI doesn't lose data."""
+        return list(self.conn.execute(
+            "SELECT * FROM articles WHERE date=? AND status IN ('ready','written') "
+            "ORDER BY id",
+            (date,)))
 
     def update_summary(self, article_id: int, *, title: str, summary: str,
                        category: str, tags: list[str], date: str | None = None) -> None:

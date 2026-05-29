@@ -4,6 +4,7 @@ window.TRACKER_DAYS["{{ day }}"] = [
 {%- for item in items %}
   {
     id: "{{ item.id }}",
+    trackers: {{ item.trackers | tojson }},
     category: {{ item.category | tojson }},
     title: {{ item.title | tojson }},
     summary: {{ item.summary | tojson }},
