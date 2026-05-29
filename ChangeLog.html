@@ -16,6 +16,25 @@
 <h1>Tracker ChangeLog</h1>
 <p class="meta">本檔由 <code>tracker pack</code> 自動維護；每次打包前由本地 ollama 生成版本重點並 prepend 於下方。</p>
 <!-- CHANGELOG_INSERTION_POINT -->
+<section class="release" id="v0.6">
+  <h2>v0.6 — 2026-05-29</h2>
+<ul>
+    <li>
+        <strong>✨ 新增功能 (CLI)</strong>：新增 `fetch --query-prefix` 參數。使用者可以為所有 DDG 網站搜尋查詢添加任意前綴字串，大幅提升在一般媒體網站上搜尋特定主題（例如歐盟法規）的相關性。
+        <p style="color: #cc0000;">⚠️ 備註：此功能特別提升了資安新聞抓取覆蓋率和主題聚焦度。</p>
+    </li>
+    <li>
+        <strong>🐛 Bug 修復 (UI)</strong>：修復了多追蹤器（multi-tracker）的年份檢視錯誤。現在能正確讀取所有追蹤器的月份資料，避免顯示空年視圖。
+    </li>
+    <li>
+        <strong>🚀 效能/功能提升 (CLI)</strong>：強化網站關鍵字搜尋邏輯，透過 `query_prefix` 參數，讓使用者能更精準地鎖定特定主題，提升資訊的聚焦度。
+    </li>
+    <li>
+        <strong>💡 使用建議</strong>：針對難以抓取的官方網站（如 ENISA, EUR-Lex），目前最佳的本地化搜尋路徑是結合 `--query-prefix` 參數進行 DDG 搜尋。
+    </li>
+</ul>
+</section>
+
 <section class="release" id="v0.5">
   <h2>v0.5 — 2026-05-29</h2>
 <ul>
