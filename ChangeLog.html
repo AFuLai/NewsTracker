@@ -16,6 +16,24 @@
 <h1>Tracker ChangeLog</h1>
 <p class="meta">本檔由 <code>tracker pack</code> 自動維護；每次打包前由本地 ollama 生成版本重點並 prepend 於下方。</p>
 <!-- CHANGELOG_INSERTION_POINT -->
+<section class="release" id="v0.7">
+  <h2>v0.7 — 2026-05-29</h2>
+<ul>
+    <li><strong>🚀 新增功能：PATH 列表抓取器 (PATH Listing Fetcher)</strong><br>
+        新增了強大的 PATH 頁面抓取功能，能夠透過模擬瀏覽器行為（使用 httpx 和 selectolax）抓取包含多個文章連結的列表頁面，並支援透過關鍵字過濾（`filter_keywords`）來提高主題相關性。</li>
+    <li><strong>🌐 內容來源擴充與優化 (重點：資安新聞抓取覆蓋率提升)</strong><br>
+        大幅擴充了全球與亞太地區的資安資訊來源，新增了 ENISA News、JPCERT/CC、NISC、新加坡 CSA 等多個關鍵來源，並為 EU CRA 追蹤增加了超過 8 個亞太視角（APAC-perspective）的對應來源。</li>
+    <li><strong>⚙️ CLI 工作流程升級</strong><br>
+        在 `fetch` 指令中新增了 PATH 抓取階段，使其工作流程更完整。同時，優化了文章來源判斷邏輯，現在能更精準地識別出以列表頁面作為文章索引的內容。</li>
+    <li><strong>📈 追蹤覆蓋率顯著提升</strong><br>
+        針對 EU CRA 相關主題的追蹤能力得到大幅提升，在實際測試樣本中，相關文章的抓取數量從平均每月 0-1 篇提升至 1-22 篇，抓取量增長了 3.5 倍。</li>
+    <li><strong>🛠️ 系統穩定性與兼容性修補</strong><br>
+        修復了文章來源判斷邏輯，使其能夠匹配所有 PATH 類型的條目，而不僅限於帶有明確 `search_path` 的項目。此外，為多個重要網站（如 ENISA, ETSI, cyber.gouv.fr 等）新增了預設的 PATH 來源。</li>
+    <li><strong>📚 內容展示優化</strong><br>
+        更新了內容分類的優先級順序，將「亞太對應」的分類提升至「開源影響」和「產業動態」之間，使使用者能更順暢地掌握全球資安趨勢。</li>
+</ul>
+</section>
+
 <section class="release" id="v0.6">
   <h2>v0.6 — 2026-05-29</h2>
 <ul>
