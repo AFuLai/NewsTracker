@@ -1,0 +1,8 @@
+你是 Tracker 專案的 release engineer。請根據以下 git log，寫出 v{version} 版本重點。
+輸出純 HTML 片段（<ul>/<li>/<p>/<code> 即可，禁止 <html>/<body>/<style>），繁體中文，重點 3–8 條，每條一行：
+- 突顯新功能、修補、效能變更、新增來源、API/CLI 變更
+- 不要列出每個 commit hash，要把多個相關 commit 歸納成一條
+- 若某條與資安新聞抓取覆蓋率、Ollama 模型、打包流程相關，請特別標註
+
+git log：
+{git_log}

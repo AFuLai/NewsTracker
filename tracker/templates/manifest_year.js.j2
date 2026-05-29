@@ -1,0 +1,11 @@
+// manifest-{{ year }}.js — {{ year }}
+window.TRACKER_YEAR = window.TRACKER_YEAR || {};
+window.TRACKER_YEAR[{{ year | tojson }}] = {
+  months: {{ months | tojson }},
+  monthFiles: {
+{%- for m in months %}
+    {{ m | tojson }}: {{ ("data/manifest-" ~ m | replace('-', '') ~ ".js") | tojson }}{% if not loop.last %},{% endif %}
+{%- endfor %}
+  },
+  lastUpdated: {{ last_updated | tojson }}
+};

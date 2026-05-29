@@ -1,0 +1,18 @@
+// data-{{ day | replace('-', '') }}.js — {{ day }}
+window.TRACKER_DAYS = window.TRACKER_DAYS || {};
+window.TRACKER_DAYS["{{ day }}"] = [
+{%- for item in items %}
+  {
+    id: "{{ item.id }}",
+    category: {{ item.category | tojson }},
+    title: {{ item.title | tojson }},
+    summary: {{ item.summary | tojson }},
+    tags: {{ item.tags | tojson }},
+    sources: [
+      {%- for s in item.sources %}
+      { name: {{ s.name | tojson }}, url: {{ s.url | tojson }}, lang: {{ (s.lang or 'EN') | tojson }} }{% if not loop.last %},{% endif %}
+      {%- endfor %}
+    ]
+  }{% if not loop.last %},{% endif %}
+{%- endfor %}
+];

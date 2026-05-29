@@ -1,0 +1,11 @@
+// manifest-{{ month | replace('-', '') }}.js — {{ month }}
+window.TRACKER_MONTH = window.TRACKER_MONTH || {};
+window.TRACKER_MONTH["{{ month }}"] = {
+  dates: [
+{%- for d in dates %}
+    { date: {{ d.date | tojson }}, file: {{ d.file | tojson }}, count: {{ d.count }} }{% if not loop.last %},{% endif %}
+{%- endfor %}
+  ],
+  totalArticles: {{ total }},
+  lastUpdated: {{ last_updated | tojson }}
+};
