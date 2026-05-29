@@ -16,6 +16,18 @@
 <h1>Tracker ChangeLog</h1>
 <p class="meta">本檔由 <code>tracker pack</code> 自動維護；每次打包前由本地 ollama 生成版本重點並 prepend 於下方。</p>
 <!-- CHANGELOG_INSERTION_POINT -->
+<section class="release" id="v0.5">
+  <h2>v0.5 — 2026-05-29</h2>
+<ul>
+    <li><strong>🚀 新增多追蹤器支援 (Multi-tracker Support)：</strong> 支援同時追蹤多個主題，目前已整合「資安」與「歐盟《爬蟲法案》 (EU CRA)」兩個頂層追蹤器。這使得資料結構更為精細，每個項目可透過 `trackers[]` 欄位標記其所屬的追蹤主題。</li>
+    <li><strong>🔍 提升資料準確性與關聯性：</strong> 優化了跨追蹤器（cross-belonging）的判斷邏輯，現在要求更嚴格的條件（如：窄域白名單、強標記和至少 3 個獨特 Token 重疊），避免了廣泛媒體域的誤判。</li>
+    <li><strong>🛠️ 關鍵修復與 CLI 升級：</strong> 修正了在切換追蹤器時，寫入（write）操作可能導致大量資料遺失的嚴重 Bug。同時新增了 `--tracker` 旗標，並加入 `cross-scan` 子命令，用於重新評估現有日期的多追蹤器歸屬。</li>
+    <li><strong>💾 增強資料遷移能力：</strong> 引入了 `migrate-v2` 子命令，可安全地將舊版資料（manifest-*.js）遷移到新的資料結構中，並自動為所有舊資料注入 `["security"]` 追蹤標籤。</li>
+    <li><strong>🌐 支援多來源追蹤：</strong> 透過新增的 `searchinfo_eu_cra.md` 來源，成功整合了第二個頂層追蹤器（EU CRA），大幅擴展了追蹤的覆蓋範圍。</li>
+    <li><strong>✨ 介面與使用者體驗優化：</strong> 網頁介面（index.html）新增了追蹤器標籤（Pills），並在文章篩選時，可根據項目所屬的追蹤器進行精準過濾。</li>
+</ul>
+</section>
+
 <section class="release" id="v0.4">
   <h2>v0.4 — 2026-05-29</h2>
 <ul>
