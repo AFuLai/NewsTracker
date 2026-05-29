@@ -33,8 +33,12 @@ def call(prompt: str, *, model: str = OLLAMA_MODEL, timeout: float = 120.0,
 
 
 def _strip_code_fence(s: str) -> str:
-    m = re.search(r"```(?:json)?\s*(.+?)```", s, re.S)
-    return (m.group(1) if m else s).strip()
+    # Match ```lang ... ``` (closed) or trailing ```lang at the start with no closer.
+    m = re.search(r"```\w*\s*\n(.+?)```", s, re.S)
+    if m:
+        return m.group(1).strip()
+    # Strip a leftover opening fence even without closer.
+    return re.sub(r"^\s*```\w*\s*\n?", "", s).strip()
 
 
 def summarize_article(*, url: str, raw_text: str, categories: list[str]) -> dict[str, Any]:
