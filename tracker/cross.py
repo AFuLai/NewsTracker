@@ -28,7 +28,10 @@ STRONG_MARKERS: dict[str, tuple[str, ...]] = {
                "delegated act", "harmonised standard", "harmonized standard",
                "ETSI EN 303", "CEN/CENELEC", "JTC 13", "JTC 21",
                "conformity assessment", "CE marking", "SBOM", "VEX",
-               "NIS2", "DORA", "Linux Foundation"),
+               "NIS2", "DORA", "Linux Foundation",
+               # APAC angle markers
+               "METI", "KISA", "TWCERT", "ACSC", "CERT-In", "JPCERT",
+               "亞太對應", "歐盟出口"),
 }
 
 
@@ -103,7 +106,9 @@ def belongs_to(*, article_url: str, article_title: str, article_tags: list[str],
 NARROW_DOMAINS: dict[str, set[str]] = {
     "eu_cra": {"enisa.europa.eu", "eur-lex.europa.eu", "digital-strategy.ec.europa.eu",
                "cencenelec.eu", "stan4cra.eu", "etsi.org", "bsi.bund.de",
-               "ssi.gouv.fr", "linuxfoundation.org"},
+               "ssi.gouv.fr", "cyber.gouv.fr", "linuxfoundation.org",
+               # APAC regulator domains — specialists for the 亞太對應 angle.
+               "nisc.go.jp", "jpcert.or.jp", "csa.gov.sg"},
     "security": {"cisa.gov", "nvd.nist.gov", "krebsonsecurity.com",
                  "googleprojectzero.blogspot.com", "googleblog.com"},
 }

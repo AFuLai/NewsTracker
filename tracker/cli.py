@@ -110,6 +110,42 @@ def fetch(
                                             tracker=tracker):
                     new_count += 1
 
+    # ── PATH method: scrape listing pages for article candidates ───────────
+    paths = dispatch.path_entries(info.entries)
+    if source:
+        paths = [e for e in paths if source in e.domain]
+    if paths:
+        from .sources.path import fetch_listing
+        # CRA / regulation-aware filter words for EU CRA tracker, else none.
+        # Broad enough to keep adjacent topics (NIS2, DORA, harmonised standards)
+        # but tight enough to reject totally unrelated news.
+        filt = (
+            "cra", "cyber resilience", "cyber-resilience",
+            "regulation", "directive", "harmonised", "harmonized",
+            "compliance", "conformity", "cybersecurity",
+            "サイバー", "規制", "網路韌性", "歐盟", "EU ",
+            "ENISA", "ETSI", "CEN", "JPCERT", "NISC", "CSA",
+            "standardisation", "standardization",
+        ) if tracker == "eu_cra" else ()
+        console.print(f"[{tracker}] PATH-scanning {len(paths)} listing entries")
+        for e in paths:
+            try:
+                hits = fetch_listing(base_url=e.url, search_path=e.search_path or "",
+                                     keyword="", domain=e.domain,
+                                     filter_keywords=filt)
+            except Exception as exc:
+                if not dry_run and store is not None:
+                    store.log_error(e.name, f"path: {exc}", e.url)
+                continue
+            for h in hits:
+                total_count += 1
+                if dry_run:
+                    console.print(f"  [{e.name}] {h.title[:70]}  {h.url}")
+                elif store.upsert_candidate(url=h.url, source=e.name,
+                                            title=h.title, raw_text=h.snippet,
+                                            tracker=tracker):
+                    new_count += 1
+
     if site_search:
         from .sources import site as ddg
         sites = dispatch.site_entries(info.entries)

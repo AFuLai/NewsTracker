@@ -22,7 +22,9 @@ def feeds_for(entries: list[Entry]) -> list[tuple[str, str]]:
 
 
 def path_entries(entries: list[Entry]) -> list[Entry]:
-    return [e for e in entries if (e.method or "").upper() == "PATH" and e.search_path]
+    """Entries that should be PATH-fetched. search_path is optional:
+    when empty, the entry.url itself is treated as the listing page."""
+    return [e for e in entries if (e.method or "").upper() == "PATH"]
 
 
 def api_entries(entries: list[Entry]) -> list[Entry]:

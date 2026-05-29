@@ -48,8 +48,16 @@ BUILTIN: dict[str, dict[str, str]] = {
                    "feed": "https://ubuntu.com/security/notices/rss.xml"},
     # Cloudflare-protected, only stealth fetch works — keep SITE for now.
     "securityweek.com": {"method": "SITE"},
-    # No public RSS endpoint found; will be handled by SITE/DuckDuckGo.
-    "enisa.europa.eu": {"method": "SITE"},
+    # EU + APAC sites whose entry.url is itself a listing page — PATH method
+    # without a keyword search_path; selectolax just extracts article links.
+    "enisa.europa.eu": {"method": "PATH"},
+    "etsi.org": {"method": "PATH"},
+    "digital-strategy.ec.europa.eu": {"method": "PATH"},
+    "cyber.gouv.fr": {"method": "PATH"},
+    "nisc.go.jp": {"method": "PATH"},
+    "csa.gov.sg": {"method": "PATH"},
+    "jpcert.or.jp": {"method": "FEED",
+                     "feed": "https://www.jpcert.or.jp/rss/jpcert.rdf"},
 }
 
 
