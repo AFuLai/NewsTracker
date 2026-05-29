@@ -108,10 +108,14 @@ def summarize(
     db: Path = typer.Option(DEFAULT_DB),
     searchinfo: Path = typer.Option(DEFAULT_SEARCHINFO),
     self_test: bool = typer.Option(False, "--self-test", help="Ping ollama and exit"),
+    fetch_full: bool = typer.Option(True, "--fetch-full/--no-fetch-full",
+                                    help="Fetch full article body when RSS summary is short"),
+    min_body: int = typer.Option(800, help="Only fetch full text when raw_text shorter than this"),
 ) -> None:
     """Call local ollama (gemma4:e4b) to summarize pending articles."""
     from .llm import self_test as _selftest
     from .llm import summarize_article
+    from .sources.article import fetch_body
 
     if self_test:
         try:
@@ -126,14 +130,19 @@ def summarize(
     rows = store.list_pending(limit=limit) if pending else []
     if not rows:
         console.print("[yellow]No pending articles.[/yellow]"); raise typer.Exit(0)
-    console.print(f"Summarizing {len(rows)} articles via ollama (concurrency={concurrency})...")
+    console.print(f"Summarizing {len(rows)} articles via ollama "
+                  f"(fetch_full={fetch_full}, concurrency={concurrency})...")
 
-    # Simple sequential loop (ollama itself is single-GPU bound).
-    done = 0
+    done = fetched = 0
     for r in rows:
-        body = r["raw_text"] or ""
-        if not body.strip():
-            store.log_error(r["source"], "empty raw_text", r["url"]); continue
+        body = (r["raw_text"] or "").strip()
+        if fetch_full and len(body) < min_body and r["url"]:
+            full = fetch_body(r["url"])
+            if len(full) > len(body):
+                body = full
+                fetched += 1
+        if not body:
+            store.log_error(r["source"], "empty body after fetch", r["url"]); continue
         try:
             result = summarize_article(url=r["url"], raw_text=body, categories=info.categories)
             store.update_summary(r["id"], title=result["title"] or r["title"],
@@ -142,7 +151,7 @@ def summarize(
             done += 1
         except Exception as exc:
             store.log_error(r["source"], f"summarize: {exc}", r["url"])
-    console.print(f"[green]Summarized {done}/{len(rows)}[/green]")
+    console.print(f"[green]Summarized {done}/{len(rows)}[/green] (full-text fetched: {fetched})")
 
 
 @app.command()
@@ -164,25 +173,51 @@ def write(
     out: Path = typer.Option(DEFAULT_OUT, "--out", help="HTML root dir"),
     searchinfo: Path = typer.Option(DEFAULT_SEARCHINFO),
     db: Path = typer.Option(DEFAULT_DB),
+    force: bool = typer.Option(False, "--force",
+                               help="Overwrite existing data-YYYYMMDD.js (default: skip if present)"),
+    merge: bool = typer.Option(True, "--merge/--no-merge",
+                               help="Cluster cross-source duplicates and merge sources list"),
 ) -> None:
-    """Render SQLite → data-YYYYMMDD.js and update manifest chain."""
+    """Render SQLite → data-YYYYMMDD.js and update manifest chain.
+
+    By default, refuses to overwrite an existing data-YYYYMMDD.js to protect
+    manually curated content. Pass --force to overwrite.
+    """
+    from .cluster import merge_by_title
     from .render import (render_day, update_month_manifest,
                          update_root_manifest, update_year_manifest)
 
     info = load_searchinfo(searchinfo)
+    data_dir = out / "data"
+    day_path = data_dir / f"data-{date.replace('-', '')}.js"
+    if day_path.exists() and not force:
+        console.print(f"[yellow]Refusing to overwrite[/yellow] {day_path} "
+                      "(use --force to overwrite)")
+        raise typer.Exit(2)
+
     store = Store(db)
     rows_raw = store.list_by_date(date)
     if not rows_raw:
         console.print(f"[yellow]No ready articles for {date}.[/yellow]"); raise typer.Exit(1)
     rows = [dict(r) for r in rows_raw]
+    original_n = len(rows)
+    if merge:
+        rows = merge_by_title(rows)
+    if len(rows) < original_n:
+        console.print(f"[dim]Merged {original_n} → {len(rows)} after cross-source clustering[/dim]")
 
-    data_dir = out / "data"
     day_file = render_day(day=date, rows=rows, out_dir=data_dir)
     month_file = update_month_manifest(month=date[:7], out_dir=data_dir)
     year_file = update_year_manifest(year=date[:4], out_dir=data_dir)
     root_file = update_root_manifest(root_html=out, title=info.title,
                                      categories=info.categories)
-    store.mark_written([r["id"] for r in rows])
+    written_ids: list[int] = []
+    for r in rows:
+        if "_merged_ids" in r:
+            written_ids.extend(r["_merged_ids"])
+        else:
+            written_ids.append(r["id"])
+    store.mark_written(written_ids)
     console.print(f"[green]Wrote[/green] {day_file.name}, {month_file.name}, "
                   f"{year_file.name}, {root_file.name}")
 
