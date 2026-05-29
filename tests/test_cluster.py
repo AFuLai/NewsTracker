@@ -31,3 +31,25 @@ def test_merge_picks_longest_summary_and_merges_sources():
     # Primary should be the longer-summary one (id=2, SecurityWeek)
     assert "SecurityWeek" in drupal["title"] or drupal["id"] == 2
     assert sorted(drupal["_merged_ids"]) == [1, 2]
+
+
+def test_same_source_does_not_merge_without_cve():
+    rows = [
+        {"id": 1, "title": "Windows Patch Tuesday May 2026 Defender Bypass",
+         "summary": "a" * 100, "url": "https://thehackernews.com/x", "source": "THN"},
+        {"id": 2, "title": "Windows Patch Tuesday Defender Bypass Update",
+         "summary": "b" * 100, "url": "https://thehackernews.com/y", "source": "THN"},
+    ]
+    merged = merge_by_title(rows)
+    assert len(merged) == 2  # same-source guard prevents collapse
+
+
+def test_same_source_still_merges_with_shared_cve():
+    rows = [
+        {"id": 1, "title": "Fortinet CVE-2026-12345 RCE part 1",
+         "summary": "a" * 100, "url": "https://thehackernews.com/x", "source": "THN"},
+        {"id": 2, "title": "Update on CVE-2026-12345 active exploitation",
+         "summary": "b" * 100, "url": "https://thehackernews.com/y", "source": "THN"},
+    ]
+    merged = merge_by_title(rows)
+    assert len(merged) == 1  # CVE bridge overrides same-source guard

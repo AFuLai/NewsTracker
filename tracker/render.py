@@ -38,9 +38,34 @@ def _parse_sources(row: dict) -> list[dict]:
     return [{"name": src_name, "url": url, "lang": "EN"}]
 
 
-def render_day(*, day: str, rows: list[dict], out_dir: Path) -> Path:
+# Display order — most actionable categories first within each day.
+CATEGORY_PRIORITY = {
+    "重大事件": 0,
+    "法規與標準": 1,
+    "漏洞與威脅情報": 2,
+    "供應鏈與開源安全": 3,
+    "前瞻技術": 4,
+    "uncategorized": 99,
+}
+
+
+def render_day(*, day: str, rows: list[dict], out_dir: Path,
+               allowed_categories: list[str] | None = None) -> Path:
+    from .llm import _coerce_category
+    allowed = allowed_categories or []
+    coerced_rows = []
+    for r in rows:
+        r = dict(r)
+        if allowed:
+            r["category"] = _coerce_category(r.get("category") or "", allowed)
+        coerced_rows.append(r)
+    sorted_rows = sorted(
+        coerced_rows,
+        key=lambda r: (CATEGORY_PRIORITY.get(r.get("category") or "uncategorized", 50),
+                       r.get("id", 0)),
+    )
     items = []
-    for i, r in enumerate(rows, 1):
+    for i, r in enumerate(sorted_rows, 1):
         items.append({
             "id": f"{day.replace('-', '')}-{i:03d}",
             "category": r.get("category") or "uncategorized",

@@ -12,7 +12,7 @@ from __future__ import annotations
 import re
 from typing import Any
 
-THRESHOLD = 0.55
+THRESHOLD = 0.45
 CJK_RE = re.compile(r"[㐀-鿿]")
 WORD_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9\-]*")
 CVE_RE = re.compile(r"CVE-\d{4}-\d{4,7}", re.I)
@@ -89,6 +89,10 @@ def merge_by_title(rows: list[dict[str, Any]],
             # Strong signal: shared CVE = same event regardless of language.
             if cve_sets[i] & cve_sets[j]:
                 union(i, j); continue
+            # Skip same-source pairs unless a CVE bridges them — articles from
+            # the same outlet on the same day are almost always different events.
+            if rows[i].get("source") and rows[i].get("source") == rows[j].get("source"):
+                continue
             if _jaccard(token_sets[i], token_sets[j]) >= threshold:
                 union(i, j)
 

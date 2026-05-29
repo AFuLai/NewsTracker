@@ -41,6 +41,23 @@ def _strip_code_fence(s: str) -> str:
     return re.sub(r"^\s*```\w*\s*\n?", "", s).strip()
 
 
+def _coerce_category(raw: str, allowed: list[str]) -> str:
+    """Coerce model output to a category in the allowed list.
+    1. exact match → keep
+    2. substring match either way → keep allowed
+    3. fallback → 'uncategorized'
+    """
+    raw = (raw or "").strip()
+    if not raw or not allowed:
+        return "uncategorized"
+    if raw in allowed:
+        return raw
+    for c in allowed:
+        if c in raw or raw in c:
+            return c
+    return "uncategorized"
+
+
 def summarize_article(*, url: str, raw_text: str, categories: list[str],
                       category_defs: list[Any] | None = None) -> dict[str, Any]:
     """Returns {title, summary, category, tags}. Falls back to safe defaults on parse error.
@@ -65,7 +82,7 @@ def summarize_article(*, url: str, raw_text: str, categories: list[str],
     return {
         "title": (data.get("title") or "").strip(),
         "summary": (data.get("summary") or "").strip(),
-        "category": (data.get("category") or "uncategorized").strip(),
+        "category": _coerce_category(data.get("category") or "", categories),
         "tags": [t.strip() for t in (data.get("tags") or []) if t and t.strip()],
     }
 

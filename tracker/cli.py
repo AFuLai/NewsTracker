@@ -271,7 +271,8 @@ def write(
     if len(rows) < original_n:
         console.print(f"[dim]Merged {original_n} → {len(rows)} after cross-source clustering[/dim]")
 
-    day_file = render_day(day=date, rows=rows, out_dir=data_dir)
+    day_file = render_day(day=date, rows=rows, out_dir=data_dir,
+                          allowed_categories=info.categories)
     month_file = update_month_manifest(month=date[:7], out_dir=data_dir)
     year_file = update_year_manifest(year=date[:4], out_dir=data_dir)
     root_file = update_root_manifest(root_html=out, title=info.title,
