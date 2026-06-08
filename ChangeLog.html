@@ -16,6 +16,18 @@
 <h1>Tracker ChangeLog</h1>
 <p class="meta">本檔由 <code>tracker pack</code> 自動維護；每次打包前由本地 ollama 生成版本重點並 prepend 於下方。</p>
 <!-- CHANGELOG_INSERTION_POINT -->
+<section class="release" id="v0.9">
+  <h2>v0.9 — 2026-06-08</h2>
+<ul>
+    <li><strong>新增核心工作流程：</strong> 引入新的 `orchestrates` pipeline 子命令，可一站式完成「擷取 (fetch) -> 摘要 (summarize) -> 寫入 (write)」的完整流程，大幅簡化使用者操作。</li>
+    <li><strong>強化交叉比對功能：</strong> 升級 `cross-scan --reverse` 指令，現在可跨多個追蹤器進行反向掃描，並預設為 Cyber Resilience Act (eu_cra) 設置查詢前綴，提升資料的全面性。</li>
+    <li><strong>修復資料寫入流程：</strong> 修正 `write` 階段的邏輯，當追蹤器沒有新資料，但共享資料檔案已存在時，系統將自動重新掃描資料檔案來更新月/年/根目錄的 Manifest，消除了手動重建步驟。</li>
+    <li><strong>提升來源覆蓋率：</strong> 透過在 `Entry` 類別中新增 `accept_all` 參數，並更新 Boannews 的配置，允許系統繞過主題關鍵字過濾器，確保能抓取到更廣泛的韓國媒體標題，提升資安新聞抓取覆蓋率。</li>
+    <li><strong>API/CLI 變更：</strong> 在 `Entry` dataclass 中新增 `accept_all: bool` 屬性，並更新 `builtins.py` 邏輯，使系統在處理資料時能正確傳遞此布林值狀態。</li>
+    <li><strong>效能與穩定性：</strong> 成功執行兩週的端到端管線測試，驗證了從擷取到寫入的穩定性，並確保了在執行 `cross-scan` 時，狀態會正確重置，避免資料重複或遺漏。</li>
+</ul>
+</section>
+
 <section class="release" id="v0.8">
   <h2>v0.8 — 2026-05-29</h2>
 <ul>
