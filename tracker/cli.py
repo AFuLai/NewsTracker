@@ -139,9 +139,14 @@ def fetch(
         console.print(f"[{tracker}] PATH-scanning {len(paths)} listing entries")
         for e in paths:
             try:
+                # Entries flagged accept_all bypass the topical filter — used for
+                # broad-coverage APAC news sites (e.g. Boannews) where headline
+                # keywords rarely include the explicit subject marker but downstream
+                # summarize+cross-detect can still classify properly.
+                entry_filt = () if e.accept_all else filt
                 hits = fetch_listing(base_url=e.url, search_path=e.search_path or "",
                                      keyword="", domain=e.domain,
-                                     filter_keywords=filt)
+                                     filter_keywords=entry_filt)
             except Exception as exc:
                 if not dry_run and store is not None:
                     store.log_error(e.name, f"path: {exc}", e.url)
@@ -337,11 +342,31 @@ def write(
         raise typer.Exit(2)
 
     store = Store(db)
-    # Gate: only proceed if THIS tracker has any ready articles for the day.
     tracker_rows = store.list_by_date(date, tracker=tracker)
+
+    # If THIS tracker has no new ready rows but the day's shared data file
+    # already exists (e.g. cross-belongings written via another tracker pass),
+    # still refresh the per-tracker month manifest so counts stay accurate.
     if not tracker_rows:
-        console.print(f"[yellow]No ready articles for {date} (tracker={tracker}).[/yellow]")
-        raise typer.Exit(1)
+        if not day_path.exists():
+            console.print(f"[yellow]No ready articles for {date} (tracker={tracker}) "
+                          f"and {day_path.name} not present.[/yellow]")
+            raise typer.Exit(1)
+        console.print(f"[dim]No new ready rows for tracker={tracker}; "
+                      f"refreshing manifests from existing data file.[/dim]")
+        month_file = update_month_manifest(month=date[:7], data_root=data_dir, tracker=tracker)
+        year_file = update_year_manifest(year=date[:4], data_root=data_dir, tracker=tracker)
+        tracker_metas = {}
+        for name in SEARCHINFOS:
+            try:
+                ti = load_tracker(name)
+                tracker_metas[name] = {"title": ti.title, "categories": ti.categories}
+            except Exception:
+                tracker_metas[name] = {"title": name, "categories": []}
+        root_file = update_root_manifest(root_html=out, trackers=tracker_metas)
+        console.print(f"[green][{tracker}] Refreshed[/green] {month_file.name}, "
+                      f"{year_file.name}, {root_file.name} (no data file rewrite)")
+        raise typer.Exit(0)
 
     # Render the SHARED data file with EVERY tracker's items for this date —
     # otherwise switching trackers in the UI loses content.
@@ -385,6 +410,112 @@ def write(
     store.mark_written(written_ids)
     console.print(f"[green][{tracker}] Wrote[/green] {day_file.name} (shared), "
                   f"{month_file.name}, {year_file.name}, {root_file.name}")
+
+
+@app.command()
+def pipeline(
+    since: str = typer.Option(..., help="YYYY-MM-DD"),
+    until: str = typer.Option(..., help="YYYY-MM-DD"),
+    trackers: str = typer.Option("all", "--tracker",
+                                 help="security|eu_cra|all (default all = both)"),
+    db: Path = typer.Option(DEFAULT_DB),
+    out: Path = typer.Option(DEFAULT_OUT, "--out"),
+    site_search: bool = typer.Option(True, "--site-search/--no-site-search",
+                                     help="DDG SITE search; for eu_cra defaults on"),
+    limit: int = typer.Option(300, help="summarize per-tracker limit"),
+    cleanup: bool = typer.Option(True, "--cleanup/--no-cleanup",
+                                 help="Run cross-scan --reverse after writes"),
+) -> None:
+    """One-shot: fetch → summarize → write → cross-scan, for one or all trackers.
+
+    Designed for daily/weekly updates: collapses 5+ commands into one and
+    handles per-tracker EU CRA defaults (query_prefix, site-search) automatically.
+    """
+    import subprocess, time
+
+    targets = list(SEARCHINFOS) if trackers == "all" else [trackers]
+    if any(t not in SEARCHINFOS for t in targets):
+        console.print(f"[red]Unknown tracker(s): {targets}; known={list(SEARCHINFOS)}[/red]")
+        raise typer.Exit(2)
+
+    t0 = time.time()
+    stats: dict[str, dict] = {t: {"fetch_new": 0, "summarized": 0, "written_days": 0}
+                              for t in targets}
+
+    # ── Phase 1: fetch ──────────────────────────────────────────────────────
+    for tk in targets:
+        cmd = ["tracker", "fetch", "--tracker", tk, "--since", since, "--until", until,
+               "--db", str(db)]
+        if site_search:
+            cmd += ["--site-search"]
+        if tk == "eu_cra":
+            cmd += ["--query-prefix", "Cyber Resilience Act"]
+        console.print(f"[bold cyan]>>> fetch[/bold cyan] {tk}: {' '.join(cmd[2:])}")
+        r = subprocess.run(cmd, capture_output=True, text=True)
+        for line in (r.stdout + r.stderr).splitlines()[-3:]:
+            if "Inserted" in line:
+                # rough parse "Inserted N new candidates"
+                try:
+                    stats[tk]["fetch_new"] = int(line.split("Inserted")[1].split()[0])
+                except Exception:
+                    pass
+                console.print(f"    {line.strip()}")
+
+    # ── Phase 2: summarize ──────────────────────────────────────────────────
+    for tk in targets:
+        cmd = ["tracker", "summarize", "--tracker", tk, "--pending", "--limit", str(limit),
+               "--since", since, "--until", until, "--db", str(db)]
+        console.print(f"[bold cyan]>>> summarize[/bold cyan] {tk}")
+        r = subprocess.run(cmd, capture_output=True, text=True)
+        for line in (r.stdout + r.stderr).splitlines()[-5:]:
+            if "Summarized" in line:
+                try:
+                    stats[tk]["summarized"] = int(line.split("Summarized")[1].split("/")[0].strip())
+                except Exception:
+                    pass
+                console.print(f"    {line.strip()}")
+
+    # ── Phase 3: write per-day per-tracker ──────────────────────────────────
+    from .dedup import Store
+    store = Store(db)
+    dates = sorted({r[0] for r in store.conn.execute(
+        "SELECT DISTINCT date FROM articles WHERE date >= ? AND date <= ? "
+        "AND status IN ('ready','written')", (since, until)).fetchall() if r[0]})
+    console.print(f"[bold cyan]>>> write[/bold cyan] {len(dates)} dates × {len(targets)} trackers")
+    for d in dates:
+        for tk in targets:
+            # Re-open status=ready for dates with prior writes so subsequent runs
+            # actually re-render with newest cross-belongings.
+            store.conn.execute(
+                "UPDATE articles SET status='ready' WHERE date=? AND status='written' "
+                "AND (','||trackers||',') LIKE '%,'||?||',%'", (d, tk))
+            store.conn.commit()
+            r = subprocess.run(
+                ["tracker", "write", "--tracker", tk, "--date", d, "--force",
+                 "--db", str(db), "--out", str(out)],
+                capture_output=True, text=True)
+            if "Wrote" in r.stdout or "Refreshed" in r.stdout:
+                stats[tk]["written_days"] += 1
+
+    # ── Phase 4: optional reverse cross-scan ────────────────────────────────
+    if cleanup:
+        console.print(f"[bold cyan]>>> cross-scan --reverse[/bold cyan]")
+        r = subprocess.run(["tracker", "cross-scan", "--reverse", "--db", str(db)],
+                           capture_output=True, text=True)
+        for line in (r.stdout + r.stderr).splitlines()[-5:]:
+            if "added" in line or "demoted" in line:
+                console.print(f"    {line.strip()}")
+
+    # ── Summary ─────────────────────────────────────────────────────────────
+    elapsed = time.time() - t0
+    console.print(f"\n[bold green]pipeline complete[/bold green] in {elapsed:.0f}s")
+    t = Table(title="Pipeline summary")
+    t.add_column("tracker"); t.add_column("fetched new", justify="right")
+    t.add_column("summarized", justify="right"); t.add_column("days written", justify="right")
+    for tk in targets:
+        s = stats[tk]
+        t.add_row(tk, str(s["fetch_new"]), str(s["summarized"]), str(s["written_days"]))
+    console.print(t)
 
 
 @app.command("cross-scan")

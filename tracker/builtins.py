@@ -3,7 +3,7 @@ does not specify one. Sourced from Info-Dig builtin-sources.md V2 (subset).
 """
 from __future__ import annotations
 
-BUILTIN: dict[str, dict[str, str]] = {
+BUILTIN: dict[str, dict[str, object]] = {
     "thehackernews.com": {"method": "FEED",
                           "feed": "https://feeds.feedburner.com/TheHackersNews"},
     "krebsonsecurity.com": {"method": "FEED",
@@ -56,7 +56,7 @@ BUILTIN: dict[str, dict[str, str]] = {
     "cyber.gouv.fr": {"method": "PATH"},
     "nisc.go.jp": {"method": "PATH"},
     "csa.gov.sg": {"method": "PATH"},
-    "boannews.com": {"method": "PATH"},
+    "boannews.com": {"method": "PATH", "accept_all": True},
     "jpcert.or.jp": {"method": "FEED",
                      "feed": "https://www.jpcert.or.jp/rss/jpcert.rdf"},
 }
@@ -73,3 +73,5 @@ def enrich(domain: str, entry) -> None:
         entry.feed_url = b["feed"]
     if not entry.search_path and b.get("search_path"):
         entry.search_path = b["search_path"]
+    if not entry.accept_all and b.get("accept_all"):
+        entry.accept_all = bool(b["accept_all"])

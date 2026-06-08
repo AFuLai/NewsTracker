@@ -20,6 +20,7 @@ class Entry:
     api_endpoint: str | None = None
     search_path: str | None = None
     tags: list[str] = field(default_factory=list)
+    accept_all: bool = False   # PATH-method: bypass topical filter words
 
 
 @dataclass
