@@ -16,6 +16,20 @@
 <h1>Tracker ChangeLog</h1>
 <p class="meta">本檔由 <code>tracker pack</code> 自動維護；每次打包前由本地 ollama 生成版本重點並 prepend 於下方。</p>
 <!-- CHANGELOG_INSERTION_POINT -->
+<section class="release" id="v0.10">
+  <h2>v0.10 — 2026-06-10</h2>
+<ul>
+    <li><strong>🌐 增加 Wayback Machine 支援 (來源韌性提升)</strong><br>
+        新增 `sources/wayback.py` 模組，大幅提升來源的存取韌性。CLI 在執行即時抓取失敗時，將自動回退至 Wayback Machine 進行備援抓取，確保資料流的連續性。同時新增了 stan4cra.eu 和 cencenelec.eu 等重要網站的支援。</li>
+    <li><strong>🛡️ 強化資安標記與分類訊號 (資安新聞抓取覆蓋率提升)</strong><br>
+        擴充了 `STRONG_MARKERS[security]` 標記，納入更多關鍵資安概念（如 malware、MaaS、stealer、trojan、phishing、C2、exfiltration 等）。此外，引入了新的文章類別參數，使 LLM 的分類結果更具權威性，顯著提升了資安資訊的標記覆蓋率。</li>
+    <li><strong>🧹 提升來源內容品質 (Source Filtering)</strong><br>
+        在來源解析層面，新增了過濾機制，能夠自動識別並排除文章頁面以外的內容，例如網站的頁尾（footer）、關於我們（about）、隱私權政策（privacy）等非核心文章內容，確保抓取資料的純淨度。</li>
+    <li><strong>📊 增設 Token 使用量追蹤 (CLI Tooling)</strong><br>
+        在 CLI 管道中加入了 Token 遙測功能。現在運行時能追蹤並估算抓取過程所消耗的 Token 數量，有助於使用者掌握資源使用量和成本預估。</li>
+</ul>
+</section>
+
 <section class="release" id="v0.9">
   <h2>v0.9 — 2026-06-08</h2>
 <ul>
