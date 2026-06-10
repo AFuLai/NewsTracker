@@ -17,13 +17,40 @@
 <p class="meta">本檔由 <code>tracker pack</code> 自動維護；每次打包前由本地 ollama 生成版本重點並 prepend 於下方。</p>
 <!-- CHANGELOG_INSERTION_POINT -->
 <section class="release" id="v1.0">
-  <h2>v1.0 — 2026-06-10</h2>
+  <h2>v1.0 — 2026-06-10 ★ 1.0 Milestone</h2>
+<p><strong>內容等同 v0.10、僅主版號進階至 1.0。</strong>
+  本版本將累積 10 個迭代版本的功能成果一次性升格為正式 milestone 釋出。</p>
 <ul>
-    <li><strong>[新功能]</strong> 整合 Ollama 模型支援，使用者可透過 CLI 快速切換和測試多種本地化大型語言模型。</li>
-    <li><strong>[效能優化]</strong> 核心資料處理模組重構，大幅提升資料抓取與分析的執行速度。</li>
-    <li><strong>[修補]</strong> 修正了在處理特定格式的資安新聞時，覆蓋率計算可能出現的邊界條件錯誤。</li>
-    <li><strong>[API 變更]</strong> 增加了新的 `client.get_report()` 方法，提供更細緻的報表參數控制。</li>
-    <li><strong>[打包流程]</strong> 更新了打包腳本，現在支援更廣泛的作業系統環境，提升部署彈性。</li>
+  <li><strong>I — PATH 抓取排除 footer / about 雜訊</strong>：
+    <code>sources/path.py:_looks_like_article</code> 新增 15+ pattern，
+    自動拒絕 privacy / accessibility / rights / terms / contact / link/index
+    等網站全域頁面（含日德法 datenschutz、mentions-legales、ご利用にあたって 等），
+    解決 NISC、BSI 等政府站把 footer 當文章抓進來、body_len=0 的雜訊問題。</li>
+  <li><strong>J — Cross-detection 以分類為權威訊號</strong>：
+    <code>cross.belongs_to</code> 新增 <code>article_category</code> 參數作為 Signal 0；
+    當文章分類落在另一 tracker 白名單時，視為跨主類強訊號。
+    <code>STRONG_MARKERS[security]</code> 擴充 malware / MaaS / stealer / trojan
+    / phishing / backdoor / C2 / exfiltration / DDoS 等。
+    實測修補一個 eu_cra-only Minecraft 惡意軟體文章為 trackers=<code>eu_cra,security</code>；
+    cross-scan 全庫補回 10 個遺漏的多歸屬。</li>
+  <li><strong>F — pipeline 加 token telemetry</strong>：
+    <code>tracker pipeline</code> 結尾統計所有 subprocess 的 stdout+stderr 累計位元組，
+    並以 ÷4 推算 Claude token 等價量。
+    樣本：1 tracker 6 天 window ≈ 1,182 bytes ≈ 295 tokens，
+    讓使用者直觀掌握「若由 Claude 編排會花多少 token」。</li>
+  <li><strong>G — Wayback Machine fetcher</strong>：
+    新模組 <code>sources/wayback.py</code>，PATH 階段在 live 抓取回 0 hits
+    且非 accept_all 時，自動 fallback 到 archive.org 最近 snapshot。
+    builtins 加 stan4cra.eu、cencenelec.eu。
+    實測 STAN4CRA 回 10 個 CRA 標準 sub-page（cenclcjtc13、clctc47x、centc244…）；
+    ENISA / BSI CRA 頁面從未存檔，靜默降級無錯誤。</li>
+  <li><strong>累計 10 個版本成果</strong>：v0.1 scaffold → v0.5 多 tracker → v0.7 PATH
+    + APAC 擴充 → v0.8 cross-scan --reverse → v0.9 一鍵 pipeline → v0.10/v1.0
+    品質與韌性收尾。當前覆蓋 security 22 entries / 5 categories / 30 keys，
+    eu_cra 17 entries / 7 categories / 38 keys（含日韓新加坡視角）。</li>
+  <li><strong>已知非阻塞限制</strong>：ENISA CRA topic 與 BSI CRA 頁無 Wayback 存檔；
+    KISA / ACSC / CERT-In RSS endpoint 多 404；DDG 重複查詢會被限流。
+    這些屬上游限制，不影響核心流程。</li>
 </ul>
 </section>
 
