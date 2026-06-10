@@ -46,6 +46,15 @@ def _looks_like_article(href: str) -> bool:
     # Reject obvious section/listing pages
     if re.match(r"^/?(news|news-events|press-releases|alerts|tags?|categories?|page|search|home|sitemap)/?$", path, re.I):
         return False
+    # Reject site-wide footer / about pages (privacy policy, accessibility,
+    # terms of use, contact, sitemap, related-links indexes). These get picked
+    # up by listing scrapes (esp. NISC, BSI, government sites) but are not
+    # news articles and yield empty bodies downstream.
+    if re.search(r"/(privacy(_policy)?|webaccessibility|accessibility|terms|rights|"
+                 r"about|contact|copyright|disclaimer|legal|imprint|impressum|"
+                 r"datenschutz|mentions[-_]?legales|cookies?|sitemap|link/index)"
+                 r"(\.html?)?/?$", path, re.I):
+        return False
     segments = [s for s in path.strip("/").split("/") if s]
     if not segments:
         return False

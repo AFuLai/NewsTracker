@@ -136,6 +136,7 @@ def fetch(
             "ENISA", "ETSI", "CEN", "JPCERT", "NISC", "CSA", "KISA",
             "standardisation", "standardization",
         ) if tracker == "eu_cra" else ()
+        from .sources import wayback
         console.print(f"[{tracker}] PATH-scanning {len(paths)} listing entries")
         for e in paths:
             try:
@@ -147,6 +148,15 @@ def fetch(
                 hits = fetch_listing(base_url=e.url, search_path=e.search_path or "",
                                      keyword="", domain=e.domain,
                                      filter_keywords=entry_filt)
+                # Wayback fallback: when live page is JS-only and returns 0
+                # candidates, try the closest Wayback snapshot. Same domain
+                # filter applies on the recovered URLs.
+                if not hits and not e.accept_all:
+                    wb_hits = wayback.fetch_listing(target_url=e.url, domain=e.domain,
+                                                    filter_keywords=entry_filt)
+                    if wb_hits:
+                        console.print(f"  [{e.name}] live=0, wayback={len(wb_hits)}")
+                        hits = wb_hits
             except Exception as exc:
                 if not dry_run and store is not None:
                     store.log_error(e.name, f"path: {exc}", e.url)
@@ -288,6 +298,7 @@ def summarize(
                 if belongs_to(article_url=r["url"],
                               article_title=result["title"] or r["title"] or "",
                               article_tags=result["tags"] or [],
+                              article_category=result["category"],
                               other=other_info, other_name=other_name,
                               narrow_domains=NARROW_DOMAINS.get(other_name)):
                     if store.add_tracker(r["id"], other_name):
@@ -442,6 +453,17 @@ def pipeline(
     stats: dict[str, dict] = {t: {"fetch_new": 0, "summarized": 0, "written_days": 0}
                               for t in targets}
 
+    # Telemetry: count total bytes of subprocess stdout/stderr that came back
+    # to this orchestrator. Estimating Claude tokens at ~4 bytes/token (a
+    # rough convention for mixed CJK + ASCII output) gives the user a sense
+    # of how much terminal output a same-shape pipeline run produces.
+    io_bytes = 0
+
+    def _io(r):
+        nonlocal io_bytes
+        io_bytes += len(r.stdout or "") + len(r.stderr or "")
+        return r
+
     # ── Phase 1: fetch ──────────────────────────────────────────────────────
     for tk in targets:
         cmd = ["tracker", "fetch", "--tracker", tk, "--since", since, "--until", until,
@@ -451,7 +473,7 @@ def pipeline(
         if tk == "eu_cra":
             cmd += ["--query-prefix", "Cyber Resilience Act"]
         console.print(f"[bold cyan]>>> fetch[/bold cyan] {tk}: {' '.join(cmd[2:])}")
-        r = subprocess.run(cmd, capture_output=True, text=True)
+        r = _io(subprocess.run(cmd, capture_output=True, text=True))
         for line in (r.stdout + r.stderr).splitlines()[-3:]:
             if "Inserted" in line:
                 # rough parse "Inserted N new candidates"
@@ -466,7 +488,7 @@ def pipeline(
         cmd = ["tracker", "summarize", "--tracker", tk, "--pending", "--limit", str(limit),
                "--since", since, "--until", until, "--db", str(db)]
         console.print(f"[bold cyan]>>> summarize[/bold cyan] {tk}")
-        r = subprocess.run(cmd, capture_output=True, text=True)
+        r = _io(subprocess.run(cmd, capture_output=True, text=True))
         for line in (r.stdout + r.stderr).splitlines()[-5:]:
             if "Summarized" in line:
                 try:
@@ -490,18 +512,18 @@ def pipeline(
                 "UPDATE articles SET status='ready' WHERE date=? AND status='written' "
                 "AND (','||trackers||',') LIKE '%,'||?||',%'", (d, tk))
             store.conn.commit()
-            r = subprocess.run(
+            r = _io(subprocess.run(
                 ["tracker", "write", "--tracker", tk, "--date", d, "--force",
                  "--db", str(db), "--out", str(out)],
-                capture_output=True, text=True)
+                capture_output=True, text=True))
             if "Wrote" in r.stdout or "Refreshed" in r.stdout:
                 stats[tk]["written_days"] += 1
 
     # ── Phase 4: optional reverse cross-scan ────────────────────────────────
     if cleanup:
         console.print(f"[bold cyan]>>> cross-scan --reverse[/bold cyan]")
-        r = subprocess.run(["tracker", "cross-scan", "--reverse", "--db", str(db)],
-                           capture_output=True, text=True)
+        r = _io(subprocess.run(["tracker", "cross-scan", "--reverse", "--db", str(db)],
+                               capture_output=True, text=True))
         for line in (r.stdout + r.stderr).splitlines()[-5:]:
             if "added" in line or "demoted" in line:
                 console.print(f"    {line.strip()}")
@@ -516,6 +538,13 @@ def pipeline(
         s = stats[tk]
         t.add_row(tk, str(s["fetch_new"]), str(s["summarized"]), str(s["written_days"]))
     console.print(t)
+
+    # Token telemetry: bytes captured from subprocesses ÷ 4 ≈ tokens. This is
+    # the cost that would be incurred if a Claude orchestrator surfaced the
+    # full pipeline output verbatim. Real cost depends on truncation/summary.
+    est_tokens = io_bytes // 4
+    console.print(f"[dim]I/O captured from subprocesses: {io_bytes:,} bytes  "
+                  f"≈ {est_tokens:,} tokens (if surfaced verbatim)[/dim]")
 
 
 @app.command("cross-scan")
@@ -558,13 +587,15 @@ def cross_scan(
         current = set(t for t in (r["trackers"] or "").split(",") if t)
         title = r["title"] or ""
         tags = (r["tags"] or "").split(",")
+        cat = r["category"]
 
         # Forward: add missing trackers if they match.
         for name, info in infos.items():
             if name in current:
                 continue
             if belongs_to(article_url=r["url"], article_title=title,
-                          article_tags=tags, other=info, other_name=name,
+                          article_tags=tags, article_category=cat,
+                          other=info, other_name=name,
                           narrow_domains=NARROW_DOMAINS.get(name)):
                 if store.add_tracker(r["id"], name):
                     added += 1
@@ -580,7 +611,8 @@ def cross_scan(
                 if not info:
                     continue
                 if belongs_to(article_url=r["url"], article_title=title,
-                              article_tags=tags, other=info, other_name=name,
+                              article_tags=tags, article_category=cat,
+                              other=info, other_name=name,
                               narrow_domains=NARROW_DOMAINS.get(name)):
                     continue  # still matches
                 # No match. Try to demote.

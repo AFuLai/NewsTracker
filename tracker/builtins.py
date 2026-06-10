@@ -57,6 +57,10 @@ BUILTIN: dict[str, dict[str, object]] = {
     "nisc.go.jp": {"method": "PATH"},
     "csa.gov.sg": {"method": "PATH"},
     "boannews.com": {"method": "PATH", "accept_all": True},
+    # JS-only SPAs whose live page yields 0 useful links — PATH fetcher
+    # auto-falls back to Wayback Machine snapshots.
+    "stan4cra.eu": {"method": "PATH"},
+    "cencenelec.eu": {"method": "PATH"},
     "jpcert.or.jp": {"method": "FEED",
                      "feed": "https://www.jpcert.or.jp/rss/jpcert.rdf"},
 }

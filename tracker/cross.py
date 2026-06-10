@@ -23,7 +23,10 @@ WORD_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9\-]*")
 # verbatim in title or tags, that's a strong "belongs here" signal.
 STRONG_MARKERS: dict[str, tuple[str, ...]] = {
     "security": ("CVE-", "KEV", "ransomware", "勒索", "資料外洩", "漏洞",
-                 "zero-day", "APT", "exploit", "RCE", "LPE"),
+                 "zero-day", "APT", "exploit", "RCE", "LPE",
+                 "malware", "惡意軟體", "Malware-as-a-Service", "MaaS",
+                 "stealer", "trojan", "phishing", "釣魚", "backdoor", "後門",
+                 "C2", "exfiltration", "DDoS"),
     "eu_cra": ("CRA", "Cyber Resilience Act", "網路韌性法", "ENISA", "EUR-Lex",
                "delegated act", "harmonised standard", "harmonized standard",
                "ETSI EN 303", "CEN/CENELEC", "JTC 13", "JTC 21",
@@ -64,12 +67,15 @@ def _strong_hit(text: str, markers: Iterable[str]) -> bool:
 
 def belongs_to(*, article_url: str, article_title: str, article_tags: list[str],
                other: SearchInfo, other_name: str,
+               article_category: str | None = None,
                min_token_overlap: int = 3,
                key_token_sets: list[set[str]] | None = None,
                narrow_domains: set[str] | None = None) -> bool:
     """Decide if an article also belongs to `other` tracker.
 
     Signals (in order of strength):
+      0. article_category is one of `other` tracker's categories — the LLM
+         has already classified the article into that topical space.
       1. Source domain is a *narrow* specialist site for `other` topic
          (caller-supplied via narrow_domains). General-purpose media sites
          that happen to appear in both searchinfos are NOT enough.
@@ -77,6 +83,11 @@ def belongs_to(*, article_url: str, article_title: str, article_tags: list[str],
          title or tags.
       3. ≥ min_token_overlap distinctive tokens shared with any KEY phrase.
     """
+    # Signal 0: category match is the most authoritative — the LLM picked
+    # a category from `other` tracker's whitelist for this article.
+    if article_category and article_category in (other.categories or []):
+        return True
+
     netloc = (urlparse(article_url).netloc or "").lower().removeprefix("www.")
     if narrow_domains:
         for d in narrow_domains:
