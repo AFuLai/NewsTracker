@@ -19,8 +19,8 @@
 <section class="release" id="v2.0">
   <h2>v2.0 — 2026-06-15</h2>
 <ul>
-    <li><strong>【核心功能升級】多層次內容過濾與驗證管線 (LLM Pipeline)</strong>：引入了全新的四層式處理流程（Gate $\rightarrow$ Summarize $\rightarrow$ Review $\rightarrow$ Probe）。新增的「審核層 (Review)」採用純 Regex 進行抗幻覺檢查，確保摘要中的 CVE ID/CVSS 分數必須出現在原始來源內，大幅提升資訊的準確性與可靠度。</li>
-    <li><strong>【來源自動偵測】新增自動化來源探測 (Auto-Probe) 功能</strong>：用戶無需手動編輯程式碼，只需提供網址，系統即可自動偵測最佳的內容抓取方式（優先順序：RSS $\rightarrow$ 網頁列表 $\rightarrow$ Ollama 分類 $\rightarrow$ Wayback Machine $\rightarrow$ 搜尋）。此功能實現了「零接觸」新增來源。</li>
+    <li><strong>【核心功能升級】多層次內容過濾與驗證管線 (LLM Pipeline)</strong>：引入了全新的四層式處理流程（Gate → Summarize → Review → Probe）。新增的「審核層 (Review)」採用純 Regex 進行抗幻覺檢查，確保摘要中的 CVE ID/CVSS 分數必須出現在原始來源內，大幅提升資訊的準確性與可靠度。</li>
+    <li><strong>【來源自動偵測】新增自動化來源探測 (Auto-Probe) 功能</strong>：用戶無需手動編輯程式碼，只需提供網址，系統即可自動偵測最佳的內容抓取方式（優先順序：RSS → 網頁列表 → Ollama 分類 → Wayback Machine → 搜尋）。此功能實現了「零接觸」新增來源。</li>
     <li><strong>【效能與覆蓋率】優化新聞抓取覆蓋率與抗噪音能力</strong>：大幅提升了對結構化噪音（如網站頁腳、隱私政策、服務條款）的排除能力。透過結合 L1 閘門和 L2 語義過濾，確保只有真正「發生在某一天」的文章內容進入處理流程，有效提升資安新聞的純淨度。</li>
     <li><strong>【效能優化】極致優化抓取流程，提升運行效率</strong>：優化了連續執行抓取任務的效率，透過 304 Conditional GET 和 24 小時的搜尋快取機制，將重複抓取任務的耗時從數十秒大幅降低至秒級，極大提升了批次處理的效率。</li>
     <li><strong>【架構穩定性】單一流程 (Single-Process) 執行與零接觸操作</strong>：將整個更新流程重構為單一進程，消除了過去依賴子程序和標準輸出解析的複雜性，使系統在 Ollama 服務中斷時能優雅地中止並記錄狀態，提升了整體穩定性。</li>
