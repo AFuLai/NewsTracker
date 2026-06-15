@@ -36,6 +36,37 @@ CREATE TABLE IF NOT EXISTS fetch_errors (
   error      TEXT,
   occurred_at TEXT NOT NULL
 );
+
+-- v2: per-source runtime profile (cache, not config — searchinfo stays source of truth)
+CREATE TABLE IF NOT EXISTS source_profiles (
+  domain          TEXT PRIMARY KEY,
+  name            TEXT,
+  method          TEXT NOT NULL,             -- fetcher registry key: FEED/LISTING/SEARCH/API/ARCHIVE
+  feed_url        TEXT,
+  search_path     TEXT,
+  api_endpoint    TEXT,
+  accept_all      INTEGER NOT NULL DEFAULT 0,
+  trackers        TEXT NOT NULL,             -- comma-separated trackers that watch this source
+  etag            TEXT,
+  last_modified   TEXT,
+  last_seen_utc   TEXT,                       -- watermark: newest article time seen last run
+  consecutive_failures INTEGER NOT NULL DEFAULT 0,
+  total_runs      INTEGER NOT NULL DEFAULT 0,
+  total_yield     INTEGER NOT NULL DEFAULT 0, -- cumulative new candidates inserted
+  probed_at       TEXT,
+  probe_note      TEXT
+);
+
+-- v2: pipeline run journal (one row per `tracker pipeline` invocation)
+CREATE TABLE IF NOT EXISTS runs (
+  run_id      INTEGER PRIMARY KEY AUTOINCREMENT,
+  started_at  TEXT NOT NULL,
+  finished_at TEXT,
+  args        TEXT,                          -- JSON: {since, until, trackers}
+  stats       TEXT,                          -- JSON: per-phase counts
+  errors      TEXT,                          -- JSON array of error strings
+  ok          INTEGER                        -- 1 success / 0 failure / NULL in-progress
+);
 """
 
 
@@ -46,6 +77,14 @@ def _ensure_trackers_column(conn) -> None:
         conn.execute(
             "ALTER TABLE articles ADD COLUMN trackers TEXT NOT NULL DEFAULT 'security'")
         conn.execute("CREATE INDEX IF NOT EXISTS idx_articles_trackers ON articles(trackers)")
+        conn.commit()
+
+
+def _ensure_v2_columns(conn) -> None:
+    """Idempotent ALTER for v2 (content_hash on articles for republish detection)."""
+    cols = [r[1] for r in conn.execute("PRAGMA table_info(articles)").fetchall()]
+    if "content_hash" not in cols:
+        conn.execute("ALTER TABLE articles ADD COLUMN content_hash TEXT")
         conn.commit()
 
 _TRACKING_PARAMS = re.compile(r"^(utm_|fbclid|gclid|mc_eid|mc_cid|_hsenc|_hsmi)", re.I)
@@ -62,6 +101,11 @@ def url_hash(url: str) -> str:
     return hashlib.sha1(normalize_url(url).encode("utf-8")).hexdigest()
 
 
+def content_hash(text: str) -> str:
+    """Hash of article body/title for republish (edited-after-publish) detection."""
+    return hashlib.sha1((text or "").encode("utf-8")).hexdigest()
+
+
 class Store:
     def __init__(self, db_path: Path):
         db_path.parent.mkdir(parents=True, exist_ok=True)
@@ -69,6 +113,7 @@ class Store:
         self.conn.row_factory = sqlite3.Row
         self.conn.executescript(SCHEMA)
         _ensure_trackers_column(self.conn)
+        _ensure_v2_columns(self.conn)
         self.conn.commit()
 
     def upsert_candidate(self, *, url: str, source: str, title: str | None = None,
@@ -206,3 +251,149 @@ class Store:
         rows = self.conn.execute(
             "SELECT status, COUNT(*) AS n FROM articles GROUP BY status").fetchall()
         return {r["status"]: r["n"] for r in rows}
+
+    # ── Batch dedup (v2: replace per-URL SELECT-then-INSERT) ────────────────
+
+    def all_url_hashes(self) -> set[str]:
+        """Load every known url_hash once for in-memory dedup during a run."""
+        return {r[0] for r in self.conn.execute("SELECT url_hash FROM articles")}
+
+    def insert_candidates_batch(self, candidates: list[dict]) -> int:
+        """Insert many candidates with a single executemany INSERT OR IGNORE.
+
+        Each candidate dict: {url, source, title?, date?, raw_text?, tracker?,
+        content_hash?}. Caller is responsible for pre-filtering against
+        all_url_hashes() to avoid wasted rows, but INSERT OR IGNORE makes this
+        safe even if duplicates slip through (UNIQUE url_hash constraint).
+        Returns the number of rows actually inserted.
+        """
+        if not candidates:
+            return 0
+        now = datetime.utcnow().isoformat()
+        rows = []
+        for c in candidates:
+            url = c["url"]
+            rows.append((
+                url_hash(url), normalize_url(url), c["source"],
+                c.get("title"), c.get("date"), c.get("raw_text"),
+                c.get("tracker", "security"), c.get("content_hash"), now,
+            ))
+        before = self.conn.total_changes
+        self.conn.executemany(
+            "INSERT OR IGNORE INTO articles "
+            "(url_hash, url, source, title, date, raw_text, trackers, content_hash, fetched_at) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            rows,
+        )
+        self.conn.commit()
+        return self.conn.total_changes - before
+
+    # ── source_profiles (v2) ────────────────────────────────────────────────
+
+    def get_profile(self, domain: str) -> sqlite3.Row | None:
+        return self.conn.execute(
+            "SELECT * FROM source_profiles WHERE domain=?", (domain,)).fetchone()
+
+    def list_profiles(self, *, tracker: str | None = None,
+                      method: str | None = None) -> list[sqlite3.Row]:
+        sql = "SELECT * FROM source_profiles"
+        clauses, params = [], []
+        if tracker:
+            clauses.append("(','||trackers||',') LIKE '%,'||?||',%'")
+            params.append(tracker)
+        if method:
+            clauses.append("method=?")
+            params.append(method)
+        if clauses:
+            sql += " WHERE " + " AND ".join(clauses)
+        sql += " ORDER BY domain"
+        return list(self.conn.execute(sql, params))
+
+    def upsert_profile(self, *, domain: str, name: str, method: str,
+                       trackers: str, feed_url: str | None = None,
+                       search_path: str | None = None, api_endpoint: str | None = None,
+                       accept_all: bool = False,
+                       probe_note: str | None = None, probed_at: str | None = None) -> None:
+        """Insert or update a source profile. Merges trackers (union) and
+        preserves HTTP cache / watermark / failure counters on update."""
+        existing = self.get_profile(domain)
+        if existing:
+            merged = sorted(set(
+                [t for t in (existing["trackers"] or "").split(",") if t] +
+                [t for t in trackers.split(",") if t]))
+            # COALESCE keeps existing feed_url/search_path/api_endpoint when the
+            # caller passes None (e.g. a union-only upsert that only adds a tracker).
+            self.conn.execute(
+                "UPDATE source_profiles SET name=?, method=?, "
+                "feed_url=COALESCE(?, feed_url), search_path=COALESCE(?, search_path), "
+                "api_endpoint=COALESCE(?, api_endpoint), accept_all=?, trackers=?, "
+                "probe_note=COALESCE(?, probe_note), probed_at=COALESCE(?, probed_at) "
+                "WHERE domain=?",
+                (name, method, feed_url, search_path, api_endpoint, int(accept_all),
+                 ",".join(merged), probe_note, probed_at, domain),
+            )
+        else:
+            self.conn.execute(
+                "INSERT INTO source_profiles "
+                "(domain, name, method, feed_url, search_path, api_endpoint, accept_all, "
+                " trackers, probe_note, probed_at) "
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                (domain, name, method, feed_url, search_path, api_endpoint, int(accept_all),
+                 trackers, probe_note, probed_at),
+            )
+        self.conn.commit()
+
+    def update_profile_http(self, domain: str, *, etag: str | None = None,
+                            last_modified: str | None = None,
+                            last_seen_utc: str | None = None) -> None:
+        self.conn.execute(
+            "UPDATE source_profiles SET "
+            "etag=COALESCE(?, etag), last_modified=COALESCE(?, last_modified), "
+            "last_seen_utc=COALESCE(?, last_seen_utc) WHERE domain=?",
+            (etag, last_modified, last_seen_utc, domain),
+        )
+        self.conn.commit()
+
+    def record_profile_yield(self, domain: str, new_count: int, *, failed: bool = False) -> None:
+        """After a fetch: bump total_runs/total_yield, reset or increment failures."""
+        if failed:
+            self.conn.execute(
+                "UPDATE source_profiles SET total_runs=total_runs+1, "
+                "consecutive_failures=consecutive_failures+1 WHERE domain=?", (domain,))
+        else:
+            self.conn.execute(
+                "UPDATE source_profiles SET total_runs=total_runs+1, "
+                "total_yield=total_yield+?, consecutive_failures=0 WHERE domain=?",
+                (new_count, domain))
+        self.conn.commit()
+
+    def set_profile_method(self, domain: str, method: str, *,
+                           feed_url: str | None = None, search_path: str | None = None,
+                           probe_note: str | None = None, probed_at: str | None = None) -> None:
+        """Used by auto-probe to record a newly detected fetch method."""
+        self.conn.execute(
+            "UPDATE source_profiles SET method=?, "
+            "feed_url=COALESCE(?, feed_url), search_path=COALESCE(?, search_path), "
+            "probe_note=?, probed_at=?, consecutive_failures=0 WHERE domain=?",
+            (method, feed_url, search_path, probe_note, probed_at, domain),
+        )
+        self.conn.commit()
+
+    # ── runs journal (v2) ───────────────────────────────────────────────────
+
+    def start_run(self, args_json: str) -> int:
+        cur = self.conn.execute(
+            "INSERT INTO runs (started_at, args) VALUES (?, ?)",
+            (datetime.utcnow().isoformat(), args_json))
+        self.conn.commit()
+        return cur.lastrowid
+
+    def finish_run(self, run_id: int, *, stats_json: str, errors_json: str, ok: bool) -> None:
+        self.conn.execute(
+            "UPDATE runs SET finished_at=?, stats=?, errors=?, ok=? WHERE run_id=?",
+            (datetime.utcnow().isoformat(), stats_json, errors_json, int(ok), run_id))
+        self.conn.commit()
+
+    def last_run(self) -> sqlite3.Row | None:
+        return self.conn.execute(
+            "SELECT * FROM runs ORDER BY run_id DESC LIMIT 1").fetchone()

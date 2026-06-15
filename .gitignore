@@ -13,3 +13,4 @@ db/*.sqlite-shm
 build/
 dist/
 .DS_Store
+COMMIT_MSG.tmp

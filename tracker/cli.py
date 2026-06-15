@@ -701,6 +701,62 @@ def migrate_v2(
     console.print(f"[green]Migration complete[/green]")
 
 
+@app.command("init-profiles")
+def init_profiles(
+    db: Path = typer.Option(DEFAULT_DB),
+    rescan: bool = typer.Option(False, "--rescan",
+                                help="Re-seed even profiles that already exist"),
+) -> None:
+    """Seed source_profiles from every tracker's searchinfo ENTRY + builtins.
+
+    This is bootstrap: after seeding, runtime fetch reads profiles from the DB.
+    searchinfo remains the source of truth — re-running picks up new ENTRYs
+    and unions trackers for shared domains. Existing profiles keep their
+    HTTP cache / watermark / failure counters unless --rescan overwrites method.
+    """
+    from .methods import canonical
+
+    store = Store(db)
+    seeded = updated = 0
+    for tname in SEARCHINFOS:
+        try:
+            info = load_tracker(tname)
+        except Exception as exc:
+            console.print(f"[red]skip {tname}: {exc}[/red]"); continue
+        for e in info.entries:
+            existing = store.get_profile(e.domain)
+            if existing and not rescan:
+                # still union the tracker membership
+                store.upsert_profile(
+                    domain=e.domain, name=e.name, method=existing["method"],
+                    trackers=tname, feed_url=existing["feed_url"],
+                    search_path=existing["search_path"],
+                    api_endpoint=existing["api_endpoint"],
+                    accept_all=bool(existing["accept_all"]))
+                updated += 1
+                continue
+            store.upsert_profile(
+                domain=e.domain, name=e.name, method=canonical(e.method),
+                trackers=tname, feed_url=e.feed_url, search_path=e.search_path,
+                api_endpoint=e.api_endpoint, accept_all=e.accept_all)
+            if existing:
+                updated += 1
+            else:
+                seeded += 1
+
+    total = len(store.list_profiles())
+    console.print(f"[green]init-profiles[/green] seeded {seeded} new, "
+                  f"updated {updated}; {total} profiles total")
+    t = Table(title="Method distribution (source_profiles)")
+    t.add_column("Method"); t.add_column("Count", justify="right")
+    dist: dict[str, int] = {}
+    for p in store.list_profiles():
+        dist[p["method"]] = dist.get(p["method"], 0) + 1
+    for k, v in sorted(dist.items()):
+        t.add_row(k, str(v))
+    console.print(t)
+
+
 @app.command()
 def pack(
     major: bool = typer.Option(False, "--major"),
