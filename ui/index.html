@@ -113,6 +113,10 @@ header {
   padding-bottom: 0.7rem;
   margin-bottom: 0.5rem;
   border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 #search-wrap {
   display: flex;
@@ -122,9 +126,29 @@ header {
   border: 1px solid var(--border);
   border-radius: 9999px;
   padding: 6px 14px;
-  width: 100%;
-  max-width: 560px;
+  flex: 1 1 300px;
+  max-width: 520px;
 }
+#search-scope {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+}
+.scope-label { font-size: 0.72rem; color: var(--text2); margin-right: 2px; }
+.scope-pill {
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text2);
+  cursor: pointer;
+  font-size: 0.74rem;
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+.scope-pill:hover { background: var(--hover); color: var(--text); }
+.scope-pill.active { background: var(--active); color: #fff; border-color: transparent; font-weight: 600; }
 #search-wrap:focus-within { border-color: var(--active); }
 .search-ico { font-size: 0.9rem; opacity: 0.65; }
 #search-box {
@@ -521,6 +545,12 @@ a.card-tag:hover { text-decoration: underline; }
         <input id="search-box" type="search" placeholder="搜尋全站新聞…" autocomplete="off" spellcheck="false">
         <button id="search-clear" title="清除搜尋">✕</button>
       </div>
+      <div id="search-scope">
+        <span class="scope-label" id="scope-label">範圍</span>
+        <button class="scope-pill active" data-scope="title">標題</button>
+        <button class="scope-pill active" data-scope="body">內文</button>
+        <button class="scope-pill active" data-scope="tags">標籤</button>
+      </div>
     </div>
     <div id="loading-msg">載入中…</div>
     <div id="no-data" class="hidden"></div>
@@ -543,6 +573,7 @@ const state = {
   lang:          "zh",   // "zh" | "en"
   searchQuery:   "",     // "" = not searching
   search:        null,   // { countByDate:{date:n}, years:[...] } when searching
+  searchScope:   { title: true, body: true, tags: true },  // which fields to match
   loadedFiles:   new Set(),
   loadedYears:   new Set(),   // keys: tracker + "/" + year
   loadedMonths:  new Set(),   // keys: tracker + "/" + month
@@ -572,6 +603,7 @@ const I18N = {
       updated:'更新：', sources:'來源', langBtn:'🌐 中',
       expand:'展開側欄', collapse:'收起側欄',
       searchPlaceholder:'搜尋全站新聞…', searching:'搜尋中…',
+      scopeLabel:'範圍', scope:{title:'標題', body:'內文', tags:'標籤'},
       noResults:q=>'找不到符合「'+q+'」的新聞',
       noData:'尚無資料，請選擇日期或月份',
       noCat:c=>'沒有「'+c+'」類別的文章',
@@ -589,6 +621,7 @@ const I18N = {
       updated:'Updated: ', sources:'Sources', langBtn:'🌐 EN',
       expand:'Expand', collapse:'Collapse',
       searchPlaceholder:'Search all news…', searching:'Searching…',
+      scopeLabel:'In', scope:{title:'Title', body:'Body', tags:'Tags'},
       noResults:q=>'No results for “'+q+'”',
       noData:'No data — pick a date or month',
       noCat:c=>'No articles in “'+c+'”',
@@ -621,6 +654,11 @@ function applyLang() {
   if (lb) lb.textContent = t('langBtn');
   const sbx = document.getElementById('search-box');
   if (sbx) sbx.placeholder = t('searchPlaceholder');
+  const scl = document.getElementById('scope-label');
+  if (scl) scl.textContent = t('scopeLabel');
+  document.querySelectorAll('#search-scope .scope-pill').forEach(b => {
+    b.textContent = L().ui.scope[b.dataset.scope] || b.dataset.scope;
+  });
   document.getElementById('lbl-showing').textContent  = t('showing');
   document.getElementById('lbl-articles').textContent = t('articles');
   const fy = document.getElementById('btn-full-year'); if (fy) fy.textContent = t('fullYear');
@@ -656,12 +694,28 @@ function toggleLang() { state.lang = state.lang === 'en' ? 'zh' : 'en'; applyLan
 // ── Site-wide search ──────────────────────────────────
 // Matches across title/summary/tags in BOTH languages so a query works
 // regardless of the display language. Space-separated terms are ANDed.
+function searchHaystack(a) {
+  const sc = state.searchScope;
+  const parts = [];
+  if (sc.title) parts.push(a.title, a.title_en);
+  if (sc.body)  parts.push(a.summary, a.summary_en);
+  if (sc.tags)  parts.push((a.tags || []).join(' '), (a.tags_en || []).join(' '));
+  return parts.join(' ').toLowerCase();
+}
 function matchesQuery(a, q) {
   if (!q) return true;
-  const hay = [a.title, a.summary, (a.tags || []).join(' '),
-               a.title_en, a.summary_en, (a.tags_en || []).join(' ')]
-              .join(' ').toLowerCase();
+  const hay = searchHaystack(a);
   return q.split(/\s+/).filter(Boolean).every(term => hay.includes(term));
+}
+
+// Toggle a search-scope field (標題/內文/標籤). Keeps at least one active.
+function toggleScope(name, btn) {
+  const sc = state.searchScope;
+  const activeCount = Object.values(sc).filter(Boolean).length;
+  if (sc[name] && activeCount === 1) return;   // never leave all scopes off
+  sc[name] = !sc[name];
+  btn.classList.toggle('active', sc[name]);
+  if (state.searchQuery && state.search) refreshSearchView();
 }
 
 // Promise wrappers around the cb-style loaders so we can await the full set.
@@ -1267,6 +1321,9 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeOverlay
   });
   document.getElementById('search-clear').addEventListener('click', () => {
     box.value = ''; clearSearch(); box.focus();
+  });
+  document.querySelectorAll('#search-scope .scope-pill').forEach(btn => {
+    btn.addEventListener('click', () => toggleScope(btn.dataset.scope, btn));
   });
 })();
 

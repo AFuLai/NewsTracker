@@ -151,12 +151,17 @@ Items without an English mirror fall back to Chinese, so the toggle is always sa
 
 ## Site-wide search
 
-The header has a **🔎 search box** that queries the whole site (the current
-tracker, across all years). On the first search the UI lazy-loads every day file
-once, then filters in-memory; matching is case-insensitive, ANDs space-separated
-terms, and looks at title/summary/tags in **both languages** (so an English query
-finds Chinese articles via the mirror, and vice-versa). Results respect the
-active category filter.
+The news area's first row has a **🔎 search box** that queries the whole site
+(the current tracker, across all years). On the first search the UI lazy-loads
+every day file once, then filters in-memory; matching is case-insensitive, ANDs
+space-separated terms, and looks in **both languages** (so an English query finds
+Chinese articles via the mirror, and vice-versa). Results respect the active
+category filter.
+
+Next to the box are **scope toggles — 標題 / 內文 / 標籤 (Title / Body / Tags)** —
+to restrict which fields are matched; all three are on by default and at least
+one always stays on. Changing a scope re-runs the search and re-adjusts the date
+menu.
 
 After a search the **date menu adjusts to the results**: year pills show only
 years with matches, the month grid greys out months with none, and the per-month
