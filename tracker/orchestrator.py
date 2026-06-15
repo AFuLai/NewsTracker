@@ -41,12 +41,11 @@ EU_CRA_FILTER = (
     "standardisation", "standardization",
 )
 
-# Optional ollama hooks, wired by WP3. Each defaults to a passthrough so the
-# orchestrator runs end-to-end before WP3 lands.
-#   GATE_FN(candidates: list[dict], tracker, info, log) -> (kept, gated_reasons)
-#   REVIEW_FN(result: dict, raw_text, info) -> (ok: bool, reason: str|None)
-GATE_FN = None
-REVIEW_FN = None
+# ollama hooks (WP3):
+#   GATE_FN(rows, tracker, info, log) -> (kept_ids, [(id, reason), ...])  L1
+#   REVIEW_FN(result: dict, raw_text, info) -> (ok: bool, reason: str|None)  L3
+from .llm.gate import run_gate as GATE_FN          # noqa: E402
+from .llm.review import review as REVIEW_FN        # noqa: E402
 
 
 @dataclass
@@ -100,7 +99,7 @@ def _setup_logger(run_ts: str) -> logging.Logger:
 def run_pipeline(*, since: str, until: str, trackers: list[str],
                  db: Path = DEFAULT_DB, out: Path = DEFAULT_OUT,
                  summarize_limit: int = 300, cleanup: bool = True,
-                 concurrency: int = 8) -> RunReport:
+                 gate: bool = True, concurrency: int = 8) -> RunReport:
     run_ts = datetime.utcnow().strftime("%Y%m%d-%H%M%S")
     log = _setup_logger(run_ts)
     t0 = time.time()
@@ -124,7 +123,7 @@ def run_pipeline(*, since: str, until: str, trackers: list[str],
 
     try:
         _phase_fetch(store, window, trackers, rep, log, concurrency)
-        if GATE_FN is not None:
+        if gate:
             _phase_gate(store, trackers, rep, log)
         _phase_summarize(store, window, trackers, rep, log, summarize_limit, concurrency)
         _phase_write(store, trackers, rep, log, out)

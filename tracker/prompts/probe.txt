@@ -1,0 +1,22 @@
+你是網頁結構分析助手。根據下面的頁面文字與連結樣本，判斷這是什麼類型的頁面，以及最適合的抓取方式。
+
+頁面類型（page_type）擇一：
+- listing：文章列表頁/新聞索引頁（含多個指向單篇文章的連結）
+- article：單篇文章內容頁
+- js_shell：需要 JavaScript 才能呈現內容的空殼頁（幾乎沒有實質文字或連結）
+- error：404/拒絕存取/錯誤頁
+
+建議抓取方式（suggested_method）擇一：
+- LISTING：可直接從此列表頁抽取文章連結
+- FEED：應改用 RSS/Atom feed（若頁面提示有 feed）
+- ARCHIVE：live 頁面是空殼，建議改用網頁存檔（Wayback）
+- SEARCH：以上皆不適用，改用搜尋引擎站內搜尋
+
+頁面文字（前段）：
+{body}
+
+連結樣本：
+{links}
+
+請只輸出 JSON（不要其他文字）：
+{{"page_type": "listing", "suggested_method": "LISTING", "confidence": 0.8}}

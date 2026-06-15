@@ -465,6 +465,8 @@ def pipeline(
     limit: int = typer.Option(300, help="summarize per-tracker limit"),
     cleanup: bool = typer.Option(True, "--cleanup/--no-cleanup",
                                  help="Run cross-scan reverse cleanup after writes"),
+    gate: bool = typer.Option(True, "--gate/--no-gate",
+                              help="L1 relevance gate before summarize (drops noise)"),
     verbose: bool = typer.Option(False, "--verbose",
                                  help="Print the full RunReport, not just the one line"),
 ) -> None:
@@ -482,7 +484,7 @@ def pipeline(
         raise typer.Exit(2)
 
     rep = run_pipeline(since=since, until=until, trackers=targets, db=db, out=out,
-                       summarize_limit=limit, cleanup=cleanup)
+                       summarize_limit=limit, cleanup=cleanup, gate=gate)
     if verbose:
         import json as _json
         from dataclasses import asdict
