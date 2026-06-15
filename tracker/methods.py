@@ -12,8 +12,9 @@ LISTING = "LISTING"
 SEARCH = "SEARCH"
 API = "API"
 ARCHIVE = "ARCHIVE"
+BROWSER = "BROWSER"
 
-CANONICAL = {FEED, LISTING, SEARCH, API, ARCHIVE}
+CANONICAL = {FEED, LISTING, SEARCH, API, ARCHIVE, BROWSER}
 
 # Legacy method name (searchinfo `method:` field / builtins) → canonical.
 _LEGACY = {
@@ -25,6 +26,8 @@ _LEGACY = {
     "API": API,
     "ARCHIVE": ARCHIVE,
     "WAYBACK": ARCHIVE,
+    "BROWSER": BROWSER,
+    "CHROME": BROWSER,
 }
 
 

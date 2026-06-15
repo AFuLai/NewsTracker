@@ -488,12 +488,25 @@ def pipeline(
         console.print(f"[red]Unknown tracker(s): {targets}; known={list(SEARCHINFOS)}[/red]")
         raise typer.Exit(2)
 
+    # If any source for these trackers needs a JS-rendering browser, make sure a
+    # debug Chrome is up (notify + retry/cancel), and pass its CDP base through.
+    browser_base = None
+    store_pre = Store(db)
+    needs_browser = any(
+        p["method"] == "BROWSER"
+        for tk in targets for p in store_pre.list_profiles(tracker=tk))
+    if needs_browser:
+        from .preflight import ensure_browser
+        browser_base = ensure_browser(console=console)
+        if browser_base is None:
+            console.print("[yellow]略過需要瀏覽器的來源（debug Chrome 未啟動）。[/yellow]")
+
     live = (not quiet) and sys.stdout.isatty()
     reporter = LiveReporter(console) if live else NullReporter()
     with reporter:
         rep = run_pipeline(since=since, until=until, trackers=targets, db=db, out=out,
                            summarize_limit=limit, cleanup=cleanup, gate=gate,
-                           reporter=reporter)
+                           browser_base=browser_base, reporter=reporter)
     # Completion summary printed after the live display has stopped.
     reporter.summary(rep)
     if verbose:

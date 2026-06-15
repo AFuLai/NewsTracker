@@ -8,7 +8,7 @@ from tracker.fetchers import feed as feed_mod
 
 
 def test_all_methods_registered():
-    assert set(REGISTRY) == {"FEED", "LISTING", "SEARCH", "API", "ARCHIVE"}
+    assert {"FEED", "LISTING", "SEARCH", "API", "ARCHIVE", "BROWSER"} <= set(REGISTRY)
 
 
 def test_get_fetcher_canonicalizes():

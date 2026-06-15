@@ -98,7 +98,7 @@ def run_pipeline(*, since: str, until: str, trackers: list[str],
                  db: Path = DEFAULT_DB, out: Path = DEFAULT_OUT,
                  summarize_limit: int = 300, cleanup: bool = True,
                  gate: bool = True, concurrency: int = 8,
-                 reporter=None) -> RunReport:
+                 browser_base: str | None = None, reporter=None) -> RunReport:
     from .progress import NullReporter
     rpt = reporter or NullReporter()
 
@@ -134,7 +134,7 @@ def run_pipeline(*, since: str, until: str, trackers: list[str],
     rpt.result("preflight", "ollama ready")
 
     try:
-        _phase_fetch(store, window, trackers, rep, log, concurrency, rpt)
+        _phase_fetch(store, window, trackers, rep, log, concurrency, rpt, browser_base)
         if gate:
             _phase_gate(store, trackers, rep, log, rpt)
         _phase_summarize(store, window, trackers, rep, log, summarize_limit, concurrency, rpt)
@@ -152,7 +152,7 @@ def run_pipeline(*, since: str, until: str, trackers: list[str],
 
 # ── Phase 1: FETCH ───────────────────────────────────────────────────────────
 
-def _phase_fetch(store, window, trackers, rep, log, concurrency, rpt):
+def _phase_fetch(store, window, trackers, rep, log, concurrency, rpt, browser_base=None):
     rpt.enter("fetch", "preparing sources")
     # Auto-reprobe any source that has crossed the failure threshold so a site
     # that changed its layout self-heals before we fetch it again.
@@ -182,7 +182,7 @@ def _phase_fetch(store, window, trackers, rep, log, concurrency, rpt):
             return Profile.from_row(
                 row, url=entry_url.get(row["domain"]),
                 extra={"keywords": keys, "query_prefix": query_prefix,
-                       "filter_keywords": filt})
+                       "filter_keywords": filt, "cdp_base": browser_base})
 
         feed_rows = [r for r in profiles if r["method"] == FEED]
         other_rows = [r for r in profiles if r["method"] != FEED]
