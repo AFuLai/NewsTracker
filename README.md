@@ -18,9 +18,23 @@ tracker pipeline --since 2026-06-09 --until 2026-06-15
 On an interactive terminal this shows a **live execution dashboard** — the
 planned phases (Preflight → Fetch → Gate → Summarize → Write → Cleanup) with
 ✓/▶/· status, a progress bar + ETA for the long phases, the current item, and
-elapsed time; on completion a summary panel. Pass `--quiet` for the one-line-only
-form (zero-touch / piping). Full detail always goes to `logs/run-<ts>.log`, the
-`runs` DB table, and `status.json` at the project root:
+elapsed time; on completion a summary panel.
+
+For a **graphical browser UI**, add `--ui`:
+
+```bash
+tracker pipeline --since 2026-03-01 --until 2026-05-31 --ui
+# 執行儀表板： http://localhost:8787   ← opens automatically in the Windows browser
+```
+
+It starts a tiny local web server (works from WSL2 via localhost forwarding — no
+X server needed), opens your Windows default browser, and renders graphical phase
+cards + progress bars + ETA that update live, plus a completion summary. `--port`
+changes the port (default 8787).
+
+Pass `--quiet` for the one-line-only form (zero-touch / piping). Full detail
+always goes to `logs/run-<ts>.log`, the `runs` DB table, and `status.json` at the
+project root:
 
 ```bash
 tracker status --last-run
@@ -153,4 +167,4 @@ cache make re-runs over an overlapping window cheap.
   calls crash glibc (`free(): invalid size`).
 - DDG rate-limits repeated queries; the SEARCH fetcher caches results 24h.
 - If ollama wedges: `pkill -9 ollama && ollama serve`.
-- After any change: `python -m pytest -q` (61 tests).
+- After any change: `python -m pytest -q` (64 tests).

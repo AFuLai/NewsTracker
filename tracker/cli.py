@@ -467,8 +467,11 @@ def pipeline(
                                  help="Run cross-scan reverse cleanup after writes"),
     gate: bool = typer.Option(True, "--gate/--no-gate",
                               help="L1 relevance gate before summarize (drops noise)"),
+    ui: bool = typer.Option(False, "--ui",
+                            help="Graphical browser dashboard (opens http://localhost:PORT)"),
+    port: int = typer.Option(8787, help="Port for the --ui web dashboard"),
     quiet: bool = typer.Option(False, "--quiet",
-                               help="No live dashboard; print only the one-line summary"),
+                               help="No dashboard; print only the one-line summary"),
     verbose: bool = typer.Option(False, "--verbose",
                                  help="Also print the full RunReport JSON"),
 ) -> None:
@@ -501,6 +504,29 @@ def pipeline(
         if browser_base is None:
             console.print("[yellow]略過需要瀏覽器的來源（debug Chrome 未啟動）。[/yellow]")
 
+    if ui:
+        # Graphical browser dashboard (works from WSL2 via localhost forwarding).
+        from .web_dashboard import WebReporter, serve
+        reporter = WebReporter()
+        httpd, used_port = _start_dashboard(reporter, port)
+        url = f"http://localhost:{used_port}"
+        console.print(f"[bold cyan]執行儀表板：[/bold cyan] [underline]{url}[/underline]")
+        _open_windows_browser(url)
+        rep = run_pipeline(since=since, until=until, trackers=targets, db=db, out=out,
+                           summarize_limit=limit, cleanup=cleanup, gate=gate,
+                           browser_base=browser_base, reporter=reporter)
+        reporter.summary(rep)   # marks finished → browser shows completion panel
+        print(rep.one_line())
+        if sys.stdin.isatty():
+            try:
+                input("儀表板仍在執行中，按 Enter 關閉…")
+            except (EOFError, KeyboardInterrupt):
+                pass
+        else:
+            import time as _t; _t.sleep(3)
+        httpd.shutdown()
+        raise typer.Exit(0 if rep.ok else 1)
+
     live = (not quiet) and sys.stdout.isatty()
     reporter = LiveReporter(console) if live else NullReporter()
     with reporter:
@@ -517,6 +543,29 @@ def pipeline(
         # headless: the single machine-readable line
         print(rep.one_line())
     raise typer.Exit(0 if rep.ok else 1)
+
+
+def _start_dashboard(reporter, port: int):
+    """Start the web dashboard, trying a few ports if the first is taken."""
+    from .web_dashboard import serve
+    for p in range(port, port + 10):
+        try:
+            return serve(reporter, port=p), p
+        except OSError:
+            continue
+    raise RuntimeError(f"no free port in {port}..{port+9} for the dashboard")
+
+
+def _open_windows_browser(url: str) -> None:
+    """Open the URL in the Windows default browser from WSL (best-effort)."""
+    import subprocess
+    for cmd in (["cmd.exe", "/c", "start", "", url], ["wslview", url],
+                ["xdg-open", url]):
+        try:
+            subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            return
+        except Exception:
+            continue
 
 
 @app.command("cross-scan")
