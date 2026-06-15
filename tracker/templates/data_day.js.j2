@@ -9,6 +9,15 @@ window.TRACKER_DAYS["{{ day }}"] = [
     title: {{ item.title | tojson }},
     summary: {{ item.summary | tojson }},
     tags: {{ item.tags | tojson }},
+    {%- if item.title_en %}
+    title_en: {{ item.title_en | tojson }},
+    {%- endif %}
+    {%- if item.summary_en %}
+    summary_en: {{ item.summary_en | tojson }},
+    {%- endif %}
+    {%- if item.tags_en %}
+    tags_en: {{ item.tags_en | tojson }},
+    {%- endif %}
     sources: [
       {%- for s in item.sources %}
       { name: {{ s.name | tojson }}, url: {{ s.url | tojson }}, lang: {{ (s.lang or 'EN') | tojson }} }{% if not loop.last %},{% endif %}

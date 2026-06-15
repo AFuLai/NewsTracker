@@ -454,8 +454,10 @@ def write(
 
 @app.command()
 def pipeline(
-    since: str = typer.Option(..., help="YYYY-MM-DD"),
-    until: str = typer.Option(..., help="YYYY-MM-DD"),
+    since: str = typer.Option("", help="YYYY-MM-DD (省略時用 --days，或預設近 7 天)"),
+    until: str = typer.Option("", help="YYYY-MM-DD (省略時 = 今天)"),
+    days: int = typer.Option(0, "--days",
+                             help="更新最近 N 天（含今天）；覆蓋 --since/--until。例：--days 3"),
     trackers: str = typer.Option("all", "--tracker",
                                  help="security|eu_cra|all (default all = both)"),
     db: Path = typer.Option(DEFAULT_DB),
@@ -467,6 +469,8 @@ def pipeline(
                                  help="Run cross-scan reverse cleanup after writes"),
     gate: bool = typer.Option(True, "--gate/--no-gate",
                               help="L1 relevance gate before summarize (drops noise)"),
+    translate: bool = typer.Option(True, "--translate/--no-translate",
+                                   help="L5 English mirror (title/summary/tags) after summarize"),
     ui: bool = typer.Option(False, "--ui",
                             help="Graphical browser dashboard (opens http://localhost:PORT)"),
     port: int = typer.Option(8787, help="Port for the --ui web dashboard"),
@@ -483,8 +487,28 @@ def pipeline(
     the runs table + status.json (`tracker status --last-run`).
     """
     import sys
+    from datetime import date, timedelta
     from .orchestrator import run_pipeline
     from .progress import LiveReporter, NullReporter
+
+    # Resolve the date window. Priority: --days (relative, incl. today) >
+    # explicit --since/--until > default (last 7 days incl. today).
+    today = date.today()
+    if days > 0:
+        if days < 1:
+            console.print("[red]--days 必須 >= 1[/red]")
+            raise typer.Exit(2)
+        since = (today - timedelta(days=days - 1)).isoformat()
+        until = today.isoformat()
+    else:
+        if not until:
+            until = today.isoformat()
+        if not since:
+            since = (today - timedelta(days=6)).isoformat()  # default: last 7 days
+    if since > until:
+        console.print(f"[red]--since ({since}) 晚於 --until ({until})[/red]")
+        raise typer.Exit(2)
+    console.print(f"[dim]更新區間：{since} … {until}[/dim]")
 
     targets = list(SEARCHINFOS) if trackers == "all" else [trackers]
     if any(t not in SEARCHINFOS for t in targets):
@@ -514,7 +538,8 @@ def pipeline(
         _open_windows_browser(url)
         rep = run_pipeline(since=since, until=until, trackers=targets, db=db, out=out,
                            summarize_limit=limit, cleanup=cleanup, gate=gate,
-                           browser_base=browser_base, reporter=reporter)
+                           translate=translate, browser_base=browser_base,
+                           reporter=reporter)
         reporter.summary(rep)   # marks finished → browser shows completion panel
         print(rep.one_line())
         if sys.stdin.isatty():
@@ -532,7 +557,8 @@ def pipeline(
     with reporter:
         rep = run_pipeline(since=since, until=until, trackers=targets, db=db, out=out,
                            summarize_limit=limit, cleanup=cleanup, gate=gate,
-                           browser_base=browser_base, reporter=reporter)
+                           translate=translate, browser_base=browser_base,
+                           reporter=reporter)
     # Completion summary printed after the live display has stopped.
     reporter.summary(rep)
     if verbose:
@@ -566,6 +592,61 @@ def _open_windows_browser(url: str) -> None:
             return
         except Exception:
             continue
+
+
+@app.command("translate")
+def translate_backfill(
+    db: Path = typer.Option(DEFAULT_DB),
+    out: Path = typer.Option(DEFAULT_OUT, "--out"),
+    limit: int = typer.Option(100_000, help="max articles to translate this run"),
+    rewrite: bool = typer.Option(True, "--rewrite/--no-rewrite",
+                                 help="Re-render affected day files + manifests afterwards"),
+) -> None:
+    """Backfill English (title/summary/tags) for already-summarized articles.
+
+    Translates every ready/written article that still lacks an English summary
+    via local ollama, then (default) re-renders the affected day data files and
+    manifests so the static site exposes the new English fields. Idempotent and
+    resumable — re-running only picks up rows still missing a translation.
+    """
+    from .llm.translate import translate_article
+    from .orchestrator import rebuild_days
+    from .preflight import ensure_ollama
+
+    if not ensure_ollama():
+        console.print("[red]ollama 不可用，無法翻譯[/red]")
+        raise typer.Exit(1)
+    store = Store(db)
+    rows = store.list_untranslated(limit=limit, statuses=("ready", "written"))
+    total = len(rows)
+    if not total:
+        console.print("[green]沒有待翻譯的文章（全部已有英文版）。[/green]")
+        raise typer.Exit(0)
+    console.print(f"翻譯 {total} 篇 → 英文（本地 ollama）…")
+    done = 0
+    affected: set[str] = set()
+    for i, r in enumerate(rows, 1):
+        tags = [t for t in (r["tags"] or "").split(",") if t]
+        try:
+            tr = translate_article(title=r["title"] or "", summary=r["summary"] or "",
+                                   tags=tags)
+        except Exception as exc:
+            console.print(f"  [yellow]id={r['id']} 翻譯失敗：{exc}[/yellow]")
+            continue
+        if tr["summary_en"]:
+            store.update_translation(
+                r["id"], title_en=tr["title_en"] or r["title"] or "",
+                summary_en=tr["summary_en"], tags_en=tr["tags_en"])
+            done += 1
+            if r["date"]:
+                affected.add(r["date"])
+        if i % 20 == 0 or i == total:
+            console.print(f"  {i}/{total}（成功 {done}）")
+    console.print(f"[green]翻譯完成：{done}/{total} 篇[/green]")
+    if rewrite and affected:
+        console.print(f"重新產生 {len(affected)} 個日期的資料檔與 manifest…")
+        n = rebuild_days(store, out, sorted(affected))
+        console.print(f"[green]已重寫 {n} 個日檔 → {out}[/green]")
 
 
 @app.command("cross-scan")

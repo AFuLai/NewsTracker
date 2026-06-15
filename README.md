@@ -10,10 +10,21 @@ HTML site to `D:\Claude\Track Security\html\`.
 
 ```bash
 cd /opt/tracker && source .venv/bin/activate
-tracker pipeline --since 2026-06-09 --until 2026-06-15
+tracker pipeline --days 7          # 更新最近 7 天（含今天）
 # → one summary line, e.g.
 # run#42 OK 2026-06-09..2026-06-15 [security,eu_cra] | fetch 41new/40src (304:6 fail:1) | gate -23 | sum 38/41 (oow:3 rev_fail:1) | cross +4/-2 | write 13d | err 2 | 612s
 ```
+
+**Date window.** Three ways, in priority order:
+
+| Form | Window |
+|------|--------|
+| `--days N` | most recent N days **including today** (`--days 1` = today only) |
+| `--since YYYY-MM-DD --until YYYY-MM-DD` | explicit range |
+| *(omit all)* | default = last 7 days incl. today |
+
+`--since` alone runs from that date to today; `--until` alone ends there with a
+7-day lookback. `--days` overrides both.
 
 On an interactive terminal this shows a **live execution dashboard** — the
 planned phases (Preflight → Fetch → Gate → Summarize → Write → Cleanup) with
@@ -127,6 +138,26 @@ debug Chrome (CDP) — opt-in; needs `chrome --remote-debugging-port=9999`.
 | L2 summarize | `llm/summarize.py` |繁中 summary + category + tags |
 | L3 review | `llm/review.py` | deterministic anti-hallucination (cited CVE/CVSS must appear in the source body); 1 retry then `review_failed` |
 | L4 probe | `llm/probe.py` | page-structure classification for auto-probe |
+| L5 translate | `llm/translate.py` | English mirror of title/summary/tags (zh→en; CVE IDs & proper nouns preserved) |
+
+## Bilingual (中文 / English)
+
+Every article is summarized in Traditional Chinese, then mirrored into English by
+the local L5 layer (`title_en` / `summary_en` / `tags_en` columns; CVE IDs,
+versions, and proper nouns are kept verbatim). The site has a **🌐 中 / EN**
+toggle in the top-right header — it switches article text, category labels,
+tracker names, and all UI chrome, and remembers the choice in `localStorage`.
+Items without an English mirror fall back to Chinese, so the toggle is always safe.
+
+The pipeline translates new articles automatically (the **Translate** phase runs
+after Summarize). To backfill or re-translate existing history:
+
+```bash
+tracker translate            # translate every article still missing English,
+                             # then re-render the affected day files + manifests
+tracker translate --no-rewrite   # DB only, skip the re-render
+tracker pipeline --days 7 --no-translate   # skip the English mirror for one run
+```
 
 ## CLI
 

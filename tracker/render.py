@@ -85,6 +85,9 @@ def render_day(*, day: str, rows: list[dict], out_dir: Path,
     )
     items = []
     for i, r in enumerate(sorted_rows, 1):
+        tags_en = r.get("tags_en")
+        if isinstance(tags_en, str):
+            tags_en = [t for t in tags_en.split(",") if t]
         items.append({
             "id": f"{day.replace('-', '')}-{i:03d}",
             "trackers": _trackers_of(r),
@@ -93,6 +96,10 @@ def render_day(*, day: str, rows: list[dict], out_dir: Path,
             "summary": r.get("summary") or "",
             "tags": [t for t in (r.get("tags") or "").split(",") if t] if isinstance(r.get("tags"), str)
                     else (r.get("tags") or []),
+            # English mirror — emitted only when present; UI falls back to zh.
+            "title_en": r.get("title_en") or "",
+            "summary_en": r.get("summary_en") or "",
+            "tags_en": tags_en or [],
             "sources": _parse_sources(r),
         })
     text = _env.get_template("data_day.js.j2").render(day=day, items=items)

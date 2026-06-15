@@ -60,6 +60,7 @@ class RunReport:
     summarize_attempted: int = 0
     summarized: int = 0
     review_failed: int = 0
+    translated: int = 0
     out_of_window: int = 0
     cross_added: int = 0
     cross_removed: int = 0
@@ -77,6 +78,7 @@ class RunReport:
                 f"gate -{self.gated_out} | "
                 f"sum {self.summarized}/{self.summarize_attempted} "
                 f"(oow:{self.out_of_window} rev_fail:{self.review_failed}) | "
+                f"i18n {self.translated} | "
                 f"cross +{self.cross_added}/-{self.cross_removed} | "
                 f"write {self.days_written}d | err {len(self.errors)} | "
                 f"{self.elapsed_s:.0f}s")
@@ -97,7 +99,7 @@ def _setup_logger(run_ts: str) -> logging.Logger:
 def run_pipeline(*, since: str, until: str, trackers: list[str],
                  db: Path = DEFAULT_DB, out: Path = DEFAULT_OUT,
                  summarize_limit: int = 300, cleanup: bool = True,
-                 gate: bool = True, concurrency: int = 8,
+                 gate: bool = True, translate: bool = True, concurrency: int = 8,
                  browser_base: str | None = None, reporter=None) -> RunReport:
     from .progress import NullReporter
     rpt = reporter or NullReporter()
@@ -115,7 +117,10 @@ def run_pipeline(*, since: str, until: str, trackers: list[str],
     plan = [("preflight", "Preflight"), ("fetch", "Fetch")]
     if gate:
         plan.append(("gate", "Gate"))
-    plan += [("summarize", "Summarize"), ("write", "Write")]
+    plan.append(("summarize", "Summarize"))
+    if translate:
+        plan.append(("translate", "Translate"))
+    plan.append(("write", "Write"))
     if cleanup:
         plan.append(("cleanup", "Cleanup"))
     rpt.begin(since=since, until=until, trackers=trackers, phases=plan)
@@ -138,6 +143,8 @@ def run_pipeline(*, since: str, until: str, trackers: list[str],
         if gate:
             _phase_gate(store, trackers, rep, log, rpt)
         _phase_summarize(store, window, trackers, rep, log, summarize_limit, concurrency, rpt)
+        if translate:
+            _phase_translate(store, rep, log, rpt)
         _phase_write(store, trackers, rep, log, out, rpt)
         if cleanup:
             _phase_cross_cleanup(store, rep, log, rpt)
@@ -398,6 +405,36 @@ def _phase_summarize(store, window, trackers, rep, log, limit, concurrency, rpt)
                             f"(oow {rep.out_of_window}, rev-fail {rep.review_failed})")
 
 
+# ── Phase 3b: TRANSLATE (L5 — English mirror) ────────────────────────────────
+
+def _phase_translate(store, rep, log, rpt):
+    """Translate freshly-summarized (ready) articles into English so the write
+    phase emits both languages. Forward-only: only rows lacking summary_en."""
+    rpt.enter("translate", "translating to English")
+    from .llm.translate import translate_article
+    rows = store.list_untranslated(limit=100_000, statuses=("ready",))
+    total = len(rows)
+    if not total:
+        rpt.result("translate", "0 (nothing new)")
+        return
+    for i, r in enumerate(rows, 1):
+        rpt.tick(i, total, f"{(r['title'] or '')[:70]}")
+        tags = [t for t in (r["tags"] or "").split(",") if t]
+        try:
+            tr = translate_article(title=r["title"] or "", summary=r["summary"] or "",
+                                   tags=tags)
+        except Exception as exc:
+            log.debug("translate id=%s error: %s", r["id"], exc)
+            continue
+        if tr["summary_en"]:
+            store.update_translation(
+                r["id"], title_en=tr["title_en"] or r["title"] or "",
+                summary_en=tr["summary_en"], tags_en=tr["tags_en"])
+            rep.translated += 1
+    log.info("translate complete: %d/%d", rep.translated, total)
+    rpt.result("translate", f"{rep.translated}/{total} → EN")
+
+
 # ── Phase 4: WRITE ───────────────────────────────────────────────────────────
 
 def _phase_write(store, trackers, rep, log, out, rpt):
@@ -449,6 +486,51 @@ def _ready_dates(store, tracker) -> list[str]:
         "SELECT DISTINCT date FROM articles WHERE status='ready' AND date IS NOT NULL "
         "AND (','||trackers||',') LIKE '%,'||?||',%' ORDER BY date DESC", (tracker,))
     return [r[0] for r in rows]
+
+
+def rebuild_days(store, out: Path, dates: list[str] | None = None) -> int:
+    """Re-render day data files + manifests for the given dates (or every
+    summarized day if None). Used after a bulk translation backfill so the
+    static files pick up the new English fields. Does not change article status.
+    Returns the number of day files rewritten."""
+    from .cluster import merge_by_title
+    from .render import (render_day, update_month_manifest,
+                         update_root_manifest, update_year_manifest)
+
+    data_dir = out / "data"
+    all_categories: list[str] = []
+    tracker_metas: dict[str, dict] = {}
+    for name in SEARCHINFOS:
+        try:
+            ti = load_tracker(name)
+            tracker_metas[name] = {"title": ti.title, "categories": ti.categories}
+            for c in ti.categories:
+                if c not in all_categories:
+                    all_categories.append(c)
+        except Exception:
+            tracker_metas[name] = {"title": name, "categories": []}
+
+    if dates is None:
+        dates = [r[0] for r in store.conn.execute(
+            "SELECT DISTINCT date FROM articles WHERE status IN ('ready','written') "
+            "AND date IS NOT NULL")]
+    months: set[str] = set()
+    years: set[str] = set()
+    written = 0
+    for d in sorted(set(dates)):
+        rows = [dict(r) for r in store.list_writable_for_day(d)]
+        if not rows:
+            continue
+        rows = merge_by_title(rows)
+        render_day(day=d, rows=rows, out_dir=data_dir, allowed_categories=all_categories)
+        months.add(d[:7]); years.add(d[:4]); written += 1
+    for tname in tracker_metas:
+        for m in sorted(months):
+            update_month_manifest(month=m, data_root=data_dir, tracker=tname)
+        for y in sorted(years):
+            update_year_manifest(year=y, data_root=data_dir, tracker=tname)
+    update_root_manifest(root_html=out, trackers=tracker_metas)
+    return written
 
 
 # ── Phase 5: cross-scan reverse cleanup ──────────────────────────────────────

@@ -87,6 +87,19 @@ def _ensure_v2_columns(conn) -> None:
         conn.execute("ALTER TABLE articles ADD COLUMN content_hash TEXT")
         conn.commit()
 
+
+def _ensure_i18n_columns(conn) -> None:
+    """Idempotent ALTER for the English mirror of each article (v2.4).
+
+    title_en/summary_en/tags_en hold the ollama-translated English version of
+    the zh summary. NULL/empty means 'not translated yet' → the UI falls back
+    to the Chinese fields, so this is fully back-compatible."""
+    cols = [r[1] for r in conn.execute("PRAGMA table_info(articles)").fetchall()]
+    for col in ("title_en", "summary_en", "tags_en"):
+        if col not in cols:
+            conn.execute(f"ALTER TABLE articles ADD COLUMN {col} TEXT")
+    conn.commit()
+
 _TRACKING_PARAMS = re.compile(r"^(utm_|fbclid|gclid|mc_eid|mc_cid|_hsenc|_hsmi)", re.I)
 
 
@@ -114,6 +127,7 @@ class Store:
         self.conn.executescript(SCHEMA)
         _ensure_trackers_column(self.conn)
         _ensure_v2_columns(self.conn)
+        _ensure_i18n_columns(self.conn)
         self.conn.commit()
 
     def upsert_candidate(self, *, url: str, source: str, title: str | None = None,
@@ -222,6 +236,27 @@ class Store:
                  datetime.utcnow().isoformat(), article_id),
             )
         self.conn.commit()
+
+    # ── i18n / English mirror (v2.4) ────────────────────────────────────────
+
+    def update_translation(self, article_id: int, *, title_en: str,
+                           summary_en: str, tags_en) -> None:
+        tags = ",".join(tags_en) if isinstance(tags_en, (list, tuple)) else (tags_en or "")
+        self.conn.execute(
+            "UPDATE articles SET title_en=?, summary_en=?, tags_en=? WHERE id=?",
+            (title_en or "", summary_en or "", tags, article_id))
+        self.conn.commit()
+
+    def list_untranslated(self, limit: int = 100_000, *,
+                          statuses: tuple[str, ...] = ("ready", "written")) -> list[sqlite3.Row]:
+        """Summarized articles that still lack an English summary."""
+        qs = ",".join("?" * len(statuses))
+        return list(self.conn.execute(
+            f"SELECT * FROM articles WHERE status IN ({qs}) "
+            "AND summary IS NOT NULL AND summary != '' "
+            "AND (summary_en IS NULL OR summary_en = '') "
+            "ORDER BY date DESC, id LIMIT ?",
+            (*statuses, limit)))
 
     def mark_written(self, article_ids: list[int]) -> None:
         self.conn.executemany(
