@@ -16,6 +16,15 @@
 <h1>Tracker ChangeLog</h1>
 <p class="meta">本檔由 <code>tracker pack</code> 自動維護；每次打包前由本地 ollama 生成版本重點並 prepend 於下方。</p>
 <!-- CHANGELOG_INSERTION_POINT -->
+<section class="release" id="v2.2">
+  <h2>v2.2 — 2026-06-15</h2>
+<ul>
+    <li><strong>[技術更新]</strong> 預設的 Chrome 除錯埠 (Debug Port) 已從 9222 更新為 9999，提升了環境的穩定性和兼容性。</li>
+    <li>優化瀏覽器資料擷取流程與預檢機制：大幅重構了 `tracker/preflight.py` 及 `tracker/fetchers/browser.py`，提升了從網頁獲取資料的可靠性與效率。</li>
+    <li>提升測試覆蓋率與文件完整性：更新了相關測試案例 (`tests/test_browser.py`)，確保核心功能在不同環境下都能穩定運行，並更新了 README 文件。</li>
+</ul>
+</section>
+
 <section class="release" id="v2.1">
   <h2>v2.1 — 2026-06-15</h2>
 <ul>
