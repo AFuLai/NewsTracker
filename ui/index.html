@@ -674,6 +674,11 @@ function applyLang() {
     setActivePill('#tracker-pills', '[data-tracker="' + state.currentTracker + '"]');
     buildCatPills((mf && mf.categories) || []);
     setActivePill('#cat-pills', '[data-cat="' + state.filterCat + '"]');
+    if (state.searchQuery && state.search) {
+      // Matched set depends on language (we search the displayed fields) → redo it.
+      refreshSearchView();
+      return;
+    }
     if (state.currentYear) {
       buildMonthGrid(state.currentYear);
       if (state.currentMonth) setActiveMonthBtn(state.currentMonth);
@@ -695,11 +700,14 @@ function toggleLang() { state.lang = state.lang === 'en' ? 'zh' : 'en'; applyLan
 // Matches across title/summary/tags in BOTH languages so a query works
 // regardless of the display language. Space-separated terms are ANDed.
 function searchHaystack(a) {
+  // Search only what is DISPLAYED in the current language — artTitle/artSummary/
+  // artTags return the en fields in EN mode, the zh fields in 中文 mode (with
+  // fallback). So a 中文 search never matches a hidden English title, and vice-versa.
   const sc = state.searchScope;
   const parts = [];
-  if (sc.title) parts.push(a.title, a.title_en);
-  if (sc.body)  parts.push(a.summary, a.summary_en);
-  if (sc.tags)  parts.push((a.tags || []).join(' '), (a.tags_en || []).join(' '));
+  if (sc.title) parts.push(artTitle(a));
+  if (sc.body)  parts.push(artSummary(a));
+  if (sc.tags)  parts.push(artTags(a).join(' '));
   return parts.join(' ').toLowerCase();
 }
 // Match one term against the haystack on a WORD boundary (alphanumeric edges),

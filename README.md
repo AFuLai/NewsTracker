@@ -153,10 +153,14 @@ Items without an English mirror fall back to Chinese, so the toggle is always sa
 
 The news area's first row has a **🔎 search box** that queries the whole site
 (the current tracker, across all years). On the first search the UI lazy-loads
-every day file once, then filters in-memory; matching is case-insensitive, ANDs
-space-separated terms, and looks in **both languages** (so an English query finds
-Chinese articles via the mirror, and vice-versa). Results respect the active
-category filter.
+every day file once, then filters in-memory. Matching is case-insensitive, ANDs
+space-separated terms, and is done on **word boundaries** for alphanumeric terms
+(so "CRA" matches the acronym, not the "cra" inside "crash") while keeping
+substring matching for CJK. It searches **only the fields shown in the current
+language** — on the 中文 page it matches the Chinese title/summary/tags, on the
+English page the English ones — so a search never hits a hidden translation.
+Results respect the active category filter, and switching language re-runs an
+active search.
 
 Next to the box are **scope toggles — 標題 / 內文 / 標籤 (Title / Body / Tags)** —
 to restrict which fields are matched; all three are on by default and at least
