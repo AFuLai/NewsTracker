@@ -1,7 +1,7 @@
 """BROWSER fetcher — render a JS-only listing page via a debug Chrome (CDP).
 
 Opt-in: only profiles whose method is BROWSER use this. The CDP base URL of a
-running debug Chrome (chrome --remote-debugging-port=9222) is supplied by the
+running debug Chrome (chrome --remote-debugging-port=9999) is supplied by the
 orchestrator in profile.extra['cdp_base'] (resolved by preflight.ensure_browser).
 If Chrome/CDP is unavailable or websocket-client is missing, the fetch returns a
 clean error and the pipeline carries on with the other sources.

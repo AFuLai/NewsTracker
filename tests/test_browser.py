@@ -26,8 +26,8 @@ def test_browser_fetch_no_cdp_returns_error():
 
 
 def test_ensure_browser_found(monkeypatch):
-    monkeypatch.setattr(preflight, "find_browser", lambda **k: "http://localhost:9222")
-    assert preflight.ensure_browser(interactive=False) == "http://localhost:9222"
+    monkeypatch.setattr(preflight, "find_browser", lambda **k: "http://localhost:9999")
+    assert preflight.ensure_browser(interactive=False) == "http://localhost:9999"
 
 
 def test_ensure_browser_not_found_noninteractive(monkeypatch):
@@ -38,6 +38,6 @@ def test_ensure_browser_not_found_noninteractive(monkeypatch):
 
 def test_candidate_cdp_bases_includes_localhost_and_host():
     bases = preflight._candidate_cdp_bases()
-    assert any("localhost:9222" in b for b in bases)
+    assert any("localhost:9999" in b for b in bases)
     # at least the loopback candidates are always present
-    assert any("127.0.0.1:9222" in b for b in bases)
+    assert any("127.0.0.1:9999" in b for b in bases)

@@ -6,8 +6,8 @@ for next time.
 
 ensure_browser(): some sources need a real JS-rendering browser (method=BROWSER).
 We cannot reliably auto-launch a GUI Chrome, so if a debug Chrome
-(--remote-debugging-port=9222) is not reachable we notify the user and let them
-start it then retry, or cancel.
+(--remote-debugging-port=9999, see CDP_PORT) is not reachable we notify the user
+and let them start it then retry, or cancel.
 """
 from __future__ import annotations
 
@@ -56,15 +56,19 @@ def ensure_ollama(*, start_timeout: int = 40, console=None) -> bool:
 
 # ── Debug Chrome (only needed for BROWSER-method sources) ────────────────────
 
+# Default Chrome DevTools remote-debugging port.
+CDP_PORT = 9999
+
+
 def _candidate_cdp_bases() -> list[str]:
-    bases = ["http://localhost:9222", "http://127.0.0.1:9222"]
+    bases = [f"http://localhost:{CDP_PORT}", f"http://127.0.0.1:{CDP_PORT}"]
     # WSL → Windows host (where the user's debug Chrome usually runs)
     try:
         out = subprocess.run(["ip", "route"], capture_output=True, text=True).stdout
         for line in out.splitlines():
             if line.startswith("default"):
                 gw = line.split()[2]
-                bases.append(f"http://{gw}:9222")
+                bases.append(f"http://{gw}:{CDP_PORT}")
                 break
     except Exception:
         pass
@@ -94,8 +98,8 @@ def ensure_browser(*, interactive: bool = True, console=None) -> str | None:
     _say("\n[yellow]需要除錯模式的 Chrome（debug Chrome）來處理需 JavaScript 渲染的來源，"
          "但目前偵測不到。[/yellow]" if console else
          "需要除錯模式的 Chrome（debug Chrome）來處理需 JS 渲染的來源，但目前偵測不到。")
-    _say("請以除錯埠啟動 Chrome，例如：\n"
-         "  chrome.exe --remote-debugging-port=9222\n"
+    _say(f"請以除錯埠啟動 Chrome，例如：\n"
+         f"  chrome.exe --remote-debugging-port={CDP_PORT}\n"
          "（Windows 端啟動即可，WSL 會自動連到主機）")
     if not (interactive and sys.stdin.isatty()):
         _say("（非互動模式：略過 BROWSER 來源）" if console else
@@ -109,4 +113,4 @@ def ensure_browser(*, interactive: bool = True, console=None) -> str | None:
         if base:
             _say("[green]已連上 debug Chrome。[/green]" if console else "已連上 debug Chrome。")
             return base
-        _say("仍偵測不到，請確認除錯埠 9222 已開啟。")
+        _say(f"仍偵測不到，請確認除錯埠 {CDP_PORT} 已開啟。")

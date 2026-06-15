@@ -30,7 +30,7 @@ tracker status --last-run
 auto-starts `ollama serve` in the background (detached, left running for next
 time). If a chosen source needs a JS-rendering browser (method=BROWSER) and a
 debug Chrome isn't reachable, you're told to start it
-(`chrome --remote-debugging-port=9222`) and retry, or cancel (browser sources
+(`chrome --remote-debugging-port=9999`) and retry, or cancel (browser sources
 are then skipped).
 
 ## Architecture (v2)
@@ -103,7 +103,7 @@ then dispatches to it. **No edits to `cli.py` or `orchestrator.py`.** Point a
 source at it by setting that profile's `method` (via `init-profiles` mapping or
 `tracker probe --save`). Canonical methods: FEED / LISTING / SEARCH / API /
 ARCHIVE / BROWSER (see `tracker/methods.py`). BROWSER renders JS-only pages via a
-debug Chrome (CDP) — opt-in; needs `chrome --remote-debugging-port=9222`.
+debug Chrome (CDP) — opt-in; needs `chrome --remote-debugging-port=9999`.
 
 ## Ollama layers
 
