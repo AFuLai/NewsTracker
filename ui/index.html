@@ -104,26 +104,37 @@ header {
   margin: 0 0.25rem;
   flex-shrink: 0;
 }
-.hd-grow { flex: 1; }
+/* Search row — sits as the first row of the news area (sticky on scroll). */
+#search-row {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: var(--bg);
+  padding-bottom: 0.7rem;
+  margin-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
 #search-wrap {
   display: flex;
   align-items: center;
-  gap: 4px;
-  background: var(--bg);
+  gap: 6px;
+  background: var(--bg2);
   border: 1px solid var(--border);
   border-radius: 9999px;
-  padding: 2px 8px;
-  flex-shrink: 0;
+  padding: 6px 14px;
+  width: 100%;
+  max-width: 560px;
 }
 #search-wrap:focus-within { border-color: var(--active); }
-.search-ico { font-size: 0.8rem; opacity: 0.65; }
+.search-ico { font-size: 0.9rem; opacity: 0.65; }
 #search-box {
   background: none;
   border: none;
   color: var(--text);
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   outline: none;
-  width: 170px;
+  flex: 1;
+  min-width: 0;
 }
 #search-box::placeholder { color: var(--text2); }
 #search-box::-webkit-search-cancel-button { -webkit-appearance: none; }
@@ -488,12 +499,6 @@ a.card-tag:hover { text-decoration: underline; }
     <div id="year-pills"></div>
     <div class="hd-sep"></div>
     <div id="cat-pills"></div>
-    <div class="hd-grow"></div>
-    <div id="search-wrap">
-      <span class="search-ico">🔎</span>
-      <input id="search-box" type="search" placeholder="搜尋全站新聞…" autocomplete="off" spellcheck="false">
-      <button id="search-clear" title="清除搜尋">✕</button>
-    </div>
   </div>
 </header>
 
@@ -510,6 +515,13 @@ a.card-tag:hover { text-decoration: underline; }
     </div>
   </aside>
   <main id="main-content">
+    <div id="search-row">
+      <div id="search-wrap">
+        <span class="search-ico">🔎</span>
+        <input id="search-box" type="search" placeholder="搜尋全站新聞…" autocomplete="off" spellcheck="false">
+        <button id="search-clear" title="清除搜尋">✕</button>
+      </div>
+    </div>
     <div id="loading-msg">載入中…</div>
     <div id="no-data" class="hidden"></div>
   </main>
@@ -1047,9 +1059,9 @@ function renderArticles(dateList) {
 
   document.getElementById('article-count').textContent = articles.length;
 
-  // Clear old cards (keep loading/no-data divs)
+  // Clear old cards (keep search row + loading/no-data divs)
   Array.from(main.children).forEach(c => {
-    if (c.id !== 'loading-msg' && c.id !== 'no-data') c.remove();
+    if (c.id !== 'loading-msg' && c.id !== 'no-data' && c.id !== 'search-row') c.remove();
   });
 
   if (!articles.length) {
@@ -1214,7 +1226,7 @@ function showMsg(msg) {
   el.textContent = msg;
   document.getElementById('no-data').classList.add('hidden');
   Array.from(document.getElementById('main-content').children).forEach(c => {
-    if (c.id !== 'loading-msg' && c.id !== 'no-data') c.remove();
+    if (c.id !== 'loading-msg' && c.id !== 'no-data' && c.id !== 'search-row') c.remove();
   });
 }
 function linkifyCVE(html) {
