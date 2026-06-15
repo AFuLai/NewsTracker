@@ -14,3 +14,5 @@ build/
 dist/
 .DS_Store
 COMMIT_MSG.tmp
+logs/
+db/query_cache.json

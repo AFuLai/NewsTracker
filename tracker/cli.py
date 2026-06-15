@@ -40,8 +40,37 @@ def status(
     tracker: str = typer.Option(DEFAULT_TRACKER, "--tracker", help=f"One of: {list(SEARCHINFOS)}"),
     searchinfo: Path | None = typer.Option(None, help="Override searchinfo path"),
     db: Path = typer.Option(DEFAULT_DB),
+    last_run: bool = typer.Option(False, "--last-run",
+                                  help="Show details of the most recent pipeline run"),
 ) -> None:
-    """Show source list, DB stats, current version."""
+    """Show source list, DB stats, current version (or --last-run details)."""
+    if last_run:
+        import json as _json
+        store = Store(db)
+        row = store.last_run()
+        if not row:
+            console.print("[yellow]No runs recorded yet.[/yellow]"); raise typer.Exit(0)
+        console.print(f"[bold]Run #{row['run_id']}[/bold]  "
+                      f"started={row['started_at']}  finished={row['finished_at']}  "
+                      f"ok={row['ok']}")
+        console.print(f"[bold]args:[/bold] {row['args']}")
+        stats = _json.loads(row["stats"]) if row["stats"] else {}
+        t = Table(title="Phase stats")
+        t.add_column("metric"); t.add_column("value", justify="right")
+        for k in ("fetch_sources", "fetch_304", "fetch_failed", "fetch_new",
+                  "gated_out", "summarize_attempted", "summarized", "out_of_window",
+                  "review_failed", "cross_added", "cross_removed", "days_written",
+                  "elapsed_s"):
+            if k in stats:
+                t.add_row(k, str(stats[k]))
+        console.print(t)
+        errs = _json.loads(row["errors"]) if row["errors"] else []
+        if errs:
+            console.print(f"[red]errors ({len(errs)}):[/red]")
+            for e in errs[:10]:
+                console.print(f"  - {e}")
+        raise typer.Exit(0)
+
     info = _info_for(tracker, searchinfo)
     m, n = read_version()
     console.print(f"[bold]Tracker:[/bold] {tracker}")
@@ -432,119 +461,35 @@ def pipeline(
     db: Path = typer.Option(DEFAULT_DB),
     out: Path = typer.Option(DEFAULT_OUT, "--out"),
     site_search: bool = typer.Option(True, "--site-search/--no-site-search",
-                                     help="DDG SITE search; for eu_cra defaults on"),
+                                     help="[deprecated/ignored] SEARCH profiles always run in v2"),
     limit: int = typer.Option(300, help="summarize per-tracker limit"),
     cleanup: bool = typer.Option(True, "--cleanup/--no-cleanup",
-                                 help="Run cross-scan --reverse after writes"),
+                                 help="Run cross-scan reverse cleanup after writes"),
+    verbose: bool = typer.Option(False, "--verbose",
+                                 help="Print the full RunReport, not just the one line"),
 ) -> None:
-    """One-shot: fetch → summarize → write → cross-scan, for one or all trackers.
+    """One-shot in-process pipeline: fetch → gate → summarize → write → cleanup.
 
-    Designed for daily/weekly updates: collapses 5+ commands into one and
-    handles per-tracker EU CRA defaults (query_prefix, site-search) automatically.
+    Single process (no subprocess self-calls). For zero-touch operation it prints
+    ONE summary line and exits 0/1; full detail goes to logs/run-*.log + the runs
+    table + status.json. Use `tracker status --last-run` for human-readable detail.
     """
-    import subprocess, time
+    from .orchestrator import run_pipeline
 
     targets = list(SEARCHINFOS) if trackers == "all" else [trackers]
     if any(t not in SEARCHINFOS for t in targets):
         console.print(f"[red]Unknown tracker(s): {targets}; known={list(SEARCHINFOS)}[/red]")
         raise typer.Exit(2)
 
-    t0 = time.time()
-    stats: dict[str, dict] = {t: {"fetch_new": 0, "summarized": 0, "written_days": 0}
-                              for t in targets}
-
-    # Telemetry: count total bytes of subprocess stdout/stderr that came back
-    # to this orchestrator. Estimating Claude tokens at ~4 bytes/token (a
-    # rough convention for mixed CJK + ASCII output) gives the user a sense
-    # of how much terminal output a same-shape pipeline run produces.
-    io_bytes = 0
-
-    def _io(r):
-        nonlocal io_bytes
-        io_bytes += len(r.stdout or "") + len(r.stderr or "")
-        return r
-
-    # ── Phase 1: fetch ──────────────────────────────────────────────────────
-    for tk in targets:
-        cmd = ["tracker", "fetch", "--tracker", tk, "--since", since, "--until", until,
-               "--db", str(db)]
-        if site_search:
-            cmd += ["--site-search"]
-        if tk == "eu_cra":
-            cmd += ["--query-prefix", "Cyber Resilience Act"]
-        console.print(f"[bold cyan]>>> fetch[/bold cyan] {tk}: {' '.join(cmd[2:])}")
-        r = _io(subprocess.run(cmd, capture_output=True, text=True))
-        for line in (r.stdout + r.stderr).splitlines()[-3:]:
-            if "Inserted" in line:
-                # rough parse "Inserted N new candidates"
-                try:
-                    stats[tk]["fetch_new"] = int(line.split("Inserted")[1].split()[0])
-                except Exception:
-                    pass
-                console.print(f"    {line.strip()}")
-
-    # ── Phase 2: summarize ──────────────────────────────────────────────────
-    for tk in targets:
-        cmd = ["tracker", "summarize", "--tracker", tk, "--pending", "--limit", str(limit),
-               "--since", since, "--until", until, "--db", str(db)]
-        console.print(f"[bold cyan]>>> summarize[/bold cyan] {tk}")
-        r = _io(subprocess.run(cmd, capture_output=True, text=True))
-        for line in (r.stdout + r.stderr).splitlines()[-5:]:
-            if "Summarized" in line:
-                try:
-                    stats[tk]["summarized"] = int(line.split("Summarized")[1].split("/")[0].strip())
-                except Exception:
-                    pass
-                console.print(f"    {line.strip()}")
-
-    # ── Phase 3: write per-day per-tracker ──────────────────────────────────
-    from .dedup import Store
-    store = Store(db)
-    dates = sorted({r[0] for r in store.conn.execute(
-        "SELECT DISTINCT date FROM articles WHERE date >= ? AND date <= ? "
-        "AND status IN ('ready','written')", (since, until)).fetchall() if r[0]})
-    console.print(f"[bold cyan]>>> write[/bold cyan] {len(dates)} dates × {len(targets)} trackers")
-    for d in dates:
-        for tk in targets:
-            # Re-open status=ready for dates with prior writes so subsequent runs
-            # actually re-render with newest cross-belongings.
-            store.conn.execute(
-                "UPDATE articles SET status='ready' WHERE date=? AND status='written' "
-                "AND (','||trackers||',') LIKE '%,'||?||',%'", (d, tk))
-            store.conn.commit()
-            r = _io(subprocess.run(
-                ["tracker", "write", "--tracker", tk, "--date", d, "--force",
-                 "--db", str(db), "--out", str(out)],
-                capture_output=True, text=True))
-            if "Wrote" in r.stdout or "Refreshed" in r.stdout:
-                stats[tk]["written_days"] += 1
-
-    # ── Phase 4: optional reverse cross-scan ────────────────────────────────
-    if cleanup:
-        console.print(f"[bold cyan]>>> cross-scan --reverse[/bold cyan]")
-        r = _io(subprocess.run(["tracker", "cross-scan", "--reverse", "--db", str(db)],
-                               capture_output=True, text=True))
-        for line in (r.stdout + r.stderr).splitlines()[-5:]:
-            if "added" in line or "demoted" in line:
-                console.print(f"    {line.strip()}")
-
-    # ── Summary ─────────────────────────────────────────────────────────────
-    elapsed = time.time() - t0
-    console.print(f"\n[bold green]pipeline complete[/bold green] in {elapsed:.0f}s")
-    t = Table(title="Pipeline summary")
-    t.add_column("tracker"); t.add_column("fetched new", justify="right")
-    t.add_column("summarized", justify="right"); t.add_column("days written", justify="right")
-    for tk in targets:
-        s = stats[tk]
-        t.add_row(tk, str(s["fetch_new"]), str(s["summarized"]), str(s["written_days"]))
-    console.print(t)
-
-    # Token telemetry: bytes captured from subprocesses ÷ 4 ≈ tokens. This is
-    # the cost that would be incurred if a Claude orchestrator surfaced the
-    # full pipeline output verbatim. Real cost depends on truncation/summary.
-    est_tokens = io_bytes // 4
-    console.print(f"[dim]I/O captured from subprocesses: {io_bytes:,} bytes  "
-                  f"≈ {est_tokens:,} tokens (if surfaced verbatim)[/dim]")
+    rep = run_pipeline(since=since, until=until, trackers=targets, db=db, out=out,
+                       summarize_limit=limit, cleanup=cleanup)
+    if verbose:
+        import json as _json
+        from dataclasses import asdict
+        console.print_json(_json.dumps(asdict(rep), ensure_ascii=False))
+    # Zero-touch contract: exactly one line to stdout.
+    print(rep.one_line())
+    raise typer.Exit(0 if rep.ok else 1)
 
 
 @app.command("cross-scan")
