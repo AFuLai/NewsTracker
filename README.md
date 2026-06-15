@@ -149,6 +149,23 @@ toggle in the top-right header — it switches article text, category labels,
 tracker names, and all UI chrome, and remembers the choice in `localStorage`.
 Items without an English mirror fall back to Chinese, so the toggle is always safe.
 
+## Site-wide search
+
+The header has a **🔎 search box** that queries the whole site (the current
+tracker, across all years). On the first search the UI lazy-loads every day file
+once, then filters in-memory; matching is case-insensitive, ANDs space-separated
+terms, and looks at title/summary/tags in **both languages** (so an English query
+finds Chinese articles via the mirror, and vice-versa). Results respect the
+active category filter.
+
+After a search the **date menu adjusts to the results**: year pills show only
+years with matches, the month grid greys out months with none, and the per-month
+date list shows only matched dates with their match counts — so you can drill
+year → month → date entirely within the result set. Clear the box (✕ or Esc) to
+return to normal browsing. Switching tracker or category re-scopes the search.
+
+## Bilingual translation backfill
+
 The pipeline translates new articles automatically (the **Translate** phase runs
 after Summarize). To backfill or re-translate existing history:
 
