@@ -705,6 +705,40 @@ def init_profiles(
 
 
 @app.command()
+def probe(
+    url: str = typer.Argument(..., help="Source URL to probe"),
+    tracker: str = typer.Option(DEFAULT_TRACKER, "--tracker"),
+    name: str = typer.Option("", help="Source display name (defaults to domain)"),
+    db: Path = typer.Option(DEFAULT_DB),
+    save: bool = typer.Option(False, "--save", help="Persist result to source_profiles"),
+    no_ollama: bool = typer.Option(False, "--no-ollama", help="Skip the L4 ollama step"),
+) -> None:
+    """Auto-detect the best fetch method for a source URL.
+
+    Probe order: RSS autodiscovery → listing density → stealth → ollama L4 →
+    Wayback → SEARCH fallback. With --save, writes method/feed_url/probe_note
+    into source_profiles so the next fetch self-configures.
+    """
+    from .probe import probe_and_save, probe_source
+    from urllib.parse import urlparse
+
+    if save:
+        store = Store(db)
+        dom = urlparse(url if url.startswith("http") else f"https://{url}").netloc
+        verdict = probe_and_save(store, url, name or dom, tracker,
+                                 use_ollama=not no_ollama)
+        console.print(f"[green]saved[/green] {verdict['domain']}: "
+                      f"method={verdict['method']} conf={verdict['confidence']:.2f}")
+    else:
+        verdict = probe_source(url, use_ollama=not no_ollama)
+    console.print(f"[bold]method:[/bold] {verdict['method']}  "
+                  f"[bold]confidence:[/bold] {verdict['confidence']:.2f}")
+    if verdict.get("feed_url"):
+        console.print(f"[bold]feed_url:[/bold] {verdict['feed_url']}")
+    console.print(f"[dim]{verdict['note']}[/dim]")
+
+
+@app.command()
 def pack(
     major: bool = typer.Option(False, "--major"),
     keep_version: bool = typer.Option(False, "--keep-version"),

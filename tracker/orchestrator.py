@@ -141,6 +141,16 @@ def run_pipeline(*, since: str, until: str, trackers: list[str],
 # ── Phase 1: FETCH ───────────────────────────────────────────────────────────
 
 def _phase_fetch(store, window, trackers, rep, log, concurrency):
+    # Auto-reprobe any source that has crossed the failure threshold so a site
+    # that changed its layout self-heals before we fetch it again.
+    try:
+        from .probe import reprobe_failing
+        reprobed = reprobe_failing(store)
+        if reprobed:
+            log.info("auto-reprobed %d failing sources", reprobed)
+    except Exception as exc:
+        log.warning("reprobe step skipped: %s", exc)
+
     all_hashes = store.all_url_hashes()       # one batch SELECT, then in-memory
     pending_new: list[dict] = []
     seen_this_run: set[str] = set()
