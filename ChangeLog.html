@@ -16,6 +16,20 @@
 <h1>Tracker ChangeLog</h1>
 <p class="meta">本檔由 <code>tracker pack</code> 自動維護；每次打包前由本地 ollama 生成版本重點並 prepend 於下方。</p>
 <!-- CHANGELOG_INSERTION_POINT -->
+<section class="release" id="v2.3">
+  <h2>v2.3 — 2026-06-15</h2>
+<ul>
+    <li><strong>✨ 新增功能：圖形瀏覽器儀表板 (Graphical Browser Dashboard)</strong><br>
+        新增了基於網頁的視覺化儀表板介面，透過 `pipeline --ui` 模式啟動，提供運行流程的即時監控體驗。</li>
+    <li><strong>📊 實時進度視覺化與狀態追蹤</strong><br>
+        儀表板支援即時的階段卡片（✓/▶/○）、各階段的進度條與計數、即時經過時間（Elapsed Clock）以及預計完成時間（ETA），讓使用者能一目瞭然地掌握爬取流程的運行狀態。</li>
+    <li><strong>💻 CLI/API 介面升級與跨平台支援</strong><br>
+        CLI 執行時，系統會自動選擇可用的埠號，並自動開啟預設瀏覽器指向儀表板。特別優化了在 WSL2 環境下，無需 X Server 也能穩定運行的能力。</li>
+    <li><strong>⚙️ 核心架構變更：WebReporter 實作</strong><br>
+        引入了 WebReporter，它負責在記憶體中維護運行狀態，並透過定時輪詢（Polling）機制，將最新的進度快照（JSON）和 HTML 頁面同步給瀏覽器，確保數據的即時性與完整性。</li>
+</ul>
+</section>
+
 <section class="release" id="v2.2">
   <h2>v2.2 — 2026-06-15</h2>
 <ul>
