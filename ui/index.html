@@ -702,10 +702,21 @@ function searchHaystack(a) {
   if (sc.tags)  parts.push((a.tags || []).join(' '), (a.tags_en || []).join(' '));
   return parts.join(' ').toLowerCase();
 }
+// Match one term against the haystack on a WORD boundary (alphanumeric edges),
+// so a short acronym like "CRA" matches "EU CRA"/"(CRA)" but NOT a fragment
+// inside a word like "crash". CJK has no a-z0-9 neighbours, so CJK terms still
+// match as substrings (e.g. 資安 inside 網路資安). Boundary chars are [a-z0-9];
+// the haystack is already lower-cased.
+function termMatches(hay, term) {
+  const esc = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const re = new RegExp('(?:^|[^a-z0-9])' + esc + '(?:[^a-z0-9]|$)');
+  return re.test(hay);
+}
 function matchesQuery(a, q) {
   if (!q) return true;
   const hay = searchHaystack(a);
-  return q.split(/\s+/).filter(Boolean).every(term => hay.includes(term));
+  return q.toLowerCase().split(/\s+/).filter(Boolean)
+          .every(term => termMatches(hay, term));
 }
 
 // Toggle a search-scope field (標題/內文/標籤). Keeps at least one active.
