@@ -467,30 +467,42 @@ def pipeline(
                                  help="Run cross-scan reverse cleanup after writes"),
     gate: bool = typer.Option(True, "--gate/--no-gate",
                               help="L1 relevance gate before summarize (drops noise)"),
+    quiet: bool = typer.Option(False, "--quiet",
+                               help="No live dashboard; print only the one-line summary"),
     verbose: bool = typer.Option(False, "--verbose",
-                                 help="Print the full RunReport, not just the one line"),
+                                 help="Also print the full RunReport JSON"),
 ) -> None:
     """One-shot in-process pipeline: fetch → gate → summarize → write → cleanup.
 
-    Single process (no subprocess self-calls). For zero-touch operation it prints
-    ONE summary line and exits 0/1; full detail goes to logs/run-*.log + the runs
-    table + status.json. Use `tracker status --last-run` for human-readable detail.
+    Interactive terminals get a live execution dashboard (phases, progress, ETA,
+    current item) and a completion summary. For headless/zero-touch use, --quiet
+    prints only the one-line summary. Full detail always goes to logs/run-*.log +
+    the runs table + status.json (`tracker status --last-run`).
     """
+    import sys
     from .orchestrator import run_pipeline
+    from .progress import LiveReporter, NullReporter
 
     targets = list(SEARCHINFOS) if trackers == "all" else [trackers]
     if any(t not in SEARCHINFOS for t in targets):
         console.print(f"[red]Unknown tracker(s): {targets}; known={list(SEARCHINFOS)}[/red]")
         raise typer.Exit(2)
 
-    rep = run_pipeline(since=since, until=until, trackers=targets, db=db, out=out,
-                       summarize_limit=limit, cleanup=cleanup, gate=gate)
+    live = (not quiet) and sys.stdout.isatty()
+    reporter = LiveReporter(console) if live else NullReporter()
+    with reporter:
+        rep = run_pipeline(since=since, until=until, trackers=targets, db=db, out=out,
+                           summarize_limit=limit, cleanup=cleanup, gate=gate,
+                           reporter=reporter)
+    # Completion summary printed after the live display has stopped.
+    reporter.summary(rep)
     if verbose:
         import json as _json
         from dataclasses import asdict
         console.print_json(_json.dumps(asdict(rep), ensure_ascii=False))
-    # Zero-touch contract: exactly one line to stdout.
-    print(rep.one_line())
+    if not live:
+        # headless: the single machine-readable line
+        print(rep.one_line())
     raise typer.Exit(0 if rep.ok else 1)
 
 

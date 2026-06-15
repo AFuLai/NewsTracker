@@ -41,10 +41,8 @@ EU_CRA_FILTER = (
     "standardisation", "standardization",
 )
 
-# ollama hooks (WP3):
-#   GATE_FN(rows, tracker, info, log) -> (kept_ids, [(id, reason), ...])  L1
-#   REVIEW_FN(result: dict, raw_text, info) -> (ok: bool, reason: str|None)  L3
-from .llm.gate import run_gate as GATE_FN          # noqa: E402
+# ollama L3 review hook (WP3): REVIEW_FN(result, raw_text, info) -> (ok, reason).
+# The L1 gate is driven directly in _phase_gate (so it can report per-batch).
 from .llm.review import review as REVIEW_FN        # noqa: E402
 
 
@@ -99,7 +97,11 @@ def _setup_logger(run_ts: str) -> logging.Logger:
 def run_pipeline(*, since: str, until: str, trackers: list[str],
                  db: Path = DEFAULT_DB, out: Path = DEFAULT_OUT,
                  summarize_limit: int = 300, cleanup: bool = True,
-                 gate: bool = True, concurrency: int = 8) -> RunReport:
+                 gate: bool = True, concurrency: int = 8,
+                 reporter=None) -> RunReport:
+    from .progress import NullReporter
+    rpt = reporter or NullReporter()
+
     run_ts = datetime.utcnow().strftime("%Y%m%d-%H%M%S")
     log = _setup_logger(run_ts)
     t0 = time.time()
@@ -109,26 +111,36 @@ def run_pipeline(*, since: str, until: str, trackers: list[str],
     rep = RunReport(run_id=rid, since=since, until=until, trackers=list(trackers))
     log.info("run %s start: %s..%s trackers=%s", rid, since, until, trackers)
 
-    # ── Phase 0: ollama preflight ────────────────────────────────────────────
-    try:
-        from .llm import self_test
-        self_test()
-        log.info("ollama self-test OK")
-    except Exception as exc:
+    # Planned phases shown in the dashboard.
+    plan = [("preflight", "Preflight"), ("fetch", "Fetch")]
+    if gate:
+        plan.append(("gate", "Gate"))
+    plan += [("summarize", "Summarize"), ("write", "Write")]
+    if cleanup:
+        plan.append(("cleanup", "Cleanup"))
+    rpt.begin(since=since, until=until, trackers=trackers, phases=plan)
+
+    # ── Phase 0: ollama preflight (auto-start if down) ───────────────────────
+    rpt.enter("preflight", "checking ollama")
+    from .preflight import ensure_ollama
+    if not ensure_ollama():
         rep.ok = False
-        rep.errors.append(f"ollama down: {exc}")
-        log.error("ollama self-test FAILED: %s", exc)
+        rep.errors.append("ollama down (auto-start failed)")
+        log.error("ollama not reachable and auto-start failed")
+        rpt.result("preflight", "ollama unreachable", failed=True)
         _finalize(store, rep, t0, log)
         return rep
+    log.info("ollama ready")
+    rpt.result("preflight", "ollama ready")
 
     try:
-        _phase_fetch(store, window, trackers, rep, log, concurrency)
+        _phase_fetch(store, window, trackers, rep, log, concurrency, rpt)
         if gate:
-            _phase_gate(store, trackers, rep, log)
-        _phase_summarize(store, window, trackers, rep, log, summarize_limit, concurrency)
-        _phase_write(store, trackers, rep, log, out)
+            _phase_gate(store, trackers, rep, log, rpt)
+        _phase_summarize(store, window, trackers, rep, log, summarize_limit, concurrency, rpt)
+        _phase_write(store, trackers, rep, log, out, rpt)
         if cleanup:
-            _phase_cross_cleanup(store, rep, log)
+            _phase_cross_cleanup(store, rep, log, rpt)
     except Exception as exc:  # never crash the orchestrator; record and finish
         rep.ok = False
         rep.errors.append(f"phase exception: {exc}")
@@ -140,7 +152,8 @@ def run_pipeline(*, since: str, until: str, trackers: list[str],
 
 # ── Phase 1: FETCH ───────────────────────────────────────────────────────────
 
-def _phase_fetch(store, window, trackers, rep, log, concurrency):
+def _phase_fetch(store, window, trackers, rep, log, concurrency, rpt):
+    rpt.enter("fetch", "preparing sources")
     # Auto-reprobe any source that has crossed the failure threshold so a site
     # that changed its layout self-heals before we fetch it again.
     try:
@@ -163,6 +176,7 @@ def _phase_fetch(store, window, trackers, rep, log, concurrency):
         profiles = store.list_profiles(tracker=tname)
         rep.fetch_sources += len(profiles)
         log.info("[%s] fetch over %d profiles", tname, len(profiles))
+        rpt.note(f"[{tname}] fetching {len(profiles)} sources")
 
         def make_profile(row):
             return Profile.from_row(
@@ -239,40 +253,61 @@ def _phase_fetch(store, window, trackers, rep, log, concurrency):
     inserted = store.insert_candidates_batch(pending_new)
     rep.fetch_new = inserted
     log.info("fetch complete: %d new candidates inserted", inserted)
+    rpt.result("fetch", f"{inserted} new / {rep.fetch_sources} sources "
+                        f"(304:{rep.fetch_304}, fail:{rep.fetch_failed})")
 
 
 # ── Phase 2: GATE (WP3 hook) ─────────────────────────────────────────────────
 
-def _phase_gate(store, trackers, rep, log):
+def _phase_gate(store, trackers, rep, log, rpt):
+    rpt.enter("gate", "scoring relevance")
+    # total batches across trackers for a progress bar
+    from .llm.gate import BATCH
+    pending = {t: [dict(r) for r in store.list_pending(limit=10_000, tracker=t)]
+               for t in trackers}
+    total_batches = sum((len(v) + BATCH - 1) // BATCH for v in pending.values())
+    done_batches = 0
     for tname in trackers:
         info = load_tracker(tname)
-        rows = [dict(r) for r in store.list_pending(limit=10_000, tracker=tname)]
+        rows = pending[tname]
         if not rows:
             continue
-        try:
-            kept_ids, gated = GATE_FN(rows, tname, info, log)  # type: ignore
-        except Exception as exc:
-            log.warning("[%s] gate failed, keeping all: %s", tname, exc)
-            continue
-        for aid, reason in gated:
-            store.mark_status(aid, "gated_out")
-            rep.gated_out += 1
-            log.debug("[%s] gated_out id=%s: %s", tname, aid, reason)
+        for start in range(0, len(rows), BATCH):
+            batch = rows[start:start + BATCH]
+            try:
+                from .llm.gate import _gate_batch
+                topic = f"{info.title}（分類：{', '.join(info.categories)}）"
+                keep = _gate_batch(topic, [{"title": r["title"], "snippet": r["raw_text"]}
+                                           for r in batch])
+            except Exception as exc:
+                log.warning("[%s] gate batch failed, keeping all: %s", tname, exc)
+                keep = [True] * len(batch)
+            for r, k in zip(batch, keep):
+                if not k:
+                    store.mark_status(r["id"], "gated_out")
+                    rep.gated_out += 1
+            done_batches += 1
+            rpt.tick(done_batches, total_batches, f"[{tname}] gated {rep.gated_out} so far")
     log.info("gate complete: %d gated out", rep.gated_out)
+    rpt.result("gate", f"dropped {rep.gated_out} noise")
 
 
 # ── Phase 3: SUMMARIZE (+ L3 review hook + cross-detect) ─────────────────────
 
-def _phase_summarize(store, window, trackers, rep, log, limit, concurrency):
+def _phase_summarize(store, window, trackers, rep, log, limit, concurrency, rpt):
     from .cross import NARROW_DOMAINS, belongs_to
     from .llm import summarize_article
     from .sources.article import fetch_body_with_date
 
     since, until = window.since.isoformat(), window.until.isoformat()
     other_infos_cache: dict[str, object] = {}
+    rpt.enter("summarize", "fetching article bodies")
+    pending_by_tracker = {t: store.list_pending(limit=limit, tracker=t) for t in trackers}
+    grand_total = sum(len(v) for v in pending_by_tracker.values())
+    processed = 0
     for tname in trackers:
         info = load_tracker(tname)
-        rows = store.list_pending(limit=limit, tracker=tname)
+        rows = pending_by_tracker[tname]
         if not rows:
             continue
         rep.summarize_attempted += len(rows)
@@ -309,6 +344,9 @@ def _phase_summarize(store, window, trackers, rep, log, limit, concurrency):
         # Phase B: serial ollama summarize + review + cross-detect
         for r in rows:
             aid = r["id"]
+            processed += 1
+            rpt.tick(processed, grand_total,
+                     f"[{tname}] {(r['title'] or '')[:70]}")
             body = bodies[aid]
             eff_date = dates[aid] or r["date"]
             if (since and eff_date and eff_date < since) or \
@@ -356,11 +394,14 @@ def _phase_summarize(store, window, trackers, rep, log, limit, concurrency):
     log.info("summarize complete: %d/%d (oow=%d rev_fail=%d cross+%d)",
              rep.summarized, rep.summarize_attempted, rep.out_of_window,
              rep.review_failed, rep.cross_added)
+    rpt.result("summarize", f"{rep.summarized}/{rep.summarize_attempted} "
+                            f"(oow {rep.out_of_window}, rev-fail {rep.review_failed})")
 
 
 # ── Phase 4: WRITE ───────────────────────────────────────────────────────────
 
-def _phase_write(store, trackers, rep, log, out):
+def _phase_write(store, trackers, rep, log, out, rpt):
+    rpt.enter("write", "rendering data files")
     from .cluster import merge_by_title
     from .render import (render_day, update_month_manifest,
                          update_root_manifest, update_year_manifest)
@@ -400,6 +441,7 @@ def _phase_write(store, trackers, rep, log, out):
         update_root_manifest(root_html=out, trackers=tracker_metas)
     rep.days_written = len(written_days)
     log.info("write complete: %d tracker-days", rep.days_written)
+    rpt.result("write", f"{rep.days_written} tracker-days")
 
 
 def _ready_dates(store, tracker) -> list[str]:
@@ -411,7 +453,8 @@ def _ready_dates(store, tracker) -> list[str]:
 
 # ── Phase 5: cross-scan reverse cleanup ──────────────────────────────────────
 
-def _phase_cross_cleanup(store, rep, log):
+def _phase_cross_cleanup(store, rep, log, rpt):
+    rpt.enter("cleanup", "re-checking cross-tracker memberships")
     from .cross import NARROW_DOMAINS, belongs_to
     rows = list(store.conn.execute(
         "SELECT * FROM articles WHERE status IN ('ready','written')"))
@@ -435,6 +478,7 @@ def _phase_cross_cleanup(store, rep, log):
             if store.remove_tracker(r["id"], name):
                 rep.cross_removed += 1
     log.info("cross cleanup: -%d demoted", rep.cross_removed)
+    rpt.result("cleanup", f"-{rep.cross_removed} demoted, +{rep.cross_added} added earlier")
 
 
 # ── finalize ─────────────────────────────────────────────────────────────────

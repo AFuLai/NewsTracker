@@ -32,11 +32,10 @@ def test_eu_cra_filter_has_markers():
 
 
 def test_pipeline_aborts_when_ollama_down(monkeypatch):
-    # self_test raises → run_pipeline must return ok=False without crashing,
+    # ensure_ollama fails → run_pipeline must return ok=False without crashing,
     # write a runs row, and leave no half-state.
-    import tracker.llm as llm
-    monkeypatch.setattr(llm, "self_test",
-                        lambda: (_ for _ in ()).throw(RuntimeError("connection refused")))
+    import tracker.preflight as preflight
+    monkeypatch.setattr(preflight, "ensure_ollama", lambda **k: False)
     tmp = Path(tempfile.mkdtemp())
     db = tmp / "t.sqlite"
     # PROJECT_ROOT status.json write goes to the real project root; tolerate it.
