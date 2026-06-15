@@ -15,12 +15,23 @@ tracker pipeline --since 2026-06-09 --until 2026-06-15
 # run#42 OK 2026-06-09..2026-06-15 [security,eu_cra] | fetch 41new/40src (304:6 fail:1) | gate -23 | sum 38/41 (oow:3 rev_fail:1) | cross +4/-2 | write 13d | err 2 | 612s
 ```
 
-Full detail goes to `logs/run-<ts>.log`, the `runs` DB table, and `status.json`
-at the project root. For human-readable detail of the last run:
+On an interactive terminal this shows a **live execution dashboard** — the
+planned phases (Preflight → Fetch → Gate → Summarize → Write → Cleanup) with
+✓/▶/· status, a progress bar + ETA for the long phases, the current item, and
+elapsed time; on completion a summary panel. Pass `--quiet` for the one-line-only
+form (zero-touch / piping). Full detail always goes to `logs/run-<ts>.log`, the
+`runs` DB table, and `status.json` at the project root:
 
 ```bash
 tracker status --last-run
 ```
+
+**Dependency preflight.** Every run first ensures ollama is up — if not, it
+auto-starts `ollama serve` in the background (detached, left running for next
+time). If a chosen source needs a JS-rendering browser (method=BROWSER) and a
+debug Chrome isn't reachable, you're told to start it
+(`chrome --remote-debugging-port=9222`) and retry, or cancel (browser sources
+are then skipped).
 
 ## Architecture (v2)
 
@@ -91,7 +102,8 @@ class JsonLdFetcher:
 then dispatches to it. **No edits to `cli.py` or `orchestrator.py`.** Point a
 source at it by setting that profile's `method` (via `init-profiles` mapping or
 `tracker probe --save`). Canonical methods: FEED / LISTING / SEARCH / API /
-ARCHIVE (see `tracker/methods.py`).
+ARCHIVE / BROWSER (see `tracker/methods.py`). BROWSER renders JS-only pages via a
+debug Chrome (CDP) — opt-in; needs `chrome --remote-debugging-port=9222`.
 
 ## Ollama layers
 
@@ -141,4 +153,4 @@ cache make re-runs over an overlapping window cheap.
   calls crash glibc (`free(): invalid size`).
 - DDG rate-limits repeated queries; the SEARCH fetcher caches results 24h.
 - If ollama wedges: `pkill -9 ollama && ollama serve`.
-- After any change: `python -m pytest -q` (53 tests).
+- After any change: `python -m pytest -q` (61 tests).
