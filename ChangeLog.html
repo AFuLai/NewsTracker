@@ -16,6 +16,22 @@
 <h1>Tracker ChangeLog</h1>
 <p class="meta">本檔由 <code>tracker pack</code> 自動維護；每次打包前由本地 ollama 生成版本重點並 prepend 於下方。</p>
 <!-- CHANGELOG_INSERTION_POINT -->
+<section class="release" id="v2.1">
+  <h2>v2.1 — 2026-06-15</h2>
+<ul>
+    <li><strong>✨ 新功能：實時執行儀表板 (Live Dashboard)</strong><br>
+        CLI 執行流程現已升級為互動式儀表板，可即時顯示所有階段（Preflight/Fetch/Gate/Summarize/Write/Cleanup）的進度、已完成項目數、以及預估剩餘時間 (ETA)，並在流程結束後提供完整的總結報告。</li>
+    <li><strong>🌐 強化爬取能力：新增 BROWSER 擷取器</strong><br>
+        引入基於瀏覽器模擬的擷取方法 (DevTools Protocol)，使 Tracker 能夠處理那些透過標準 HTTP 請求無法存取、或會被網站阻擋的複雜網頁內容，顯著提升資安新聞抓取覆蓋率。</li>
+    <li><strong>🤖 依賴自動化與穩定性提升</strong><br>
+        <span style="color: #FF6347;">[Ollama 模型]</span> 流程啟動前會自動檢查並啟動本地 Ollama 服務，確保模型服務的可用性，提升執行流程的穩定性。</li>
+    <li><strong>💻 瀏覽器環境預檢機制</strong><br>
+        <span style="color: #4682B4;">[Browser]</span> 增加了 Debug Chrome 預檢 (Preflight) 機制。在執行任何需要瀏覽器模擬的任務前，系統會自動檢查本地是否啟動了符合要求的 Chrome 實例，並提供詳細的啟動指引。</li>
+    <li><strong>⚙️ 流程優化與 CLI 體驗</strong><br>
+        CLI 介面預設在 TTY 環境下提供實時儀表板體驗；同時，新增了 `--quiet` 參數，允許使用者在不顯示進度條的情況下，僅獲得簡潔的單行總結報告。</li>
+</ul>
+</section>
+
 <section class="release" id="v2.0">
   <h2>v2.0 — 2026-06-15</h2>
 <ul>
