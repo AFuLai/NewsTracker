@@ -7,11 +7,20 @@
 <script src="manifest.js"></script>
 <style>
 :root {
+  /* Security categories */
   --cat-law: #3b82f6;
   --cat-vuln: #ef4444;
   --cat-supply: #f59e0b;
   --cat-incident: #8b5cf6;
   --cat-tech: #10b981;
+  /* EU CRA categories */
+  --cra-legis: #6366f1;
+  --cra-std: #0ea5e9;
+  --cra-comply: #14b8a6;
+  --cra-oss: #22c55e;
+  --cra-apac: #eab308;
+  --cra-industry: #ec4899;
+  --cra-event: #a855f7;
 }
 [data-theme="dark"] {
   --bg: #0f172a;
@@ -181,10 +190,10 @@ header {
 }
 #tracker-pills .pill {
   font-weight: 600;
-  border-color: var(--accent);
+  border-color: var(--active);
 }
 #tracker-pills .pill.active {
-  background: var(--accent);
+  background: var(--active);
   color: #fff;
 }
 #year-pills, #cat-pills {
@@ -206,12 +215,23 @@ header {
 .pill:hover { background: var(--hover); color: var(--text); }
 .pill.active { color: #fff; border-color: transparent; font-weight: 600; }
 .pill.year-pill.active { background: var(--active); }
+/* Fallback so any category pill stays visible even without a specific colour. */
+.pill.cat-pill.active { background: var(--active); color: #fff; }
 .pill.cat-pill[data-cat="全部"].active { background: var(--text2); }
+/* Security categories */
 .pill.cat-pill[data-cat="法規與標準"].active { background: var(--cat-law); }
 .pill.cat-pill[data-cat="漏洞與威脅情報"].active { background: var(--cat-vuln); }
 .pill.cat-pill[data-cat="供應鏈與開源安全"].active { background: var(--cat-supply); }
 .pill.cat-pill[data-cat="重大事件"].active { background: var(--cat-incident); }
 .pill.cat-pill[data-cat="前瞻技術"].active { background: var(--cat-tech); }
+/* EU CRA categories */
+.pill.cat-pill[data-cat="法令更新"].active { background: var(--cra-legis); }
+.pill.cat-pill[data-cat="調和標準"].active { background: var(--cra-std); }
+.pill.cat-pill[data-cat="合規指引"].active { background: var(--cra-comply); }
+.pill.cat-pill[data-cat="開源影響"].active { background: var(--cra-oss); }
+.pill.cat-pill[data-cat="亞太對應"].active { background: var(--cra-apac); }
+.pill.cat-pill[data-cat="產業動態"].active { background: var(--cra-industry); }
+.pill.cat-pill[data-cat="研討活動"].active { background: var(--cra-event); }
 
 /* ── App body ─────────────────────────────────────── */
 .app-body {
@@ -401,12 +421,22 @@ header {
   font-weight: 700;
   color: #fff;
   width: fit-content;
+  background: var(--text2);   /* default; specific .cat-* rules override */
 }
+/* Security categories */
 .cat-法規與標準 { background: var(--cat-law); }
 .cat-漏洞與威脅情報 { background: var(--cat-vuln); }
 .cat-供應鏈與開源安全 { background: var(--cat-supply); }
 .cat-重大事件 { background: var(--cat-incident); }
 .cat-前瞻技術 { background: var(--cat-tech); }
+/* EU CRA categories */
+.cat-法令更新 { background: var(--cra-legis); }
+.cat-調和標準 { background: var(--cra-std); }
+.cat-合規指引 { background: var(--cra-comply); }
+.cat-開源影響 { background: var(--cra-oss); }
+.cat-亞太對應 { background: var(--cra-apac); }
+.cat-產業動態 { background: var(--cra-industry); }
+.cat-研討活動 { background: var(--cra-event); }
 .card-title {
   font-size: 0.88rem;
   font-weight: 600;
