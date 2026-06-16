@@ -41,6 +41,15 @@ EU_CRA_FILTER = (
     "standardisation", "standardization",
 )
 
+# Per-tracker fetch tuning: a SEARCH query prefix + a keyword filter applied to
+# LISTING/SEARCH candidates (FEED/API ignore it). Trackers not listed here use
+# the defaults (no prefix, no filter) — e.g. `security` and `os`, whose sources
+# are already on-topic (or query-scoped) and rely on the L1 gate for noise
+# removal rather than a keyword whitelist that could drop valid headlines.
+TRACKER_FETCH: dict[str, dict] = {
+    "eu_cra": {"query_prefix": "Cyber Resilience Act", "filter": EU_CRA_FILTER},
+}
+
 # ollama L3 review hook (WP3): REVIEW_FN(result, raw_text, info) -> (ok, reason).
 # The L1 gate is driven directly in _phase_gate (so it can report per-batch).
 from .llm.review import review as REVIEW_FN        # noqa: E402
@@ -177,8 +186,9 @@ def _phase_fetch(store, window, trackers, rep, log, concurrency, rpt, browser_ba
     for tname in trackers:
         info = load_tracker(tname)
         keys = [k.text for k in info.keys]
-        query_prefix = "Cyber Resilience Act" if tname == "eu_cra" else ""
-        filt = EU_CRA_FILTER if tname == "eu_cra" else ()
+        _fcfg = TRACKER_FETCH.get(tname, {})
+        query_prefix = _fcfg.get("query_prefix", "")
+        filt = _fcfg.get("filter", ())
         entry_url = {e.domain: e.url for e in info.entries}
         profiles = store.list_profiles(tracker=tname)
         rep.fetch_sources += len(profiles)

@@ -21,6 +21,12 @@
   --cra-apac: #eab308;
   --cra-industry: #ec4899;
   --cra-event: #a855f7;
+  /* OS categories (by platform) */
+  --os-linux: #f0a500;
+  --os-windows: #0078d4;
+  --os-apple: #6e7681;
+  --os-android: #3ddc84;
+  --os-focus: #ef4444;
 }
 [data-theme="dark"] {
   --bg: #0f172a;
@@ -232,6 +238,12 @@ header {
 .pill.cat-pill[data-cat="亞太對應"].active { background: var(--cra-apac); }
 .pill.cat-pill[data-cat="產業動態"].active { background: var(--cra-industry); }
 .pill.cat-pill[data-cat="研討活動"].active { background: var(--cra-event); }
+/* OS categories */
+.pill.cat-pill[data-cat="Linux"].active { background: var(--os-linux); }
+.pill.cat-pill[data-cat="Windows"].active { background: var(--os-windows); }
+.pill.cat-pill[data-cat="Apple"].active { background: var(--os-apple); }
+.pill.cat-pill[data-cat="Android"].active { background: var(--os-android); color: #04210b; }
+.pill.cat-pill[data-cat="重點關注"].active { background: var(--os-focus); }
 
 /* ── App body ─────────────────────────────────────── */
 .app-body {
@@ -437,6 +449,12 @@ header {
 .cat-亞太對應 { background: var(--cra-apac); }
 .cat-產業動態 { background: var(--cra-industry); }
 .cat-研討活動 { background: var(--cra-event); }
+/* OS categories */
+.cat-Linux { background: var(--os-linux); }
+.cat-Windows { background: var(--os-windows); }
+.cat-Apple { background: var(--os-apple); }
+.cat-Android { background: var(--os-android); color: #04210b; }
+.cat-重點關注 { background: var(--os-focus); }
 .card-title {
   font-size: 0.88rem;
   font-weight: 600;
@@ -621,12 +639,14 @@ const CAT_EN = {
   '法令更新':'Legislative Updates', '調和標準':'Harmonised Standards',
   '合規指引':'Compliance Guidance', '開源影響':'Open-Source Impact',
   '亞太對應':'APAC Response', '產業動態':'Industry News',
-  '研討活動':'Events & Workshops', 'uncategorized':'Uncategorized'
+  '研討活動':'Events & Workshops',
+  '重點關注':'Watchlist',   // OS tracker (Linux/Windows/Apple/Android show as-is)
+  'uncategorized':'Uncategorized'
 };
-const TRACKER_TITLE_EN = { security:'Security News Tracker', eu_cra:'EU CRA Tracker' };
+const TRACKER_TITLE_EN = { security:'Security News Tracker', eu_cra:'EU CRA Tracker', os:'OS Tracker' };
 const I18N = {
   zh: {
-    short: { security:'資安', eu_cra:'EU CRA' },
+    short: { security:'資安', eu_cra:'EU CRA', os:'作業系統' },
     months: ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'],
     ui: {
       all:'全部', fullYear:'📅 全年', dates:'日期', showing:'顯示', articles:'篇',
@@ -644,7 +664,7 @@ const I18N = {
     }
   },
   en: {
-    short: { security:'Security', eu_cra:'EU CRA' },
+    short: { security:'Security', eu_cra:'EU CRA', os:'Operating Systems' },
     months: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
     ui: {
       all:'All', fullYear:'📅 Full Year', dates:'Dates', showing:'Showing', articles:'',
@@ -1053,7 +1073,8 @@ function buildCatPills(cats) {
   const el = document.getElementById('cat-pills');
   el.innerHTML = '';
   const all = ['全部', ...cats];
-  const icons = { '全部':'', '法規與標準':'📋 ', '漏洞與威脅情報':'🔴 ', '供應鏈與開源安全':'🔗 ', '重大事件':'🚨 ', '前瞻技術':'🚀 ' };
+  const icons = { '全部':'', '法規與標準':'📋 ', '漏洞與威脅情報':'🔴 ', '供應鏈與開源安全':'🔗 ', '重大事件':'🚨 ', '前瞻技術':'🚀 ',
+                  'Linux':'🐧 ', 'Windows':'🪟 ', 'Apple':'🍎 ', 'Android':'🤖 ', '重點關注':'⭐ ' };
   all.forEach((c, i) => {
     const btn = document.createElement('button');
     btn.className = 'pill cat-pill' + (i === 0 ? ' active' : '');

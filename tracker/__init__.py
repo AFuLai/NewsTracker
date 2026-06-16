@@ -14,6 +14,7 @@ OLLAMA_MODEL = "gemma4:e4b"
 SEARCHINFOS: dict[str, Path] = {
     "security": PROJECT_ROOT / "searchinfo_security.md",
     "eu_cra":   PROJECT_ROOT / "searchinfo_eu_cra.md",
+    "os":       PROJECT_ROOT / "searchinfo_os.md",
 }
 DEFAULT_TRACKER = "security"
 

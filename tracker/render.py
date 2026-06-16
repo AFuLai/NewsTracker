@@ -55,6 +55,12 @@ CATEGORY_PRIORITY = {
     "亞太對應": 4,
     "產業動態": 5,
     "研討活動": 6,
+    # OS tracker (by platform)
+    "Linux": 0,
+    "Windows": 1,
+    "Apple": 2,
+    "Android": 3,
+    "重點關注": 4,
     "uncategorized": 99,
 }
 
@@ -147,10 +153,17 @@ def _scan_month(data_root: Path, month: str, tracker: str) -> tuple[list[dict], 
 def update_month_manifest(*, month: str, data_root: Path, tracker: str) -> Path:
     """Write data_root/<tracker>/manifest-YYYYMM.js scanning shared data files."""
     dates, total = _scan_month(data_root, month, tracker)
+    path = data_root / tracker / f"manifest-{month.replace('-', '')}.js"
+    # Don't keep a manifest for a month this tracker has no items in — otherwise
+    # the year scan would surface an empty month in the UI grid.
+    if total == 0:
+        if path.exists():
+            path.unlink()
+        return path
     last_updated = _date.today().isoformat()
     text = _env.get_template("manifest_month.js.j2").render(
         month=month, dates=dates, total=total, last_updated=last_updated, tracker=tracker)
-    return _write(data_root / tracker / f"manifest-{month.replace('-', '')}.js", text)
+    return _write(path, text)
 
 
 def _scan_year(data_root: Path, year: str, tracker: str) -> list[str]:
@@ -163,10 +176,17 @@ def _scan_year(data_root: Path, year: str, tracker: str) -> list[str]:
 
 def update_year_manifest(*, year: str, data_root: Path, tracker: str) -> Path:
     months = _scan_year(data_root, year, tracker)
+    path = data_root / tracker / f"manifest-{year}.js"
+    # No months with items this year for this tracker → drop the year manifest so
+    # the UI doesn't show an empty year pill.
+    if not months:
+        if path.exists():
+            path.unlink()
+        return path
     last_updated = _date.today().isoformat()
     text = _env.get_template("manifest_year.js.j2").render(
         year=year, months=months, last_updated=last_updated, tracker=tracker)
-    return _write(data_root / tracker / f"manifest-{year}.js", text)
+    return _write(path, text)
 
 
 def update_root_manifest(*, root_html: Path,

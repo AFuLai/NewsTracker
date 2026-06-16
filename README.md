@@ -6,6 +6,16 @@ with one command and reads one line back; everything else (fetch, relevance
 gating, summarize, self-review, write, cleanup) happens locally. Outputs a static
 HTML site to `D:\Claude\Track Security\html\`.
 
+**Trackers** (top-level topics, switchable in the UI; each has its own
+`searchinfo_*.md`, categories, and manifest tree):
+- `security` — 資安新聞（5 類）
+- `eu_cra` — EU CRA 法令與標準（7 類）
+- `os` — 作業系統 Linux / Windows / Apple / Android（依平台 5 類，含 NVD CVE API）
+
+Adding a tracker = one `searchinfo_*.md` + one line in `SEARCHINFOS`
+(`tracker/__init__.py`); the orchestrator, cross-detection, manifest, and UI
+tracker pill all pick it up generically.
+
 ## One-command operation (zero-touch)
 
 ```bash

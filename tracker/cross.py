@@ -35,6 +35,12 @@ STRONG_MARKERS: dict[str, tuple[str, ...]] = {
                # APAC angle markers
                "METI", "KISA", "TWCERT", "ACSC", "CERT-In", "JPCERT",
                "亞太對應", "歐盟出口"),
+    # OS-specific markers — deliberately NOT the generic "CVE-" (too broad; that
+    # belongs to security). These are platform/kernel signals.
+    "os": ("Linux kernel", "Linux", "Windows", "Android", "iOS", "iPadOS",
+           "macOS", "watchOS", "kernel", "Patch Tuesday", "AOSP", "Pixel",
+           "systemd", "glibc", "OpenSSH", "Win32", "NTLM", "WebKit",
+           "Ubuntu", "Debian", "Fedora", "MSRC", "作業系統", "核心"),
 }
 
 
@@ -125,4 +131,11 @@ NARROW_DOMAINS: dict[str, set[str]] = {
                # would create false positives.
     "security": {"cisa.gov", "nvd.nist.gov", "krebsonsecurity.com",
                  "googleprojectzero.blogspot.com", "googleblog.com"},
+    # OS specialists — kernel/distro/vendor sites whose articles are almost
+    # always about an operating system. General tech media (Ars, The Register,
+    # THN) are deliberately NOT here.
+    "os": {"kernel.org", "lwn.net", "phoronix.com", "source.android.com",
+           "android-developers.googleblog.com", "msrc.microsoft.com",
+           "blogs.windows.com", "windowslatest.com", "support.apple.com",
+           "9to5mac.com", "9to5google.com", "ubuntu.com", "debian.org"},
 }
