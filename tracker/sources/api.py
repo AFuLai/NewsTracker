@@ -6,12 +6,12 @@ from datetime import date
 import httpx
 
 
-def nvd_cves(keyword: str, *, since: date, until: date) -> list[dict]:
+def _nvd_query(keyword: str, since: date, until: date) -> list[dict]:
     params = {
         "keywordSearch": keyword,
         "pubStartDate": f"{since.isoformat()}T00:00:00.000",
         "pubEndDate": f"{until.isoformat()}T23:59:59.000",
-        "resultsPerPage": 20,
+        "resultsPerPage": 30,
     }
     try:
         r = httpx.get("https://services.nvd.nist.gov/rest/json/cves/2.0",
@@ -20,6 +20,21 @@ def nvd_cves(keyword: str, *, since: date, until: date) -> list[dict]:
         return r.json().get("vulnerabilities", [])
     except Exception:
         return []
+
+
+def nvd_cves(keyword: str, *, since: date, until: date) -> list[dict]:
+    """Query NVD for CVEs published in [since, until].
+
+    NVD rejects a pubStartDate/pubEndDate span longer than 120 days, so longer
+    windows are split into ≤120-day chunks and concatenated."""
+    from datetime import timedelta
+    out: list[dict] = []
+    start = since
+    while start <= until:
+        end = min(start + timedelta(days=119), until)
+        out.extend(_nvd_query(keyword, start, end))
+        start = end + timedelta(days=1)
+    return out
 
 
 def hn_stories(keyword: str, *, since: date, until: date) -> list[dict]:
