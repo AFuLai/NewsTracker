@@ -18,8 +18,10 @@ tracker pill all pick it up generically.
 
 ## One-command operation (zero-touch)
 
+Runs in the machine-wide venv at **`/opt/venv`** (shared with other tools). The
+`tracker` command is on PATH via `~/.local/bin/tracker` — no activation needed.
+
 ```bash
-cd /opt/tracker && source .venv/bin/activate
 tracker pipeline --days 7          # 更新最近 7 天（含今天）
 # → one summary line, e.g.
 # run#42 OK 2026-06-09..2026-06-15 [security,eu_cra] | fetch 41new/40src (304:6 fail:1) | gate -23 | sum 38/41 (oow:3 rev_fail:1) | cross +4/-2 | write 13d | err 2 | 612s
@@ -52,6 +54,34 @@ It starts a tiny local web server (works from WSL2 via localhost forwarding — 
 X server needed), opens your Windows default browser, and renders graphical phase
 cards + progress bars + ETA that update live, plus a completion summary. `--port`
 changes the port (default 8787).
+
+**Interactive console.** The `--ui` dashboard is also a control panel:
+- **⏸ 暫停 / ▶ 恢復** — pause/resume the run (takes effect between articles).
+- **↻ 重新來過 從 [stage]** — restart from any stage on the current data; tick
+  **強制重做** to first reset that stage's output (ready→pending for Summarize,
+  clear `summary_en` for Translate) and redo it.
+- **Summarize / Translate backend** — switch between Gemini and Ollama live; the
+  change applies to subsequent articles.
+- **✕ 關閉** — stop the run and exit.
+
+## LLM backends (Gemini via Chrome / Ollama)
+
+Summarize and Translate can run on **Gemini** (driven through your logged-in
+debug Chrome, like IC37) or local **Ollama**. Default is **auto**: Gemini if a
+debug Chrome (`--remote-debugging-port=9999`) is reachable, otherwise Ollama. A
+Gemini call that fails (Chrome down, not logged in, timeout) **transparently
+falls back to Ollama** per call, so a run never stalls.
+
+```bash
+tracker pipeline --days 7 --summarize-llm gemini --translate-llm ollama
+tracker pipeline --days 7 --gemini-model Flash-Lite     # pick the Gemini UI model
+# auto (default): gemini when Chrome is up, else ollama; per-call fallback to ollama
+```
+
+Gate / review / probe always use Ollama (fast, high-frequency, local).
+**Privacy:** the Gemini backend sends prompts to Google — it is only the default
+when your debug Chrome is detected. The shared venv lives at `/opt/venv` (with
+`playwright`).
 
 Pass `--quiet` for the one-line-only form (zero-touch / piping). Full detail
 always goes to `logs/run-<ts>.log`, the `runs` DB table, and `status.json` at the

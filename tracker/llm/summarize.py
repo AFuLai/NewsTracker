@@ -8,18 +8,19 @@ from . import _coerce_category, _prompt, _strip_code_fence, call
 
 
 def summarize_article(*, url: str, raw_text: str, categories: list[str],
-                      category_defs: list[Any] | None = None) -> dict[str, Any]:
+                      category_defs: list[Any] | None = None,
+                      backend: str = "ollama") -> dict[str, Any]:
     """Returns {title, summary, category, tags}. Safe defaults on parse error.
 
     category_defs: optional objects with .name/.description; sent to the prompt
-    for disambiguation."""
+    for disambiguation. backend: "ollama" | "gemini" (gemini falls back to ollama)."""
     tmpl = _prompt("summary.txt")
     if category_defs:
         cat_block = "\n".join(f"- {c.name}：{c.description}" for c in category_defs)
     else:
         cat_block = " / ".join(categories)
     prompt = tmpl.format(url=url, category_defs=cat_block, body=raw_text[:6000])
-    response = call(prompt, format_json=True)
+    response = call(prompt, format_json=True, backend=backend)
     try:
         data = json.loads(_strip_code_fence(response))
     except (json.JSONDecodeError, ValueError):

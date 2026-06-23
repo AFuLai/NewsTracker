@@ -19,6 +19,7 @@ dependencies = [
   "pydantic>=2.7",
   "rich>=13.7",
   "websocket-client>=1.7",
+  "playwright>=1.40",
 ]
 
 [project.scripts]

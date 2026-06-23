@@ -74,6 +74,9 @@ class RunReport:
     cross_added: int = 0
     cross_removed: int = 0
     days_written: int = 0
+    summarize_backend: str = "ollama"
+    translate_backend: str = "ollama"
+    gemini_fallback: int = 0
     errors: list[str] = field(default_factory=list)
     elapsed_s: float = 0.0
     ok: bool = True
@@ -88,6 +91,8 @@ class RunReport:
                 f"sum {self.summarized}/{self.summarize_attempted} "
                 f"(oow:{self.out_of_window} rev_fail:{self.review_failed}) | "
                 f"i18n {self.translated} | "
+                f"llm {self.summarize_backend[:3]}/{self.translate_backend[:3]}"
+                f"{f' fb{self.gemini_fallback}' if self.gemini_fallback else ''} | "
                 f"cross +{self.cross_added}/-{self.cross_removed} | "
                 f"write {self.days_written}d | err {len(self.errors)} | "
                 f"{self.elapsed_s:.0f}s")
@@ -109,8 +114,13 @@ def run_pipeline(*, since: str, until: str, trackers: list[str],
                  db: Path = DEFAULT_DB, out: Path = DEFAULT_OUT,
                  summarize_limit: int = 300, cleanup: bool = True,
                  gate: bool = True, translate: bool = True, concurrency: int = 8,
-                 browser_base: str | None = None, reporter=None) -> RunReport:
+                 browser_base: str | None = None, reporter=None,
+                 start_at: str = "fetch", force: bool = False, controller=None,
+                 summarize_backend: str = "ollama",
+                 translate_backend: str = "ollama") -> RunReport:
     from .progress import NullReporter
+    from .control import PHASES, ControlAbort
+    from . import llm
     rpt = reporter or NullReporter()
 
     run_ts = datetime.utcnow().strftime("%Y%m%d-%H%M%S")
@@ -120,7 +130,11 @@ def run_pipeline(*, since: str, until: str, trackers: list[str],
     store = Store(db)
     rid = store.start_run(json.dumps({"since": since, "until": until, "trackers": trackers}))
     rep = RunReport(run_id=rid, since=since, until=until, trackers=list(trackers))
-    log.info("run %s start: %s..%s trackers=%s", rid, since, until, trackers)
+    rep.summarize_backend, rep.translate_backend = summarize_backend, translate_backend
+    stats0 = dict(llm.STATS)
+    log.info("run %s start: %s..%s trackers=%s start_at=%s force=%s backends=%s/%s",
+             rid, since, until, trackers, start_at, force,
+             summarize_backend, translate_backend)
 
     # Planned phases shown in the dashboard.
     plan = [("preflight", "Preflight"), ("fetch", "Fetch")]
@@ -134,6 +148,13 @@ def run_pipeline(*, since: str, until: str, trackers: list[str],
         plan.append(("cleanup", "Cleanup"))
     rpt.begin(since=since, until=until, trackers=trackers, phases=plan)
 
+    start_idx = PHASES.index(start_at) if start_at in PHASES else 0
+    def _do(name):
+        return PHASES.index(name) >= start_idx
+    def _ck():
+        if controller is not None:
+            controller.checkpoint()
+
     # ── Phase 0: ollama preflight (auto-start if down) ───────────────────────
     rpt.enter("preflight", "checking ollama")
     from .preflight import ensure_ollama
@@ -142,27 +163,44 @@ def run_pipeline(*, since: str, until: str, trackers: list[str],
         rep.errors.append("ollama down (auto-start failed)")
         log.error("ollama not reachable and auto-start failed")
         rpt.result("preflight", "ollama unreachable", failed=True)
-        _finalize(store, rep, t0, log)
+        _finalize(store, rep, t0, log, stats0)
         return rep
     log.info("ollama ready")
     rpt.result("preflight", "ollama ready")
 
     try:
-        _phase_fetch(store, window, trackers, rep, log, concurrency, rpt, browser_base)
-        if gate:
-            _phase_gate(store, trackers, rep, log, rpt)
-        _phase_summarize(store, window, trackers, rep, log, summarize_limit, concurrency, rpt)
-        if translate:
-            _phase_translate(store, rep, log, rpt)
-        _phase_write(store, trackers, rep, log, out, rpt)
-        if cleanup:
-            _phase_cross_cleanup(store, rep, log, rpt)
+        if _do("fetch"):
+            _ck(); _phase_fetch(store, window, trackers, rep, log, concurrency, rpt, browser_base)
+        if gate and _do("gate"):
+            _ck(); _phase_gate(store, trackers, rep, log, rpt)
+        if _do("summarize"):
+            _ck()
+            if force and start_at == "summarize":
+                _reset_resummarize(store, window, trackers, log)
+            _phase_summarize(store, window, trackers, rep, log, summarize_limit,
+                             concurrency, rpt, controller=controller,
+                             backend=summarize_backend)
+        if translate and _do("translate"):
+            _ck()
+            if force and start_at == "translate":
+                _reset_retranslate(store, window, trackers, log)
+            _phase_translate(store, rep, log, rpt, controller=controller,
+                             backend=translate_backend)
+        if _do("write"):
+            _ck(); _phase_write(store, trackers, rep, log, out, rpt)
+        if cleanup and _do("cleanup"):
+            _ck(); _phase_cross_cleanup(store, rep, log, rpt)
+    except ControlAbort:
+        rep.errors.append("restart requested")
+        log.info("control: restart requested mid-run")
+        _finalize(store, rep, t0, log, stats0)
+        raise
     except Exception as exc:  # never crash the orchestrator; record and finish
         rep.ok = False
         rep.errors.append(f"phase exception: {exc}")
         log.exception("pipeline phase crashed")
 
-    _finalize(store, rep, t0, log)
+    _finalize(store, rep, t0, log, stats0)
     return rep
 
 
@@ -311,7 +349,8 @@ def _phase_gate(store, trackers, rep, log, rpt):
 
 # ── Phase 3: SUMMARIZE (+ L3 review hook + cross-detect) ─────────────────────
 
-def _phase_summarize(store, window, trackers, rep, log, limit, concurrency, rpt):
+def _phase_summarize(store, window, trackers, rep, log, limit, concurrency, rpt,
+                     controller=None, backend="ollama"):
     from .cross import NARROW_DOMAINS, belongs_to
     from .llm import summarize_article
     from .sources.article import fetch_body_with_date
@@ -358,9 +397,12 @@ def _phase_summarize(store, window, trackers, rep, log, limit, concurrency, rpt)
                     if mdate:
                         dates[aid] = mdate
 
-        # Phase B: serial ollama summarize + review + cross-detect
+        # Phase B: serial summarize + review + cross-detect (pausable per article)
         for r in rows:
             aid = r["id"]
+            if controller is not None:
+                controller.checkpoint()
+            bk = controller.backend_for("summarize") if controller is not None else backend
             processed += 1
             rpt.tick(processed, grand_total,
                      f"[{tname}] {(r['title'] or '')[:70]}")
@@ -377,14 +419,14 @@ def _phase_summarize(store, window, trackers, rep, log, limit, concurrency, rpt)
             try:
                 result = summarize_article(
                     url=r["url"], raw_text=body, categories=info.categories,
-                    category_defs=info.category_defs)
+                    category_defs=info.category_defs, backend=bk)
                 if REVIEW_FN is not None:
                     ok, reason = REVIEW_FN(result, body, info)
                     if not ok:
                         # one retry
                         result = summarize_article(
                             url=r["url"], raw_text=body, categories=info.categories,
-                            category_defs=info.category_defs)
+                            category_defs=info.category_defs, backend=bk)
                         ok2, reason2 = REVIEW_FN(result, body, info)
                         if not ok2:
                             store.mark_status(aid, "review_failed", date=dates[aid])
@@ -417,7 +459,7 @@ def _phase_summarize(store, window, trackers, rep, log, limit, concurrency, rpt)
 
 # ── Phase 3b: TRANSLATE (L5 — English mirror) ────────────────────────────────
 
-def _phase_translate(store, rep, log, rpt):
+def _phase_translate(store, rep, log, rpt, controller=None, backend="ollama"):
     """Translate freshly-summarized (ready) articles into English so the write
     phase emits both languages. Forward-only: only rows lacking summary_en."""
     rpt.enter("translate", "translating to English")
@@ -428,11 +470,14 @@ def _phase_translate(store, rep, log, rpt):
         rpt.result("translate", "0 (nothing new)")
         return
     for i, r in enumerate(rows, 1):
+        if controller is not None:
+            controller.checkpoint()
+        bk = controller.backend_for("translate") if controller is not None else backend
         rpt.tick(i, total, f"{(r['title'] or '')[:70]}")
         tags = [t for t in (r["tags"] or "").split(",") if t]
         try:
             tr = translate_article(title=r["title"] or "", summary=r["summary"] or "",
-                                   tags=tags)
+                                   tags=tags, backend=bk)
         except Exception as exc:
             log.debug("translate id=%s error: %s", r["id"], exc)
             continue
@@ -575,8 +620,36 @@ def _phase_cross_cleanup(store, rep, log, rpt):
 
 # ── finalize ─────────────────────────────────────────────────────────────────
 
-def _finalize(store, rep, t0, log):
+def _tracker_or(trackers) -> str:
+    # trackers come from SEARCHINFOS keys (safe identifiers), inlined for an OR clause.
+    return " OR ".join(f"(','||trackers||',') LIKE '%,{t},%'" for t in trackers) or "0"
+
+
+def _reset_resummarize(store, window, trackers, log):
+    """Force redo: ready/written → pending in this window+trackers (re-summarize)."""
+    n = store.conn.execute(
+        f"UPDATE articles SET status='pending' WHERE status IN ('ready','written') "
+        f"AND date>=? AND date<=? AND ({_tracker_or(trackers)})",
+        (window.since.isoformat(), window.until.isoformat())).rowcount
+    store.conn.commit()
+    log.info("force re-summarize: reset %d -> pending", n)
+
+
+def _reset_retranslate(store, window, trackers, log):
+    """Force redo: clear summary_en in this window+trackers (re-translate)."""
+    n = store.conn.execute(
+        f"UPDATE articles SET summary_en=NULL WHERE status IN ('ready','written') "
+        f"AND date>=? AND date<=? AND ({_tracker_or(trackers)})",
+        (window.since.isoformat(), window.until.isoformat())).rowcount
+    store.conn.commit()
+    log.info("force re-translate: cleared %d summary_en", n)
+
+
+def _finalize(store, rep, t0, log, stats0=None):
     rep.elapsed_s = time.time() - t0
+    if stats0 is not None:
+        from . import llm
+        rep.gemini_fallback = llm.STATS["gemini_fallback"] - stats0.get("gemini_fallback", 0)
     stats = asdict(rep)
     store.finish_run(rep.run_id, stats_json=json.dumps(stats, ensure_ascii=False),
                      errors_json=json.dumps(rep.errors, ensure_ascii=False), ok=rep.ok)

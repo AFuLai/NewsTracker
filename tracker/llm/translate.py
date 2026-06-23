@@ -15,14 +15,16 @@ from . import _prompt, _strip_code_fence, call
 
 
 def translate_article(*, title: str, summary: str,
-                      tags: list[str] | None = None) -> dict[str, Any]:
+                      tags: list[str] | None = None,
+                      backend: str = "ollama") -> dict[str, Any]:
     """Returns {title_en, summary_en, tags_en}. Empty strings on parse failure
-    (caller then skips the update and the UI falls back to the zh fields)."""
+    (caller then skips the update and the UI falls back to the zh fields).
+    backend: "ollama" | "gemini" (gemini falls back to ollama on failure)."""
     tags = [t for t in (tags or []) if t and t.strip()]
     tmpl = _prompt("translate.txt")
     prompt = tmpl.format(title=title or "", summary=summary or "",
                          tags=", ".join(tags) if tags else "(none)")
-    response = call(prompt, format_json=True)
+    response = call(prompt, format_json=True, backend=backend)
     try:
         data = json.loads(_strip_code_fence(response))
     except (json.JSONDecodeError, ValueError):

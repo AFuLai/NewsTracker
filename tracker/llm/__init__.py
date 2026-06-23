@@ -12,6 +12,8 @@ external callers (`from .llm import ...`) keep working unchanged.
 """
 from __future__ import annotations
 
+import logging
+import os
 import re
 from importlib import resources
 from typing import Any
@@ -20,13 +22,24 @@ import httpx
 
 from .. import OLLAMA_MODEL, OLLAMA_URL
 
+_log = logging.getLogger("tracker.llm")
+
+# Default Gemini UI model (Flash is more capable than Flash-Lite for our prompts).
+GEMINI_MODEL = os.environ.get("TRACKER_GEMINI_MODEL", "Flash")
+
+# Per-process backend telemetry; the orchestrator reads this for the run report.
+STATS = {"gemini_ok": 0, "gemini_fallback": 0}
+
+# Markers wrapped around the Gemini prompt so we can detect a complete reply.
+_GEM_START, _GEM_END = "⟦TRK⟧", "⟦/TRK⟧"
+
 
 def _prompt(name: str) -> str:
     return resources.files("tracker.prompts").joinpath(name).read_text(encoding="utf-8")
 
 
-def call(prompt: str, *, model: str = OLLAMA_MODEL, timeout: float = 120.0,
-         system: str | None = None, format_json: bool = False) -> str:
+def _call_ollama(prompt: str, *, model: str = OLLAMA_MODEL, timeout: float = 120.0,
+                 system: str | None = None, format_json: bool = False) -> str:
     payload: dict[str, Any] = {
         "model": model,
         "prompt": prompt,
@@ -40,6 +53,45 @@ def call(prompt: str, *, model: str = OLLAMA_MODEL, timeout: float = 120.0,
     r = httpx.post(f"{OLLAMA_URL}/api/generate", json=payload, timeout=timeout)
     r.raise_for_status()
     return r.json().get("response", "")
+
+
+def _call_gemini(prompt: str, *, timeout: float = 120.0, format_json: bool = False) -> str:
+    """Ask Gemini via Chrome. Wraps the prompt with completion markers (+ a JSON
+    hint when needed) and returns the text between them. Raises on any failure."""
+    from . import gemini
+    rule = (f"\n\n【輸出規則】請在回覆最前面單獨輸出 {_GEM_START}，最後面單獨輸出 {_GEM_END}，"
+            f"中間放實際回覆內容，不要其他多餘文字。")
+    if format_json:
+        rule += f" {_GEM_START} 與 {_GEM_END} 之間必須是合法 JSON。"
+    return gemini.ask(prompt + rule, timeout_ms=int(timeout * 1000), model=GEMINI_MODEL,
+                      start_marker=_GEM_START, end_marker=_GEM_END)
+
+
+def call(prompt: str, *, model: str = OLLAMA_MODEL, timeout: float = 120.0,
+         system: str | None = None, format_json: bool = False,
+         backend: str = "ollama") -> str:
+    """LLM call with selectable backend. `backend="gemini"` drives Chrome/Gemini
+    and, on ANY failure, transparently falls back to local Ollama (per-call)."""
+    if backend == "gemini":
+        try:
+            out = _call_gemini(prompt, timeout=timeout, format_json=format_json)
+            STATS["gemini_ok"] += 1
+            return out
+        except Exception as exc:
+            STATS["gemini_fallback"] += 1
+            _log.warning("Gemini failed (%s) — falling back to Ollama", exc)
+            # fall through to Ollama with the original (unmarked) prompt
+    return _call_ollama(prompt, model=model, timeout=timeout,
+                        system=system, format_json=format_json)
+
+
+def resolve_default_backend() -> str:
+    """`gemini` if a debug Chrome is reachable, else `ollama`."""
+    try:
+        from . import gemini
+        return "gemini" if gemini.available() else "ollama"
+    except Exception:
+        return "ollama"
 
 
 def _strip_code_fence(s: str) -> str:

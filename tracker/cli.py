@@ -471,6 +471,12 @@ def pipeline(
                               help="L1 relevance gate before summarize (drops noise)"),
     translate: bool = typer.Option(True, "--translate/--no-translate",
                                    help="L5 English mirror (title/summary/tags) after summarize"),
+    summarize_llm: str = typer.Option("auto", "--summarize-llm",
+                                      help="auto|gemini|ollama (auto=gemini if a debug Chrome is up)"),
+    translate_llm: str = typer.Option("auto", "--translate-llm",
+                                      help="auto|gemini|ollama (auto=gemini if a debug Chrome is up)"),
+    gemini_model: str = typer.Option("", "--gemini-model",
+                                     help="Gemini UI model (e.g. Flash, Flash-Lite); blank=default"),
     ui: bool = typer.Option(False, "--ui",
                             help="Graphical browser dashboard (opens http://localhost:PORT)"),
     port: int = typer.Option(8787, help="Port for the --ui web dashboard"),
@@ -515,6 +521,16 @@ def pipeline(
         console.print(f"[red]Unknown tracker(s): {targets}; known={list(SEARCHINFOS)}[/red]")
         raise typer.Exit(2)
 
+    # Resolve LLM backend for summarize/translate (auto = gemini if a debug Chrome
+    # is reachable, else ollama). gemini always falls back to ollama on failure.
+    import tracker.llm as _llm
+    if gemini_model:
+        _llm.GEMINI_MODEL = gemini_model
+    def _resolve_be(choice):
+        return _llm.resolve_default_backend() if choice == "auto" else choice
+    sum_be, tra_be = _resolve_be(summarize_llm), _resolve_be(translate_llm)
+    console.print(f"[dim]LLM 後端：summarize={sum_be} · translate={tra_be}[/dim]")
+
     # If any source for these trackers needs a JS-rendering browser, make sure a
     # debug Chrome is up (notify + retry/cancel), and pass its CDP base through.
     browser_base = None
@@ -529,28 +545,44 @@ def pipeline(
             console.print("[yellow]略過需要瀏覽器的來源（debug Chrome 未啟動）。[/yellow]")
 
     if ui:
-        # Graphical browser dashboard (works from WSL2 via localhost forwarding).
-        from .web_dashboard import WebReporter, serve
-        reporter = WebReporter()
+        # Interactive browser console: pause/resume, restart-from-stage, and live
+        # LLM-backend switching (works from WSL2 via localhost forwarding).
+        import time as _t
+        from .web_dashboard import WebReporter
+        from .control import Controller, ControlAbort
+        controller = Controller(summarize_backend=sum_be, translate_backend=tra_be)
+        reporter = WebReporter(controller)
         httpd, used_port = _start_dashboard(reporter, port)
         url = f"http://localhost:{used_port}"
-        console.print(f"[bold cyan]執行儀表板：[/bold cyan] [underline]{url}[/underline]")
+        console.print(f"[bold cyan]互動控制台：[/bold cyan] [underline]{url}[/underline]")
         _open_windows_browser(url)
-        rep = run_pipeline(since=since, until=until, trackers=targets, db=db, out=out,
-                           summarize_limit=limit, cleanup=cleanup, gate=gate,
-                           translate=translate, browser_base=browser_base,
-                           reporter=reporter)
-        reporter.summary(rep)   # marks finished → browser shows completion panel
-        print(rep.one_line())
-        if sys.stdin.isatty():
+        start_at, force, rep = "fetch", False, None
+        while True:
+            reporter.restarting()
             try:
-                input("儀表板仍在執行中，按 Enter 關閉…")
-            except (EOFError, KeyboardInterrupt):
-                pass
-        else:
-            import time as _t; _t.sleep(3)
+                rep = run_pipeline(since=since, until=until, trackers=targets, db=db, out=out,
+                                   summarize_limit=limit, cleanup=cleanup, gate=gate,
+                                   translate=translate, browser_base=browser_base,
+                                   reporter=reporter, controller=controller,
+                                   start_at=start_at, force=force,
+                                   summarize_backend=sum_be, translate_backend=tra_be)
+            except ControlAbort:
+                if controller.closed:        # close = stop now and exit
+                    break
+                start_at, force = controller.consume_restart()
+                console.print(f"[yellow]↻ 從 {start_at} 重新來過（force={force}）[/yellow]")
+                continue
+            reporter.summary(rep)
+            print(rep.one_line())
+            # Stay up: let the user restart a stage or close from the dashboard.
+            while not controller.closed and not controller.restart_pending():
+                _t.sleep(0.3)
+            if controller.closed:
+                break
+            start_at, force = controller.consume_restart()
+            console.print(f"[yellow]↻ 從 {start_at} 重新來過（force={force}）[/yellow]")
         httpd.shutdown()
-        raise typer.Exit(0 if rep.ok else 1)
+        raise typer.Exit(0 if (rep and rep.ok) else 1)
 
     live = (not quiet) and sys.stdout.isatty()
     reporter = LiveReporter(console) if live else NullReporter()
@@ -558,7 +590,8 @@ def pipeline(
         rep = run_pipeline(since=since, until=until, trackers=targets, db=db, out=out,
                            summarize_limit=limit, cleanup=cleanup, gate=gate,
                            translate=translate, browser_base=browser_base,
-                           reporter=reporter)
+                           reporter=reporter,
+                           summarize_backend=sum_be, translate_backend=tra_be)
     # Completion summary printed after the live display has stopped.
     reporter.summary(rep)
     if verbose:

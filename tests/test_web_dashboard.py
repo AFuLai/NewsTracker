@@ -56,3 +56,37 @@ def test_http_server_serves_state_and_html():
         assert "Tracker 執行儀表板" in html and "/state" in html
     finally:
         httpd.shutdown()
+
+
+def _post(base, payload):
+    req = urllib.request.Request(base + "/control",
+                                 data=json.dumps(payload).encode(),
+                                 headers={"Content-Type": "application/json"},
+                                 method="POST")
+    return json.loads(urllib.request.urlopen(req, timeout=3).read())
+
+
+def test_control_endpoints_drive_controller():
+    from tracker.control import Controller
+    c = Controller(summarize_backend="ollama", translate_backend="ollama")
+    r = WebReporter(c)
+    r.begin(since="2026-03-01", until="2026-03-02", trackers=["os"],
+            phases=[("summarize", "Summarize")])
+    httpd = serve(r, port=8802)
+    try:
+        base = "http://127.0.0.1:8802"
+        assert _post(base, {"cmd": "pause"})["ok"] and c.paused
+        assert _post(base, {"cmd": "backend", "role": "summarize", "backend": "gemini"})["ok"]
+        assert c.backend_for("summarize") == "gemini"
+        # /state surfaces the live control state
+        st = json.loads(urllib.request.urlopen(base + "/state", timeout=3).read())
+        assert st["control"]["paused"] is True
+        assert st["control"]["backends"]["summarize"] == "gemini"
+        assert _post(base, {"cmd": "resume"})["ok"] and not c.paused
+        assert _post(base, {"cmd": "restart", "phase": "summarize", "force": True})["ok"]
+        assert c.restart_pending()
+        phase, force = c.consume_restart()
+        assert phase == "summarize" and force is True
+    finally:
+        httpd.shutdown()
+

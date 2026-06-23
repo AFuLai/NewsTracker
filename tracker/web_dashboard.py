@@ -23,7 +23,7 @@ DEFAULT_PORT = 8787
 
 
 class WebReporter(NullReporter):
-    def __init__(self):
+    def __init__(self, controller=None):
         self._lock = threading.Lock()
         self.t0 = time.time()
         self.title = ""
@@ -33,6 +33,7 @@ class WebReporter(NullReporter):
         self.note_text = ""
         self.finished = False
         self.summary_data: dict | None = None
+        self.controller = controller   # live pause/resume/restart/backend control
 
     # ── Reporter interface ───────────────────────────────────────────────────
     def begin(self, *, since, until, trackers, phases):
@@ -84,6 +85,13 @@ class WebReporter(NullReporter):
             self.finished = True
             self.summary_data = asdict(rep)
 
+    def restarting(self):
+        """Called by the CLI between a restart-abort and the new run: clears the
+        finished flag so the page shows the run is live again."""
+        with self._lock:
+            self.finished = False
+            self.summary_data = None
+
     # ── snapshot for the web page ────────────────────────────────────────────
     def snapshot(self) -> dict:
         with self._lock:
@@ -94,6 +102,7 @@ class WebReporter(NullReporter):
                 if p["total"] and p["done"]:
                     avg = (now - p["started_at"]) / p["done"]
                     eta = (p["total"] - p["done"]) * avg
+            control = self.controller.snapshot() if self.controller is not None else None
             return {
                 "title": self.title,
                 "elapsed": now - self.t0,
@@ -103,7 +112,30 @@ class WebReporter(NullReporter):
                 "phases": [dict(p) for p in self.phases],
                 "finished": self.finished,
                 "summary": self.summary_data,
+                "control": control,
             }
+
+
+def _apply_control(controller, cmd: dict) -> bool:
+    action = cmd.get("cmd")
+    if action == "pause":
+        controller.pause(); return True
+    if action == "resume":
+        controller.resume(); return True
+    if action == "restart":
+        phase = cmd.get("phase")
+        if phase:
+            controller.request_restart(phase, bool(cmd.get("force")))
+            return True
+        return False
+    if action == "backend":
+        role, backend = cmd.get("role"), cmd.get("backend")
+        if role and backend:
+            controller.set_backend(role, backend)
+            return True
+    if action == "close":
+        controller.close(); return True
+    return False
 
 
 def serve(reporter: WebReporter, *, port: int = DEFAULT_PORT) -> ThreadingHTTPServer:
@@ -126,6 +158,21 @@ def serve(reporter: WebReporter, *, port: int = DEFAULT_PORT) -> ThreadingHTTPSe
                 self.send_header("Content-Type", "text/html; charset=utf-8")
                 self.end_headers()
                 self.wfile.write(body)
+
+        def do_POST(self):
+            ok = False
+            if self.path.startswith("/control") and reporter.controller is not None:
+                try:
+                    n = int(self.headers.get("Content-Length", 0))
+                    cmd = json.loads(self.rfile.read(n) or b"{}")
+                    ok = _apply_control(reporter.controller, cmd)
+                except Exception:
+                    ok = False
+            body = json.dumps({"ok": ok}).encode("utf-8")
+            self.send_response(200 if ok else 400)
+            self.send_header("Content-Type", "application/json")
+            self.end_headers()
+            self.wfile.write(body)
 
     httpd = ThreadingHTTPServer(("0.0.0.0", port), Handler)
     t = threading.Thread(target=httpd.serve_forever, daemon=True)
@@ -185,6 +232,20 @@ _HTML = r"""<!DOCTYPE html>
   .dot { display:inline-block; width:8px; height:8px; border-radius:50%;
          background:var(--green); margin-right:6px; }
   .dot.off { background:var(--dim); }
+  .control { display:flex; flex-wrap:wrap; align-items:center; gap:8px;
+             background:var(--card); border:1px solid var(--line); border-radius:10px;
+             padding:10px 14px; margin-bottom:14px; font-size:.84rem; }
+  .control.hidden { display:none; }
+  .control button, .control select { background:#222b34; color:var(--txt);
+             border:1px solid var(--line); border-radius:7px; padding:5px 10px;
+             cursor:pointer; font-size:.82rem; }
+  .control button:hover, .control select:hover { border-color:var(--accent); }
+  .control button.primary { background:var(--accent); color:#04210b;
+             border-color:transparent; font-weight:600; }
+  .control button:disabled { opacity:.4; cursor:default; }
+  .control .sep { width:1px; height:20px; background:var(--line); margin:0 4px; }
+  .control label { color:var(--dim); }
+  .pausedBadge { color:var(--yellow); font-weight:600; }
 </style></head>
 <body><div class="wrap">
   <header>
@@ -193,6 +254,26 @@ _HTML = r"""<!DOCTYPE html>
     <span class="clock"><span class="dot off" id="live"></span>
       已過 <b id="elapsed">0:00</b><span class="eta" id="eta"></span></span>
   </header>
+  <div class="control hidden" id="control">
+    <button id="btnPause" class="primary">⏸ 暫停</button>
+    <span id="pausedTag"></span>
+    <span class="sep"></span>
+    <label>Summarize</label>
+    <select id="beSum"><option value="ollama">Ollama</option><option value="gemini">Gemini</option></select>
+    <label>Translate</label>
+    <select id="beTra"><option value="ollama">Ollama</option><option value="gemini">Gemini</option></select>
+    <span class="sep"></span>
+    <label>從</label>
+    <select id="reFrom">
+      <option value="fetch">Fetch</option><option value="gate">Gate</option>
+      <option value="summarize" selected>Summarize</option><option value="translate">Translate</option>
+      <option value="write">Write</option><option value="cleanup">Cleanup</option>
+    </select>
+    <label><input type="checkbox" id="reForce"> 強制重做</label>
+    <button id="btnRestart">↻ 重新來過</button>
+    <span class="sep"></span>
+    <button id="btnClose">✕ 關閉</button>
+  </div>
   <div id="phases"></div>
   <div class="note" id="note"></div>
   <div id="summary"></div>
@@ -203,8 +284,28 @@ function fmt(s){ s=Math.max(0,Math.floor(s)); const h=(s/3600|0),m=(s%3600/60|0)
   return h? `${h}:${String(m).padStart(2,'0')}:${String(x).padStart(2,'0')}`
           : `${m}:${String(x).padStart(2,'0')}`; }
 const ICON={pending:'○',running:'▶',done:'✓',failed:'✗'};
+let CTRL=null;
+async function ctl(cmd){ try{ await fetch('/control',{method:'POST',
+  headers:{'Content-Type':'application/json'}, body:JSON.stringify(cmd)}); }catch(e){} }
+$('btnPause').onclick = ()=> ctl({cmd:(CTRL&&CTRL.paused)?'resume':'pause'});
+$('beSum').onchange = e=> ctl({cmd:'backend', role:'summarize', backend:e.target.value});
+$('beTra').onchange = e=> ctl({cmd:'backend', role:'translate', backend:e.target.value});
+$('btnRestart').onclick = ()=> ctl({cmd:'restart', phase:$('reFrom').value, force:$('reForce').checked});
+$('btnClose').onclick = ()=> { ctl({cmd:'close'}); };
+function syncControl(st){
+  if(!st.control){ $('control').classList.add('hidden'); return; }
+  CTRL = st.control;
+  $('control').classList.remove('hidden');
+  $('btnPause').textContent = st.control.paused ? '▶ 恢復' : '⏸ 暫停';
+  $('pausedTag').innerHTML = st.control.paused ? '<span class="pausedBadge">⏸ 已暫停</span>' : '';
+  if(document.activeElement!==$('beSum')) $('beSum').value = st.control.backends.summarize;
+  if(document.activeElement!==$('beTra')) $('beTra').value = st.control.backends.translate;
+  // pause toggle is only meaningful while a run is live
+  $('btnPause').disabled = !!st.finished;
+}
 async function poll(){
   let st; try{ st=await (await fetch('/state',{cache:'no-store'})).json(); }catch(e){ return; }
+  syncControl(st);
   $('title').textContent = st.title || '';
   $('elapsed').textContent = fmt(st.elapsed);
   $('eta').textContent = (st.running && st.eta!=null) ? `　預估剩餘 ~${fmt(st.eta)}` : '';
@@ -235,6 +336,7 @@ async function poll(){
       row('擷取', `${s.fetch_new} 新 / ${s.fetch_sources} 來源 (304:${s.fetch_304}, 失敗:${s.fetch_failed})`)+
       row('過濾掉', s.gated_out)+
       row('摘要', `${s.summarized} / ${s.summarize_attempted}（窗外 ${s.out_of_window}, 審核退回 ${s.review_failed}）`)+
+      row('LLM 後端', `Sum:${s.summarize_backend||'ollama'} · Tra:${s.translate_backend||'ollama'}${s.gemini_fallback? ' · Gemini退回 '+s.gemini_fallback:''}`)+
       row('跨主類', `+${s.cross_added} / -${s.cross_removed}`)+
       row('寫入天數', s.days_written)+
       row('錯誤', (s.errors||[]).length)+
