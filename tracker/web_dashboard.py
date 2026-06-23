@@ -118,6 +118,8 @@ class WebReporter(NullReporter):
 
 def _apply_control(controller, cmd: dict) -> bool:
     action = cmd.get("cmd")
+    if action == "start":
+        return controller.request_start(cmd.get("config"))
     if action == "pause":
         controller.pause(); return True
     if action == "resume":
@@ -246,6 +248,19 @@ _HTML = r"""<!DOCTYPE html>
   .control .sep { width:1px; height:20px; background:var(--line); margin:0 4px; }
   .control label { color:var(--dim); }
   .pausedBadge { color:var(--yellow); font-weight:600; }
+  .config { background:var(--card); border:1px solid var(--line); border-radius:12px;
+            padding:18px 20px; margin-bottom:16px; }
+  .config.hidden { display:none; }
+  .config h3 { margin:0 0 14px; font-size:1.02rem; }
+  .cfgrow { display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin-bottom:12px; }
+  .cfgrow > label { color:var(--dim); min-width:74px; }
+  .config input, .config select { background:#222b34; color:var(--txt);
+            border:1px solid var(--line); border-radius:7px; padding:5px 9px; font-size:.85rem; }
+  .config input[type=checkbox] { width:auto; min-width:0; }
+  .config .chk { color:var(--txt); display:inline-flex; align-items:center; gap:5px; }
+  #btnStart { background:var(--green); color:#04210b; border:none; border-radius:8px;
+            padding:9px 22px; font-size:.95rem; font-weight:700; cursor:pointer; margin-top:4px; }
+  #btnStart:hover { filter:brightness(1.1); }
 </style></head>
 <body><div class="wrap">
   <header>
@@ -254,6 +269,28 @@ _HTML = r"""<!DOCTYPE html>
     <span class="clock"><span class="dot off" id="live"></span>
       已過 <b id="elapsed">0:00</b><span class="eta" id="eta"></span></span>
   </header>
+  <div class="config hidden" id="config">
+    <h3>⚙️ 確認參數後開始</h3>
+    <div class="cfgrow">
+      <label>日期</label>
+      <input id="cfgSince" type="date"> <span style="color:var(--dim)">→</span> <input id="cfgUntil" type="date">
+    </div>
+    <div class="cfgrow"><label>追蹤</label><span id="cfgTrackers"></span></div>
+    <div class="cfgrow">
+      <label>LLM</label>
+      <span class="chk">Summarize <select id="cfgSum"><option value="ollama">Ollama</option><option value="gemini">Gemini</option></select></span>
+      <span class="chk">Translate <select id="cfgTra"><option value="ollama">Ollama</option><option value="gemini">Gemini</option></select></span>
+    </div>
+    <div class="cfgrow">
+      <label>選項</label>
+      <label class="chk"><input type="checkbox" id="cfgGate"> Gate 過濾</label>
+      <label class="chk"><input type="checkbox" id="cfgTranslate"> 翻譯</label>
+      <label class="chk"><input type="checkbox" id="cfgCleanup"> Cleanup</label>
+      <label class="chk">摘要上限 <input id="cfgLimit" type="number" min="1" style="width:74px"></label>
+    </div>
+    <button id="btnStart">▶ 開始執行</button>
+    <span id="cfgErr" style="color:var(--red); margin-left:10px;"></span>
+  </div>
   <div class="control hidden" id="control">
     <button id="btnPause" class="primary">⏸ 暫停</button>
     <span id="pausedTag"></span>
@@ -292,9 +329,44 @@ $('beSum').onchange = e=> ctl({cmd:'backend', role:'summarize', backend:e.target
 $('beTra').onchange = e=> ctl({cmd:'backend', role:'translate', backend:e.target.value});
 $('btnRestart').onclick = ()=> ctl({cmd:'restart', phase:$('reFrom').value, force:$('reForce').checked});
 $('btnClose').onclick = ()=> { ctl({cmd:'close'}); };
+let CFG_INIT=false;
+function buildConfig(cfg){
+  if(CFG_INIT) return; CFG_INIT=true;
+  $('cfgSince').value = cfg.since||''; $('cfgUntil').value = cfg.until||'';
+  $('cfgSum').value = cfg.summarize_backend||'ollama';
+  $('cfgTra').value = cfg.translate_backend||'ollama';
+  $('cfgGate').checked = cfg.gate!==false;
+  $('cfgTranslate').checked = cfg.translate!==false;
+  $('cfgCleanup').checked = cfg.cleanup!==false;
+  $('cfgLimit').value = cfg.limit||300;
+  const tw = $('cfgTrackers'); tw.innerHTML='';
+  (cfg.all_trackers||[]).forEach(t=>{
+    const lbl=document.createElement('label'); lbl.className='chk';
+    lbl.innerHTML='<input type="checkbox" id="trk_'+t+'" '+((cfg.trackers||[]).includes(t)?'checked':'')+'> '+t;
+    tw.appendChild(lbl);
+  });
+}
+$('btnStart').onclick = async ()=>{
+  const all = (CTRL&&CTRL.config&&CTRL.config.all_trackers)||[];
+  const trackers = all.filter(t=>{ const e=$('trk_'+t); return e&&e.checked; });
+  const config = { since:$('cfgSince').value, until:$('cfgUntil').value, trackers,
+    summarize_backend:$('cfgSum').value, translate_backend:$('cfgTra').value,
+    gate:$('cfgGate').checked, translate:$('cfgTranslate').checked,
+    cleanup:$('cfgCleanup').checked, limit:parseInt($('cfgLimit').value)||300 };
+  const r = await fetch('/control',{method:'POST',headers:{'Content-Type':'application/json'},
+                                    body:JSON.stringify({cmd:'start',config})});
+  $('cfgErr').textContent = r.ok ? '' : '參數有誤（請確認日期區間與至少一個追蹤項目）';
+};
 function syncControl(st){
-  if(!st.control){ $('control').classList.add('hidden'); return; }
+  if(!st.control){ $('control').classList.add('hidden'); $('config').classList.add('hidden'); return; }
   CTRL = st.control;
+  if(!st.control.started){
+    buildConfig(st.control.config||{});
+    $('config').classList.remove('hidden');
+    $('control').classList.add('hidden');
+    return;
+  }
+  $('config').classList.add('hidden');
   $('control').classList.remove('hidden');
   $('btnPause').textContent = st.control.paused ? '▶ 恢復' : '⏸ 暫停';
   $('pausedTag').innerHTML = st.control.paused ? '<span class="pausedBadge">⏸ 已暫停</span>' : '';
@@ -307,6 +379,11 @@ async function poll(){
   let st; try{ st=await (await fetch('/state',{cache:'no-store'})).json(); }catch(e){ return; }
   syncControl(st);
   $('title').textContent = st.title || '';
+  if(st.control && !st.control.started){   // config mode: nothing is running yet
+    $('elapsed').textContent='—'; $('eta').textContent='';
+    $('live').className='dot off'; $('phases').innerHTML=''; $('note').textContent='';
+    $('summary').innerHTML=''; return;
+  }
   $('elapsed').textContent = fmt(st.elapsed);
   $('eta').textContent = (st.running && st.eta!=null) ? `　預估剩餘 ~${fmt(st.eta)}` : '';
   $('live').className = 'dot' + (st.finished?' off':'');

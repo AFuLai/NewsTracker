@@ -19,9 +19,13 @@ class ControlAbort(Exception):
     """Raised at a checkpoint when a restart-from-stage was requested."""
 
 
+_EDITABLE = ("since", "until", "trackers", "gate", "translate", "cleanup",
+             "limit", "summarize_backend", "translate_backend", "gemini_model")
+
+
 class Controller:
     def __init__(self, *, summarize_backend: str = "ollama",
-                 translate_backend: str = "ollama"):
+                 translate_backend: str = "ollama", config: dict | None = None):
         self._lock = threading.Lock()
         self._resumed = threading.Event()
         self._resumed.set()                 # set = running, clear = paused
@@ -31,6 +35,9 @@ class Controller:
         self._force = False
         self.closed = False
         self.backends = {"summarize": summarize_backend, "translate": translate_backend}
+        # Pre-run config gate: the UI reviews/edits these, then clicks Start.
+        self.config = dict(config or {})
+        self._started = threading.Event()
 
     # ── commands (called from the web server thread) ────────────────────────
     def pause(self):
@@ -63,6 +70,47 @@ class Controller:
             self.closed = True
             self._abort = True
         self._resumed.set()
+        self._started.set()    # unblock a wait_for_start() if closed before starting
+
+    # ── pre-run config gate ─────────────────────────────────────────────────
+    def request_start(self, incoming: dict | None) -> bool:
+        """Validate + apply the (possibly UI-edited) config and release the run."""
+        incoming = incoming or {}
+        cfg = self.config
+        since = incoming.get("since", cfg.get("since"))
+        until = incoming.get("until", cfg.get("until"))
+        try:
+            from datetime import date
+            if date.fromisoformat(since) > date.fromisoformat(until):
+                return False
+        except Exception:
+            return False
+        allt = cfg.get("all_trackers", [])
+        trackers = [t for t in (incoming.get("trackers") or cfg.get("trackers") or [])
+                    if t in allt]
+        if not trackers:
+            return False
+        with self._lock:
+            cfg["since"], cfg["until"], cfg["trackers"] = since, until, trackers
+            for k in ("gate", "translate", "cleanup", "summarize_backend",
+                      "translate_backend", "gemini_model"):
+                if k in incoming:
+                    cfg[k] = incoming[k]
+            if "limit" in incoming:
+                try:
+                    cfg["limit"] = int(incoming["limit"])
+                except (TypeError, ValueError):
+                    pass
+            self.backends["summarize"] = cfg.get("summarize_backend", "ollama")
+            self.backends["translate"] = cfg.get("translate_backend", "ollama")
+        self._started.set()
+        return True
+
+    def wait_for_start(self):
+        self._started.wait()
+
+    def started(self) -> bool:
+        return self._started.is_set()
 
     def restart_pending(self) -> bool:
         with self._lock:
@@ -91,4 +139,5 @@ class Controller:
 
     def snapshot(self) -> dict:
         with self._lock:
-            return {"paused": self.paused, "backends": dict(self.backends)}
+            return {"paused": self.paused, "backends": dict(self.backends),
+                    "started": self._started.is_set(), "config": dict(self.config)}

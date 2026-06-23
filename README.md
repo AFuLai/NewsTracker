@@ -55,7 +55,12 @@ X server needed), opens your Windows default browser, and renders graphical phas
 cards + progress bars + ETA that update live, plus a completion summary. `--port`
 changes the port (default 8787).
 
-**Interactive console.** The `--ui` dashboard is also a control panel:
+**Interactive console.** With `--ui` the dashboard opens **before anything runs**
+and shows a parameter form (date window, trackers, Summarize/Translate backend,
+Gate/Translate/Cleanup toggles, summarize limit) pre-filled from the command
+line. Review/edit it, then click **▶ 開始執行** to start. The CLI flags are just
+the defaults; the run uses whatever you confirm in the form. After it starts, the
+panel becomes a control bar:
 - **⏸ 暫停 / ▶ 恢復** — pause/resume the run (takes effect between articles).
 - **↻ 重新來過 從 [stage]** — restart from any stage on the current data; tick
   **強制重做** to first reset that stage's output (ready→pending for Summarize,

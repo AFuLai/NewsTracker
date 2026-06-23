@@ -65,3 +65,31 @@ def test_close():
     assert not c.closed
     c.close()
     assert c.closed
+
+
+def test_config_start_gate():
+    cfg = {"since": "2026-01-01", "until": "2026-01-05", "trackers": ["os"],
+           "all_trackers": ["security", "os"], "gate": True, "limit": 300,
+           "summarize_backend": "ollama", "translate_backend": "ollama"}
+    c = Controller(config=cfg)
+    assert not c.started()
+    # invalid: since > until
+    assert c.request_start({"since": "2026-02-01", "until": "2026-01-01",
+                            "trackers": ["os"]}) is False
+    assert not c.started()
+    # invalid: no known tracker
+    assert c.request_start({"trackers": ["bogus"]}) is False
+    # valid: edits applied, run released
+    assert c.request_start({"since": "2026-03-01", "until": "2026-03-10",
+                            "trackers": ["security", "os"],
+                            "summarize_backend": "gemini", "limit": "50"}) is True
+    assert c.started()
+    assert c.config["since"] == "2026-03-01" and c.config["trackers"] == ["security", "os"]
+    assert c.config["limit"] == 50 and c.backend_for("summarize") == "gemini"
+
+
+def test_close_unblocks_wait_for_start():
+    c = Controller()
+    c.close()
+    c.wait_for_start()   # must return immediately, not hang
+    assert c.closed

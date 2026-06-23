@@ -545,17 +545,38 @@ def pipeline(
             console.print("[yellow]略過需要瀏覽器的來源（debug Chrome 未啟動）。[/yellow]")
 
     if ui:
-        # Interactive browser console: pause/resume, restart-from-stage, and live
-        # LLM-backend switching (works from WSL2 via localhost forwarding).
+        # Interactive browser console: review/confirm parameters, then Start; plus
+        # pause/resume, restart-from-stage, and live LLM-backend switching.
         import time as _t
         from .web_dashboard import WebReporter
         from .control import Controller, ControlAbort
-        controller = Controller(summarize_backend=sum_be, translate_backend=tra_be)
+        ui_config = {
+            "since": since, "until": until, "trackers": targets,
+            "all_trackers": list(SEARCHINFOS),
+            "gate": gate, "translate": translate, "cleanup": cleanup, "limit": limit,
+            "summarize_backend": sum_be, "translate_backend": tra_be,
+            "gemini_model": _llm.GEMINI_MODEL,
+        }
+        controller = Controller(summarize_backend=sum_be, translate_backend=tra_be,
+                                config=ui_config)
         reporter = WebReporter(controller)
         httpd, used_port = _start_dashboard(reporter, port)
         url = f"http://localhost:{used_port}"
         console.print(f"[bold cyan]互動控制台：[/bold cyan] [underline]{url}[/underline]")
+        console.print("[dim]請在控制台確認參數後按「開始執行」…[/dim]")
         _open_windows_browser(url)
+        controller.wait_for_start()        # block until the UI confirms parameters
+        if controller.closed:              # closed before starting → just exit
+            httpd.shutdown()
+            raise typer.Exit(0)
+        cfg = controller.config
+        since, until, targets = cfg["since"], cfg["until"], cfg["trackers"]
+        gate, translate, cleanup = cfg.get("gate", gate), cfg.get("translate", translate), cfg.get("cleanup", cleanup)
+        limit = cfg.get("limit", limit)
+        sum_be, tra_be = cfg.get("summarize_backend", sum_be), cfg.get("translate_backend", tra_be)
+        if cfg.get("gemini_model"):
+            _llm.GEMINI_MODEL = cfg["gemini_model"]
+        console.print(f"[dim]開始：{since}…{until} {targets} · sum={sum_be} tra={tra_be}[/dim]")
         start_at, force, rep = "fetch", False, None
         while True:
             reporter.restarting()
