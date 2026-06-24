@@ -26,6 +26,9 @@ _log = logging.getLogger("tracker.llm")
 
 # Default Gemini UI model (Flash is more capable than Flash-Lite for our prompts).
 GEMINI_MODEL = os.environ.get("TRACKER_GEMINI_MODEL", "Flash")
+# Per-call Gemini response timeout (seconds). Kept short so a missing-marker reply
+# falls back to Ollama quickly instead of stalling the run; Flash answers in ~10-30s.
+GEMINI_TIMEOUT = float(os.environ.get("TRACKER_GEMINI_TIMEOUT", "45"))
 
 # Per-process backend telemetry; the orchestrator reads this for the run report.
 STATS = {"gemini_ok": 0, "gemini_fallback": 0}
@@ -63,8 +66,9 @@ def _call_gemini(prompt: str, *, timeout: float = 120.0, format_json: bool = Fal
             f"中間放實際回覆內容，不要其他多餘文字。")
     if format_json:
         rule += f" {_GEM_START} 與 {_GEM_END} 之間必須是合法 JSON。"
-    return gemini.ask(prompt + rule, timeout_ms=int(timeout * 1000), model=GEMINI_MODEL,
-                      start_marker=_GEM_START, end_marker=_GEM_END)
+    # Use the (shorter) Gemini-specific timeout so marker failures fall back fast.
+    return gemini.ask(prompt + rule, timeout_ms=int(GEMINI_TIMEOUT * 1000),
+                      model=GEMINI_MODEL, start_marker=_GEM_START, end_marker=_GEM_END)
 
 
 def call(prompt: str, *, model: str = OLLAMA_MODEL, timeout: float = 120.0,
