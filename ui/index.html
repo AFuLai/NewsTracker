@@ -617,7 +617,7 @@ const state = {
   currentMode:   null,   // "month" | "full-year" | "date"
   currentMonth:  null,
   currentDate:   null,
-  filterCat:     "全部",
+  filterCats:    new Set(),   // empty = 全部; multi-select otherwise
   lang:          "zh",   // "zh" | "en"
   searchQuery:   "",     // "" = not searching
   search:        null,   // { countByDate:{date:n}, years:[...] } when searching
@@ -722,8 +722,7 @@ function applyLang() {
     document.getElementById('tracker-title').textContent = trackerTitle(state.currentTracker, mf);
     buildTrackerPills(Object.keys(getTrackers()));
     setActivePill('#tracker-pills', '[data-tracker="' + state.currentTracker + '"]');
-    buildCatPills((mf && mf.categories) || []);
-    setActivePill('#cat-pills', '[data-cat="' + state.filterCat + '"]');
+    buildCatPills((mf && mf.categories) || []);   // buildCatPills → refreshCatPills
     if (state.searchQuery && state.search) {
       // Matched set depends on language (we search the displayed fields) → redo it.
       refreshSearchView();
@@ -821,7 +820,8 @@ function buildSearchIndex() {
     let n = 0;
     for (const a of days[date]) {
       if (!itemBelongsToTracker(a, state.currentTracker)) continue;
-      if (state.filterCat !== '全部' && a.category !== state.filterCat) continue;
+      if (state.filterCats.size &&
+          !state.filterCats.has(effectiveCat(a, state.currentTracker))) continue;
       if (matchesQuery(a, q)) n++;
     }
     if (n > 0) { counts[date] = n; years.add(date.slice(0, 4)); }
@@ -904,6 +904,48 @@ function itemBelongsToTracker(item, tracker) {
   return tracker === 'security';
 }
 
+// Cross-belonging articles keep their *home* tracker's category (a single
+// `category` field). When viewed under a different tracker that category is
+// not one of that tracker's pills, so it would only ever surface under 全部.
+// CAT_MAP remaps a foreign category onto the nearest local subcategory so the
+// item is findable (and colour-coded) under a real pill of the viewing tracker.
+const CAT_MAP = {
+  security: {
+    // os platforms → treated as vuln/threat intel under a security lens
+    'Linux':'漏洞與威脅情報', 'Windows':'漏洞與威脅情報', 'Apple':'漏洞與威脅情報',
+    'Android':'漏洞與威脅情報', '重點關注':'前瞻技術',
+    // eu_cra → security
+    '法令更新':'法規與標準', '調和標準':'法規與標準', '合規指引':'法規與標準',
+    '亞太對應':'法規與標準', '開源影響':'供應鏈與開源安全',
+    '產業動態':'重大事件', '研討活動':'前瞻技術',
+  },
+  eu_cra: {
+    // security → eu_cra
+    '法規與標準':'法令更新', '供應鏈與開源安全':'開源影響', '漏洞與威脅情報':'合規指引',
+    '前瞻技術':'產業動態', '重大事件':'產業動態',
+    // os → eu_cra
+    'Linux':'開源影響', 'Windows':'產業動態', 'Apple':'產業動態',
+    'Android':'產業動態', '重點關注':'產業動態',
+  },
+  os: {
+    // no platform signal from a foreign article → cross-platform watchlist
+    '漏洞與威脅情報':'重點關注', '法規與標準':'重點關注', '供應鏈與開源安全':'重點關注',
+    '前瞻技術':'重點關注', '重大事件':'重點關注',
+    '法令更新':'重點關注', '調和標準':'重點關注', '合規指引':'重點關注',
+    '開源影響':'重點關注', '產業動態':'重點關注', '亞太對應':'重點關注', '研討活動':'重點關注',
+  },
+};
+
+// The category an article should display/filter under for the given tracker.
+function effectiveCat(a, tracker) {
+  const cat = a.category;
+  const mf = (getTrackers() || {})[tracker];
+  const own = (mf && mf.categories) || [];
+  if (own.includes(cat)) return cat;      // native category → unchanged
+  const m = CAT_MAP[tracker];
+  return (m && m[cat]) || cat;            // remap foreign; else leave as-is
+}
+
 // ── Sidebar toggle ────────────────────────────────────
 function toggleSidebar() {
   const sidebar = document.getElementById('sidebar');
@@ -942,7 +984,7 @@ function selectTracker(name) {
   state.currentMonth = null;
   state.currentDate = null;
   state.currentMode = null;
-  state.filterCat = '全部';
+  state.filterCats = new Set();
   state.searchQuery = '';        // a fresh tracker starts unsearched
   state.search = null;
   const _sb = document.getElementById('search-box'); if (_sb) _sb.value = '';
@@ -1075,13 +1117,24 @@ function buildCatPills(cats) {
   const all = ['全部', ...cats];
   const icons = { '全部':'', '法規與標準':'📋 ', '漏洞與威脅情報':'🔴 ', '供應鏈與開源安全':'🔗 ', '重大事件':'🚨 ', '前瞻技術':'🚀 ',
                   'Linux':'🐧 ', 'Windows':'🪟 ', 'Apple':'🍎 ', 'Android':'🤖 ', '重點關注':'⭐ ' };
-  all.forEach((c, i) => {
+  all.forEach((c) => {
     const btn = document.createElement('button');
-    btn.className = 'pill cat-pill' + (i === 0 ? ' active' : '');
+    btn.className = 'pill cat-pill';
     btn.dataset.cat = c;   // key stays Chinese; only the label is localized
     btn.textContent = (icons[c] || '') + catLabel(c);
-    btn.onclick = () => setFilter(c, btn);
+    btn.onclick = () => setFilter(c);
     el.appendChild(btn);
+  });
+  refreshCatPills();
+}
+
+// Multi-select: 全部 is active when nothing is picked; otherwise every picked
+// category pill is highlighted (more than one can be on at once).
+function refreshCatPills() {
+  document.querySelectorAll('#cat-pills .cat-pill').forEach(btn => {
+    const c = btn.dataset.cat;
+    const on = c === '全部' ? state.filterCats.size === 0 : state.filterCats.has(c);
+    btn.classList.toggle('active', on);
   });
 }
 
@@ -1139,9 +1192,15 @@ function hideDateList() {
 }
 
 // ── Filter ────────────────────────────────────────────
-function setFilter(cat, btn) {
-  state.filterCat = cat;
-  setActivePill('#cat-pills', '[data-cat="' + cat + '"]');
+function setFilter(cat) {
+  if (cat === '全部') {
+    state.filterCats.clear();                 // 全部 resets the multi-select
+  } else if (state.filterCats.has(cat)) {
+    state.filterCats.delete(cat);             // toggle off
+  } else {
+    state.filterCats.add(cat);                // toggle on (multi-select)
+  }
+  refreshCatPills();
   if (state.searchQuery && state.search) {
     refreshSearchView();   // date menu + counts depend on the category too
   } else {
@@ -1171,8 +1230,9 @@ function renderArticles(dateList) {
     articles = articles.filter(a => itemBelongsToTracker(a, state.currentTracker));
   }
 
-  if (state.filterCat !== '全部') {
-    articles = articles.filter(a => a.category === state.filterCat);
+  if (state.filterCats.size) {
+    articles = articles.filter(a =>
+      state.filterCats.has(effectiveCat(a, state.currentTracker)));
   }
 
   // Site-wide search: keep only items matching the query (in either language).
@@ -1193,9 +1253,9 @@ function renderArticles(dateList) {
     noData.classList.remove('hidden');
     noData.textContent = state.searchQuery
       ? L().ui.noResults(state.searchQuery)
-      : (state.filterCat === '全部'
+      : (state.filterCats.size === 0
           ? t('noData')
-          : L().ui.noCat(catLabel(state.filterCat)));
+          : L().ui.noCat([...state.filterCats].map(catLabel).join(' / ')));
     return;
   }
 
@@ -1226,7 +1286,8 @@ function renderArticles(dateList) {
 function buildCard(a) {
   const card = document.createElement('div');
   card.className = 'card';
-  const catClass = 'cat-' + a.category;   // colour class keyed on the zh category
+  const ecat = effectiveCat(a, state.currentTracker);
+  const catClass = 'cat-' + ecat;   // colour class keyed on the viewing tracker's category
   const title = artTitle(a), summary = artSummary(a);
   const preview = summary.length > 120 ? summary.slice(0, 120) + '…' : summary;
   const srcName = a.sources && a.sources[0] ? escHtml(a.sources[0].name) : '';
@@ -1237,7 +1298,7 @@ function buildCard(a) {
     return '<span class="card-tag">' + escHtml(tg) + '</span>';
   }).join('');
   card.innerHTML = [
-    '<span class="cat-badge ' + catClass + '">' + escHtml(catLabel(a.category)) + '</span>',
+    '<span class="cat-badge ' + catClass + '">' + escHtml(catLabel(ecat)) + '</span>',
     '<h3 class="card-title">' + linkifyCVE(escHtml(title)) + '</h3>',
     '<p class="card-summary-preview">' + escHtml(preview) + '</p>',
     '<div class="card-tags">' + tagsHtml + '</div>',
@@ -1249,7 +1310,8 @@ function buildCard(a) {
 
 function openOverlay(a) {
   const box = document.getElementById('overlay-box');
-  const catClass = 'cat-' + a.category;
+  const ecat = effectiveCat(a, state.currentTracker);
+  const catClass = 'cat-' + ecat;
   const srcHtml = (a.sources || []).map(s =>
     '<li><a href="' + escHtml(s.url) + '" target="_blank" rel="noopener">[' + escHtml(s.lang) + '] ' + escHtml(s.name) + '</a></li>'
   ).join('');
@@ -1261,7 +1323,7 @@ function openOverlay(a) {
   }).join('');
   box.innerHTML = [
     '<button id="overlay-close" onclick="closeOverlay()">✕</button>',
-    '<span class="cat-badge ' + catClass + '">' + escHtml(catLabel(a.category)) + '</span>',
+    '<span class="cat-badge ' + catClass + '">' + escHtml(catLabel(ecat)) + '</span>',
     '<h2>' + linkifyCVE(escHtml(artTitle(a))) + '</h2>',
     '<p class="card-summary">' + linkifyCVE(escHtml(artSummary(a))) + '</p>',
     '<div class="card-tags">' + tagsHtml + '</div>',
