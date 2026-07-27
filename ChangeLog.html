@@ -16,6 +16,17 @@
 <h1>Tracker ChangeLog</h1>
 <p class="meta">本檔由 <code>tracker pack</code> 自動維護；每次打包前由本地 ollama 生成版本重點並 prepend 於下方。</p>
 <!-- CHANGELOG_INSERTION_POINT -->
+<section class="release" id="v2.20">
+  <h2>v2.20 — 2026-07-27</h2>
+<ul>
+    <li><strong>【來源優化】ETSI 新聞來源精準度大幅提升：</strong> 針對 ETSI 網站的內容爬取邏輯進行全面重構，成功排除網站結構頁面（如法律公告、網站地圖）和非主題相關內容，大幅降低了雜訊噪音。這使得 eu_cra 來源的準確性從 77% 提升至 87%。</li>
+    <li><strong>【核心修補】導入來源自定義過濾器：</strong> 升級了主題過濾機制，現在能夠識別並忽略來源網站自身名稱或網域的關鍵字（例如在 etsi.org 上忽略 "ETSI"），確保爬取內容只聚焦於真正的行業新聞，而非網站自我介紹。</li>
+    <li><strong>【穩定性修補】修復日誌重建流程：</strong> 修正了資料重建（rebuild_days）的邏輯，使其能正確掃描和處理先前因資料過濾而留下的「過時日誌」，確保資料庫的完整性和時效性。</li>
+    <li><strong>【內容覆蓋】修復標準編號標記：</strong> 修正了標準編號的標記邏輯，確保在爬取時不會誤排除與主要標準（如 EN 303）相關的其他重要標準（如 EN 304 223），提升了技術標準的覆蓋範圍。</li>
+    <li><strong>【效能提升】整體爬取穩定性與準確性：</strong> 透過多個路徑和內容結構的精準過濾，成功將原本被誤判為新聞的網站結構頁面（如 `/legal-notice`）排除在外，使爬取結果更純粹、更可靠。</li>
+</ul>
+</section>
+
 <section class="release" id="v2.19">
   <h2>v2.19 — 2026-07-27</h2>
 <ul>
