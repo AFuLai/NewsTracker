@@ -4,6 +4,8 @@ from __future__ import annotations
 import asyncio
 import json
 from datetime import date as _date
+from datetime import datetime
+from datetime import timedelta as _timedelta
 from pathlib import Path
 
 import typer
@@ -11,7 +13,7 @@ from rich.console import Console
 from rich.table import Table
 
 from . import (DEFAULT_DB, DEFAULT_OUT, DEFAULT_TARBALL, DEFAULT_TRACKER,
-               OLLAMA_MODEL, SEARCHINFOS)
+               OLLAMA_MODEL, PROJECT_ROOT, SEARCHINFOS)
 from .config import load_searchinfo, load_tracker
 from .dedup import Store
 from .pack import pack as run_pack
@@ -97,6 +99,71 @@ def status(
                       + "  ".join(f"{k}={v}" for k, v in s.items()))
     else:
         console.print(f"[dim]DB not initialized yet: {db}[/dim]")
+
+
+@app.command()
+def sources(
+    tracker: str | None = typer.Option(None, "--tracker",
+                                       help=f"Filter to one of: {list(SEARCHINFOS)} (default: all)"),
+    db: Path = typer.Option(DEFAULT_DB),
+    json_out: bool = typer.Option(False, "--json",
+                                  help="Emit machine-readable JSON instead of a table"),
+) -> None:
+    """Per-source health report: yield, junk%, errors — worst sources first.
+
+    Correlates source_profiles (domain/method/trackers/yield/watermark) with
+    articles (written/gated_out/skipped_window/review_failed counts + junk%)
+    and fetch_errors (count + last error). Profiles with no matching articles
+    still show up with zeros; article/error sources with no matching profile
+    still show up as their own (unmatched) row — nothing is dropped.
+    """
+    from .health import source_health_report
+
+    rows = source_health_report(db, tracker=tracker)
+    if json_out:
+        typer.echo(json.dumps(rows, ensure_ascii=False, indent=2))
+        raise typer.Exit(0)
+
+    if not rows:
+        console.print("[yellow]No source data yet (run `tracker init-profiles` first).[/yellow]")
+        raise typer.Exit(0)
+
+    t = Table(title=f"Source health{f' ({tracker})' if tracker else ''}")
+    t.add_column("Source")
+    t.add_column("Method")
+    t.add_column("Runs", justify="right")
+    t.add_column("Yield", justify="right")
+    t.add_column("Fails", justify="right")
+    t.add_column("Watermark")
+    t.add_column("Written", justify="right")
+    t.add_column("Junk%", justify="right")
+    t.add_column("Newest")
+    t.add_column("Errs", justify="right")
+    t.add_column("Last error")
+
+    for r in rows:
+        label = r["name"] or r["domain"] or "?"
+        if r["unmatched"]:
+            label = f"[dim]{label} (unmatched)[/dim]"
+        junk_txt = f"{r['junk_pct']:.1f}"
+        if r["junk_pct"] >= 50:
+            junk_txt = f"[red]{junk_txt}[/red]"
+        elif r["junk_pct"] >= 20:
+            junk_txt = f"[yellow]{junk_txt}[/yellow]"
+        yield_txt = str(r["total_yield"])
+        if r["total_yield"] == 0 and not r["unmatched"]:
+            yield_txt = f"[red]{yield_txt}[/red]"
+        t.add_row(
+            label, r["method"] or "-", str(r["total_runs"]), yield_txt,
+            str(r["consecutive_failures"]), r["last_seen_utc"] or "-",
+            str(r["written"]), junk_txt, r["newest_article_date"] or "-",
+            str(r["error_count"]), r["last_error_at"] or "-",
+        )
+    console.print(t)
+    n_zero = sum(1 for r in rows if r["total_yield"] == 0 and not r["unmatched"])
+    n_junk = sum(1 for r in rows if r["junk_pct"] >= 50)
+    console.print(f"[dim]{len(rows)} sources · {n_zero} zero-yield · "
+                  f"{n_junk} high-junk (>=50%)[/dim]")
 
 
 @app.command()
@@ -701,6 +768,163 @@ def translate_backfill(
         console.print(f"重新產生 {len(affected)} 個日期的資料檔與 manifest…")
         n = rebuild_days(store, out, sorted(affected))
         console.print(f"[green]已重寫 {n} 個日檔 → {out}[/green]")
+
+
+def _translate_backfill(*, db: Path, out: Path) -> dict:
+    """Best-effort English backfill for still-untranslated ready/written rows.
+
+    Row-level failures (a single bad ollama call) are skipped, not fatal, so
+    one flaky article never stops the rest of the backfill. If ollama itself
+    is unreachable this raises — callers (namely `daily`) decide whether that
+    should be treated as fatal for the overall run (it isn't: see `daily`)."""
+    from .dedup import Store
+    from .llm.translate import translate_article
+    from .preflight import ensure_ollama
+
+    if not ensure_ollama():
+        raise RuntimeError("ollama unavailable for translate backfill")
+    store = Store(db)
+    rows = store.list_untranslated(limit=100_000, statuses=("ready", "written"))
+    total = len(rows)
+    done = row_errors = 0
+    for r in rows:
+        tags = [t for t in (r["tags"] or "").split(",") if t]
+        try:
+            tr = translate_article(title=r["title"] or "", summary=r["summary"] or "",
+                                   tags=tags)
+        except Exception:
+            row_errors += 1
+            continue
+        if tr["summary_en"]:
+            store.update_translation(
+                r["id"], title_en=tr["title_en"] or r["title"] or "",
+                summary_en=tr["summary_en"], tags_en=tr["tags_en"])
+            done += 1
+    return {"attempted": total, "translated": done, "row_errors": row_errors, "error": None}
+
+
+@app.command()
+def daily(
+    days: int = typer.Option(3, "--days", help="更新最近 N 天（含今天）"),
+    trackers: str = typer.Option("all", "--tracker",
+                                 help=f"{'|'.join(SEARCHINFOS)}|all (default all)"),
+    db: Path = typer.Option(DEFAULT_DB),
+    out: Path = typer.Option(DEFAULT_OUT, "--out"),
+    limit: int = typer.Option(300, help="summarize per-tracker limit"),
+) -> None:
+    """Autonomous, non-interactive, re-runnable end-to-end site update.
+
+    Order: (1) ensure ollama is up, (2) run_pipeline for the last N days with
+    translation disabled and summarize forced to ollama, (3) a best-effort
+    translate backfill for anything still untranslated (failure here is
+    logged but never fatal), (4) rebuild_days as a safety net so every
+    ready/written day is re-rendered regardless of what happened above, (5)
+    write status.json + print one summary line.
+
+    Never prompts, never opens a browser/UI. Safe to re-run after a killed
+    background job — every phase only touches rows still needing work.
+    Exit code reflects the pipeline phase only; a failed translate backfill
+    or rebuild does not by itself cause a non-zero exit.
+    """
+    from .dedup import Store
+    from .orchestrator import RunReport, rebuild_days, run_pipeline
+    from .preflight import ensure_ollama
+
+    if days < 1:
+        console.print("[red]--days 必須 >= 1[/red]")
+        raise typer.Exit(2)
+
+    today = _date.today()
+    since = (today - _timedelta(days=days - 1)).isoformat()
+    until = today.isoformat()
+
+    targets = list(SEARCHINFOS) if trackers == "all" else [trackers]
+    if any(t not in SEARCHINFOS for t in targets):
+        console.print(f"[red]Unknown tracker(s): {targets}; known={list(SEARCHINFOS)}[/red]")
+        raise typer.Exit(2)
+
+    errors: list[str] = []
+
+    # 1. Ensure ollama (reuse preflight; run_pipeline re-checks internally
+    #    too, so this is a best-effort warm start, not a hard gate).
+    console.print("[dim]checking ollama…[/dim]")
+    ensure_ollama(console=console)
+
+    # 2. Pipeline: translation deferred to step 3, summarize forced to ollama
+    #    (the local, always-available backend — no debug-Chrome dependency).
+    console.print(f"[dim]pipeline {since}..{until} [{','.join(targets)}] "
+                  f"(translate deferred, backend=ollama)[/dim]")
+    try:
+        rep = run_pipeline(since=since, until=until, trackers=targets, db=db, out=out,
+                           summarize_limit=limit, cleanup=True, gate=True,
+                           translate=False, summarize_backend="ollama",
+                           translate_backend="ollama")
+    except Exception as exc:
+        console.print(f"[red]pipeline crashed: {exc}[/red]")
+        rep = RunReport(since=since, until=until, trackers=targets, ok=False)
+        rep.errors.append(f"run_pipeline crashed: {exc}")
+    errors.extend(rep.errors)
+
+    # 3. Translate backfill: best-effort, never fatal to the overall run.
+    try:
+        translate_stats = _translate_backfill(db=db, out=out)
+    except Exception as exc:
+        translate_stats = {"attempted": 0, "translated": 0, "row_errors": 0, "error": str(exc)}
+        errors.append(f"translate backfill: {exc}")
+        console.print(f"[yellow]translate backfill failed (non-fatal): {exc}[/yellow]")
+
+    # 4. Safety rebuild: re-render every ready/written day regardless of what
+    #    happened above, so a killed mid-run job still leaves a correct site.
+    store = Store(db)
+    try:
+        rebuilt = rebuild_days(store, out, dates=None)
+    except Exception as exc:
+        rebuilt = 0
+        errors.append(f"rebuild_days: {exc}")
+        console.print(f"[yellow]rebuild_days failed (non-fatal): {exc}[/yellow]")
+
+    # 5. status.json + one summary line.
+    newest_row = store.conn.execute(
+        "SELECT MAX(date) FROM articles WHERE status IN ('ready','written')").fetchone()
+    newest = newest_row[0] if newest_row else None
+    per_tracker_written = {}
+    for tname in targets:
+        row = store.conn.execute(
+            "SELECT COUNT(*) FROM articles WHERE status='written' AND "
+            "(','||trackers||',') LIKE '%,'||?||',%'", (tname,)).fetchone()
+        per_tracker_written[tname] = row[0]
+
+    ok = rep.ok
+    status = {
+        "command": "daily",
+        "timestamp": datetime.utcnow().isoformat(),
+        "days": days, "since": since, "until": until, "trackers": targets,
+        "ok": ok,
+        "pipeline": {
+            "one_line": rep.one_line(),
+            "fetch_new": rep.fetch_new, "fetch_sources": rep.fetch_sources,
+            "gated_out": rep.gated_out,
+            "summarized": rep.summarized, "summarize_attempted": rep.summarize_attempted,
+            "review_failed": rep.review_failed, "out_of_window": rep.out_of_window,
+            "cross_added": rep.cross_added, "cross_removed": rep.cross_removed,
+            "days_written": rep.days_written,
+        },
+        "translate_backfill": translate_stats,
+        "rebuild": {"days_rebuilt": rebuilt},
+        "per_tracker_written": per_tracker_written,
+        "newest_article_date": newest,
+        "backends": {"summarize": "ollama", "translate": "ollama"},
+        "errors": errors,
+    }
+    (PROJECT_ROOT / "status.json").write_text(
+        json.dumps(status, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    line = (f"daily {status['timestamp']} {since}..{until} [{','.join(targets)}] "
+           f"{'OK' if ok else 'FAIL'} | {rep.one_line()} | "
+           f"translate {translate_stats.get('translated', 0)}/{translate_stats.get('attempted', 0)} | "
+           f"rebuilt {rebuilt}d | newest {newest or '-'} | err {len(errors)}")
+    print(line)
+    raise typer.Exit(0 if ok else 1)
 
 
 @app.command("cross-scan")

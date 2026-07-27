@@ -55,6 +55,13 @@ def _looks_like_article(href: str) -> bool:
                  r"datenschutz|mentions[-_]?legales|cookies?|sitemap|link/index)"
                  r"(\.html?)?/?$", path, re.I):
         return False
+    # Reject non-news sections (how-to guides, forums, deals). These are
+    # slug-shaped so they pass the heuristic below, but trafilatura extracts
+    # nothing from them — they were the source of 308 of the DB's 369
+    # "empty body after fetch" errors (all BleepingComputer /tutorials/).
+    if re.match(r"^/?(tutorials?|how-to|forums?|deals?|offers?|glossary)(/|$)",
+                path, re.I):
+        return False
     segments = [s for s in path.strip("/").split("/") if s]
     if not segments:
         return False

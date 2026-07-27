@@ -61,12 +61,70 @@ def _key_token_sets(info: SearchInfo) -> list[set[str]]:
     return [_tokens(k.text) for k in info.keys]
 
 
+# Deliberately NOT `\b` / `\w`: in Python's unicode mode `\w` matches CJK, so
+# `\bWindows\b` would FAIL on "Windows代理程式" and `\bLinux\b` on
+# "新型Linux/Windows惡意程式" — titles in this corpus routinely butt an ASCII
+# product name straight against Han characters with no space. Word boundaries
+# here mean "not glued to another ASCII word character", which still rejects
+# "LinuxFoundation" / "democracy" / "Terracraft" while keeping CJK adjacency.
+_ASCII_WORD = "A-Za-z0-9_"
+_LEFT_GUARD = f"(?<![{_ASCII_WORD}])"
+_RIGHT_GUARD = f"(?![{_ASCII_WORD}])"
+_ASCII_WORD_CHAR_RE = re.compile(f"[{_ASCII_WORD}]")
+
+
+def _compile_marker(marker: str) -> str | re.Pattern[str]:
+    """Turn one STRONG_MARKERS phrase into a matcher.
+
+    * A marker containing any CJK codepoint is returned as a lowercased
+      **string** -> plain substring match. CJK text has no word separators,
+      so a boundary assertion would never fire inside 「重大漏洞揭露」.
+    * Anything else is returned as a compiled case-insensitive **regex**
+      guarded by ASCII word boundaries, so "CRA" no longer matches inside
+      "demo*cra*cy" / "Terra*cra*ft" / "*Cra*ig", and "Linux" no longer
+      matches inside "LinuxFoundation".
+
+    A guard is only added on a side where the marker actually ends in a word
+    character, so "CVE-" compiles to ``(?<![A-Za-z0-9_])CVE\\-`` with no
+    trailing guard (a trailing one would demand a non-word char right after
+    the hyphen and so reject "CVE-2026-1234"'s digits under some spellings);
+    "CEN/CENELEC" keeps both guards.
+    """
+    if CJK_RE.search(marker):
+        return marker.lower()
+    pat = re.escape(marker)
+    if marker and _ASCII_WORD_CHAR_RE.match(marker[0]):
+        pat = _LEFT_GUARD + pat
+    if marker and _ASCII_WORD_CHAR_RE.match(marker[-1]):
+        pat = pat + _RIGHT_GUARD
+    return re.compile(pat, re.IGNORECASE)
+
+
+# Precompiled once at import time: belongs_to() runs per article per tracker
+# over thousands of rows, so compiling inside the loop would be a real
+# regression. Extra/unknown markers get compiled lazily and memoised.
+_MARKER_MATCHERS: dict[str, str | re.Pattern[str]] = {
+    m: _compile_marker(m) for markers in STRONG_MARKERS.values() for m in markers
+}
+
+
+def _matcher(marker: str) -> str | re.Pattern[str]:
+    m = _MARKER_MATCHERS.get(marker)
+    if m is None:
+        m = _MARKER_MATCHERS[marker] = _compile_marker(marker)
+    return m
+
+
 def _strong_hit(text: str, markers: Iterable[str]) -> bool:
     if not text:
         return False
     lower = text.lower()
-    for m in markers:
-        if m.lower() in lower:
+    for marker in markers:
+        m = _matcher(marker)
+        if isinstance(m, str):
+            if m in lower:
+                return True
+        elif m.search(text):
             return True
     return False
 

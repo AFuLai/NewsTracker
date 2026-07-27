@@ -31,6 +31,9 @@ COMMON_FEED_PATHS = ("/feed", "/rss", "/rss.xml", "/atom.xml", "/index.xml",
                      "/feed.xml", "/feed/", "/rss/")
 MIN_LISTING_LINKS = 5
 FAILURE_REPROBE_THRESHOLD = 3
+# A source can 200-OK forever while returning nothing (moved listing, changed
+# markup). Re-probe those too, a little later than hard failures.
+EMPTY_REPROBE_THRESHOLD = 8
 
 
 def _get_html(url: str, timeout: float = 15.0) -> str:
@@ -185,12 +188,19 @@ def probe_and_save(store, url: str, name: str, tracker: str, *,
 
 
 def reprobe_failing(store, *, use_ollama: bool = True) -> int:
-    """Re-probe every profile whose consecutive_failures crossed the threshold."""
+    """Re-probe profiles that are failing *or* silently yielding nothing.
+
+    A source that errors out crosses consecutive_failures; a source that
+    "succeeds" but returns zero items every run crosses consecutive_empty.
+    The latter is the more common rot (a moved listing page still 200s), so
+    both must trigger a reprobe — otherwise a dead source is re-fetched
+    forever and never re-detected."""
     n = 0
-    for p in store.list_profiles():
-        if (p["consecutive_failures"] or 0) >= FAILURE_REPROBE_THRESHOLD:
-            url = p["feed_url"] or f"https://{p['domain']}"
-            probe_and_save(store, url, p["name"], (p["trackers"] or "").split(",")[0],
-                           use_ollama=use_ollama)
-            n += 1
+    for p in store.list_reprobe_candidates(
+            failure_threshold=FAILURE_REPROBE_THRESHOLD,
+            empty_threshold=EMPTY_REPROBE_THRESHOLD):
+        url = p["feed_url"] or f"https://{p['domain']}"
+        probe_and_save(store, url, p["name"], (p["trackers"] or "").split(",")[0],
+                       use_ollama=use_ollama)
+        n += 1
     return n

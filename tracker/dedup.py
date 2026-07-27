@@ -4,7 +4,7 @@ from __future__ import annotations
 import hashlib
 import re
 import sqlite3
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 from urllib.parse import urlparse, urlunparse, parse_qsl, urlencode
 
@@ -28,6 +28,8 @@ CREATE TABLE IF NOT EXISTS articles (
 );
 CREATE INDEX IF NOT EXISTS idx_articles_date   ON articles(date);
 CREATE INDEX IF NOT EXISTS idx_articles_status ON articles(status);
+CREATE INDEX IF NOT EXISTS idx_articles_category ON articles(category);
+CREATE INDEX IF NOT EXISTS idx_articles_source   ON articles(source);
 
 CREATE TABLE IF NOT EXISTS fetch_errors (
   id         INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -100,6 +102,35 @@ def _ensure_i18n_columns(conn) -> None:
             conn.execute(f"ALTER TABLE articles ADD COLUMN {col} TEXT")
     conn.commit()
 
+
+def _ensure_profile_dormancy_columns(conn) -> None:
+    """Idempotent ALTER for dormancy tracking (v2.5).
+
+    `consecutive_failures` only increments on an EXCEPTION during fetch, so a
+    source that succeeds every run but returns zero items (dead source, no
+    new content) never trips it and is never auto-reprobed. `consecutive_empty`
+    tracks that case; `last_attempt_utc` lets us re-check a dormant source at
+    most once a week instead of skipping it forever."""
+    cols = [r[1] for r in conn.execute("PRAGMA table_info(source_profiles)").fetchall()]
+    if "consecutive_empty" not in cols:
+        conn.execute(
+            "ALTER TABLE source_profiles ADD COLUMN consecutive_empty INTEGER NOT NULL DEFAULT 0")
+    if "last_attempt_utc" not in cols:
+        conn.execute("ALTER TABLE source_profiles ADD COLUMN last_attempt_utc TEXT")
+    conn.commit()
+
+
+def _reconcile_stale_runs(conn) -> None:
+    """Mark crashed/aborted runs as failed.
+
+    A row in `runs` with ok IS NULL means the process died before calling
+    finish_run(). If it started more than 24h ago it is definitely not still
+    running, so flip it to ok=0 rather than leaving it NULL forever. Rows
+    younger than 24h are left alone — they may be genuinely in-flight."""
+    cutoff = (datetime.utcnow() - timedelta(hours=24)).isoformat()
+    conn.execute("UPDATE runs SET ok=0 WHERE ok IS NULL AND started_at < ?", (cutoff,))
+    conn.commit()
+
 _TRACKING_PARAMS = re.compile(r"^(utm_|fbclid|gclid|mc_eid|mc_cid|_hsenc|_hsmi)", re.I)
 
 
@@ -128,7 +159,9 @@ class Store:
         _ensure_trackers_column(self.conn)
         _ensure_v2_columns(self.conn)
         _ensure_i18n_columns(self.conn)
+        _ensure_profile_dormancy_columns(self.conn)
         self.conn.commit()
+        _reconcile_stale_runs(self.conn)
 
     def upsert_candidate(self, *, url: str, source: str, title: str | None = None,
                          date: str | None = None, raw_text: str | None = None,
@@ -389,18 +422,100 @@ class Store:
         )
         self.conn.commit()
 
-    def record_profile_yield(self, domain: str, new_count: int, *, failed: bool = False) -> None:
-        """After a fetch: bump total_runs/total_yield, reset or increment failures."""
+    def record_profile_yield(self, domain: str, new_count: int, *,
+                             failed: bool = False,
+                             items_seen: int | None = None) -> None:
+        """After a fetch: bump total_runs/total_yield, reset or increment failures.
+
+        `failed` only happens on an exception during fetch (consecutive_failures).
+
+        `consecutive_empty` tracks a *different* rot: a source that keeps
+        answering 200 OK while returning nothing (moved listing, changed
+        markup). It never raises, so it would otherwise never trip the
+        failure-based auto-reprobe.
+
+        `items_seen` is the number of RAW candidates the fetcher returned,
+        before dedup. Prefer it over `new_count` for the empty signal:
+        `new_count` is post-dedup, so a perfectly healthy source that returns
+        30 already-known articles in a narrow window scores 0 and would be
+        wrongly marked empty. Only "the fetcher parsed nothing at all" means
+        the source is actually broken. Falls back to `new_count` when the
+        caller has no raw count (keeps older call sites working).
+
+        last_attempt_utc is stamped on every call so dormancy checks know how
+        fresh this is."""
+        now = datetime.utcnow().isoformat()
+        looked_empty = (items_seen if items_seen is not None else new_count) == 0
         if failed:
             self.conn.execute(
                 "UPDATE source_profiles SET total_runs=total_runs+1, "
-                "consecutive_failures=consecutive_failures+1 WHERE domain=?", (domain,))
+                "consecutive_failures=consecutive_failures+1, last_attempt_utc=? "
+                "WHERE domain=?", (now, domain))
+        elif not looked_empty:
+            self.conn.execute(
+                "UPDATE source_profiles SET total_runs=total_runs+1, "
+                "total_yield=total_yield+?, consecutive_failures=0, consecutive_empty=0, "
+                "last_attempt_utc=? WHERE domain=?",
+                (max(new_count, 0), now, domain))
         else:
             self.conn.execute(
                 "UPDATE source_profiles SET total_runs=total_runs+1, "
-                "total_yield=total_yield+?, consecutive_failures=0 WHERE domain=?",
-                (new_count, domain))
+                "consecutive_failures=0, consecutive_empty=consecutive_empty+1, "
+                "last_attempt_utc=? WHERE domain=?",
+                (now, domain))
         self.conn.commit()
+
+    def mark_profile_alive(self, domain: str) -> None:
+        """HTTP 304 Not Modified: the source answered correctly and told us
+        nothing changed. That is the *healthiest* possible outcome (conditional
+        GET working as designed), so it must reset the empty counter rather
+        than increment it — otherwise the best-behaved sources go dormant
+        fastest."""
+        self.conn.execute(
+            "UPDATE source_profiles SET total_runs=total_runs+1, "
+            "consecutive_failures=0, consecutive_empty=0, last_attempt_utc=? "
+            "WHERE domain=?", (datetime.utcnow().isoformat(), domain))
+        self.conn.commit()
+
+    def is_dormant(self, profile_row, now: datetime | None = None) -> bool:
+        """True if a source has been empty for 8+ consecutive runs AND was
+        last attempted within the past 7 days — i.e. we already know it's
+        dead and confirmed that recently, so skip it this run. Once the last
+        attempt ages past 7 days, this returns False again so the fetch phase
+        picks it back up (at most once a week) rather than abandoning it
+        forever."""
+        def _get(key, default=None):
+            try:
+                return profile_row[key]
+            except (IndexError, KeyError, TypeError):
+                return default
+
+        consecutive_empty = _get("consecutive_empty", 0) or 0
+        if consecutive_empty < 8:
+            return False
+        last_attempt = _get("last_attempt_utc")
+        if not last_attempt:
+            return False
+        try:
+            last_dt = datetime.fromisoformat(last_attempt)
+        except (TypeError, ValueError):
+            return False
+        now = now or datetime.utcnow()
+        return (now - last_dt) < timedelta(days=7)
+
+    def list_reprobe_candidates(self, *, failure_threshold: int = 3,
+                                empty_threshold: int = 8) -> list[sqlite3.Row]:
+        """Profiles due for auto-reprobe: either the existing
+        consecutive_failures threshold (exception-driven) OR a high
+        consecutive_empty count (successful but zero-yield for many runs —
+        a dead source that never trips the failure counter). Exposed here
+        rather than queried inline in probe.reprobe_failing() so both
+        conditions live in one place; probe.py still needs a one-line change
+        to call this instead of iterating list_profiles() itself."""
+        return list(self.conn.execute(
+            "SELECT * FROM source_profiles WHERE consecutive_failures >= ? "
+            "OR consecutive_empty >= ? ORDER BY domain",
+            (failure_threshold, empty_threshold)))
 
     def set_profile_method(self, domain: str, method: str, *,
                            feed_url: str | None = None, search_path: str | None = None,

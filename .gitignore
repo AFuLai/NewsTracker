@@ -16,3 +16,5 @@ dist/
 COMMIT_MSG.tmp
 logs/
 db/query_cache.json
+db/*.bak*
+db/*.sqlite.*

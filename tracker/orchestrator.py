@@ -65,6 +65,7 @@ class RunReport:
     fetch_304: int = 0
     fetch_failed: int = 0
     fetch_new: int = 0
+    dormant_skipped: int = 0
     gated_out: int = 0
     summarize_attempted: int = 0
     summarized: int = 0
@@ -117,7 +118,8 @@ def run_pipeline(*, since: str, until: str, trackers: list[str],
                  browser_base: str | None = None, reporter=None,
                  start_at: str = "fetch", force: bool = False, controller=None,
                  summarize_backend: str = "ollama",
-                 translate_backend: str = "ollama") -> RunReport:
+                 translate_backend: str = "ollama",
+                 include_dormant: bool = False) -> RunReport:
     from .progress import NullReporter
     from .control import PHASES, ControlAbort
     from . import llm
@@ -170,7 +172,8 @@ def run_pipeline(*, since: str, until: str, trackers: list[str],
 
     try:
         if _do("fetch"):
-            _ck(); _phase_fetch(store, window, trackers, rep, log, concurrency, rpt, browser_base)
+            _ck(); _phase_fetch(store, window, trackers, rep, log, concurrency, rpt, browser_base,
+                                include_dormant=include_dormant)
         if gate and _do("gate"):
             _ck(); _phase_gate(store, trackers, rep, log, rpt)
         if _do("summarize"):
@@ -206,7 +209,8 @@ def run_pipeline(*, since: str, until: str, trackers: list[str],
 
 # ── Phase 1: FETCH ───────────────────────────────────────────────────────────
 
-def _phase_fetch(store, window, trackers, rep, log, concurrency, rpt, browser_base=None):
+def _phase_fetch(store, window, trackers, rep, log, concurrency, rpt, browser_base=None,
+                 *, include_dormant: bool = False):
     rpt.enter("fetch", "preparing sources")
     # Auto-reprobe any source that has crossed the failure threshold so a site
     # that changed its layout self-heals before we fetch it again.
@@ -228,10 +232,21 @@ def _phase_fetch(store, window, trackers, rep, log, concurrency, rpt, browser_ba
         query_prefix = _fcfg.get("query_prefix", "")
         filt = _fcfg.get("filter", ())
         entry_url = {e.domain: e.url for e in info.entries}
-        profiles = store.list_profiles(tracker=tname)
+        all_profiles = store.list_profiles(tracker=tname)
+        if include_dormant:
+            profiles = all_profiles
+            n_dormant = 0
+        else:
+            profiles = [r for r in all_profiles if not store.is_dormant(r)]
+            n_dormant = len(all_profiles) - len(profiles)
         rep.fetch_sources += len(profiles)
-        log.info("[%s] fetch over %d profiles", tname, len(profiles))
-        rpt.note(f"[{tname}] fetching {len(profiles)} sources")
+        rep.dormant_skipped += n_dormant
+        log.info("[%s] fetch over %d profiles (%d dormant skipped)",
+                 tname, len(profiles), n_dormant)
+        if n_dormant:
+            log.info("[%s] skipped %d dormant sources", tname, n_dormant)
+        rpt.note(f"[{tname}] fetching {len(profiles)} sources"
+                 + (f", skipped {n_dormant} dormant" if n_dormant else ""))
 
         def make_profile(row):
             return Profile.from_row(
@@ -270,7 +285,7 @@ def _phase_fetch(store, window, trackers, rep, log, concurrency, rpt, browser_ba
                 continue
             if res.not_modified:
                 rep.fetch_304 += 1
-                store.record_profile_yield(domain, 0)
+                store.mark_profile_alive(domain)
                 log.debug("[%s] %s 304 not modified", tname, domain)
                 continue
             items = list(res.items)
@@ -302,14 +317,21 @@ def _phase_fetch(store, window, trackers, rep, log, concurrency, rpt, browser_ba
             store.update_profile_http(
                 domain, etag=res.etag, last_modified=res.last_modified,
                 last_seen_utc=newest or None)
-            store.record_profile_yield(domain, new_for_source)
+            # items_seen (pre-dedup) is the honest liveness signal: a healthy
+            # source in a narrow window returns plenty of items that all dedup
+            # away, which is NOT the same as a source that parsed nothing.
+            store.record_profile_yield(domain, new_for_source,
+                                       items_seen=len(res.items))
             log.debug("[%s] %s yielded %d new", tname, domain, new_for_source)
 
     inserted = store.insert_candidates_batch(pending_new)
     rep.fetch_new = inserted
     log.info("fetch complete: %d new candidates inserted", inserted)
+    if rep.dormant_skipped:
+        log.info("skipped %d dormant sources", rep.dormant_skipped)
     rpt.result("fetch", f"{inserted} new / {rep.fetch_sources} sources "
-                        f"(304:{rep.fetch_304}, fail:{rep.fetch_failed})")
+                        f"(304:{rep.fetch_304}, fail:{rep.fetch_failed}, "
+                        f"dormant:{rep.dormant_skipped})")
 
 
 # ── Phase 2: GATE (WP3 hook) ─────────────────────────────────────────────────
