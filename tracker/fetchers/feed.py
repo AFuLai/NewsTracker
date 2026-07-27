@@ -12,7 +12,8 @@ from datetime import datetime, timezone
 import feedparser
 import httpx
 
-from . import Candidate, DateWindow, FetchResult, Profile, register
+from . import (Candidate, DateWindow, FetchResult, Profile, effective_filter,
+               register)
 from ..dedup import content_hash
 
 UA = "tracker/2.x (+wsl; conditional-get)"
@@ -43,6 +44,10 @@ class FeedFetcher:
         parsed = feedparser.parse(r.content)
         items: list[Candidate] = []
         newest = profile.last_seen_utc or ""
+        filt = () if profile.accept_all else tuple(
+            k.lower() for k in effective_filter(
+                profile.extra.get("filter_keywords", ()),
+                domain=profile.domain, name=profile.name))
         for e in parsed.entries:
             published = _iso_date(e)
             link = getattr(e, "link", "") or ""
@@ -52,6 +57,15 @@ class FeedFetcher:
                 continue
             title = (getattr(e, "title", "") or "").strip()
             summary = getattr(e, "summary", None)
+            # Topical filter, same as LISTING already applies. Only trackers
+            # that declare one in TRACKER_FETCH are affected — today that is
+            # eu_cra alone, so security/os feeds are untouched. Without this a
+            # broad institutional feed (etsi.org publishes Plugtests reports,
+            # award winners and a GSM obituary) pours straight into a narrow
+            # topical tracker.
+            if filt and not any(k in f"{title} {summary or ''} {link}".lower()
+                                for k in filt):
+                continue
             items.append(Candidate(
                 url=link, title=title, snippet=summary or "",
                 published=published,

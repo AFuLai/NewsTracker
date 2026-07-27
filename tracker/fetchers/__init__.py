@@ -10,6 +10,7 @@ ARCHIVE.
 """
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
 from datetime import date
 from typing import ClassVar, Protocol, runtime_checkable
@@ -86,6 +87,25 @@ class FetchResult:
     # means the fetcher parsed nothing at all. None → caller falls back to
     # len(items).
     items_seen: int | None = None
+
+
+_WORD_RE = re.compile(r"[a-z0-9]+")
+
+
+def effective_filter(keywords, *, domain: str = "", name: str = "") -> tuple[str, ...]:
+    """Drop filter keywords that merely name the source itself.
+
+    A topical whitelist is evidence only when it could have been absent.
+    EU_CRA_FILTER contains "ETSI", "CSA", "JPCERT", "NISC" so that a general
+    news site mentioning them is kept — but on etsi.org every single article
+    says "ETSI", so the keyword passes the entire feed and the filter becomes
+    a no-op exactly where it is needed most. Measured: 14 of ETSI's 23 eu_cra
+    articles were off-topic, including its legal notice and sitemap.
+    """
+    self_tokens = set(_WORD_RE.findall((domain or "").lower()))
+    self_tokens |= set(_WORD_RE.findall((name or "").lower()))
+    return tuple(k for k in (keywords or ())
+                 if k.strip().lower() not in self_tokens)
 
 
 @runtime_checkable

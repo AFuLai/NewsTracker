@@ -6,7 +6,8 @@ words come from profile.extra['filter_keywords']; accept_all bypasses them.
 """
 from __future__ import annotations
 
-from . import Candidate, DateWindow, FetchResult, Profile, register
+from . import (Candidate, DateWindow, FetchResult, Profile, effective_filter,
+               register)
 from ..sources.path import fetch_listing as _fetch_listing
 
 
@@ -16,7 +17,9 @@ class ListingFetcher:
 
     def fetch(self, profile: Profile, window: DateWindow) -> FetchResult:
         base = profile.url or (f"https://{profile.domain}")
-        filt = () if profile.accept_all else tuple(profile.extra.get("filter_keywords", ()))
+        filt = () if profile.accept_all else effective_filter(
+            profile.extra.get("filter_keywords", ()),
+            domain=profile.domain, name=profile.name)
         try:
             # Fetch UNFILTERED (one HTTP request) and apply the topic filter
             # here, so we learn both numbers without hitting the page twice.

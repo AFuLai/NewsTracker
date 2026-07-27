@@ -29,7 +29,10 @@ STRONG_MARKERS: dict[str, tuple[str, ...]] = {
                  "C2", "exfiltration", "DDoS"),
     "eu_cra": ("CRA", "Cyber Resilience Act", "網路韌性法", "ENISA", "EUR-Lex",
                "delegated act", "harmonised standard", "harmonized standard",
-               "ETSI EN 303", "CEN/CENELEC", "JTC 13", "JTC 21",
+               # "ETSI EN" not "ETSI EN 303": the release of ANY European Norm
+               # is what the 調和標準 category exists for. Pinning it to 303
+               # silently excluded EN 304 223 (AI system security framework).
+               "ETSI EN", "CEN/CENELEC", "JTC 13", "JTC 21",
                "conformity assessment", "CE marking", "SBOM", "VEX",
                "NIS2", "DORA", "Linux Foundation",
                # APAC angle markers

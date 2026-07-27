@@ -38,6 +38,10 @@ EU_CRA_FILTER = (
     "網路韌性", "歐盟", "EU ", "資安",
     "사이버", "유럽", "보안", "규제",
     "ENISA", "ETSI", "CEN", "JPCERT", "NISC", "CSA", "KISA",
+    # A European Norm release is on-topic wherever it comes from. Kept as a
+    # two-word phrase so effective_filter() does not treat it as the mere
+    # name of the source when fetching etsi.org itself.
+    "ETSI EN", "EN 303", "EN 304",
     "standardisation", "standardization",
 )
 
@@ -596,12 +600,27 @@ def rebuild_days(store, out: Path, dates: list[str] | None = None) -> int:
         dates = [r[0] for r in store.conn.execute(
             "SELECT DISTINCT date FROM articles WHERE status IN ('ready','written') "
             "AND date IS NOT NULL")]
+        # Also consider days that only exist on disk. A day whose articles were
+        # all demoted (gated_out, or cross-removed) drops out of the query
+        # above, so it would never be revisited and its now-wrong file would
+        # stay on the site forever. Observed: gating etsi.org/legal-notice left
+        # 「ETSI 官方網站法律公告」 live in data-20260327.js after a full rebuild.
+        for p in data_dir.glob("data-????????.js"):
+            ymd = p.stem.removeprefix("data-")
+            if len(ymd) == 8 and ymd.isdigit():
+                dates.append(f"{ymd[:4]}-{ymd[4:6]}-{ymd[6:8]}")
     months: set[str] = set()
     years: set[str] = set()
     written = 0
     for d in sorted(set(dates)):
         rows = [dict(r) for r in store.list_writable_for_day(d)]
         if not rows:
+            # Nothing left for this day — drop the stale file so it stops
+            # being served. Manifests are rescanned from the files below.
+            stale = data_dir / f"data-{d.replace('-', '')}.js"
+            if stale.exists():
+                stale.unlink()
+                months.add(d[:7]); years.add(d[:4]); written += 1
             continue
         rows = merge_by_title(rows)
         render_day(day=d, rows=rows, out_dir=data_dir, allowed_categories=all_categories)

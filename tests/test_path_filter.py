@@ -60,6 +60,43 @@ def test_ranking_does_not_drop_links_when_no_listing_path(monkeypatch):
     assert len(hits) == 10
 
 
+def test_rejects_site_structure_pages():
+    """These were all summarised into fake news articles on the live site:
+    etsi.org/legal-notice became 「ETSI 官方網站法律公告」, /site-map became
+    「ETSI 網站導覽」, and three /membership/* pages became articles about
+    corporate influence on standards."""
+    for url in (
+        "https://etsi.org/legal-notice",
+        "https://etsi.org/site-map",
+        "https://etsi.org/subcribe-news",
+        "https://etsi.org/membership/large-corporations",
+        "https://etsi.org/membership/contribution-classes",
+        "https://etsi.org/resources/intellectual-property-rights",
+        "https://etsi.org/expertise/policy-affairs",
+        "https://example.com/about-us",
+        "https://example.com/contact",
+        "https://example.com/privacy-policy",
+    ):
+        assert not _looks_like_article(url), url
+
+
+def test_structural_rule_does_not_eat_real_sections():
+    """Regression guard: an earlier draft matched bare 'legal' and
+    'newsletter' and wrongly rejected 7 live articles — The Register files
+    real reporting under /legal/<date>/<slug> and OpenSSF publishes its
+    CRA coverage under /newsletter/<date>/<slug>."""
+    for url in (
+        "https://theregister.com/legal/2026/06/25/european-commission-cloud-gatekeepers",
+        "https://theregister.com/legal/2026/07/13/apple-accuses-openai",
+        "https://openssf.org/newsletter/2026/05/28/openssf-newsletter-may",
+        # whole-segment matching: these merely START with a structural word
+        "https://example.com/member-states-adopt-cra",
+        "https://example.com/about-the-cra-regulation-explained",
+        "https://example.com/legal-experts-weigh-in-on-cra",
+    ):
+        assert _looks_like_article(url), url
+
+
 def test_keeps_real_news_articles():
     """The filter must not eat legitimate news — including slugs that merely
     start with 'how-to' as part of the headline rather than a section."""

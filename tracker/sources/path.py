@@ -38,6 +38,22 @@ def _get_html(url: str, timeout: float) -> str:
     return stealth_fetch(url, timeout=timeout)
 
 
+# Whole path segments that mark a site-structure page rather than a story.
+# Anchored with (/|$) on both sides so only complete segments match.
+# NOTE: bare "legal" and "newsletter" are deliberately NOT here. They are real
+# content sections on real publishers — theregister.com/legal/<date>/<slug> and
+# openssf.org/newsletter/<date>/<slug> are ordinary articles, and an earlier
+# draft of this rule rejected 7 of them (one being CRA coverage we want).
+# Only the unambiguous "legal notice" page form is matched.
+_STRUCTURAL_SEG_RE = re.compile(
+    r"/(legal[-_]notice|imprint|impressum|disclaimer|copyright"
+    r"|privacy([-_]policy)?|terms([-_]of[-_](use|service))?"
+    r"|site[-_]?map|subs?cribe([-_]news)?"
+    r"|members?|membership|intellectual[-_]property([-_]rights)?"
+    r"|about([-_]us)?|contact([-_]us)?|careers?|jobs?"
+    r"|cookies?|accessibility|expertise)(/|$)", re.I)
+
+
 def _looks_like_article(href: str) -> bool:
     p = urlparse(href)
     path = p.path or "/"
@@ -61,6 +77,15 @@ def _looks_like_article(href: str) -> bool:
     # "empty body after fetch" errors (all BleepingComputer /tutorials/).
     if re.match(r"^/?(tutorials?|how-to|forums?|deals?|offers?|glossary)(/|$)",
                 path, re.I):
+        return False
+    # Reject site-structure pages anywhere in the path. The rule above this
+    # one anchors to the END of the path, so hyphenated variants slipped
+    # through and were summarised into fake news: etsi.org/legal-notice became
+    # "ETSI 官方網站法律公告", /site-map became "ETSI 網站導覽", and three
+    # /membership/* pages became articles about corporate influence. Each
+    # alternative must be a WHOLE segment, so a real headline like
+    # /member-states-adopt-cra or /about-the-cra-regulation is untouched.
+    if _STRUCTURAL_SEG_RE.search(path):
         return False
     segments = [s for s in path.strip("/").split("/") if s]
     if not segments:
