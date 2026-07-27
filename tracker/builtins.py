@@ -48,19 +48,38 @@ BUILTIN: dict[str, dict[str, object]] = {
                    "feed": "https://ubuntu.com/security/notices/rss.xml"},
     # Cloudflare-protected, only stealth fetch works — keep SITE for now.
     "securityweek.com": {"method": "SITE"},
-    # EU + APAC sites whose entry.url is itself a listing page — PATH method
-    # without a keyword search_path; selectolax just extracts article links.
-    "enisa.europa.eu": {"method": "PATH"},
-    "etsi.org": {"method": "PATH"},
-    "digital-strategy.ec.europa.eu": {"method": "PATH"},
-    "cyber.gouv.fr": {"method": "PATH"},
+    # ── EU CRA official sources ────────────────────────────────────────────
+    # Feeds below were found by live probe on 2026-07-27 and each verified to
+    # return real, dated items. Before this, all of these were configured as
+    # PATH against the domain root and had yielded literally nothing across
+    # 31-67 runs, which is why the eu_cra tracker was starved.
+    "digital-strategy.ec.europa.eu": {"method": "FEED",
+                                      "feed": "https://digital-strategy.ec.europa.eu/en/rss.xml"},
+    "etsi.org": {"method": "FEED", "feed": "https://www.etsi.org/rss"},
+    "cyber.gouv.fr": {"method": "FEED",            # ANSSI, via autodiscovery
+                      "feed": "https://cyber.gouv.fr/en/news/atom/"},
+    "linuxfoundation.org": {"method": "FEED",
+                            "feed": "https://www.linuxfoundation.org/blog/rss.xml"},
+    # accept_all was set back when this was a LISTING scrape that matched
+    # nothing. Now that it has a real feed, accept_all bypasses the tracker's
+    # topic filter and floods eu_cra with general Korean security news
+    # (crypto theft, Zimbra CVEs) that has nothing to do with the CRA. Its
+    # value here is specifically the KR/KISA angle *on the CRA*, so it must
+    # be topic-filtered like every other source.
+    "boannews.com": {"method": "FEED",
+                     "feed": "https://www.boannews.com/media/news_rss.xml"},
+    # No feed exists; the news index does carry real article links, but they
+    # sit *after* a 30-entry nav block — see the ranking fix in sources/path.py.
+    "enisa.europa.eu": {"method": "PATH", "search_path": "/news"},
+    "csa.gov.sg": {"method": "PATH", "search_path": "/news-events"},
     "nisc.go.jp": {"method": "PATH"},
-    "csa.gov.sg": {"method": "PATH"},
-    "boannews.com": {"method": "PATH", "accept_all": True},
-    # JS-only SPAs whose live page yields 0 useful links — PATH fetcher
-    # auto-falls back to Wayback Machine snapshots.
+    # Still unsolved: no feed, and the live page exposes no article links even
+    # unthrottled. PATH falls back to Wayback snapshots.
     "stan4cra.eu": {"method": "PATH"},
     "cencenelec.eu": {"method": "PATH"},
+    # Android bulletins live under a dated path; without it the fetcher
+    # scraped the docs root and returned navigation (97% of its rows gated).
+    "source.android.com": {"method": "PATH", "search_path": "/docs/security/bulletin"},
     "jpcert.or.jp": {"method": "FEED",
                      "feed": "https://www.jpcert.or.jp/rss/jpcert.rdf"},
 }

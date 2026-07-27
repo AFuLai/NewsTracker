@@ -18,11 +18,23 @@ class ListingFetcher:
         base = profile.url or (f"https://{profile.domain}")
         filt = () if profile.accept_all else tuple(profile.extra.get("filter_keywords", ()))
         try:
-            hits = _fetch_listing(
+            # Fetch UNFILTERED (one HTTP request) and apply the topic filter
+            # here, so we learn both numbers without hitting the page twice.
+            all_hits = _fetch_listing(
                 base_url=base, search_path=profile.search_path or "",
-                keyword="", domain=profile.domain, filter_keywords=filt)
+                keyword="", domain=profile.domain, filter_keywords=())
         except Exception as exc:
             return FetchResult(error=str(exc))
+        if filt:
+            low = tuple(k.lower() for k in filt)
+            hits = [h for h in all_hits
+                    if any(k in f"{h.title} {h.url}".lower() for k in low)]
+        else:
+            hits = all_hits
         items = [Candidate(url=h.url, title=h.title, snippet=getattr(h, "snippet", "") or "")
                  for h in hits]
-        return FetchResult(items=items)
+        # Liveness is measured BEFORE the tracker's topic filter: ENISA's news
+        # index is perfectly healthy even in a week when none of its stories
+        # mention the CRA. Only "the page yielded no article links at all"
+        # means the source is actually broken.
+        return FetchResult(items=items, items_seen=len(all_hits))

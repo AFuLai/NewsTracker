@@ -317,11 +317,16 @@ def _phase_fetch(store, window, trackers, rep, log, concurrency, rpt, browser_ba
             store.update_profile_http(
                 domain, etag=res.etag, last_modified=res.last_modified,
                 last_seen_utc=newest or None)
-            # items_seen (pre-dedup) is the honest liveness signal: a healthy
-            # source in a narrow window returns plenty of items that all dedup
-            # away, which is NOT the same as a source that parsed nothing.
-            store.record_profile_yield(domain, new_for_source,
-                                       items_seen=len(res.items))
+            # Liveness signal, in order of honesty:
+            #   res.items_seen — raw entries the source served, before the
+            #     date-window and topic filters (fetchers that know it set it)
+            #   len(res.items) — fallback for fetchers that don't
+            # Never new_for_source: that is post-dedup, so a healthy source
+            # returning 30 already-known articles would score 0.
+            store.record_profile_yield(
+                domain, new_for_source,
+                items_seen=res.items_seen if res.items_seen is not None
+                else len(res.items))
             log.debug("[%s] %s yielded %d new", tname, domain, new_for_source)
 
     inserted = store.insert_candidates_batch(pending_new)

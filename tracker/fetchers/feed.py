@@ -61,6 +61,12 @@ class FeedFetcher:
                 newest = published
         return FetchResult(
             items=items,
+            # Raw entries the feed actually served, BEFORE the date-window
+            # filter above. This is the liveness signal: official bodies like
+            # ANSSI/ENISA publish monthly, so a healthy feed routinely has
+            # zero items inside a 3-day window. Judging liveness by `items`
+            # would mark exactly those slow official sources dead again.
+            items_seen=len(parsed.entries),
             etag=r.headers.get("ETag"),
             last_modified=r.headers.get("Last-Modified"),
         )

@@ -129,6 +129,15 @@ def fetch_listing(base_url: str, *, search_path: str = "",
             continue
         seen.add(abs_url)
         hits.append(Hit(title=anchor_text, url=abs_url))
-        if len(hits) >= max_results:
-            break
-    return hits
+    # Rank before truncating. Site navigation appears FIRST in the DOM, so a
+    # plain "take the first max_results" filled the entire quota with menu
+    # entries and never reached the articles: ENISA's /news page yields 55
+    # article-shaped links of which the 12 real stories all sort after the
+    # nav block — at max_results=30 we collected zero of them, which is why
+    # that source read as dead for 67 runs.
+    # Articles on a listing page almost always live under the listing's own
+    # path, so prefer those; everything else keeps its original order.
+    listing_path = (urlparse(url).path or "").rstrip("/")
+    if listing_path and listing_path != "":
+        hits.sort(key=lambda h: 0 if urlparse(h.url).path.startswith(listing_path + "/") else 1)
+    return hits[:max_results]

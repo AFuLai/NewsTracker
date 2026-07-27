@@ -79,6 +79,13 @@ class FetchResult:
     etag: str | None = None             # new etag to persist
     last_modified: str | None = None    # new Last-Modified to persist
     error: str | None = None            # non-None → fetch failed
+    # Raw entries the source served before window/topic filtering. Used ONLY
+    # as the liveness signal for dormancy: `items` can legitimately be empty
+    # for a perfectly healthy source (nothing published in this window, or
+    # nothing matching the tracker's topic filter), whereas items_seen == 0
+    # means the fetcher parsed nothing at all. None → caller falls back to
+    # len(items).
+    items_seen: int | None = None
 
 
 @runtime_checkable
