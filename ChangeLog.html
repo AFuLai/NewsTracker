@@ -16,6 +16,18 @@
 <h1>Tracker ChangeLog</h1>
 <p class="meta">本檔由 <code>tracker pack</code> 自動維護；每次打包前由本地 ollama 生成版本重點並 prepend 於下方。</p>
 <!-- CHANGELOG_INSERTION_POINT -->
+<section class="release" id="v2.17">
+  <h2>v2.17 — 2026-07-27</h2>
+<ul>
+    <li><strong>🚀 提升資料來源健康監測與穩定性：</strong> 來源健康追蹤機制大幅優化，現在能透過追蹤「成功但內容為空」的狀態來判斷來源是否失效。若來源連續空值，系統將自動觸發重新探測（auto-reprobe）。此外，HTTP 304 狀態現在被視為最健康的狀態，不再被誤判為空值。</li>
+    <li><strong>⚙️ 強化自動化更新流程與模型整合：</strong> 引入更穩健的每日自動更新流程，確保即使翻譯或資料重建階段發生非致命錯誤，系統也能順利完成寫入。此流程已整合 <code>ollama</code> 模型，並實現了冪等化（Idempotent）和非互動式運行，大幅提升系統的可靠性。 <span style="color: blue;">[特別標註：Ollama 模型、打包流程]</span></li>
+    <li><strong>🎯 提高跨來源精準度與匹配準確性：</strong> 修正了強標記（STRONG_MARKERS）的匹配邏輯，現在能更精準地在單詞邊界（word boundaries）進行匹配，並移除了多個誤判的成員資格，確保內容擷取的準確性。</li>
+    <li><strong>🧹 增強內容抓取衛生與過濾能力：</strong> 實施了更嚴格的列表過濾器，主動拒絕抓取 `/tutorials/`、`/forums/` 或 `/deals/` 等非文章類型的頁面，大幅減少了資料庫中因抓取到空內容而產生的錯誤。</li>
+    <li><strong>🛠️ 系統底層優化與健壯性提升：</strong> 增加了對休眠來源（Dormant sources）的處理機制，將其探測頻率從每次運行改為每週運行，並記錄跳過次數，確保系統運行的透明化與穩定性。</li>
+    <li><strong>🧪 測試覆蓋範圍擴大：</strong> 測試案例數量從 102 個增加到 128 個，並對多個核心模組（如 `cli.py`, `cross.py`, `health.py`）進行了大量測試覆蓋率的增強，確保了 v2.17 的整體穩定性。</li>
+</ul>
+</section>
+
 <section class="release" id="v2.16">
   <h2>v2.16 — 2026-07-01</h2>
 <p>根據您提供的 Git Log 資訊，目前顯示「(no commits since last tag)」，表示自上次發布標籤以來，程式碼庫中沒有新的提交紀錄。因此，無法生成 v2.16 版本重點。請提供包含變更內容的 Git Log，我將為您撰寫發布說明。</p>
