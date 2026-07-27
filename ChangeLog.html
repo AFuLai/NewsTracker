@@ -16,6 +16,18 @@
 <h1>Tracker ChangeLog</h1>
 <p class="meta">本檔由 <code>tracker pack</code> 自動維護；每次打包前由本地 ollama 生成版本重點並 prepend 於下方。</p>
 <!-- CHANGELOG_INSERTION_POINT -->
+<section class="release" id="v2.18">
+  <h2>v2.18 — 2026-07-27</h2>
+<ul>
+    <li><strong>【資安新聞抓取覆蓋率提升】</strong>成功復甦多個關鍵的歐盟官方資安來源 (EU CRA)，包括 EC 官方頁面、ANSSI (cyber.gouv.fr) 等，使追蹤的內容產出量從 147 筆增加至 160 筆，顯著提升了覆蓋範圍。</li>
+    <li>修復了多個導致資安來源「休眠」的根本問題：優化了內容抓取邏輯，確保了深度連結路徑的追蹤，並修正了列表頁面（listing）的排名機制，避免了過早截斷關鍵資訊。</li>
+    <li>強化了來源的「活躍度訊號」（Liveness Signal）：現在 `FetchResult.items_seen` 會報告過濾前的原始項目數量，確保即使官方機構發布內容頻率較低，來源也不會被誤判為失效。</li>
+    <li>新增並自動發現了多個關鍵的資安資訊來源，包括 <code title="EC official CRA page">digital-strategy.ec.europa.eu</code>、<code title="ANSSI, autodiscovered">cyber.gouv.fr</code>、<code title="etsi.org">etsi.org</code> 等，極大地擴展了資訊採集網。</li>
+    <li>修復了多個邊緣案例的抓取錯誤，例如修復了 <code title="source.android.com">source.android.com</code> 的抓取邏輯，使其能正確回傳日期最新的安全公告。</li>
+    <li>提升了系統的穩定性與準確性：移除了一個過於寬泛的來源（boannews）的接受所有設定，防止其抓取到大量與資安主題無關的雜訊內容。</li>
+</ul>
+</section>
+
 <section class="release" id="v2.17">
   <h2>v2.17 — 2026-07-27</h2>
 <ul>
