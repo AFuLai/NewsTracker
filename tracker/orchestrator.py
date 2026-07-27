@@ -637,7 +637,11 @@ def _phase_cross_cleanup(store, rep, log, rpt):
                 continue
             if belongs_to(article_url=r["url"], article_title=title, article_tags=tags,
                           article_category=cat, other=info, other_name=name,
-                          narrow_domains=NARROW_DOMAINS.get(name)):
+                          narrow_domains=NARROW_DOMAINS.get(name),
+                          # Lets the category signal stay authoritative for a
+                          # tracker's own articles while requiring topical
+                          # evidence for ones borrowed from another tracker.
+                          article_trackers=sorted(current)):
                 continue
             if store.remove_tracker(r["id"], name):
                 rep.cross_removed += 1

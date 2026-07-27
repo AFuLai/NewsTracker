@@ -44,6 +44,52 @@ STRONG_MARKERS: dict[str, tuple[str, ...]] = {
 }
 
 
+# Some markers name a *thing that co-occurs with* the topic rather than the
+# topic itself. "SBOM" is the clearest case: it appears in any supply-chain
+# story, and on its own it admitted 20 irrelevant articles into eu_cra while
+# bringing in exactly 1 relevant one. Same for the APAC/OSS body names, which
+# were added to catch "how ACSC/JPCERT responded to the CRA" but in practice
+# matched every routine advisory those bodies publish.
+#
+# These require corroborating regulatory context before they admit an article;
+# everything else in STRONG_MARKERS stays decisive on its own.
+CONTEXTUAL_MARKERS: dict[str, tuple[str, ...]] = {
+    "eu_cra": ("SBOM", "VEX", "NIS2", "DORA", "Linux Foundation",
+               "METI", "KISA", "TWCERT", "ACSC", "CERT-In", "JPCERT"),
+}
+
+# What counts as corroborating context: the article must actually be talking
+# about EU regulation, not merely mention a body or an artefact.
+CONTEXT_TERMS: dict[str, tuple[str, ...]] = {
+    "eu_cra": ("CRA", "Cyber Resilience", "網路韌性", "EU", "European",
+               "歐盟", "EUR-Lex", "regulation", "directive", "法規", "法令",
+               "指令", "compliance", "合規", "conformity", "harmonis",
+               "harmoniz", "調和", "obligation", "義務", "CE marking"),
+}
+
+# Narrow domains whose *general* output is not automatically on-topic.
+#
+# Being an EU-official CRA body makes essentially everything they publish
+# relevant, and the corpus agrees: digital-strategy.ec.europa.eu 38/38 on
+# topic, enisa.europa.eu 15/15, eur-lex/bsi/stan4cra 2/2 each. Those stay
+# decisive by domain alone.
+#
+# The bodies below were added to catch their *response to* the CRA, but in
+# practice they publish routine advisories: csa.gov.sg 11 articles / 0 on
+# topic, jpcert.or.jp 8/0, linuxfoundation.org 3/0. etsi.org is genuinely
+# mixed (25/11) — an EU standards body that also puts out quantum and network
+# news. All of these must show topical evidence before admitting.
+NARROW_DOMAINS_NEEDING_CONTEXT: frozenset[str] = frozenset({
+    "csa.gov.sg", "jpcert.or.jp", "linuxfoundation.org", "nisc.go.jp",
+    "etsi.org",
+})
+
+
+def _decisive_markers(tracker: str) -> tuple[str, ...]:
+    ctx = set(CONTEXTUAL_MARKERS.get(tracker, ()))
+    return tuple(m for m in STRONG_MARKERS.get(tracker, ()) if m not in ctx)
+
+
 def _tokens(text: str) -> set[str]:
     text = (text or "").lower()
     toks: set[str] = set()
@@ -134,7 +180,8 @@ def belongs_to(*, article_url: str, article_title: str, article_tags: list[str],
                article_category: str | None = None,
                min_token_overlap: int = 3,
                key_token_sets: list[set[str]] | None = None,
-               narrow_domains: set[str] | None = None) -> bool:
+               narrow_domains: set[str] | None = None,
+               article_trackers: list[str] | None = None) -> bool:
     """Decide if an article also belongs to `other` tracker.
 
     Signals (in order of strength):
@@ -147,21 +194,38 @@ def belongs_to(*, article_url: str, article_title: str, article_tags: list[str],
          title or tags.
       3. ≥ min_token_overlap distinctive tokens shared with any KEY phrase.
     """
-    # Signal 0: category match is the most authoritative — the LLM picked
-    # a category from `other` tracker's whitelist for this article.
+    tag_blob = " ".join(article_tags or [])
+    blob = f"{article_title} {tag_blob}"
+    contextual = CONTEXTUAL_MARKERS.get(other_name, ())
+    needs_context = bool(contextual)
+    has_context = (_strong_hit(blob, CONTEXT_TERMS.get(other_name, ()))
+                   if needs_context else True)
+
+    # Signal 0: the LLM classified this article into one of `other`'s
+    # categories. That is authoritative for the tracker's OWN articles, but
+    # weak for cross-admission: eu_cra owns broad buckets like 產業動態, so a
+    # routine Oracle/SAP advisory lands in one and is pulled in despite having
+    # nothing to do with the regulation. When the article already lives in
+    # another tracker, require corroborating context as well. Measured on the
+    # live corpus: this drops 14 more off-topic articles and 0 relevant ones.
     if article_category and article_category in (other.categories or []):
-        return True
+        owned_solely = ([t for t in (article_trackers or []) if t] == [other_name])
+        if owned_solely or not needs_context or has_context:
+            return True
 
     netloc = (urlparse(article_url).netloc or "").lower().removeprefix("www.")
     if narrow_domains:
         for d in narrow_domains:
             if netloc == d or netloc.endswith("." + d):
-                return True
+                if d not in NARROW_DOMAINS_NEEDING_CONTEXT or has_context:
+                    return True
+                break   # domain matched but context missing — keep checking
 
-    tag_blob = " ".join(article_tags or [])
-    if _strong_hit(article_title, STRONG_MARKERS.get(other_name, ())):
+    decisive = _decisive_markers(other_name) if contextual else STRONG_MARKERS.get(other_name, ())
+    if _strong_hit(article_title, decisive) or _strong_hit(tag_blob, decisive):
         return True
-    if _strong_hit(tag_blob, STRONG_MARKERS.get(other_name, ())):
+    # Contextual markers admit only alongside regulatory context.
+    if contextual and has_context and _strong_hit(blob, contextual):
         return True
 
     article_toks = _tokens(article_title) | _tokens(tag_blob)
