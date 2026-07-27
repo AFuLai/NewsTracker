@@ -16,6 +16,17 @@
 <h1>Tracker ChangeLog</h1>
 <p class="meta">本檔由 <code>tracker pack</code> 自動維護；每次打包前由本地 ollama 生成版本重點並 prepend 於下方。</p>
 <!-- CHANGELOG_INSERTION_POINT -->
+<section class="release" id="v2.19">
+  <h2>v2.19 — 2026-07-27</h2>
+<ul>
+    <li><strong>【資安新聞抓取覆蓋率/精準度提升】</strong> 針對歐盟網路韌性法案 (EU CRA) 的內容歸屬邏輯進行重大優化，大幅降低了噪音內容的納入率，將噪音比例從 47% 降至 22%。</li>
+    <li>實施了「雙層標記系統」(Two-tier markers)：現今的上下文標記 (CONTEXTUAL_MARKERS，如 SBOM, VEX, NIS2) 不再單獨判斷，必須同時搭配實際的歐盟/法規措辭 (CONTEXT_TERMS) 才能被認定為有效標記。</li>
+    <li>優化了「窄域網域」的判定機制：非官方或周邊機構的網站（如 jpcert.or.jp, csa.gov.sg）現在需要提供額外的證據或上下文支持，才能被納入內容判斷，避免誤判。</li>
+    <li>調整了「類別訊號」的權威性：該訊號對於 Tracker 自身產生的文章仍具備權威性，但對於引用或借用來源的文章，現在需要額外的上下文佐證。</li>
+    <li>整體內容品質提升：通過上述多重修補，成功將 EU CRA 相關的內容判斷準確度提升，確保了內容的相關性，並減少了大量不相關的技術公告。</li>
+</ul>
+</section>
+
 <section class="release" id="v2.18">
   <h2>v2.18 — 2026-07-27</h2>
 <ul>
