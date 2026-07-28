@@ -51,7 +51,29 @@ _STRUCTURAL_SEG_RE = re.compile(
     r"|site[-_]?map|subs?cribe([-_]news)?"
     r"|members?|membership|intellectual[-_]property([-_]rights)?"
     r"|about([-_]us)?|contact([-_]us)?|careers?|jobs?"
+    r"|information[-_]for"
     r"|cookies?|accessibility|expertise)(/|$)", re.I)
+
+
+_ORG_ABOUT_RE = re.compile(r"^/about[-_]([a-z0-9]+)(/|$)", re.I)
+
+
+def _is_org_about_page(path: str) -> bool:
+    """True for an organisation's root-level "about us" area.
+
+    `/about-csa`, `/about-1`, `/about-enisa/who-we-are` are org pages; six of
+    them were live on the site as EU CRA news, including
+    enisa.europa.eu/about-enisa/accounting-finance summarised as 「ENISA 官方
+    公布年度財務報告」.
+
+    The rule is deliberately narrow so it cannot eat a real headline. It only
+    fires at the FIRST path segment (news slugs sit under a date or section),
+    and only when the part after `about-` is a single token or the path
+    continues — so `/about-the-cra-regulation`, called out as must-keep in
+    `_STRUCTURAL_SEG_RE`'s comment, is untouched.  Measured over the 5,789-row
+    corpus: 9 hits, none of them an article.
+    """
+    return bool(_ORG_ABOUT_RE.match(path or ""))
 
 
 def _looks_like_article(href: str) -> bool:
@@ -86,6 +108,8 @@ def _looks_like_article(href: str) -> bool:
     # alternative must be a WHOLE segment, so a real headline like
     # /member-states-adopt-cra or /about-the-cra-regulation is untouched.
     if _STRUCTURAL_SEG_RE.search(path):
+        return False
+    if _is_org_about_page(path):
         return False
     segments = [s for s in path.strip("/").split("/") if s]
     if not segments:
