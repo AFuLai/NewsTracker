@@ -16,6 +16,17 @@
 <h1>Tracker ChangeLog</h1>
 <p class="meta">本檔由 <code>tracker pack</code> 自動維護；每次打包前由本地 ollama 生成版本重點並 prepend 於下方。</p>
 <!-- CHANGELOG_INSERTION_POINT -->
+<section class="release" id="v2.23">
+  <h2>v2.23 — 2026-07-28</h2>
+<ul>
+    <li><strong>🚀 數據覆蓋率大幅提升與資料恢復：</strong> 本版本完成了 v2.22 開始的資料恢復工作，成功重新排程和摘要了大量先前跳過的資料。特別提升了對 OS、EU-CRA 和 Security 等關鍵來源的覆蓋率，確保了更完整的資安新聞抓取覆蓋範圍。</li>
+    <li><strong>✨ 增強多語言網站的去重機制：</strong> 新增了 `_is_translated_duplicate` 標記，專門用於處理如 ec.europa.eu 等跨語言網站的重複內容。此機制能精準識別並排除不同語言版本間的重複政策頁面，同時避免誤判其他來源的正常內容。</li>
+    <li><strong>📚 來源資料庫擴充與深度優化：</strong> 成功擴充了 Security、EU-CRA 和 OS 等來源的資料範圍。EU CRA 來源現在納入了 2018 年至 2024 年的歷史參考資料，大幅增加了資料的深度和廣度。</li>
+    <li><strong>🧹 提升內容篩選的準確性：</strong> 優化了資料擷取邏輯，能夠更精準地識別並排除結構性頁面、非文章類型的參考頁面（如標準委員會頁面或主題中心），確保摘要內容的純淨度。</li>
+    <li><strong>🛠️ 數據品質修正與穩定性提升：</strong> 針對特定來源的歷史資料，手動修正了錯誤的發布日期（例如 CSA advisory），確保了時間軸的準確性。同時，新增了測試案例，提升了系統的穩定性。</li>
+</ul>
+</section>
+
 <section class="release" id="v2.22">
   <h2>v2.22 — 2026-07-28</h2>
 <ul>
