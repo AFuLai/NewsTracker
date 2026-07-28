@@ -85,6 +85,28 @@ BUILTIN: dict[str, dict[str, object]] = {
 }
 
 
+#: Additional entry points for a site whose primary profile cannot cover it
+#: alone (v2.24). Seeded by `tracker init-profiles` alongside the searchinfo
+#: ENTRYs, keyed by `dedup.profile_key(domain, search_path)`.
+#:
+#: digital-strategy.ec.europa.eu is the motivating case. Its only RSS feed
+#: (/en/rss.xml) is a site-wide firehose capped at TEN items covering every EU
+#: digital-policy topic — AI robotics, GenAI pilots, DSA fines — and measured
+#: on 2026-07-28 it held zero cyber-resilience entries while its newest item
+#: was three days older than the CRA guidance we had missed. `?topic=` is not
+#: a real filter: an invented topic returns byte-identical results. The feed
+#: yielded 10 candidates across 35 runs. Scraping /en/library instead finds
+#: the CRA documents directly (2 hits once the eu_cra topic filter applies).
+EXTRA_ENTRY_POINTS: dict[str, list[dict]] = {
+    "digital-strategy.ec.europa.eu": [
+        {"name": "EC CRA 實施頁面（Library）",
+         "method": "LISTING", "search_path": "/en/library"},
+        {"name": "EC CRA 實施頁面（News）",
+         "method": "LISTING", "search_path": "/en/news"},
+    ],
+}
+
+
 def enrich(domain: str, entry) -> None:
     """In-place augment Entry with builtin method/feed if not already set."""
     b = BUILTIN.get(domain)

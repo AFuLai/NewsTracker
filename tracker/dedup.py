@@ -41,7 +41,8 @@ CREATE TABLE IF NOT EXISTS fetch_errors (
 
 -- v2: per-source runtime profile (cache, not config — searchinfo stays source of truth)
 CREATE TABLE IF NOT EXISTS source_profiles (
-  domain          TEXT PRIMARY KEY,
+  source_key      TEXT PRIMARY KEY,            -- domain, or "domain#/path" for extra entry points
+  domain          TEXT NOT NULL,
   name            TEXT,
   method          TEXT NOT NULL,             -- fetcher registry key: FEED/LISTING/SEARCH/API/ARCHIVE
   feed_url        TEXT,
@@ -120,6 +121,76 @@ def _ensure_profile_dormancy_columns(conn) -> None:
     conn.commit()
 
 
+def profile_key(domain: str, entry: str | None = None) -> str:
+    """Stable identity for a source profile.
+
+    One site can expose several entry points that need different fetchers:
+    digital-strategy.ec.europa.eu publishes CRA guidance under /en/library
+    while its only RSS feed is a 10-slot, site-wide firehose that the guidance
+    never even reached. Keying purely on the domain allowed exactly one of
+    those, so the second entry point could not be configured at all.
+
+    For the ordinary single-entry source the key IS the bare domain, so every
+    existing profile keeps its identity across the migration and every
+    domain-keyed call site keeps working untouched.
+
+    `entry` is the explicit opt-in to a SECONDARY entry point, and is
+    deliberately not derived from `search_path`: a primary profile may perfectly
+    well have a search_path of its own (enisa.europa.eu → /news,
+    source.android.com → /docs/security/bulletin). Deriving the suffix from
+    search_path re-keyed those four existing profiles and silently forked each
+    into a duplicate with zeroed counters.
+    """
+    suffix = (entry or "").strip()
+    return f"{domain}#{suffix}" if suffix else domain
+
+
+def _ensure_profile_source_key(conn) -> None:
+    """Idempotent rebuild moving the PK from `domain` to `source_key` (v2.24).
+
+    SQLite cannot alter a primary key in place, so the table is rebuilt. Legacy
+    rows get source_key = domain — identical to what `profile_key()` returns for
+    a source with no search_path — which is what keeps the migration a no-op for
+    everything that already exists.
+    """
+    cols = [r[1] for r in conn.execute("PRAGMA table_info(source_profiles)").fetchall()]
+    if not cols or "source_key" in cols:
+        return
+    carried = [c for c in cols if c != "domain"]
+    conn.executescript("""
+        CREATE TABLE source_profiles_new (
+          source_key      TEXT PRIMARY KEY,
+          domain          TEXT NOT NULL,
+          name            TEXT,
+          method          TEXT NOT NULL,
+          feed_url        TEXT,
+          search_path     TEXT,
+          api_endpoint    TEXT,
+          accept_all      INTEGER NOT NULL DEFAULT 0,
+          trackers        TEXT NOT NULL,
+          etag            TEXT,
+          last_modified   TEXT,
+          last_seen_utc   TEXT,
+          consecutive_failures INTEGER NOT NULL DEFAULT 0,
+          total_runs      INTEGER NOT NULL DEFAULT 0,
+          total_yield     INTEGER NOT NULL DEFAULT 0,
+          probed_at       TEXT,
+          probe_note      TEXT,
+          consecutive_empty INTEGER NOT NULL DEFAULT 0,
+          last_attempt_utc TEXT
+        );
+    """)
+    conn.execute(
+        f"INSERT INTO source_profiles_new (source_key, domain, {', '.join(carried)}) "
+        f"SELECT domain, domain, {', '.join(carried)} FROM source_profiles")
+    conn.executescript("""
+        DROP TABLE source_profiles;
+        ALTER TABLE source_profiles_new RENAME TO source_profiles;
+        CREATE INDEX IF NOT EXISTS idx_profiles_domain ON source_profiles(domain);
+    """)
+    conn.commit()
+
+
 def _reconcile_stale_runs(conn) -> None:
     """Mark crashed/aborted runs as failed.
 
@@ -160,6 +231,7 @@ class Store:
         _ensure_v2_columns(self.conn)
         _ensure_i18n_columns(self.conn)
         _ensure_profile_dormancy_columns(self.conn)
+        _ensure_profile_source_key(self.conn)
         self.conn.commit()
         _reconcile_stale_runs(self.conn)
 
@@ -358,9 +430,16 @@ class Store:
 
     # ── source_profiles (v2) ────────────────────────────────────────────────
 
-    def get_profile(self, domain: str) -> sqlite3.Row | None:
+    def get_profile(self, key: str) -> sqlite3.Row | None:
+        """Look up by source_key. For a single-entry source that is the bare
+        domain, so existing domain-keyed callers need no change."""
         return self.conn.execute(
-            "SELECT * FROM source_profiles WHERE domain=?", (domain,)).fetchone()
+            "SELECT * FROM source_profiles WHERE source_key=?", (key,)).fetchone()
+
+    def list_profiles_for_domain(self, domain: str) -> list[sqlite3.Row]:
+        """Every entry point configured for one site (v2.24)."""
+        return list(self.conn.execute(
+            "SELECT * FROM source_profiles WHERE domain=? ORDER BY source_key", (domain,)))
 
     def list_profiles(self, *, tracker: str | None = None,
                       method: str | None = None) -> list[sqlite3.Row]:
@@ -374,17 +453,23 @@ class Store:
             params.append(method)
         if clauses:
             sql += " WHERE " + " AND ".join(clauses)
-        sql += " ORDER BY domain"
+        sql += " ORDER BY source_key"
         return list(self.conn.execute(sql, params))
 
     def upsert_profile(self, *, domain: str, name: str, method: str,
                        trackers: str, feed_url: str | None = None,
                        search_path: str | None = None, api_endpoint: str | None = None,
-                       accept_all: bool = False,
+                       accept_all: bool = False, entry: str | None = None,
                        probe_note: str | None = None, probed_at: str | None = None) -> None:
         """Insert or update a source profile. Merges trackers (union) and
-        preserves HTTP cache / watermark / failure counters on update."""
-        existing = self.get_profile(domain)
+        preserves HTTP cache / watermark / failure counters on update.
+
+        Identity is `profile_key(domain, entry)`. Without `entry` this is the
+        site's primary profile — including when it carries a search_path of its
+        own. Pass `entry` only to create/update an ADDITIONAL entry point.
+        """
+        key = profile_key(domain, entry)
+        existing = self.get_profile(key)
         if existing:
             merged = sorted(set(
                 [t for t in (existing["trackers"] or "").split(",") if t] +
@@ -396,33 +481,33 @@ class Store:
                 "feed_url=COALESCE(?, feed_url), search_path=COALESCE(?, search_path), "
                 "api_endpoint=COALESCE(?, api_endpoint), accept_all=?, trackers=?, "
                 "probe_note=COALESCE(?, probe_note), probed_at=COALESCE(?, probed_at) "
-                "WHERE domain=?",
+                "WHERE source_key=?",
                 (name, method, feed_url, search_path, api_endpoint, int(accept_all),
-                 ",".join(merged), probe_note, probed_at, domain),
+                 ",".join(merged), probe_note, probed_at, key),
             )
         else:
             self.conn.execute(
                 "INSERT INTO source_profiles "
-                "(domain, name, method, feed_url, search_path, api_endpoint, accept_all, "
-                " trackers, probe_note, probed_at) "
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                (domain, name, method, feed_url, search_path, api_endpoint, int(accept_all),
-                 trackers, probe_note, probed_at),
+                "(source_key, domain, name, method, feed_url, search_path, api_endpoint, "
+                " accept_all, trackers, probe_note, probed_at) "
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                (key, domain, name, method, feed_url, search_path, api_endpoint,
+                 int(accept_all), trackers, probe_note, probed_at),
             )
         self.conn.commit()
 
-    def update_profile_http(self, domain: str, *, etag: str | None = None,
+    def update_profile_http(self, key: str, *, etag: str | None = None,
                             last_modified: str | None = None,
                             last_seen_utc: str | None = None) -> None:
         self.conn.execute(
             "UPDATE source_profiles SET "
             "etag=COALESCE(?, etag), last_modified=COALESCE(?, last_modified), "
-            "last_seen_utc=COALESCE(?, last_seen_utc) WHERE domain=?",
-            (etag, last_modified, last_seen_utc, domain),
+            "last_seen_utc=COALESCE(?, last_seen_utc) WHERE source_key=?",
+            (etag, last_modified, last_seen_utc, key),
         )
         self.conn.commit()
 
-    def record_profile_yield(self, domain: str, new_count: int, *,
+    def record_profile_yield(self, key: str, new_count: int, *,
                              failed: bool = False,
                              items_seen: int | None = None) -> None:
         """After a fetch: bump total_runs/total_yield, reset or increment failures.
@@ -450,22 +535,22 @@ class Store:
             self.conn.execute(
                 "UPDATE source_profiles SET total_runs=total_runs+1, "
                 "consecutive_failures=consecutive_failures+1, last_attempt_utc=? "
-                "WHERE domain=?", (now, domain))
+                "WHERE source_key=?", (now, key))
         elif not looked_empty:
             self.conn.execute(
                 "UPDATE source_profiles SET total_runs=total_runs+1, "
                 "total_yield=total_yield+?, consecutive_failures=0, consecutive_empty=0, "
-                "last_attempt_utc=? WHERE domain=?",
-                (max(new_count, 0), now, domain))
+                "last_attempt_utc=? WHERE source_key=?",
+                (max(new_count, 0), now, key))
         else:
             self.conn.execute(
                 "UPDATE source_profiles SET total_runs=total_runs+1, "
                 "consecutive_failures=0, consecutive_empty=consecutive_empty+1, "
-                "last_attempt_utc=? WHERE domain=?",
-                (now, domain))
+                "last_attempt_utc=? WHERE source_key=?",
+                (now, key))
         self.conn.commit()
 
-    def mark_profile_alive(self, domain: str) -> None:
+    def mark_profile_alive(self, key: str) -> None:
         """HTTP 304 Not Modified: the source answered correctly and told us
         nothing changed. That is the *healthiest* possible outcome (conditional
         GET working as designed), so it must reset the empty counter rather
@@ -474,7 +559,7 @@ class Store:
         self.conn.execute(
             "UPDATE source_profiles SET total_runs=total_runs+1, "
             "consecutive_failures=0, consecutive_empty=0, last_attempt_utc=? "
-            "WHERE domain=?", (datetime.utcnow().isoformat(), domain))
+            "WHERE source_key=?", (datetime.utcnow().isoformat(), key))
         self.conn.commit()
 
     def is_dormant(self, profile_row, now: datetime | None = None) -> bool:
@@ -514,18 +599,18 @@ class Store:
         to call this instead of iterating list_profiles() itself."""
         return list(self.conn.execute(
             "SELECT * FROM source_profiles WHERE consecutive_failures >= ? "
-            "OR consecutive_empty >= ? ORDER BY domain",
+            "OR consecutive_empty >= ? ORDER BY source_key",
             (failure_threshold, empty_threshold)))
 
-    def set_profile_method(self, domain: str, method: str, *,
+    def set_profile_method(self, key: str, method: str, *,
                            feed_url: str | None = None, search_path: str | None = None,
                            probe_note: str | None = None, probed_at: str | None = None) -> None:
         """Used by auto-probe to record a newly detected fetch method."""
         self.conn.execute(
             "UPDATE source_profiles SET method=?, "
             "feed_url=COALESCE(?, feed_url), search_path=COALESCE(?, search_path), "
-            "probe_note=?, probed_at=?, consecutive_failures=0 WHERE domain=?",
-            (method, feed_url, search_path, probe_note, probed_at, domain),
+            "probe_note=?, probed_at=?, consecutive_failures=0 WHERE source_key=?",
+            (method, feed_url, search_path, probe_note, probed_at, key),
         )
         self.conn.commit()
 

@@ -253,8 +253,15 @@ def _phase_fetch(store, window, trackers, rep, log, concurrency, rpt, browser_ba
                  + (f", skipped {n_dormant} dormant" if n_dormant else ""))
 
         def make_profile(row):
+            # fetch_listing appends search_path to the base URL, and the
+            # searchinfo ENTRY url is itself a deep link
+            # (…/en/policies/cyber-resilience-act). A path-scoped entry point
+            # therefore has to start from the domain root, or the two paths
+            # concatenate into nonsense.
+            url = (entry_url.get(row["domain"])
+                   if row["source_key"] == row["domain"] else None)
             return Profile.from_row(
-                row, url=entry_url.get(row["domain"]),
+                row, url=url,
                 extra={"keywords": keys, "query_prefix": query_prefix,
                        "filter_keywords": filt, "cdp_base": browser_base})
 
@@ -281,15 +288,19 @@ def _phase_fetch(store, window, trackers, rep, log, concurrency, rpt, browser_ba
 
         for row, res, err in results:
             domain = row["domain"]
+            # Counters are keyed by source_key, not domain: one site can have
+            # several entry points (see dedup.profile_key) and each must age
+            # independently. For a single-entry source the two are identical.
+            key = row["source_key"]
             if err or (res and res.error):
                 rep.fetch_failed += 1
-                store.record_profile_yield(domain, 0, failed=True)
+                store.record_profile_yield(key, 0, failed=True)
                 store.log_error(row["name"], f"fetch: {err or res.error}", None)
                 log.debug("[%s] %s fetch error: %s", tname, domain, err or res.error)
                 continue
             if res.not_modified:
                 rep.fetch_304 += 1
-                store.mark_profile_alive(domain)
+                store.mark_profile_alive(key)
                 log.debug("[%s] %s 304 not modified", tname, domain)
                 continue
             items = list(res.items)
@@ -319,7 +330,7 @@ def _phase_fetch(store, window, trackers, rep, log, concurrency, rpt, browser_ba
                 if c.published and c.published > newest:
                     newest = c.published
             store.update_profile_http(
-                domain, etag=res.etag, last_modified=res.last_modified,
+                key, etag=res.etag, last_modified=res.last_modified,
                 last_seen_utc=newest or None)
             # Liveness signal, in order of honesty:
             #   res.items_seen — raw entries the source served, before the
@@ -328,7 +339,7 @@ def _phase_fetch(store, window, trackers, rep, log, concurrency, rpt, browser_ba
             # Never new_for_source: that is post-dedup, so a healthy source
             # returning 30 already-known articles would score 0.
             store.record_profile_yield(
-                domain, new_for_source,
+                key, new_for_source,
                 items_seen=res.items_seen if res.items_seen is not None
                 else len(res.items))
             log.debug("[%s] %s yielded %d new", tname, domain, new_for_source)

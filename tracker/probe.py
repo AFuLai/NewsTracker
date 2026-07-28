@@ -199,6 +199,12 @@ def reprobe_failing(store, *, use_ollama: bool = True) -> int:
     for p in store.list_reprobe_candidates(
             failure_threshold=FAILURE_REPROBE_THRESHOLD,
             empty_threshold=EMPTY_REPROBE_THRESHOLD):
+        # Secondary entry points (source_key "domain#/path") are explicitly
+        # configured, not auto-discovered. Probing them would probe the domain
+        # ROOT and then overwrite the path-scoped profile with the root's
+        # verdict — actively wrong. Leave them to their configuration.
+        if p["source_key"] != p["domain"]:
+            continue
         url = p["feed_url"] or f"https://{p['domain']}"
         probe_and_save(store, url, p["name"], (p["trackers"] or "").split(",")[0],
                        use_ollama=use_ollama)

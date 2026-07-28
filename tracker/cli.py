@@ -15,7 +15,7 @@ from rich.table import Table
 from . import (DEFAULT_DB, DEFAULT_OUT, DEFAULT_TARBALL, DEFAULT_TRACKER,
                OLLAMA_MODEL, PROJECT_ROOT, SEARCHINFOS)
 from .config import load_searchinfo, load_tracker
-from .dedup import Store
+from .dedup import Store, profile_key
 from .pack import pack as run_pack
 from .pack import read_version
 from .sources import dispatch
@@ -1131,6 +1131,21 @@ def init_profiles(
                 updated += 1
             else:
                 seeded += 1
+
+        # Extra entry points for sites one profile cannot cover (v2.24).
+        from .builtins import EXTRA_ENTRY_POINTS
+        domains = {e.domain for e in info.entries}
+        for dom, extras in EXTRA_ENTRY_POINTS.items():
+            if dom not in domains:
+                continue
+            for x in extras:
+                had = store.get_profile(profile_key(dom, x["search_path"]))
+                store.upsert_profile(
+                    domain=dom, name=x["name"], method=canonical(x["method"]),
+                    trackers=tname, search_path=x["search_path"],
+                    entry=x["search_path"])
+                seeded += 0 if had else 1
+                updated += 1 if had else 0
 
     total = len(store.list_profiles())
     console.print(f"[green]init-profiles[/green] seeded {seeded} new, "
