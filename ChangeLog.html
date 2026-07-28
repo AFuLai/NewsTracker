@@ -16,6 +16,17 @@
 <h1>Tracker ChangeLog</h1>
 <p class="meta">本檔由 <code>tracker pack</code> 自動維護；每次打包前由本地 ollama 生成版本重點並 prepend 於下方。</p>
 <!-- CHANGELOG_INSERTION_POINT -->
+<section class="release" id="v2.24">
+  <h2>v2.24 — 2026-07-28</h2>
+<ul>
+    <li><strong>【核心功能】多入口點支援：</strong> 升級了資料來源模型，允許單一網站（Domain）配置多個不同的進入點（Entry Points）。這解決了先前只能為每個網站設定單一入口點的限制，大幅提升了資料抓取彈性。</li>
+    <li><strong>【資料覆蓋率提升】強化歐盟資安內容抓取：</strong> 透過新增的內建入口點（builtins.EXTRA_ENTRY_POINTS），成功抓取到先前遺漏的關鍵歐盟資安文件，包括關於《網路韌性法案》（Cyber Resilience Act）和 AI 的最新指導文件。 <span style="color: red;">（特別標註：資安新聞抓取覆蓋率）</span></li>
+    <li><strong>【資料完整性修復】修復 Profile Key 邏輯：</strong> 修正了資料庫鍵值生成邏輯的 Bug，確保了當網站具有多個入口點時，不會產生重複的 Profile 記錄，維護了資料的唯一性和完整性。</li>
+    <li><strong>【資料回填與覆蓋】大規模歷史資料回掃：</strong> 執行了針對 12 個頁面的大規模回填掃描，共發現 53 篇符合歐盟資安法案（eu_cra）主題的缺失文章，極大地擴展了歷史資料的潛在覆蓋範圍。 <span style="color: red;">（特別標註：資安新聞抓取覆蓋率）</span></li>
+    <li><strong>【邏輯優化】自動探測機制優化：</strong> 調整了自動探測（Auto-reprobe）的邏輯，現在會跳過次級入口點的探測，避免了根目錄（ROOT）的判斷結果覆蓋掉路徑限定的 Profile 資訊，提高了系統的穩定性。</li>
+</ul>
+</section>
+
 <section class="release" id="v2.23">
   <h2>v2.23 — 2026-07-28</h2>
 <ul>
