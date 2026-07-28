@@ -438,7 +438,12 @@ def _phase_summarize(store, window, trackers, rep, log, limit, concurrency, rpt,
             rpt.tick(processed, grand_total,
                      f"[{tname}] {(r['title'] or '')[:70]}")
             body = bodies[aid]
-            eff_date = dates[aid] or r["date"]
+            # F2: the feed/API pubDate is authoritative. Some sites' article
+            # HTML carries a bogus meta date (e.g. a site-wide static value),
+            # which must never outrank a real feed date when deciding whether
+            # an article falls inside the run's window. Meta date is only a
+            # fallback for sources that don't supply a feed date at all.
+            eff_date = r["date"] or dates[aid]
             if (since and eff_date and eff_date < since) or \
                (until and eff_date and eff_date > until):
                 store.mark_status(aid, "skipped_window", date=dates[aid])
@@ -464,10 +469,19 @@ def _phase_summarize(store, window, trackers, rep, log, limit, concurrency, rpt,
                             store.log_error(r["source"], f"review: {reason2}", r["url"])
                             rep.review_failed += 1
                             continue
+                # F3: if neither the feed nor the meta extraction produced a
+                # date, fall back to the discovery date (fetched_at — when
+                # this candidate was first inserted) so the article still
+                # gets a non-NULL `date` and isn't permanently invisible to
+                # every downstream date-keyed query (_ready_dates,
+                # rebuild_days, list_by_date, ...). update_summary's
+                # date=COALESCE(date, ?) means this never clobbers a genuine
+                # feed/meta date already stored in the row.
+                fallback_date = dates[aid] or (r["fetched_at"] or "")[:10] or None
                 store.update_summary(
                     aid, title=result["title"] or r["title"],
                     summary=result["summary"], category=result["category"],
-                    tags=result["tags"], date=dates[aid])
+                    tags=result["tags"], date=fallback_date)
                 rep.summarized += 1
                 for oname, oinfo in others.items():
                     if belongs_to(article_url=r["url"],

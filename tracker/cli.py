@@ -373,7 +373,10 @@ def summarize(
     done = skipped_window = cross_hits = 0
     for r in rows:
         body = bodies[r["id"]]
-        effective_date = extracted_dates[r["id"]] or r["date"]
+        # F2: feed/API pubDate is authoritative; see orchestrator._phase_summarize
+        # for the full rationale (this is the parallel summarize path — same bug,
+        # same fix).
+        effective_date = r["date"] or extracted_dates[r["id"]]
         if (since and effective_date and effective_date < since) or \
            (until and effective_date and effective_date > until):
             store.mark_status(r["id"], "skipped_window", date=extracted_dates[r["id"]])
@@ -385,9 +388,14 @@ def summarize(
             result = summarize_article(url=r["url"], raw_text=body,
                                        categories=info.categories,
                                        category_defs=info.category_defs)
+            # F3: fall back to the discovery date (fetched_at) when neither the
+            # feed nor the meta extraction gave one, so the article never ends
+            # up with a permanently NULL `date`. See orchestrator._phase_summarize.
+            fallback_date = (extracted_dates[r["id"]]
+                             or (r["fetched_at"] or "")[:10] or None)
             store.update_summary(r["id"], title=result["title"] or r["title"],
                                  summary=result["summary"], category=result["category"],
-                                 tags=result["tags"], date=extracted_dates[r["id"]])
+                                 tags=result["tags"], date=fallback_date)
             done += 1
             # Cross-tracker detection
             for other_name, other_info in other_infos.items():
