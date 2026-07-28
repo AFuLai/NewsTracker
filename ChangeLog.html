@@ -16,6 +16,17 @@
 <h1>Tracker ChangeLog</h1>
 <p class="meta">本檔由 <code>tracker pack</code> 自動維護；每次打包前由本地 ollama 生成版本重點並 prepend 於下方。</p>
 <!-- CHANGELOG_INSERTION_POINT -->
+<section class="release" id="v2.22">
+  <h2>v2.22 — 2026-07-28</h2>
+<ul>
+    <li><strong>【資料恢復與來源擴充】</strong> 成功修復了 v2.21 的資料遺失 Bug，並重新抓取和摘要了 15 篇先前被錯誤跳過的歐盟網路安全法規（EU CRA）文章。</li>
+    <li><strong>【資安內容覆蓋率提升】</strong> 恢復並納入了多篇關鍵的資安標準與報告，包括 ETSI 的研討會資料、ENISA 的網路安全報告、ANSSI 關於 NIS 2 的資訊，以及六篇 CSA 漏洞公告。</li>
+    <li><strong>【結構化內容過濾優化】</strong> 大幅提升了網站結構頁面（如 `/about` 頁面）的過濾準確性。新增了更精細的判斷機制，有效拒絕了大量非文章內容的「關於我們」頁面，避免資料污染。</li>
+    <li><strong>【系統穩定性修復】</strong> 修復了導致資料流失的 `skipped_window` 邏輯錯誤，確保資料處理流程的穩定性。</li>
+    <li><strong>【測試與品質提升】</strong> 增加了新的測試案例 `test_org_about_filter.py`，並將測試通過數量從 175 個提升至 190 個，確保了程式碼的健壯性。</li>
+</ul>
+</section>
+
 <section class="release" id="v2.21">
   <h2>v2.21 — 2026-07-28</h2>
 <ul>
