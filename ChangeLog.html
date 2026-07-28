@@ -16,6 +16,17 @@
 <h1>Tracker ChangeLog</h1>
 <p class="meta">本檔由 <code>tracker pack</code> 自動維護；每次打包前由本地 ollama 生成版本重點並 prepend 於下方。</p>
 <!-- CHANGELOG_INSERTION_POINT -->
+<section class="release" id="v2.21">
+  <h2>v2.21 — 2026-07-28</h2>
+<ul>
+    <li><strong>內容提取優化 (F1)：</strong> 引入基於內容結構的「樣板內容偵測器」（boilerplate guard）。此功能能精準區分文章主體內容與網站側邊欄、導航等重複性、非核心的樣板文字，大幅提升從複雜網頁（如 theregister.com）中提取純淨文章內容的準確性。</li>
+    <li><strong>日期判斷權重提升 (F2 & F3)：</strong> 修正了文章日期判斷的權重邏輯。現在，系統會優先採信 RSS Feed 或 API 提供的發布日期，只有在來源缺乏日期資訊時，才會參考文章的元數據，確保文章不會因靜態網站的錯誤日期而被誤判為過期或丟失。</li>
+    <li><strong>網址抓取魯棒性增強 (F4)：</strong> 增強了網址解析與抓取機制。當原始 URL 經過標準化（移除 `www.`）後無法成功連線時，系統現在會自動嘗試使用帶有 `www.` 的網址進行重試，成功恢復了多個先前因網址格式問題而無法抓取的資料來源。</li>
+    <li><strong>資料完整性與回填：</strong> 修正了先前因缺乏日期資訊而導致的資料丟失問題。現在，對於無法在插入時獲取日期的文章，系統會回退使用文章的「首次發現日期」（fetched_at）作為備用日期，防止重要資料（如歐盟法規文件）永久無法被索引。</li>
+    <li><strong>測試覆蓋範圍擴大：</strong> 新增了多個單元測試，包括樣板內容提取測試、日期優先級測試和 `www.` 網址回退測試，顯著提升了程式碼的穩定性和可靠性。</li>
+</ul>
+</section>
+
 <section class="release" id="v2.20">
   <h2>v2.20 — 2026-07-27</h2>
 <ul>
