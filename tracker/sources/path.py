@@ -57,6 +57,28 @@ _STRUCTURAL_SEG_RE = re.compile(
 
 _ORG_ABOUT_RE = re.compile(r"^/about[-_]([a-z0-9]+)(/|$)", re.I)
 
+# europa.eu serves the same page under a per-language path prefix. The CRA
+# policy page was ingested 20 times — once per language — and 18 of those
+# translations were live on the site as separate articles, each summarised into
+# its own near-identical Chinese paragraph.
+_EUROPA_HOST_RE = re.compile(r"(^|\.)ec\.europa\.eu$", re.I)
+_LANG_PREFIX_RE = re.compile(r"^/([a-z]{2})(/|$)", re.I)
+
+
+def _is_translated_duplicate(host: str, path: str) -> bool:
+    """True for a non-English language variant on an EU Commission host.
+
+    Scoped to ec.europa.eu on purpose. A generic "two-letter first segment"
+    rule looks tempting and is wrong: it would throw away Ars Technica's /ai/
+    section (28 rows) and JPCERT's /at/ and /wr/ advisory sections (17 rows),
+    all of which are real articles. Only the europa.eu family is known to
+    mirror every page across languages with /en/ always present.
+    """
+    if not _EUROPA_HOST_RE.search(host or ""):
+        return False
+    m = _LANG_PREFIX_RE.match(path or "")
+    return bool(m) and m.group(1).lower() != "en"
+
 
 def _is_org_about_page(path: str) -> bool:
     """True for an organisation's root-level "about us" area.
@@ -110,6 +132,8 @@ def _looks_like_article(href: str) -> bool:
     if _STRUCTURAL_SEG_RE.search(path):
         return False
     if _is_org_about_page(path):
+        return False
+    if _is_translated_duplicate(p.netloc, path):
         return False
     segments = [s for s in path.strip("/").split("/") if s]
     if not segments:
