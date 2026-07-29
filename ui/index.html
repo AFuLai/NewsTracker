@@ -230,7 +230,9 @@ header {
 }
 .hamburger-btn {
   position: relative;
-  display: none;   /* shown only in the compact breakpoint */
+  display: inline-flex;   /* always visible: it IS the collapsed sidebar */
+  align-items: center;
+  justify-content: center;
   background: none;
   border: 1px solid var(--outline);
   color: var(--on-surface);
@@ -402,38 +404,55 @@ header {
   flex: 1 1 0;
   min-height: 0;           /* let children scroll instead of growing the body */
   overflow: hidden;
+  position: relative;      /* anchor for the floating #sidebar + scrim */
 }
 
-/* ── Sidebar ─────────────────────────────────────── */
+/* ── Sidebar — floating overlay panel that collapses to the header's
+   small hamburger button. Never reserves layout space (main content is
+   full-width underneath); slides off-canvas when collapsed. ── */
 #sidebar {
-  width: 94px;
-  min-width: 94px;
+  position: absolute;
+  top: 8px;
+  bottom: 8px;
+  left: 8px;
+  z-index: 60;
+  width: 200px;
   background: var(--surface-container);
-  border-right: 1px solid var(--outline-variant);
+  border: 1px solid var(--outline-variant);
+  border-radius: var(--shape-l);
+  box-shadow: var(--elev-3, 0 8px 24px rgba(0,0,0,.4));
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 0.4rem 0.3rem;
+  padding: 0.4rem 0.4rem;
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
-  flex-shrink: 0;
-  transition: width var(--motion-medium) var(--ease-standard),
-              min-width var(--motion-medium) var(--ease-standard),
-              transform var(--motion-medium) var(--ease-emphasized);
+  /* collapsed (default): off-canvas + hidden from tab order / AT */
+  transform: translateX(calc(-100% - 16px));
+  visibility: hidden;
+  transition: transform var(--motion-medium) var(--ease-emphasized),
+              visibility 0s linear var(--motion-medium);
 }
-#sidebar.collapsed {
-  width: 28px;
-  min-width: 28px;
-  padding: 0.4rem 0;
-  overflow: hidden;
+#sidebar.nav-open {
+  transform: translateX(0);
+  visibility: visible;
+  transition: transform var(--motion-medium) var(--ease-emphasized),
+              visibility 0s;
 }
-#sidebar.collapsed .sb-section,
-#sidebar.collapsed #date-section {
-  display: none;
+/* Scrim: shown (JS adds .open) only on the compact breakpoint, where the
+   drawer is modal. On wider screens the drawer is dismissible and leaves
+   the content interactive, so no scrim is applied. */
+#sidebar-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 55;
+  background: rgba(0,0,0,0.5);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity var(--motion-medium) var(--ease-standard),
+              visibility var(--motion-medium) var(--ease-standard);
 }
-/* collapsed → chevron points the other way (expand), no textContent swap */
-#sidebar-toggle svg { transition: transform var(--motion-short) var(--ease-standard); }
-#sidebar.collapsed #sidebar-toggle svg { transform: rotate(180deg); }
+#sidebar-scrim.open { opacity: 1; visibility: visible; }
 
 /* ── Sidebar toggle button ───────────────────────── */
 #sidebar-toggle {
@@ -783,43 +802,14 @@ a.card-tag:hover { text-decoration: underline; }
   .cards-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
 }
 @media (max-width: 599px) {                       /* compact */
-  .app-body { position: relative; }
-  #sidebar {
-    position: absolute;
-    inset: 0 auto 0 0;
-    z-index: 60;
-    width: 240px;
-    min-width: 240px;
-    transform: translateX(-100%);
-    /* closed → hidden from tab order + AT (delay so the slide-out still shows) */
-    visibility: hidden;
-    box-shadow: var(--elev-3, 0 8px 24px rgba(0,0,0,.4));
-    transition: transform var(--motion-medium) var(--ease-emphasized),
-                visibility 0s linear var(--motion-medium);
-  }
-  #sidebar.drawer-open {
-    transform: translateX(0);
-    visibility: visible;
-    transition: transform var(--motion-medium) var(--ease-emphasized),
-                visibility 0s;
-  }
-  #sidebar-scrim {
-    position: absolute;
-    inset: 0;
-    z-index: 55;
-    background: rgba(0,0,0,0.5);
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity var(--motion-medium) var(--ease-standard),
-                visibility var(--motion-medium) var(--ease-standard);
-  }
-  #sidebar-scrim.open { opacity: 1; visibility: visible; }
+  /* Sidebar is already a floating drawer at all widths; compact just widens
+     it a touch and makes it modal (scrim + inert applied from JS). */
+  #sidebar { width: min(280px, 82vw); }
   .cards-grid { grid-template-columns: minmax(0, 1fr); }
   /* row2 becomes one horizontally-scrolling strip instead of wrapping */
   .hd-row2 { flex-wrap: nowrap; overflow-x: auto; }
   #year-pills, #cat-pills { flex-wrap: nowrap; }
   .hd-row1 { gap: 0.5rem; }
-  .hamburger-btn { display: inline-flex; align-items: center; justify-content: center; }
   /* Mobile has room to spare — enlarge the actual box instead of relying on
      the invisible ::after hit-slop (which is more prone to overlap in the
      dense month/date lists at this width). */
@@ -872,7 +862,7 @@ a.card-tag:hover { text-decoration: underline; }
 
 <div class="app-body">
   <aside id="sidebar">
-    <button id="sidebar-toggle" onclick="toggleSidebar()" aria-label="收起側欄"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M15 18l-6-6 6-6"/></svg></button>
+    <button id="sidebar-toggle" onclick="closeNav(true)" aria-label="收起側欄"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M15 18l-6-6 6-6"/></svg></button>
     <div class="sb-section">
       <button id="btn-full-year" onclick="selectFullYear()"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="flex-shrink:0"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg><span class="btn-label">全年</span></button>
       <div id="month-grid"></div>
@@ -1002,7 +992,7 @@ function applyLang() {
   try { localStorage.setItem('tracker_lang', state.lang); } catch (e) {}
   document.documentElement.lang = state.lang === 'en' ? 'en' : 'zh-TW';
   // Localize icon-only buttons' accessible names (aria-label only — lang-btn's
-  // bilingual title stays as-is; sidebar-toggle is handled below via collapsed).
+  // bilingual title stays as-is; sidebar-toggle's label is set below).
   [['drawer-toggle', 'menu'], ['skin-btn', 'skinBtn'], ['theme-btn', 'themeBtn'],
    ['lang-btn', 'langLabel'], ['search-clear', 'clearSearch']].forEach(([id, key]) => {
     const el = document.getElementById(id);
@@ -1023,10 +1013,9 @@ function applyLang() {
     document.getElementById('last-updated').textContent = t('updated') + TRACKER_LAST_UPDATED;
   const sbBtn = document.getElementById('sidebar-toggle');
   if (sbBtn) {
-    const collapsed = document.getElementById('sidebar').classList.contains('collapsed');
-    const sbLabel = collapsed ? t('expand') : t('collapse');
-    sbBtn.title = sbLabel;
-    sbBtn.setAttribute('aria-label', sbLabel);
+    // in-panel ◀ is always a "collapse" control now (only visible while open)
+    sbBtn.title = t('collapse');
+    sbBtn.setAttribute('aria-label', t('collapse'));
   }
   if (state.currentTracker) {
     const mf = currentManifest();
@@ -1259,52 +1248,50 @@ function effectiveCat(a, tracker) {
 }
 
 // ── Sidebar toggle ────────────────────────────────────
-function toggleSidebar() {
-  const sidebar = document.getElementById('sidebar');
-  const btn = document.getElementById('sidebar-toggle');
-  const collapsed = sidebar.classList.toggle('collapsed');
-  // Don't touch textContent — that would wipe the chevron SVG. The icon flips
-  // via CSS (#sidebar.collapsed #sidebar-toggle svg) off the collapsed class.
-  const label = collapsed ? t('expand') : t('collapse');
-  btn.title = label;
-  btn.setAttribute('aria-label', label);
-}
-
-// ── Compact navigation drawer (< 600px) ───────────────────────────────
-// Desktop's toggleSidebar() (above) just collapses the rail; this is the
-// separate modal-drawer behaviour for the compact breakpoint's hamburger.
-let drawerReturnFocus = null;
-function drawerFocusables() {
+// ── Floating navigation drawer (all widths) ───────────────────────────
+// The sidebar floats over the content and collapses off-canvas, leaving the
+// header hamburger as the "small button". Modal (scrim + inert) only on the
+// compact breakpoint; dismissible elsewhere so content stays interactive.
+function isCompact() { return matchMedia('(max-width: 599px)').matches; }
+let navReturnFocus = null;
+function navFocusables() {
   const sidebar = document.getElementById('sidebar');
   return [...sidebar.querySelectorAll('button, [href], input, [tabindex]:not([tabindex="-1"])')]
     .filter(el => el.offsetParent !== null);
 }
-function openDrawer() {
+function openNav(persist) {
   const sidebar = document.getElementById('sidebar');
   const scrim = document.getElementById('sidebar-scrim');
-  const btn = document.getElementById('drawer-toggle');
+  const ham = document.getElementById('drawer-toggle');
   const main = document.getElementById('main-content');
-  drawerReturnFocus = document.activeElement;
-  sidebar.classList.add('drawer-open');
-  scrim.classList.add('open');
-  if (btn) btn.setAttribute('aria-expanded', 'true');
-  main.inert = true;
-  const first = drawerFocusables()[0];
+  navReturnFocus = document.activeElement;
+  sidebar.classList.add('nav-open');
+  if (ham) ham.setAttribute('aria-expanded', 'true');
+  if (isCompact()) { if (scrim) scrim.classList.add('open'); main.inert = true; }
+  if (persist) { try { localStorage.setItem('tracker_nav', 'open'); } catch (e) {} }
+  const first = navFocusables()[0];
   if (first) first.focus();
 }
-function closeDrawer() {
+function closeNav(persist) {
   const sidebar = document.getElementById('sidebar');
   const scrim = document.getElementById('sidebar-scrim');
-  const btn = document.getElementById('drawer-toggle');
+  const ham = document.getElementById('drawer-toggle');
   const main = document.getElementById('main-content');
-  if (!sidebar.classList.contains('drawer-open')) return;
-  sidebar.classList.remove('drawer-open');
-  scrim.classList.remove('open');
-  if (btn) btn.setAttribute('aria-expanded', 'false');
+  const wasOpen = sidebar.classList.contains('nav-open');
+  sidebar.classList.remove('nav-open');
+  if (scrim) scrim.classList.remove('open');
+  if (ham) ham.setAttribute('aria-expanded', 'false');
   main.inert = false;
-  if (drawerReturnFocus && document.body.contains(drawerReturnFocus)) drawerReturnFocus.focus();
-  else if (btn) btn.focus();
-  drawerReturnFocus = null;
+  if (persist) { try { localStorage.setItem('tracker_nav', 'collapsed'); } catch (e) {} }
+  if (wasOpen) {
+    if (navReturnFocus && document.body.contains(navReturnFocus) && navReturnFocus.offsetParent !== null) navReturnFocus.focus();
+    else if (ham) ham.focus();
+  }
+  navReturnFocus = null;
+}
+function toggleNav() {
+  if (document.getElementById('sidebar').classList.contains('nav-open')) closeNav(true);
+  else openNav(true);
 }
 
 // ── Boot ─────────────────────────────────────────────
@@ -1337,6 +1324,16 @@ function init() {
     if (saved_skin === 'classic' || saved_skin === 'md3') {
       document.documentElement.dataset.skin = saved_skin;
     }
+  } catch (e) {}
+  // Floating nav: default open on desktop, collapsed on compact; persisted.
+  // Set the class directly (no openNav — avoid stealing focus on boot).
+  try {
+    const navPref = localStorage.getItem('tracker_nav');
+    const startOpen = navPref !== 'collapsed' && !isCompact();
+    const sb = document.getElementById('sidebar');
+    const ham = document.getElementById('drawer-toggle');
+    if (sb && startOpen) sb.classList.add('nav-open');
+    if (ham) ham.setAttribute('aria-expanded', String(!!startOpen));
   } catch (e) {}
   const all = getTrackers();
   if (!all) {
@@ -1487,6 +1484,9 @@ function selectDate(date) {
   const btn = document.querySelector('.date-btn[data-date="' + date + '"]');
   if (btn) { btn.classList.add('active'); btn.setAttribute('aria-pressed', 'true'); }
   renderArticles([date]);
+  // On compact the drawer is modal — dismiss it after picking a date so the
+  // results aren't hidden behind it. (Not during a deep-link restore.)
+  if (!restoring && isCompact()) closeNav(false);
 }
 
 // ── Build UI helpers ──────────────────────────────────
@@ -1970,15 +1970,15 @@ document.getElementById('overlay').addEventListener('click', e => {
 document.addEventListener('keydown', e => {
   if (e.key !== 'Escape') return;
   if (!document.getElementById('overlay').classList.contains('hidden')) closeOverlay();
-  else if (document.getElementById('sidebar').classList.contains('drawer-open')) closeDrawer();
+  else if (document.getElementById('sidebar').classList.contains('nav-open')) closeNav(true);
 });
 
-// Compact navigation drawer: hamburger opens it, scrim click closes it.
+// Floating nav drawer: hamburger toggles it, scrim (compact) click closes it.
 (function wireDrawer() {
   const btn = document.getElementById('drawer-toggle');
   const scrim = document.getElementById('sidebar-scrim');
-  if (btn) btn.addEventListener('click', openDrawer);
-  if (scrim) scrim.addEventListener('click', closeDrawer);
+  if (btn) btn.addEventListener('click', toggleNav);
+  if (scrim) scrim.addEventListener('click', () => closeNav(true));
 })();
 
 // Search box: debounced live search + Enter + Esc/clear.
