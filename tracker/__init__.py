@@ -3,7 +3,11 @@ from pathlib import Path
 
 ROOT = Path("/opt/tracker")
 PROJECT_ROOT = Path("/mnt/d/Claude/Track Security")
-DEFAULT_OUT = PROJECT_ROOT / "html"
+# Static site output lives on ext4 (native to render.py): ~90x faster small-file
+# writes than drvfs(/mnt/d) and none of the cross-write pitfalls (drvfs speed
+# tax, 777/CRLF git noise, AV locking, ADS streams). The tarball stays on /mnt/d
+# for Windows-side distribution.
+DEFAULT_OUT = ROOT / "html"
 DEFAULT_TARBALL = PROJECT_ROOT / "tarball"
 DEFAULT_DB = ROOT / "db" / "articles.sqlite"
 OLLAMA_URL = "http://localhost:11434"
