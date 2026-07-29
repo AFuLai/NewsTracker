@@ -16,6 +16,17 @@
 <h1>Tracker ChangeLog</h1>
 <p class="meta">本檔由 <code>tracker pack</code> 自動維護；每次打包前由本地 ollama 生成版本重點並 prepend 於下方。</p>
 <!-- CHANGELOG_INSERTION_POINT -->
+<section class="release" id="v2.25">
+  <h2>v2.25 — 2026-07-29</h2>
+<ul>
+    <li><strong>【新增來源/資安】</strong> 成功回填 31 篇歐盟網路安全（EC cybersecurity）文件，涵蓋了數位策略、網路安全法案、NIS2 指令等重要主題，大幅提升資安內容覆蓋率。</li>
+    <li><strong>【修補/穩定性】</strong> 修正了 HTTP 429 (Rate Limit) 錯誤處理機制，現在能明確區分「限速請求」與「空內容頁面」，避免誤判來源為失效，提升資料擷取可靠性。</li>
+    <li><strong>【CLI/API 變更】</strong> 強化了 CLI 摘要路徑的穩定性，確保在執行批次處理時，即使遇到限速錯誤，整個批次也不會中斷，並能正確記錄限速狀態。</li>
+    <li><strong>【效能/資料處理】</strong> 擴展了資料擷取範圍，將年份標籤（year pills）的範圍從 2018 年擴展至 2026 年，並修復了相關的 JavaScript 錯誤。</li>
+    <li><strong>【新增功能】</strong> 增加了對限速（RateLimited）的測試案例，提升了系統在處理外部 API 限制時的健壯性。</li>
+</ul>
+</section>
+
 <section class="release" id="v2.24">
   <h2>v2.24 — 2026-07-28</h2>
 <ul>
