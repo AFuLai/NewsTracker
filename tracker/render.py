@@ -3,10 +3,13 @@ from __future__ import annotations
 
 import json
 import re
+import shutil
 from datetime import date as _date
 from pathlib import Path
 
 from jinja2 import Environment, PackageLoader, select_autoescape
+
+from . import ROOT
 
 
 def _tojson_unicode(value):
@@ -189,6 +192,22 @@ def update_year_manifest(*, year: str, data_root: Path, tracker: str) -> Path:
     return _write(path, text)
 
 
+def sync_index_html(root_html: Path) -> Path | None:
+    """Copy the UI shell (ui/index.html) into the output root so the served
+    site always matches the source. Byte-exact, skips when unchanged; both
+    sides are ext4 now, so it is cheap and free of the drvfs/ADS pitfalls that
+    the old manual cross-copy to /mnt/d had. Returns the dest if it changed."""
+    src = ROOT / "ui" / "index.html"
+    if not src.exists():
+        return None
+    dst = root_html / "index.html"
+    if dst.exists() and dst.read_bytes() == src.read_bytes():
+        return None
+    dst.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(src, dst)
+    return dst
+
+
 def update_root_manifest(*, root_html: Path,
                          trackers: dict[str, dict]) -> Path:
     """Write TRACKER_MANIFESTS root file. `trackers` maps name → {title, categories}."""
@@ -210,4 +229,6 @@ def update_root_manifest(*, root_html: Path,
         }
     text = _env.get_template("manifest_root.js.j2").render(
         trackers=blocks, last_updated=last_updated)
-    return _write(root_html / "manifest.js", text)
+    result = _write(root_html / "manifest.js", text)
+    sync_index_html(root_html)   # keep the served shell in step with ui/index.html
+    return result
