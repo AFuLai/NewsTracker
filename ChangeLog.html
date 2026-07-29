@@ -16,6 +16,15 @@
 <h1>Tracker ChangeLog</h1>
 <p class="meta">本檔由 <code>tracker pack</code> 自動維護；每次打包前由本地 ollama 生成版本重點並 prepend 於下方。</p>
 <!-- CHANGELOG_INSERTION_POINT -->
+<section class="release" id="v2.28">
+  <h2>v2.28 — 2026-07-29</h2>
+<ul>
+    <li><strong>🎨 介面重大重構：</strong>側邊欄（Sidebar）已升級為浮動抽屜式設計。無論在何種螢幕尺寸下，導航欄位不再佔用固定欄位，而是以可收合的浮動面板形式呈現，提升了跨裝置的統一使用體驗。</li>
+    <li><strong>🚀 效能提升（打包流程）：</strong>修復了靜態網站的輸出路徑問題。現在將靜態網站輸出至原生 <code>ext4</code> 檔案系統，取代了 WSL2 的 <code>drvfs</code>，大幅改善了小檔案寫入的效能瓶頸，極大地提升了建置速度。</li>
+    <li><strong>⚙️ 建置流程優化：</strong>新增了自動同步機制，確保 <code>ui/index.html</code> 在每次建置時都能自動、準確地同步到輸出根目錄，消除了手動跨複製步驟，提升了建置的穩定性和可靠性。</li>
+</ul>
+</section>
+
 <section class="release" id="v2.27">
   <h2>v2.27 — 2026-07-29</h2>
 <ul>
