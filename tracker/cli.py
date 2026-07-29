@@ -353,16 +353,29 @@ def summarize(
     bodies: dict[int, str] = {r["id"]: (r["raw_text"] or "").strip() for r in rows}
     extracted_dates: dict[int, str | None] = {r["id"]: None for r in rows}
     fetched = 0
+    throttled: set[int] = set()          # must exist even with --no-fetch-full
     if fetch_full:
         from concurrent.futures import ThreadPoolExecutor
         targets = [(r["id"], r["url"]) for r in rows
                    if r["url"] and (len(bodies[r["id"]]) < min_body or not r["date"])]
+        def _one(t):
+            """(id, body, meta_date, was_throttled). RateLimited must never
+            escape into pool.map — it would abort the whole batch."""
+            from .sources.article import RateLimited
+            try:
+                body, mdate = fetch_body_with_date(t[1])
+                return t[0], body, mdate, False
+            except RateLimited:
+                return t[0], "", None, True
+
         if targets:
             console.print(f"  fetching {len(targets)} full bodies in parallel "
                           f"(workers={concurrency})...")
             with ThreadPoolExecutor(max_workers=max(concurrency, 2)) as pool:
-                results = pool.map(lambda t: (t[0], *fetch_body_with_date(t[1])), targets)
-                for aid, full, mdate in results:
+                for aid, full, mdate, was_throttled in pool.map(_one, targets):
+                    if was_throttled:
+                        throttled.add(aid)
+                        continue
                     if len(full) > len(bodies[aid]):
                         bodies[aid] = full
                         fetched += 1
@@ -370,9 +383,15 @@ def summarize(
                         extracted_dates[aid] = mdate
 
     # Phase B: serial ollama + optional cross-detect
-    done = skipped_window = cross_hits = 0
+    done = skipped_window = cross_hits = rate_limited = 0
     for r in rows:
         body = bodies[r["id"]]
+        if r["id"] in throttled and not body:
+            # Server said slow down; the page is fine. Stay `pending` for the
+            # next run instead of being written off as an empty body.
+            store.log_error(r["source"], "rate limited (HTTP 429)", r["url"])
+            rate_limited += 1
+            continue
         # F2: feed/API pubDate is authoritative; see orchestrator._phase_summarize
         # for the full rationale (this is the parallel summarize path — same bug,
         # same fix).
@@ -413,6 +432,8 @@ def summarize(
            f"(fetched: {fetched}")
     if skipped_window:
         msg += f", out-of-window: {skipped_window}"
+    if rate_limited:
+        msg += f", rate-limited (retry next run): {rate_limited}"
     if cross_hits:
         msg += f", cross-tracker added: {cross_hits}"
     console.print(msg + ")")

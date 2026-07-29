@@ -76,6 +76,10 @@ class RunReport:
     review_failed: int = 0
     translated: int = 0
     out_of_window: int = 0
+    #: Rows left `pending` because the server returned 429. Not a failure —
+    #: the next run retries them. Counted separately so a throttled source is
+    #: never mistaken for a dead one.
+    rate_limited: int = 0
     cross_added: int = 0
     cross_removed: int = 0
     days_written: int = 0
@@ -94,7 +98,8 @@ class RunReport:
                 f"(304:{self.fetch_304} fail:{self.fetch_failed}) | "
                 f"gate -{self.gated_out} | "
                 f"sum {self.summarized}/{self.summarize_attempted} "
-                f"(oow:{self.out_of_window} rev_fail:{self.review_failed}) | "
+                f"(oow:{self.out_of_window} rev_fail:{self.review_failed}"
+                f"{f' 429:{self.rate_limited}' if self.rate_limited else ''}) | "
                 f"i18n {self.translated} | "
                 f"llm {self.summarize_backend[:3]}/{self.translate_backend[:3]}"
                 f"{f' fb{self.gemini_fallback}' if self.gemini_fallback else ''} | "
@@ -429,11 +434,24 @@ def _phase_summarize(store, window, trackers, rep, log, limit, concurrency, rpt,
         dates = {r["id"]: None for r in rows}
         targets = [(r["id"], r["url"]) for r in rows
                    if r["url"] and (len(bodies[r["id"]]) < 800 or not r["date"])]
+        throttled: set[int] = set()
+
+        def _fetch(t):
+            """Returns (body, meta_date, was_throttled)."""
+            from .sources.article import RateLimited
+            try:
+                body, mdate = fetch_body_with_date(t[1])
+                return body, mdate, False
+            except RateLimited:
+                return "", None, True
+
         if targets:
             with ThreadPoolExecutor(max_workers=max(concurrency, 2)) as pool:
-                for aid, (body, mdate) in zip(
-                        [t[0] for t in targets],
-                        pool.map(lambda t: fetch_body_with_date(t[1]), targets)):
+                for aid, (body, mdate, was_throttled) in zip(
+                        [t[0] for t in targets], pool.map(_fetch, targets)):
+                    if was_throttled:
+                        throttled.add(aid)
+                        continue
                     if len(body) > len(bodies[aid]):
                         bodies[aid] = body
                     if mdate:
@@ -459,6 +477,14 @@ def _phase_summarize(store, window, trackers, rep, log, limit, concurrency, rpt,
                (until and eff_date and eff_date > until):
                 store.mark_status(aid, "skipped_window", date=dates[aid])
                 rep.out_of_window += 1
+                continue
+            if aid in throttled and not body:
+                # The page exists; the server just told us to slow down. Leave
+                # the row `pending` so the next run picks it up, and say so —
+                # recording "empty body" here is what made throttling look like
+                # a dead source for months.
+                store.log_error(r["source"], "rate limited (HTTP 429)", r["url"])
+                rep.rate_limited += 1
                 continue
             if not body:
                 store.log_error(r["source"], "empty body after fetch", r["url"])

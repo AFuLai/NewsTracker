@@ -6,6 +6,7 @@ Order of attempts:
 """
 from __future__ import annotations
 
+import time
 from urllib.parse import urlsplit, urlunsplit
 
 import httpx
@@ -39,8 +40,26 @@ def _pick(body: str, body2: str) -> str:
     return body2 if len(body2) > len(body) else body
 
 
+class RateLimited(Exception):
+    """The server asked us to slow down (HTTP 429).
+
+    Distinct from "this page has no content": the document is there and will be
+    served once we back off. Collapsing the two is how 250 perfectly good
+    digital-strategy.ec.europa.eu pages looked like 197 undated failures — the
+    site answered 429 with a 40 KB "Sorry" page, `_get_html` saw status != 200
+    and returned "", and the caller logged `empty body after fetch`. The same
+    conflation is why BleepingComputer's 310 such errors read like anti-bot
+    blocking rather than throttling.
+    """
+
+
+#: Seconds to wait before the retry that follows a 429. Deliberately generous:
+#: europa.eu kept returning 429 for minutes at a sustained 1 req/s.
+RATE_LIMIT_BACKOFF = 8.0
+
+
 def _one_get(url: str, timeout: float) -> tuple[str, bool]:
-    """Fetch *url*. Returns (html, host_unreachable).
+    """Fetch *url*. Returns (html, host_unreachable). Raises RateLimited on 429.
 
     `host_unreachable` is set on ConnectError, which is what httpx raises when
     the hostname has no DNS record ("[Errno -5] No address associated with
@@ -53,8 +72,12 @@ def _one_get(url: str, timeout: float) -> tuple[str, bool]:
                       headers={"User-Agent": UA, "Accept-Language": "en,zh-TW;q=0.7"})
         if r.status_code == 200:
             return r.text, False
+        if r.status_code == 429:
+            raise RateLimited(url)
     except httpx.ConnectError:
         return "", True
+    except RateLimited:
+        raise
     except Exception:
         pass
     return "", False
@@ -77,12 +100,26 @@ def _get_html(url: str, timeout: float) -> str:
     have no bare-domain record at all, so every stored URL for them was
     unfetchable from the start (60 `empty body after fetch` errors, previously
     misread as anti-bot blocking).
+
+    A 429 gets one backoff-and-retry here; if the server is still throttling,
+    RateLimited propagates so the caller can record *throttled* rather than
+    *empty*, and try again on a later run instead of writing the page off.
     """
-    html, dns_failed = _one_get(url, timeout)
+    try:
+        html, dns_failed = _one_get(url, timeout)
+    except RateLimited:
+        time.sleep(RATE_LIMIT_BACKOFF)
+        html, dns_failed = _one_get(url, timeout)   # still 429 → propagates
     if html or not dns_failed:
         return html
     alt = _www(url)
-    return _one_get(alt, timeout)[0] if alt else ""
+    if not alt:
+        return ""
+    try:
+        return _one_get(alt, timeout)[0]
+    except RateLimited:
+        time.sleep(RATE_LIMIT_BACKOFF)
+        return _one_get(alt, timeout)[0]
 
 
 def fetch_body(url: str, *, timeout: float = 20.0) -> str:
