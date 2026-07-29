@@ -949,6 +949,8 @@ const I18N = {
       all:'全部', fullYear:'全年', dates:'日期', showing:'顯示', articles:'篇',
       updated:'更新：', sources:'來源', langBtn:'🌐 中',
       expand:'展開側欄', collapse:'收起側欄',
+      menu:'選單', skinBtn:'切換外觀', themeBtn:'切換主題', langLabel:'切換語言',
+      clearSearch:'清除搜尋', close:'關閉',
       searchPlaceholder:'搜尋全站新聞…', searching:'搜尋中…',
       scopeLabel:'範圍', scope:{title:'標題', body:'內文', tags:'標籤'},
       noResults:q=>'找不到符合「'+q+'」的新聞',
@@ -967,6 +969,8 @@ const I18N = {
       all:'All', fullYear:'Full Year', dates:'Dates', showing:'Showing', articles:'',
       updated:'Updated: ', sources:'Sources', langBtn:'🌐 EN',
       expand:'Expand', collapse:'Collapse',
+      menu:'Menu', skinBtn:'Toggle appearance', themeBtn:'Toggle theme', langLabel:'Toggle language',
+      clearSearch:'Clear search', close:'Close',
       searchPlaceholder:'Search all news…', searching:'Searching…',
       scopeLabel:'In', scope:{title:'Title', body:'Body', tags:'Tags'},
       noResults:q=>'No results for “'+q+'”',
@@ -997,8 +1001,13 @@ function artTags(a)    { return (state.lang === 'en' && a.tags_en && a.tags_en.l
 function applyLang() {
   try { localStorage.setItem('tracker_lang', state.lang); } catch (e) {}
   document.documentElement.lang = state.lang === 'en' ? 'en' : 'zh-TW';
-  const lb = document.getElementById('lang-btn');
-  if (lb) lb.setAttribute('aria-label', state.lang === 'en' ? '切換語言' : '切換語言');
+  // Localize icon-only buttons' accessible names (aria-label only — lang-btn's
+  // bilingual title stays as-is; sidebar-toggle is handled below via collapsed).
+  [['drawer-toggle', 'menu'], ['skin-btn', 'skinBtn'], ['theme-btn', 'themeBtn'],
+   ['lang-btn', 'langLabel'], ['search-clear', 'clearSearch']].forEach(([id, key]) => {
+    const el = document.getElementById(id);
+    if (el && t(key)) el.setAttribute('aria-label', t(key));
+  });
   const sbx = document.getElementById('search-box');
   if (sbx) sbx.placeholder = t('searchPlaceholder');
   const scl = document.getElementById('scope-label');
@@ -1739,7 +1748,7 @@ function openOverlay(a, triggerEl) {
     return '<span class="card-tag">' + escHtml(tg) + '</span>';
   }).join('');
   box.innerHTML = [
-    '<button id="overlay-close" onclick="closeOverlay()" aria-label="關閉"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button>',
+    '<button id="overlay-close" onclick="closeOverlay()" aria-label="' + escHtml(t('close')) + '"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button>',
     '<span class="cat-badge ' + catClass + '">' + escHtml(catLabel(ecat)) + '</span>',
     '<h2 id="overlay-title">' + linkifyCVE(escHtml(artTitle(a))) + '</h2>',
     '<p class="card-summary">' + linkifyCVE(escHtml(artSummary(a))) + '</p>',
