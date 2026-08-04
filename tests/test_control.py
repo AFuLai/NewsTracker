@@ -1,10 +1,11 @@
-"""Tests for the live pipeline Controller (pause/resume/restart/backend)."""
+"""Tests for the live pipeline Controller (pause/resume/restart/backend) and the
+dashboard-driven CRA library job."""
 import threading
 import time
 
 import pytest
 
-from tracker.control import Controller, ControlAbort
+from tracker.control import Controller, ControlAbort, CraLibJob
 
 
 def test_pause_blocks_then_resume_releases():
@@ -93,3 +94,52 @@ def test_close_unblocks_wait_for_start():
     c.close()
     c.wait_for_start()   # must return immediately, not hang
     assert c.closed
+
+
+# ── CRA library job (dashboard button) ──────────────────────────────────────
+def _wait_until(pred, timeout=3.0):
+    end = time.time() + timeout
+    while time.time() < end:
+        if pred():
+            return True
+        time.sleep(0.02)
+    return False
+
+
+def test_cralib_job_runs_and_reports(tmp_path):
+    gate = threading.Event()
+    def fake_sync(db, progress=None):
+        progress(0, 2, "first")
+        gate.wait(3)
+        progress(2, 2, "")
+        return {"new": [{"title": "A", "url": "u/a", "cluster": "SBOM", "source": "s"}],
+                "updated": [], "removed": [], "unchanged": 7, "errors": []}
+    job = CraLibJob(db=tmp_path / "t.sqlite", out=tmp_path,
+                    sync=fake_sync, emit_js=lambda db, out: out / "data/cra_library.js")
+    assert job.snapshot()["status"] == "idle"
+    assert job.start() is True
+    assert _wait_until(lambda: job.snapshot()["total"] == 2)
+    snap = job.snapshot()
+    assert snap["status"] == "running" and snap["note"] == "first"
+    assert job.start() is False          # one at a time
+    gate.set()
+    assert _wait_until(lambda: not job.running())
+    snap = job.snapshot()
+    assert snap["status"] == "done" and snap["done"] == 2
+    assert snap["report"]["unchanged"] == 7
+    assert snap["report"]["new"] == [{"title": "A", "url": "u/a",
+                                      "cluster": "SBOM", "source": "s"}]
+    assert snap["emitted"].endswith("cra_library.js")
+    assert job.start() is True           # re-runnable after finishing
+
+
+def test_cralib_job_records_failure(tmp_path):
+    def boom(db, progress=None):
+        raise RuntimeError("index unreachable")
+    job = CraLibJob(db=tmp_path / "t.sqlite", out=tmp_path,
+                    sync=boom, emit_js=lambda db, out: None)
+    job.start()
+    assert _wait_until(lambda: not job.running())
+    snap = job.snapshot()
+    assert snap["status"] == "failed" and "index unreachable" in snap["error"]
+    assert snap["report"] is None

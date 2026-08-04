@@ -5,10 +5,16 @@ POST /control) and the orchestrator (which obeys them at checkpoints). The
 orchestrator calls `checkpoint()` between phases and between articles; that call
 blocks while paused and raises ControlAbort when a restart is requested — the CLI
 catches it and re-runs the pipeline from the chosen stage.
+
+CraLibJob is the same idea for the CRA reference library: the dashboard starts a
+`tracker cra-lib` sync in a background thread and polls its state. It is
+deliberately independent of the pipeline run — the library is a separate
+catalogue and can be refreshed before, after, or instead of a news run.
 """
 from __future__ import annotations
 
 import threading
+import time
 
 PHASES = ["fetch", "gate", "summarize", "translate", "write", "cleanup"]
 ROLES = ("summarize", "translate")
@@ -141,3 +147,105 @@ class Controller:
         with self._lock:
             return {"paused": self.paused, "backends": dict(self.backends),
                     "started": self._started.is_set(), "config": dict(self.config)}
+
+
+class CraLibJob:
+    """A one-at-a-time CRA library sync driven from the dashboard.
+
+    `start()` spawns a daemon thread running cra_library.sync() (+ emit_js) and
+    returns False if a sync is already in flight. `snapshot()` is what the page
+    polls: status, live progress, and the last run's report.
+    """
+
+    def __init__(self, *, db, out, emit: bool = True, sync=None, emit_js=None):
+        self.db = db
+        self.out = out
+        self.emit = emit
+        self._sync = sync            # injectable for tests
+        self._emit_js = emit_js
+        self._lock = threading.Lock()
+        self._thread: threading.Thread | None = None
+        self.status = "idle"         # idle | running | done | failed
+        self.done = 0
+        self.total = 0
+        self.note = ""
+        self.started_at = 0.0
+        self.elapsed = 0.0
+        self.report: dict | None = None
+        self.error: str | None = None
+        self.emitted: str | None = None
+
+    # ── command (called from the web server thread) ─────────────────────────
+    def start(self) -> bool:
+        with self._lock:
+            if self.status == "running":
+                return False
+            self.status = "running"
+            self.done = self.total = 0
+            self.note = ""
+            self.report = None
+            self.error = None
+            self.emitted = None
+            self.started_at = time.time()
+            self.elapsed = 0.0
+            self._thread = threading.Thread(target=self._run, daemon=True)
+            self._thread.start()
+            return True
+
+    def running(self) -> bool:
+        with self._lock:
+            return self.status == "running"
+
+    # ── worker ──────────────────────────────────────────────────────────────
+    def _progress(self, done, total, note=""):
+        with self._lock:
+            self.done, self.total, self.note = done, total, note or ""
+            self.elapsed = time.time() - self.started_at
+
+    def _run(self):
+        sync, emit_js = self._sync, self._emit_js
+        if sync is None or emit_js is None:
+            from .cra_library import sync as _s, emit_js as _e
+            sync = sync or _s
+            emit_js = emit_js or _e
+        try:
+            rep = sync(self.db, progress=self._progress)
+            emitted = str(emit_js(self.db, self.out)) if self.emit else None
+        except Exception as exc:
+            with self._lock:
+                self.status = "failed"
+                self.error = f"{type(exc).__name__}: {exc}"
+                self.note = ""
+                self.elapsed = time.time() - self.started_at
+            return
+        with self._lock:
+            self.status = "done"
+            self.report = rep
+            self.emitted = emitted
+            self.note = ""
+            self.elapsed = time.time() - self.started_at
+
+    # ── snapshot for the web page ───────────────────────────────────────────
+    def snapshot(self) -> dict:
+        with self._lock:
+            elapsed = (time.time() - self.started_at) if self.status == "running" \
+                else self.elapsed
+            rep = self.report
+            summary = None
+            if rep is not None:
+                summary = {
+                    "new": [_topic(t) for t in rep["new"]],
+                    "updated": [_topic(t) for t in rep["updated"]],
+                    "removed": [_topic(t) for t in rep["removed"]],
+                    "unchanged": rep["unchanged"],
+                    "errors": list(rep["errors"]),
+                }
+            return {"status": self.status, "done": self.done, "total": self.total,
+                    "note": self.note, "elapsed": elapsed, "error": self.error,
+                    "emitted": self.emitted, "report": summary}
+
+
+def _topic(t: dict) -> dict:
+    return {"title": t.get("title") or t.get("url") or "",
+            "url": t.get("url", ""), "cluster": t.get("cluster") or "",
+            "source": t.get("source") or ""}

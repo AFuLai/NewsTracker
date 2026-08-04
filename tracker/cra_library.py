@@ -189,64 +189,97 @@ def snapshot(url: str) -> tuple[str | None, str | None]:
 def _conn(db: Path) -> sqlite3.Connection:
     c = sqlite3.connect(str(db))
     c.row_factory = sqlite3.Row
+    # A sync may run alongside a pipeline write (both from the dashboard), so
+    # wait for the other writer instead of failing with "database is locked".
+    c.execute("PRAGMA busy_timeout=30000")
     c.executescript(CRA_SCHEMA)
     return c
 
 
-def sync(db: Path = DEFAULT_DB, sites: list[str] | None = None) -> dict:
-    """Re-discover each site and reconcile the catalogue. Returns a report."""
+def sync(db: Path = DEFAULT_DB, sites: list[str] | None = None,
+         progress=None) -> dict:
+    """Re-discover each site and reconcile the catalogue. Returns a report.
+
+    `progress(done, total, note)` — optional callback, invoked once per topic
+    (and while discovering, with total=0) so a UI can show a live bar.
+    """
     sites = sites or list(SITES)
     conn = _conn(db)
     today = date.today().isoformat()
     rep = {"new": [], "updated": [], "unchanged": 0, "removed": [], "errors": []}
     seen: set[str] = set()
 
+    def _tick(done, total, note=""):
+        if progress is not None:
+            progress(done, total, note)
+
+    # Discover every site first so the per-topic phase has a real total.
+    discovered: list[tuple[str, dict]] = []
+    ok_sites: list[str] = []
     for sk in sites:
+        _tick(0, 0, f"discover {sk}")
         try:
             topics = discover(sk)
         except Exception as e:
             rep["errors"].append(f"{sk} discover: {e}")
             continue
-        for tp in topics:
-            seen.add(tp["url"])
-            h, page_title = snapshot(tp["url"])
-            title = page_title or tp["title"]      # page <h1> wins over anchor text
-            tp = {**tp, "title": title}
-            row = conn.execute("SELECT * FROM cra_topic WHERE url=?", (tp["url"],)).fetchone()
-            if row is None:
-                conn.execute(
-                    "INSERT INTO cra_topic(source,cluster,title,url,content_hash,"
-                    "first_seen,last_seen,last_changed,status) VALUES(?,?,?,?,?,?,?,?,'active')",
-                    (sk, tp["cluster"], title, tp["url"], h, today, today, today))
-                rep["new"].append({**tp, "source": sk})
-            else:
-                changed = bool(h) and bool(row["content_hash"]) and h != row["content_hash"]
-                if changed:
-                    conn.execute(
-                        "UPDATE cra_topic SET cluster=?,title=?,content_hash=?,"
-                        "last_seen=?,last_changed=?,status='active' WHERE url=?",
-                        (tp["cluster"], tp["title"], h, today, today, tp["url"]))
-                    rep["updated"].append({**tp, "source": sk})
-                else:
-                    # keep the hash if this fetch failed (h is None) so we don't
-                    # lose the baseline; still refresh label/cluster/last_seen.
-                    conn.execute(
-                        "UPDATE cra_topic SET cluster=?,title=?,last_seen=?,status='active'"
-                        + ("" if h is None else ",content_hash=COALESCE(content_hash,?)")
-                        + " WHERE url=?",
-                        ((tp["cluster"], tp["title"], today, tp["url"]) if h is None
-                         else (tp["cluster"], tp["title"], today, h, tp["url"])))
-                    rep["unchanged"] += 1
+        ok_sites.append(sk)
+        discovered.extend((sk, tp) for tp in topics)
 
-    # topics we track for the synced sites but no longer see -> gone
-    placeholders = ",".join("?" * len(sites))
-    for r in conn.execute(
-            f"SELECT url,title,source FROM cra_topic "
-            f"WHERE status='active' AND source IN ({placeholders})", sites).fetchall():
-        if r["url"] not in seen:
-            conn.execute("UPDATE cra_topic SET status='gone',last_seen=? WHERE url=?",
-                         (today, r["url"]))
-            rep["removed"].append(dict(r))
+    total = len(discovered)
+    for i, (sk, tp) in enumerate(discovered):
+        _tick(i, total, tp["title"] or tp["url"])
+        seen.add(tp["url"])
+        try:
+            h, page_title = snapshot(tp["url"])
+        except Exception as e:                    # one bad page must not kill the run
+            rep["errors"].append(f"{sk} {tp['url']}: {e}")
+            continue
+        title = page_title or tp["title"]      # page <h1> wins over anchor text
+        tp = {**tp, "title": title}
+        row = conn.execute("SELECT * FROM cra_topic WHERE url=?", (tp["url"],)).fetchone()
+        if row is None:
+            conn.execute(
+                "INSERT INTO cra_topic(source,cluster,title,url,content_hash,"
+                "first_seen,last_seen,last_changed,status) VALUES(?,?,?,?,?,?,?,?,'active')",
+                (sk, tp["cluster"], title, tp["url"], h, today, today, today))
+            rep["new"].append({**tp, "source": sk})
+        else:
+            changed = bool(h) and bool(row["content_hash"]) and h != row["content_hash"]
+            if changed:
+                conn.execute(
+                    "UPDATE cra_topic SET cluster=?,title=?,content_hash=?,"
+                    "last_seen=?,last_changed=?,status='active' WHERE url=?",
+                    (tp["cluster"], tp["title"], h, today, today, tp["url"]))
+                rep["updated"].append({**tp, "source": sk})
+            else:
+                # keep the hash if this fetch failed (h is None) so we don't
+                # lose the baseline; still refresh label/cluster/last_seen.
+                conn.execute(
+                    "UPDATE cra_topic SET cluster=?,title=?,last_seen=?,status='active'"
+                    + ("" if h is None else ",content_hash=COALESCE(content_hash,?)")
+                    + " WHERE url=?",
+                    ((tp["cluster"], tp["title"], today, tp["url"]) if h is None
+                     else (tp["cluster"], tp["title"], today, h, tp["url"])))
+                rep["unchanged"] += 1
+        # Commit per topic: the loop is minutes long, and holding one write
+        # transaction open would lock out a concurrent pipeline write (and lose
+        # everything if the process exits mid-sync).
+        conn.commit()
+    _tick(total, total, "")
+
+    # Topics we track for the synced sites but no longer see -> gone. Only sites
+    # whose discovery succeeded may retire topics: a site that failed to load
+    # tells us nothing about which of its topics still exist.
+    if ok_sites:
+        placeholders = ",".join("?" * len(ok_sites))
+        for r in conn.execute(
+                f"SELECT url,title,source FROM cra_topic "
+                f"WHERE status='active' AND source IN ({placeholders})", ok_sites).fetchall():
+            if r["url"] not in seen:
+                conn.execute("UPDATE cra_topic SET status='gone',last_seen=? WHERE url=?",
+                             (today, r["url"]))
+                rep["removed"].append(dict(r))
 
     conn.commit()
     conn.close()

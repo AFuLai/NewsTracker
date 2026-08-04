@@ -23,7 +23,7 @@ DEFAULT_PORT = 8787
 
 
 class WebReporter(NullReporter):
-    def __init__(self, controller=None):
+    def __init__(self, controller=None, cra_job=None):
         self._lock = threading.Lock()
         self.t0 = time.time()
         self.title = ""
@@ -34,6 +34,7 @@ class WebReporter(NullReporter):
         self.finished = False
         self.summary_data: dict | None = None
         self.controller = controller   # live pause/resume/restart/backend control
+        self.cra_job = cra_job         # CRA reference-library sync, run on demand
 
     # ── Reporter interface ───────────────────────────────────────────────────
     def begin(self, *, since, until, trackers, phases):
@@ -103,7 +104,9 @@ class WebReporter(NullReporter):
                     avg = (now - p["started_at"]) / p["done"]
                     eta = (p["total"] - p["done"]) * avg
             control = self.controller.snapshot() if self.controller is not None else None
+            cralib = self.cra_job.snapshot() if self.cra_job is not None else None
             return {
+                "cralib": cralib,
                 "title": self.title,
                 "elapsed": now - self.t0,
                 "running": self.current,
@@ -116,8 +119,12 @@ class WebReporter(NullReporter):
             }
 
 
-def _apply_control(controller, cmd: dict) -> bool:
+def _apply_control(controller, cmd: dict, cra_job=None) -> bool:
     action = cmd.get("cmd")
+    if action == "cralib":
+        return bool(cra_job is not None and cra_job.start())
+    if controller is None:
+        return False
     if action == "start":
         return controller.request_start(cmd.get("config"))
     if action == "pause":
@@ -163,11 +170,12 @@ def serve(reporter: WebReporter, *, port: int = DEFAULT_PORT) -> ThreadingHTTPSe
 
         def do_POST(self):
             ok = False
-            if self.path.startswith("/control") and reporter.controller is not None:
+            if self.path.startswith("/control") and (
+                    reporter.controller is not None or reporter.cra_job is not None):
                 try:
                     n = int(self.headers.get("Content-Length", 0))
                     cmd = json.loads(self.rfile.read(n) or b"{}")
-                    ok = _apply_control(reporter.controller, cmd)
+                    ok = _apply_control(reporter.controller, cmd, reporter.cra_job)
                 except Exception:
                     ok = False
             body = json.dumps({"ok": ok}).encode("utf-8")
@@ -261,6 +269,35 @@ _HTML = r"""<!DOCTYPE html>
   #btnStart { background:var(--green); color:#04210b; border:none; border-radius:8px;
             padding:9px 22px; font-size:.95rem; font-weight:700; cursor:pointer; margin-top:4px; }
   #btnStart:hover { filter:brightness(1.1); }
+  .cra { background:var(--card); border:1px solid var(--line); border-radius:10px;
+         padding:10px 14px; margin-bottom:14px; font-size:.86rem; }
+  .cra.hidden { display:none; }
+  .crahead { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .crahead b { font-weight:600; }
+  .cra button { background:#222b34; color:var(--txt); border:1px solid var(--line);
+         border-radius:7px; padding:5px 10px; cursor:pointer; font-size:.82rem; }
+  .cra button:hover:not(:disabled) { border-color:var(--accent); }
+  .cra button:disabled { opacity:.45; cursor:default; }
+  .crastat { color:var(--dim); flex:1; min-width:0; overflow:hidden;
+         text-overflow:ellipsis; white-space:nowrap; }
+  .crastat.ok { color:var(--green); }
+  .crastat.err { color:var(--red); }
+  .craprog { display:flex; align-items:center; gap:8px; margin-top:9px; }
+  .craprog.hidden { display:none; }
+  .cralist { margin-top:9px; display:flex; flex-direction:column; gap:4px; }
+  .cralist:empty { display:none; }
+  .cralist a { color:var(--txt); text-decoration:none; }
+  .cralist a:hover { text-decoration:underline; }
+  .cralist .row { display:flex; align-items:baseline; gap:8px; min-width:0; }
+  .cralist .t { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .cralist .cl { color:var(--dim); font-size:.8rem; flex:none; }
+  .chip { flex:none; border-radius:5px; padding:1px 6px; font-size:.72rem;
+         font-weight:700; letter-spacing:.02em; }
+  .chip.new { background:var(--green); color:#04210b; }
+  .chip.upd { background:var(--yellow); color:#1a1200; }
+  .chip.gone { background:var(--red); color:#2a0606; }
+  .chip.err { background:#3a1b1b; color:var(--red); }
+  .cramore { color:var(--dim); font-size:.8rem; }
 </style></head>
 <body><div class="wrap">
   <header>
@@ -311,6 +348,18 @@ _HTML = r"""<!DOCTYPE html>
     <span class="sep"></span>
     <button id="btnClose">✕ 關閉</button>
   </div>
+  <div class="cra hidden" id="cra">
+    <div class="crahead">
+      <b>📚 CRA 參考圖書庫</b>
+      <button id="btnCra">↻ 更新 CRA 庫</button>
+      <span class="crastat" id="craStat"></span>
+    </div>
+    <div class="craprog hidden" id="craProg">
+      <div class="bar"><i id="craBar"></i></div>
+      <span class="count" id="craCount"></span>
+    </div>
+    <div class="cralist" id="craList"></div>
+  </div>
   <div id="phases"></div>
   <div class="note" id="note"></div>
   <div id="summary"></div>
@@ -357,6 +406,55 @@ $('btnStart').onclick = async ()=>{
                                     body:JSON.stringify({cmd:'start',config})});
   $('cfgErr').textContent = r.ok ? '' : '參數有誤（請確認日期區間與至少一個追蹤項目）';
 };
+let CRA_PENDING = false;   // click → server ack, so a poll can't re-enable early
+$('btnCra').onclick = async ()=> {
+  $('btnCra').disabled = true; CRA_PENDING = true;
+  try{ await ctl({cmd:'cralib'}); } finally { CRA_PENDING = false; }
+};
+const CRA_MAX = 30;   // rows listed per run; the rest are summarised as "+N"
+function craRows(items, cls, tag){
+  return items.slice(0, CRA_MAX).map(t=>
+    `<div class="row"><span class="chip ${cls}">${tag}</span>`+
+    `<span class="t">${t.url? `<a href="${esc(t.url)}" target="_blank" rel="noopener">${esc(t.title)}</a>`
+                            : esc(t.title)}</span>`+
+    `<span class="cl">${esc(t.cluster||t.source||'')}</span></div>`).join('')+
+    (items.length>CRA_MAX? `<div class="cramore">…另有 ${items.length-CRA_MAX} 項</div>`:'');
+}
+function syncCra(st){
+  const c = st.cralib;
+  if(!c){ $('cra').classList.add('hidden'); return; }
+  $('cra').classList.remove('hidden');
+  const running = c.status==='running';
+  $('btnCra').disabled = running || CRA_PENDING;
+  $('btnCra').textContent = running ? '⏳ 更新中…' : '↻ 更新 CRA 庫';
+  $('craProg').classList.toggle('hidden', !running);
+  if(running){
+    const pct = c.total? Math.round(100*c.done/c.total) : 0;
+    $('craBar').style.width = pct+'%';
+    $('craCount').textContent = c.total? `${c.done}/${c.total}` : '探索中';
+  }
+  const stat = $('craStat');
+  stat.className = 'crastat';
+  if(running){
+    stat.textContent = `已過 ${fmt(c.elapsed)}${c.note? '　↳ '+c.note : ''}`;
+  } else if(c.status==='failed'){
+    stat.classList.add('err');
+    stat.textContent = '❌ 失敗：' + (c.error||'');
+  } else if(c.status==='done' && c.report){
+    const r = c.report;
+    stat.classList.add('ok');
+    stat.textContent = `✅ 新增 ${r.new.length} · 更新 ${r.updated.length} · `+
+      `未變 ${r.unchanged} · 消失 ${r.removed.length}`+
+      (r.errors.length? ` · 錯誤 ${r.errors.length}`:'')+`　(${fmt(c.elapsed)})`;
+  } else {
+    stat.textContent = '獨立於新聞流程；更新後會重寫 data/cra_library.js';
+  }
+  const r = c.report;
+  $('craList').innerHTML = !r ? '' :
+    craRows(r.new,'new','NEW') + craRows(r.updated,'upd','UPDATED') +
+    craRows(r.removed,'gone','GONE') +
+    craRows(r.errors.map(e=>({title:e})),'err','ERR');
+}
 function syncControl(st){
   if(!st.control){ $('control').classList.add('hidden'); $('config').classList.add('hidden'); return; }
   CTRL = st.control;
@@ -378,6 +476,7 @@ function syncControl(st){
 async function poll(){
   let st; try{ st=await (await fetch('/state',{cache:'no-store'})).json(); }catch(e){ return; }
   syncControl(st);
+  syncCra(st);            // usable before Start and after a run finishes
   $('title').textContent = st.title || '';
   if(st.control && !st.control.started){   // config mode: nothing is running yet
     $('elapsed').textContent='—'; $('eta').textContent='';

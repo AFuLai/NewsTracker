@@ -72,3 +72,50 @@ def test_sync_lifecycle(tmp_path, monkeypatch):
     assert len(r3["removed"]) == 1 and r3["removed"][0]["url"].endswith("/a")
     active = [t for t in C.list_topics(db)]
     assert {t["url"].rsplit("/", 1)[-1] for t in active} == {"b"}
+
+
+# ── progress callback drives the dashboard's bar ───────────────────────────
+def test_sync_reports_progress(tmp_path, monkeypatch):
+    db = tmp_path / "t.sqlite"
+    topics = [{"url": f"https://craevidence.com/cra-compliance/{s}", "title": s.upper(),
+               "cluster": "SBOM"} for s in ("a", "b", "c")]
+    monkeypatch.setattr(C, "discover", lambda sk: topics)
+    monkeypatch.setattr(C, "snapshot", lambda url: ("h", "T"))
+    seen = []
+    C.sync(db, sites=["craevidence"], progress=lambda d, t, n="": seen.append((d, t, n)))
+    assert seen[0] == (0, 0, "discover craevidence")      # discovery, total unknown
+    assert [(d, t) for d, t, _ in seen[1:]] == [(0, 3), (1, 3), (2, 3), (3, 3)]
+
+
+# ── a site whose index fails must not retire that site's topics ────────────
+def test_failed_discovery_does_not_mark_gone(tmp_path, monkeypatch):
+    db = tmp_path / "t.sqlite"
+    topics = [{"url": "https://craevidence.com/cra-compliance/a", "title": "A",
+               "cluster": "SBOM"}]
+    monkeypatch.setattr(C, "snapshot", lambda url: ("h", "A"))
+    monkeypatch.setattr(C, "discover", lambda sk: topics)
+    assert len(C.sync(db, sites=["craevidence"])["new"]) == 1
+
+    def boom(sk):
+        raise RuntimeError("empty index")
+    monkeypatch.setattr(C, "discover", boom)
+    rep = C.sync(db, sites=["craevidence"])
+    assert rep["removed"] == [] and rep["errors"]         # error, but nothing retired
+    assert [t["status"] for t in C.list_topics(db)] == ["active"]
+
+
+# ── one unfetchable topic must not abort the whole sync ────────────────────
+def test_topic_error_is_collected_not_fatal(tmp_path, monkeypatch):
+    db = tmp_path / "t.sqlite"
+    topics = [{"url": "https://craevidence.com/cra-compliance/a", "title": "A", "cluster": "SBOM"},
+              {"url": "https://craevidence.com/cra-compliance/b", "title": "B", "cluster": "SBOM"}]
+    monkeypatch.setattr(C, "discover", lambda sk: topics)
+    def flaky(url):
+        if url.endswith("/a"):
+            raise RuntimeError("timeout")
+        return "h", "B"
+    monkeypatch.setattr(C, "snapshot", flaky)
+    rep = C.sync(db, sites=["craevidence"])
+    assert len(rep["new"]) == 1 and rep["new"][0]["url"].endswith("/b")
+    assert len(rep["errors"]) == 1 and "timeout" in rep["errors"][0]
+    assert rep["removed"] == []                          # /a was seen, just unreadable

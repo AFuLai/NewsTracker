@@ -687,7 +687,7 @@ def pipeline(
         # pause/resume, restart-from-stage, and live LLM-backend switching.
         import time as _t
         from .web_dashboard import WebReporter
-        from .control import Controller, ControlAbort
+        from .control import Controller, ControlAbort, CraLibJob
         ui_config = {
             "since": since, "until": until, "trackers": targets,
             "all_trackers": list(SEARCHINFOS),
@@ -697,14 +697,24 @@ def pipeline(
         }
         controller = Controller(summarize_backend=sum_be, translate_backend=tra_be,
                                 config=ui_config)
-        reporter = WebReporter(controller)
+        # CRA library sync: on-demand from the console, independent of the run.
+        cra_job = CraLibJob(db=db, out=out)
+        reporter = WebReporter(controller, cra_job)
         httpd, used_port = _start_dashboard(reporter, port)
         url = f"http://localhost:{used_port}"
         console.print(f"[bold cyan]互動控制台：[/bold cyan] [underline]{url}[/underline]")
-        console.print("[dim]請在控制台確認參數後按「開始執行」…[/dim]")
+        console.print("[dim]請在控制台確認參數後按「開始執行」；"
+                      "CRA 圖書庫可隨時按「更新 CRA 庫」單獨更新。[/dim]")
         _open_windows_browser(url)
+        def _drain_cra():
+            """Don't exit out from under a CRA sync — it's a daemon thread."""
+            if cra_job.running():
+                console.print("[yellow]等待 CRA 圖書庫更新完成…[/yellow]")
+                while cra_job.running():
+                    _t.sleep(0.3)
         controller.wait_for_start()        # block until the UI confirms parameters
         if controller.closed:              # closed before starting → just exit
+            _drain_cra()
             httpd.shutdown()
             raise typer.Exit(0)
         cfg = controller.config
@@ -740,6 +750,7 @@ def pipeline(
                 break
             start_at, force = controller.consume_restart()
             console.print(f"[yellow]↻ 從 {start_at} 重新來過（force={force}）[/yellow]")
+        _drain_cra()
         httpd.shutdown()
         raise typer.Exit(0 if (rep and rep.ok) else 1)
 

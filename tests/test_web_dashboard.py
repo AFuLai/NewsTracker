@@ -1,5 +1,7 @@
 """Tests for the browser dashboard: WebReporter snapshot + HTTP server."""
 import json
+import time
+import urllib.error
 import urllib.request
 
 from tracker.web_dashboard import WebReporter, serve
@@ -87,6 +89,57 @@ def test_control_endpoints_drive_controller():
         assert c.restart_pending()
         phase, force = c.consume_restart()
         assert phase == "summarize" and force is True
+    finally:
+        httpd.shutdown()
+
+
+def test_cralib_command_starts_job_and_state_shows_it():
+    import threading
+    from tracker.control import CraLibJob
+
+    gate = threading.Event()
+    def fake_sync(db, progress=None):
+        progress(1, 4, "topic")
+        gate.wait(3)
+        return {"new": [], "updated": [], "removed": [], "unchanged": 4, "errors": []}
+    job = CraLibJob(db="x.sqlite", out="out", sync=fake_sync,
+                    emit_js=lambda db, out: "out/data/cra_library.js")
+    r = WebReporter(None, job)          # no Controller: the CRA button still works
+    httpd = serve(r, port=8803)
+    try:
+        base = "http://127.0.0.1:8803"
+        st = json.loads(urllib.request.urlopen(base + "/state", timeout=3).read())
+        assert st["cralib"]["status"] == "idle"
+        assert _post(base, {"cmd": "cralib"})["ok"] is True
+        end = time.time() + 3
+        while time.time() < end:
+            st = json.loads(urllib.request.urlopen(base + "/state", timeout=3).read())
+            if st["cralib"]["total"] == 4:
+                break
+            time.sleep(0.02)
+        assert st["cralib"]["status"] == "running" and st["cralib"]["total"] == 4
+        assert job.start() is False                            # already running
+        gate.set()
+        html = urllib.request.urlopen(base + "/", timeout=3).read().decode()
+        assert "更新 CRA 庫" in html and "cralib" in html
+    finally:
+        gate.set()
+        httpd.shutdown()
+
+
+def test_control_post_without_controller_or_job_is_rejected():
+    r = WebReporter()
+    httpd = serve(r, port=8804)
+    try:
+        req = urllib.request.Request("http://127.0.0.1:8804/control",
+                                     data=b'{"cmd":"pause"}',
+                                     headers={"Content-Type": "application/json"},
+                                     method="POST")
+        try:
+            urllib.request.urlopen(req, timeout=3)
+            assert False, "expected HTTP 400"
+        except urllib.error.HTTPError as e:
+            assert e.code == 400
     finally:
         httpd.shutdown()
 
