@@ -234,9 +234,9 @@ class CraLibJob:
             summary = None
             if rep is not None:
                 summary = {
-                    "new": [_topic(t) for t in rep["new"]],
-                    "updated": [_topic(t) for t in rep["updated"]],
-                    "removed": [_topic(t) for t in rep["removed"]],
+                    "new": _topics(rep["new"]),
+                    "updated": _topics(rep["updated"]),
+                    "removed": _topics(rep["removed"]),
                     "unchanged": rep["unchanged"],
                     "errors": list(rep["errors"]),
                 }
@@ -248,4 +248,11 @@ class CraLibJob:
 def _topic(t: dict) -> dict:
     return {"title": t.get("title") or t.get("url") or "",
             "url": t.get("url", ""), "cluster": t.get("cluster") or "",
-            "source": t.get("source") or ""}
+            "source": t.get("source") or "",
+            # the page's own revision date, not our crawl date
+            "date": t.get("source_date") or "", "kind": t.get("date_kind") or ""}
+
+
+def _topics(items) -> list[dict]:
+    """Newest official revision first — the order the sites actually updated."""
+    return sorted((_topic(t) for t in items), key=lambda t: t["date"], reverse=True)

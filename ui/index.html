@@ -715,6 +715,10 @@ a.lib-card { text-decoration: none; color: inherit; }
 }
 .lib-chip.new { background: var(--cra-oss-fill);  color: var(--cra-oss-on); }   /* green */
 .lib-chip.upd { background: var(--cra-apac-fill); color: var(--cra-apac-on); }  /* amber */
+/* The date the page itself states it was revised — the one that orders the
+   official updates. `.weak` = only a site-wide build stamp was available. */
+.lib-date { font-variant-numeric: tabular-nums; font-weight: 600; }
+.lib-date.weak { font-weight: 400; text-decoration: underline dotted; }
 
 /* ── Overlay ─────────────────────────────────────── */
 #overlay {
@@ -1500,6 +1504,10 @@ function renderLibrary() {
   }
   const groups = {};
   topics.forEach(t => { (groups[t.cluster] = groups[t.cluster] || []).push(t); });
+  // Newest official revision first inside each cluster: our crawl dates cannot
+  // order the sites' own updates, the pages' stated dates can.
+  Object.values(groups).forEach(g => g.sort((a, b) =>
+    (libWhen(b).date || '').localeCompare(libWhen(a).date || '')));
   const frag = document.createDocumentFragment();
   Object.keys(groups).sort().forEach(cl => {
     const div = document.createElement('div');
@@ -1513,23 +1521,48 @@ function renderLibrary() {
   });
   main.appendChild(frag);
 }
+// Which date to show for a topic, and how much it is worth. `source_date` is
+// what the page itself states (dateModified / datePublished, or the document's
+// HTTP build stamp); only that can put the official updates in order. Our own
+// crawl dates are the last resort — they say when *we* noticed, not when the
+// site changed.
+const LIB_DATE_LABEL = {
+  modified:  { zh: '官方更新', en: 'official update' },
+  published: { zh: '官方發佈', en: 'published' },
+  site:      { zh: '站台部署', en: 'site build' },
+  detected:  { zh: '偵測變更', en: 'change detected' },
+  added:     { zh: '收錄',     en: 'catalogued' }
+};
+function libWhen(t) {
+  if (t.source_date) return { date: t.source_date, kind: t.date_kind || 'modified' };
+  if (t.last_changed) return { date: t.last_changed, kind: 'detected' };
+  return { date: t.first_seen || '', kind: 'added' };
+}
 function buildLibCard(t, gen, sources) {
   const a = document.createElement('a');
   a.className = 'card lib-card';
   a.href = t.url; a.target = '_blank'; a.rel = 'noopener';
   const srcName = (sources && sources[t.source]) || t.source;
+  const when = libWhen(t);
   const isNew = t.first_seen && gen && daysBetween(t.first_seen, gen) <= 14;
-  const isUpd = !isNew && t.last_changed && gen && t.last_changed !== t.first_seen
-             && daysBetween(t.last_changed, gen) <= 14;
+  // "Updated" now means the *page* says it was revised recently; only when the
+  // page states nothing do we fall back to the date we detected a change.
+  const isUpd = !isNew && when.date && gen && when.kind !== 'added'
+             && !(when.kind === 'detected' && t.last_changed === t.first_seen)
+             && daysBetween(when.date, gen) <= 14;
   const chip = isNew ? '<span class="lib-chip new">' + (state.lang === 'en' ? 'NEW' : '新') + '</span>'
              : isUpd ? '<span class="lib-chip upd">' + (state.lang === 'en' ? 'UPDATED' : '更新') + '</span>'
              : '';
+  const lbl = (LIB_DATE_LABEL[when.kind] || LIB_DATE_LABEL.detected)[state.lang === 'en' ? 'en' : 'zh'];
+  const weak = (when.kind === 'site' || when.kind === 'detected' || when.kind === 'added');
+  const dateHtml = when.date
+    ? ' · <span class="lib-date' + (weak ? ' weak' : '') + '" title="' + escHtml(lbl) + '">' +
+      escHtml(lbl + ' ' + when.date) + '</span>'
+    : '';
   a.innerHTML = [
     '<span class="cat-badge lib-badge">' + escHtml(srcName) + '</span>',
     '<h3 class="card-title">' + escHtml(t.title) + '</h3>',
-    '<div class="card-meta">' + chip + escHtml(t.cluster) +
-      (t.last_changed ? ' · ' + (state.lang === 'en' ? 'updated ' : '更新 ') + escHtml(t.last_changed) : '') +
-    '</div>'
+    '<div class="card-meta">' + chip + escHtml(t.cluster) + dateHtml + '</div>'
   ].join('');
   return a;
 }

@@ -112,7 +112,10 @@ def test_cralib_job_runs_and_reports(tmp_path):
         progress(0, 2, "first")
         gate.wait(3)
         progress(2, 2, "")
-        return {"new": [{"title": "A", "url": "u/a", "cluster": "SBOM", "source": "s"}],
+        return {"new": [{"title": "A", "url": "u/a", "cluster": "SBOM", "source": "s",
+                         "source_date": "2026-06-24", "date_kind": "modified"},
+                        {"title": "B", "url": "u/b", "cluster": "SBOM", "source": "s",
+                         "source_date": "2026-07-20", "date_kind": "modified"}],
                 "updated": [], "removed": [], "unchanged": 7, "errors": []}
     job = CraLibJob(db=tmp_path / "t.sqlite", out=tmp_path,
                     sync=fake_sync, emit_js=lambda db, out: out / "data/cra_library.js")
@@ -127,8 +130,10 @@ def test_cralib_job_runs_and_reports(tmp_path):
     snap = job.snapshot()
     assert snap["status"] == "done" and snap["done"] == 2
     assert snap["report"]["unchanged"] == 7
-    assert snap["report"]["new"] == [{"title": "A", "url": "u/a",
-                                      "cluster": "SBOM", "source": "s"}]
+    # rows carry the page's own revision date, newest official update first
+    assert [(t["title"], t["date"], t["kind"]) for t in snap["report"]["new"]] == [
+        ("B", "2026-07-20", "modified"), ("A", "2026-06-24", "modified")]
+    assert snap["report"]["new"][0]["url"] == "u/b"
     assert snap["emitted"].endswith("cra_library.js")
     assert job.start() is True           # re-runnable after finishing
 

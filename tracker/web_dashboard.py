@@ -291,6 +291,10 @@ _HTML = r"""<!DOCTYPE html>
   .cralist .row { display:flex; align-items:baseline; gap:8px; min-width:0; }
   .cralist .t { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .cralist .cl { color:var(--dim); font-size:.8rem; flex:none; }
+  .cralist .d { flex:none; font-variant-numeric:tabular-nums; font-size:.8rem;
+         color:var(--accent); cursor:help; }
+  .cralist .d.weak { color:var(--dim); text-decoration:underline dotted; }
+  .cralist .d.dim { color:var(--dim); }
   .chip { flex:none; border-radius:5px; padding:1px 6px; font-size:.72rem;
          font-weight:700; letter-spacing:.02em; }
   .chip.new { background:var(--green); color:#04210b; }
@@ -412,9 +416,16 @@ $('btnCra').onclick = async ()=> {
   try{ await ctl({cmd:'cralib'}); } finally { CRA_PENDING = false; }
 };
 const CRA_MAX = 30;   // rows listed per run; the rest are summarised as "+N"
+// 官方頁面自己標示的修訂日；kind='site' 是整站部署時間戳（弱訊號）。
+const KIND={modified:'官方更新',published:'官方發佈',site:'站台部署'};
+function craDate(t){
+  if(!t.date) return '<span class="d dim">未標日期</span>';
+  return `<span class="d${t.kind==='site'?' weak':''}" title="${esc(KIND[t.kind]||t.kind)}">`+
+         `${esc(t.date)}</span>`;
+}
 function craRows(items, cls, tag){
   return items.slice(0, CRA_MAX).map(t=>
-    `<div class="row"><span class="chip ${cls}">${tag}</span>`+
+    `<div class="row"><span class="chip ${cls}">${tag}</span>${t.nodate?'':craDate(t)}`+
     `<span class="t">${t.url? `<a href="${esc(t.url)}" target="_blank" rel="noopener">${esc(t.title)}</a>`
                             : esc(t.title)}</span>`+
     `<span class="cl">${esc(t.cluster||t.source||'')}</span></div>`).join('')+
@@ -453,7 +464,7 @@ function syncCra(st){
   $('craList').innerHTML = !r ? '' :
     craRows(r.new,'new','NEW') + craRows(r.updated,'upd','UPDATED') +
     craRows(r.removed,'gone','GONE') +
-    craRows(r.errors.map(e=>({title:e})),'err','ERR');
+    craRows(r.errors.map(e=>({title:e, nodate:true})),'err','ERR');
 }
 function syncControl(st){
   if(!st.control){ $('control').classList.add('hidden'); $('config').classList.add('hidden'); return; }

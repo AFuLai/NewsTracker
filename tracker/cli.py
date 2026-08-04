@@ -562,11 +562,14 @@ def cra_lib(
 
     if list_only:
         rows = list_topics(db)
+        # Newest official revision first — that is the order the sites updated.
+        rows.sort(key=lambda r: (r["source_date"] or r["last_changed"] or ""), reverse=True)
         tbl = Table(title=f"CRA library — {len(rows)} active topics")
-        tbl.add_column("source"); tbl.add_column("cluster"); tbl.add_column("title")
-        tbl.add_column("changed")
+        tbl.add_column("official"); tbl.add_column("kind"); tbl.add_column("source")
+        tbl.add_column("cluster"); tbl.add_column("title"); tbl.add_column("detected")
         for r in rows:
-            tbl.add_row(r["source"], r["cluster"] or "-", (r["title"] or "")[:50],
+            tbl.add_row(r["source_date"] or "-", r["date_kind"] or "-", r["source"],
+                        r["cluster"] or "-", (r["title"] or "")[:50],
                         r["last_changed"] or "-")
         console.print(tbl)
         return
@@ -577,10 +580,14 @@ def cra_lib(
                   f"[yellow]UPDATED[/yellow] {len(rep['updated'])}  "
                   f"[dim]unchanged {rep['unchanged']}[/dim]  "
                   f"[red]gone {len(rep['removed'])}[/red]")
-    for t in rep["new"]:
-        console.print(f"  [green]+ NEW[/green]     ({t['source']}/{t['cluster']}) {t['title']}")
-    for t in rep["updated"]:
-        console.print(f"  [yellow]~ UPDATED[/yellow] ({t['source']}/{t['cluster']}) {t['title']}")
+    def _when(t):
+        """The page's own revision date — the one that orders official updates."""
+        d, k = t.get("source_date"), t.get("date_kind")
+        return f"[dim]{d} ({k})[/dim] " if d else "[dim]      (undated)[/dim] "
+    for t in sorted(rep["new"], key=lambda t: t.get("source_date") or "", reverse=True):
+        console.print(f"  [green]+ NEW[/green]     {_when(t)}({t['source']}/{t['cluster']}) {t['title']}")
+    for t in sorted(rep["updated"], key=lambda t: t.get("source_date") or "", reverse=True):
+        console.print(f"  [yellow]~ UPDATED[/yellow] {_when(t)}({t['source']}/{t['cluster']}) {t['title']}")
     for t in rep["removed"]:
         console.print(f"  [red]- GONE[/red]    ({t['source']}) {t['title']}")
     for e in rep["errors"]:

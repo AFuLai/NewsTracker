@@ -11,21 +11,35 @@ re-discovers the topic set on each site, then:
   - URL never seen        -> NEW topic (insert)
   - URL seen, hash differs -> UPDATED topic (bump content_hash + last_changed)
   - URL in DB not seen now -> mark 'gone'
+
+Dates: `first_seen`/`last_changed` are *our* crawl dates — they only say when we
+noticed something, so they cannot order the official updates (a page revised
+before we started tracking looks like it changed the day we first fetched it).
+So every topic also carries the page's own date, `source_date`, with
+`date_kind` recording how trustworthy it is:
+  modified  — the page states when it was last revised (JSON-LD dateModified,
+              article:modified_time, …). This is the one that orders updates.
+  published — only an original publication date was found.
+  site      — no per-page date at all; the HTTP Last-Modified of the document.
+              Static sites redeploy every page at once, so this is a site build
+              stamp, not evidence that this topic changed.
+  (null)    — nothing found; consumers fall back to last_changed/first_seen.
 """
 from __future__ import annotations
 
 import hashlib
 import re
 import sqlite3
-from datetime import date
+from datetime import date, timedelta
 from pathlib import Path
 from urllib.parse import urljoin, urlsplit
 
+import httpx
 from selectolax.parser import HTMLParser
 
 from . import DEFAULT_DB
 from .extract import extract_body
-from .sources.article import _get_html, fetch_body
+from .sources.article import UA, _get_html, fetch_body
 
 # anchor texts that are call-to-action buttons, not topic titles
 _CTA_RE = re.compile(r"^(read|learn more|open|view|see|explore|start|get|download|→|»)\b", re.I)
@@ -42,11 +56,16 @@ CREATE TABLE IF NOT EXISTS cra_topic (
   first_seen   TEXT NOT NULL,              -- ISO date first catalogued
   last_seen    TEXT NOT NULL,              -- ISO date last present in discovery
   last_changed TEXT,                       -- ISO date content_hash last changed
-  status       TEXT NOT NULL DEFAULT 'active'   -- 'active' | 'gone'
+  status       TEXT NOT NULL DEFAULT 'active',  -- 'active' | 'gone'
+  source_date  TEXT,                       -- the page's OWN date (ISO), if stated
+  date_kind    TEXT                        -- 'modified' | 'published' | 'site'
 );
 CREATE INDEX IF NOT EXISTS idx_cra_topic_source ON cra_topic(source);
 CREATE INDEX IF NOT EXISTS idx_cra_topic_status ON cra_topic(status);
 """
+
+#: Columns added after the table shipped; _conn() backfills them in place.
+_ADDED_COLUMNS = {"source_date": "TEXT", "date_kind": "TEXT"}
 
 # ── per-site cluster assignment ───────────────────────────────────────────
 _CRAEV_CLUSTERS = {
@@ -155,6 +174,100 @@ def discover(site_key: str) -> list[dict]:
             for u, t in sorted(best.items())]
 
 
+# ── the page's own date ───────────────────────────────────────────────────
+_MONTHS = {m: i for i, m in enumerate(
+    ["jan", "feb", "mar", "apr", "may", "jun",
+     "jul", "aug", "sep", "oct", "nov", "dec"], 1)}
+_ISO_RE = re.compile(r"(\d{4})[-/](\d{1,2})[-/](\d{1,2})")
+_TXT_RE = re.compile(r"([A-Za-z]{3,9})\.?\s+(\d{1,2}),?\s+(\d{4})")       # July 17, 2026
+_TXT2_RE = re.compile(r"(\d{1,2})\s+([A-Za-z]{3,9})\.?,?\s+(\d{4})")     # 17 July 2026
+_JSONLD = {"modified": re.compile(r'"dateModified"\s*:\s*"([^"]{4,40})"'),
+           "published": re.compile(r'"datePublished"\s*:\s*"([^"]{4,40})"')}
+#: <meta> keys, most authoritative first, mapped to the kind they stand for.
+_META_KEYS = [
+    ("article:modified_time", "modified"), ("og:updated_time", "modified"),
+    ("datemodified", "modified"), ("last-modified", "modified"),
+    ("revised", "modified"), ("dcterms.modified", "modified"),
+    ("article:published_time", "published"), ("datepublished", "published"),
+    ("date", "published"), ("dcterms.date", "published"),
+]
+#: Anything outside this window is a parse artefact (a nav "2015", a typo'd
+#: year), not a real revision date.
+_MIN_DATE = "2015-01-01"
+
+
+def _iso(raw: str | None) -> str | None:
+    """Normalise a date string to YYYY-MM-DD, or None if it isn't a sane date."""
+    if not raw:
+        return None
+    s = " ".join(str(raw).split())
+    y = mo = d = None
+    m = _ISO_RE.search(s)
+    if m:
+        y, mo, d = (int(x) for x in m.groups())
+    else:
+        m = _TXT_RE.search(s)
+        if m and m.group(1)[:3].lower() in _MONTHS:
+            mo, d, y = _MONTHS[m.group(1)[:3].lower()], int(m.group(2)), int(m.group(3))
+        else:
+            m = _TXT2_RE.search(s)
+            if m and m.group(2)[:3].lower() in _MONTHS:
+                d, mo, y = int(m.group(1)), _MONTHS[m.group(2)[:3].lower()], int(m.group(3))
+    if not y:
+        return None
+    try:
+        out = date(y, mo, d).isoformat()
+    except ValueError:
+        return None
+    # Tomorrow is still plausible (timezones); next month is not.
+    if out < _MIN_DATE or out > (date.today() + timedelta(days=1)).isoformat():
+        return None
+    return out
+
+
+def page_date(html: str, tree: HTMLParser | None = None) -> tuple[str | None, str | None]:
+    """(ISO date, kind) stated by the page itself; (None, None) when it states none.
+
+    JSON-LD wins over <meta>: on craevidence.com the JSON-LD block carries both
+    dateModified and datePublished while trafilatura's metadata only surfaces
+    the publication date, which is exactly the date that cannot order revisions.
+    """
+    if not html:
+        return None, None
+    for kind in ("modified", "published"):
+        for raw in _JSONLD[kind].findall(html):
+            iso = _iso(raw)
+            if iso:
+                return iso, kind
+    tree = tree if tree is not None else HTMLParser(html)
+    metas: dict[str, str] = {}
+    for m in tree.css("meta"):
+        a = m.attributes
+        key = (a.get("property") or a.get("name") or a.get("itemprop") or "").strip().lower()
+        val = (a.get("content") or "").strip()
+        if key and val:
+            metas.setdefault(key, val)
+    for key, kind in _META_KEYS:
+        iso = _iso(metas.get(key))
+        if iso:
+            return iso, kind
+    return None, None
+
+
+def http_last_modified(url: str, timeout: float = 15.0) -> str | None:
+    """The document's HTTP Last-Modified as an ISO date (site build stamp)."""
+    try:
+        r = httpx.head(url, follow_redirects=True, timeout=timeout,
+                       headers={"User-Agent": UA})
+        lm = r.headers.get("last-modified")
+        if not lm:
+            return None
+        from email.utils import parsedate_to_datetime
+        return parsedate_to_datetime(lm).date().isoformat()
+    except Exception:
+        return None
+
+
 def _page_title(tree: HTMLParser) -> str | None:
     h1 = tree.css_first("h1")
     if h1 and h1.text().strip():
@@ -166,23 +279,31 @@ def _page_title(tree: HTMLParser) -> str | None:
     return None
 
 
-def snapshot(url: str) -> tuple[str | None, str | None]:
-    """Return (content_hash, page_title). One fetch yields both; the page's own
-    <h1> is the authoritative title (discovery anchor text is only a fallback).
-    content_hash is None when the body is too thin / unfetchable."""
+def snapshot(url: str) -> tuple[str | None, str | None, str | None, str | None]:
+    """Return (content_hash, page_title, source_date, date_kind).
+
+    One fetch yields all four; the page's own <h1> is the authoritative title
+    (discovery anchor text is only a fallback) and its own stated date is the
+    authoritative revision time (our crawl date is only a fallback).
+    content_hash is None when the body is too thin / unfetchable.
+    """
     html = _get_html(url, 20.0)
     if not html:
         # last resort: stealth path for the hash, no title
         body = fetch_body(url)
         norm = " ".join((body or "").split())
         h = hashlib.sha256(norm.encode("utf-8")).hexdigest() if len(norm) >= 80 else None
-        return h, None
+        return h, None, None, None
     tree = HTMLParser(html)
     title = _page_title(tree)
+    sdate, kind = page_date(html, tree)
+    if not sdate:                       # no date on the page — fall back to the
+        sdate = http_last_modified(url)  # document's HTTP build stamp
+        kind = "site" if sdate else None
     body = extract_body(html, url=url) or ""
     norm = " ".join(body.split())
     h = hashlib.sha256(norm.encode("utf-8")).hexdigest() if len(norm) >= 80 else None
-    return h, title
+    return h, title, sdate, kind
 
 
 # ── store ─────────────────────────────────────────────────────────────────
@@ -193,6 +314,11 @@ def _conn(db: Path) -> sqlite3.Connection:
     # wait for the other writer instead of failing with "database is locked".
     c.execute("PRAGMA busy_timeout=30000")
     c.executescript(CRA_SCHEMA)
+    have = {r["name"] for r in c.execute("PRAGMA table_info(cra_topic)").fetchall()}
+    for col, decl in _ADDED_COLUMNS.items():        # in-place upgrade of old DBs
+        if col not in have:
+            c.execute(f"ALTER TABLE cra_topic ADD COLUMN {col} {decl}")
+    c.commit()
     return c
 
 
@@ -231,36 +357,44 @@ def sync(db: Path = DEFAULT_DB, sites: list[str] | None = None,
         _tick(i, total, tp["title"] or tp["url"])
         seen.add(tp["url"])
         try:
-            h, page_title = snapshot(tp["url"])
+            h, page_title, sdate, kind = snapshot(tp["url"])
         except Exception as e:                    # one bad page must not kill the run
             rep["errors"].append(f"{sk} {tp['url']}: {e}")
             continue
         title = page_title or tp["title"]      # page <h1> wins over anchor text
-        tp = {**tp, "title": title}
+        tp = {**tp, "title": title, "source_date": sdate, "date_kind": kind}
         row = conn.execute("SELECT * FROM cra_topic WHERE url=?", (tp["url"],)).fetchone()
         if row is None:
             conn.execute(
                 "INSERT INTO cra_topic(source,cluster,title,url,content_hash,"
-                "first_seen,last_seen,last_changed,status) VALUES(?,?,?,?,?,?,?,?,'active')",
-                (sk, tp["cluster"], title, tp["url"], h, today, today, today))
+                "first_seen,last_seen,last_changed,status,source_date,date_kind) "
+                "VALUES(?,?,?,?,?,?,?,?,'active',?,?)",
+                (sk, tp["cluster"], title, tp["url"], h, today, today, today, sdate, kind))
             rep["new"].append({**tp, "source": sk})
         else:
             changed = bool(h) and bool(row["content_hash"]) and h != row["content_hash"]
+            # Never overwrite a stated date with nothing: a fetch that lost the
+            # metadata must not erase what the page told us last time.
+            if sdate is None:
+                sdate, kind = row["source_date"], row["date_kind"]
+                tp = {**tp, "source_date": sdate, "date_kind": kind}
             if changed:
                 conn.execute(
                     "UPDATE cra_topic SET cluster=?,title=?,content_hash=?,"
-                    "last_seen=?,last_changed=?,status='active' WHERE url=?",
-                    (tp["cluster"], tp["title"], h, today, today, tp["url"]))
+                    "last_seen=?,last_changed=?,status='active',source_date=?,date_kind=? "
+                    "WHERE url=?",
+                    (tp["cluster"], tp["title"], h, today, today, sdate, kind, tp["url"]))
                 rep["updated"].append({**tp, "source": sk})
             else:
                 # keep the hash if this fetch failed (h is None) so we don't
                 # lose the baseline; still refresh label/cluster/last_seen.
                 conn.execute(
-                    "UPDATE cra_topic SET cluster=?,title=?,last_seen=?,status='active'"
+                    "UPDATE cra_topic SET cluster=?,title=?,last_seen=?,status='active',"
+                    "source_date=?,date_kind=?"
                     + ("" if h is None else ",content_hash=COALESCE(content_hash,?)")
                     + " WHERE url=?",
-                    ((tp["cluster"], tp["title"], today, tp["url"]) if h is None
-                     else (tp["cluster"], tp["title"], today, h, tp["url"])))
+                    ((tp["cluster"], tp["title"], today, sdate, kind, tp["url"]) if h is None
+                     else (tp["cluster"], tp["title"], today, sdate, kind, h, tp["url"])))
                 rep["unchanged"] += 1
         # Commit per topic: the loop is minutes long, and holding one write
         # transaction open would lock out a concurrent pipeline write (and lose
@@ -302,8 +436,8 @@ def emit_js(db: Path, out_dir: Path) -> Path:
     import json
     conn = _conn(db)
     rows = [dict(r) for r in conn.execute(
-        "SELECT source,cluster,title,url,first_seen,last_seen,last_changed,status "
-        "FROM cra_topic ORDER BY source,cluster,title").fetchall()]
+        "SELECT source,cluster,title,url,first_seen,last_seen,last_changed,status,"
+        "source_date,date_kind FROM cra_topic ORDER BY source,cluster,title").fetchall()]
     conn.close()
     sources = {k: v["name"] for k, v in SITES.items()}
     payload = {
