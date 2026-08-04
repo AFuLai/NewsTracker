@@ -192,6 +192,69 @@ def test_sync_stores_source_date_and_never_erases_it(tmp_path, monkeypatch):
     assert (row["source_date"], row["date_kind"]) == ("2026-07-20", "modified")
 
 
+# ── ETSI Labs STAN4CRA (standards drafts, read through the GitLab API) ─────
+_PROJECTS = [
+    {"id": 411, "name": "EN 304 617 Browser", "path": "en-304-617",
+     "web_url": "https://labs.etsi.org/rep/stan4cra/en-304-617",
+     "last_activity_at": "2026-07-30T08:40:41.216Z"},
+    {"id": 431, "name": "EN 4000X Hardware devices with security boxes", "path": "en-4000x",
+     "web_url": "https://labs.etsi.org/rep/stan4cra/en-4000x",
+     "last_activity_at": "2026-01-22T13:56:16.820Z"},
+]
+
+
+def _fake_gitlab(calls=None, commits=True):
+    def gl(path, timeout=25.0):
+        if calls is not None:
+            calls.append(path)
+        if path.startswith("groups/"):
+            return _PROJECTS
+        if "/repository/commits" in path:
+            if not commits:
+                raise RuntimeError("404 no commits")
+            return [{"id": "aee6241a" * 5, "committed_date": "2026-07-30T08:40:41.000+00:00"}]
+        pid = path.rsplit("/", 1)[-1]           # projects/<url-encoded path>
+        return next(p for p in _PROJECTS if p["path"] in pid)
+    return gl
+
+
+def test_discover_stan4cra_lists_one_topic_per_draft(monkeypatch):
+    monkeypatch.setattr(C, "_gitlab", _fake_gitlab())
+    topics = C.discover_stan4cra()
+    assert [t["title"] for t in topics] == ["EN 304 617 Browser",
+                                            "EN 4000X Hardware devices with security boxes"]
+    assert {t["cluster"] for t in topics} == {"Standards Drafts"}
+    assert topics[0]["url"] == "https://labs.etsi.org/rep/stan4cra/en-304-617"
+
+
+def test_snapshot_stan4cra_uses_the_head_commit(monkeypatch):
+    calls = []
+    monkeypatch.setattr(C, "_gitlab", _fake_gitlab(calls))
+    h, title, sdate, kind = C.snapshot_stan4cra("https://labs.etsi.org/rep/stan4cra/en-304-617")
+    assert h == "aee6241a" * 5                       # the commit id IS the hash
+    assert (title, sdate, kind) == ("EN 304 617 Browser", "2026-07-30", "modified")
+    assert calls[0] == "projects/stan4cra%2Fen-304-617"   # path is URL-encoded
+
+
+def test_snapshot_stan4cra_falls_back_to_last_activity(monkeypatch):
+    monkeypatch.setattr(C, "_gitlab", _fake_gitlab(commits=False))
+    h, title, sdate, kind = C.snapshot_stan4cra("https://labs.etsi.org/rep/stan4cra/en-4000x")
+    assert h and (sdate, kind) == ("2026-01-22", "modified")
+
+
+def test_sync_routes_stan4cra_through_its_own_snapshot(tmp_path, monkeypatch):
+    """A site with custom callables must not fall back to the HTML path."""
+    monkeypatch.setattr(C, "_gitlab", _fake_gitlab())
+    def boom(url):
+        raise AssertionError("the generic page snapshot must not be used here")
+    monkeypatch.setattr(C, "snapshot", boom)
+    rep = C.sync(tmp_path / "t.sqlite", sites=["stan4cra"])
+    assert len(rep["new"]) == 2 and not rep["errors"]
+    rows = {r["title"]: r for r in C.list_topics(tmp_path / "t.sqlite")}
+    assert rows["EN 304 617 Browser"]["source_date"] == "2026-07-30"
+    assert rows["EN 304 617 Browser"]["source"] == "stan4cra"
+
+
 def test_conn_adds_the_date_columns_to_an_existing_table(tmp_path):
     import sqlite3
     db = tmp_path / "old.sqlite"

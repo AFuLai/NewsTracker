@@ -97,6 +97,34 @@ def test_structural_rule_does_not_eat_real_sections():
         assert _looks_like_article(url), url
 
 
+def test_rejects_taxonomy_archives():
+    """A tag/category/author/page archive lists articles, it never is one.
+    Measured over the 6,632-row corpus: 11 such rows, none an article."""
+    for url in (
+        "https://complycra.eu/tag/privacy-by-design",
+        "https://complycra.eu/tag/cyber-resilience-act/",
+        "https://bleepingcomputer.com/author/bill-toulas",
+        "https://example.com/category/regulation",
+        "https://example.com/categories/regulation",
+        "https://example.com/page/2",
+    ):
+        assert not _looks_like_article(url), url
+
+
+def test_taxonomy_rule_does_not_eat_posts_filed_under_a_taxonomy():
+    """WordPress also serves real posts as /category/<cat>/<post-slug>, so the
+    archive rule is anchored at the end of the path."""
+    for url in (
+        "https://example.com/category/regulation/eu-adopts-cra-delegated-act",
+        "https://example.com/tag/cra/why-the-deadline-moved",
+        "https://example.com/author/jane-doe/how-cra-changes-oss",
+        # 'tag'/'page' as part of a real slug, not a taxonomy segment
+        "https://example.com/tagging-products-for-cra-compliance",
+        "https://example.com/page-one-of-the-cra-guide",
+    ):
+        assert _looks_like_article(url), url
+
+
 def test_keeps_real_news_articles():
     """The filter must not eat legitimate news — including slugs that merely
     start with 'how-to' as part of the headline rather than a section."""

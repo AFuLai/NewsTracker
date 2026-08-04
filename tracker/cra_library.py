@@ -6,6 +6,12 @@ stable reference / guidance pages, keyed by URL, with a content hash so we can
 tell when an existing topic's body changes. Dated "latest news" items are out
 of scope by design (they belong to the news pipeline).
 
+Most sites are discovered by scraping an index page, but a site may supply its
+own `discover` / `snapshot` callables in SITES when that does not work: the
+ETSI Labs STAN4CRA group (the harmonised-standard drafts) serves a JavaScript
+app with no links in the HTML, so it is read through GitLab's REST API, where
+each draft's head commit doubles as its content hash.
+
 Storage: a `cra_topic` table in the same SQLite DB. Each run (`tracker cra-lib`)
 re-discovers the topic set on each site, then:
   - URL never seen        -> NEW topic (insert)
@@ -110,6 +116,10 @@ def _cluster_craevidence(url: str) -> str:
     return _CRAEV_CLUSTERS.get(slug) or _CRAEV_ARTICLE_CLUSTER.get(slug, "Other")
 
 
+def _cluster_stan4cra(url: str) -> str:
+    return "Standards Drafts"
+
+
 def _cluster_cra_eu(url: str) -> str:
     slug = urlsplit(url).path.strip("/").replace(".html", "")
     if slug.startswith("guide-"):
@@ -117,6 +127,61 @@ def _cluster_cra_eu(url: str) -> str:
     if slug in ("fast-check", "tools"):
         return "Assessment Tools"
     return "Reference Documents"
+
+
+# ── ETSI Labs STAN4CRA: the harmonised-standard drafts ────────────────────
+# The group's web page is a JavaScript app (zero anchors in the served HTML),
+# so the HTML discovery used for the other sites finds nothing. GitLab's public
+# REST API lists the same projects — one per draft — and gives us both a real
+# title ("EN 304 617 Browser") and the head commit, which is a far better
+# change signal than a hash of the rendered page.
+STAN4CRA_API = "https://labs.etsi.org/rep/api/v4"
+STAN4CRA_GROUP = "stan4cra"
+
+
+def _gitlab(path: str, timeout: float = 25.0):
+    r = httpx.get(f"{STAN4CRA_API}/{path}", headers={"User-Agent": UA},
+                  timeout=timeout, follow_redirects=True)
+    r.raise_for_status()
+    return r.json()
+
+
+def discover_stan4cra() -> list[dict]:
+    """Return [{url, title, cluster}] — one entry per standard-draft project."""
+    projects = _gitlab(f"groups/{STAN4CRA_GROUP}/projects"
+                       "?per_page=100&archived=false&with_shared=false")
+    out = []
+    for p in projects:
+        url = (p.get("web_url") or "").rstrip("/")
+        if not url:
+            continue
+        out.append({"url": url,
+                    "title": (p.get("name") or p.get("path") or url)[:160],
+                    "cluster": _cluster_stan4cra(url)})
+    return sorted(out, key=lambda t: t["url"])
+
+
+def snapshot_stan4cra(url: str) -> tuple[str | None, str | None, str | None, str | None]:
+    """(head commit id, project name, commit date, kind) for one draft repo.
+
+    The head commit *is* a content hash, so no page fetch is needed. A repo
+    with no readable commits (empty, or drafting happens in issues only) falls
+    back to the project's last activity so it is still ordered and watched.
+    """
+    from urllib.parse import quote
+    path = urlsplit(url).path.split("/rep/", 1)[-1].strip("/")
+    proj = _gitlab(f"projects/{quote(path, safe='')}")
+    title = (proj.get("name") or path)[:160]
+    try:
+        commits = _gitlab(f"projects/{proj['id']}/repository/commits?per_page=1")
+    except Exception:
+        commits = []
+    if commits:
+        c = commits[0]
+        return c.get("id"), title, _iso(c.get("committed_date")), "modified"
+    act = proj.get("last_activity_at")
+    h = hashlib.sha256((act or "").encode("utf-8")).hexdigest() if act else None
+    return h, title, _iso(act), ("modified" if act else None)
 
 
 # ── site registry ─────────────────────────────────────────────────────────
@@ -136,6 +201,14 @@ SITES = {
         "exclude_re": re.compile(r"/(news|cra-news|privacy|terms|imprint|cookie)", re.I),
         "cluster": _cluster_cra_eu,
     },
+    "stan4cra": {
+        "name": "ETSI Labs STAN4CRA",
+        "index": "https://labs.etsi.org/rep/stan4cra",
+        # served as a JS app → discovered through the GitLab API instead
+        "discover": discover_stan4cra,
+        "snapshot": snapshot_stan4cra,
+        "cluster": _cluster_stan4cra,
+    },
 }
 
 
@@ -143,6 +216,9 @@ SITES = {
 def discover(site_key: str) -> list[dict]:
     """Return [{url, title, cluster}] of stable topics on a site's index."""
     cfg = SITES[site_key]
+    custom = cfg.get("discover")
+    if custom is not None:
+        return custom()
     html = _get_html(cfg["index"], 25.0)
     if not html:
         raise RuntimeError(f"empty index for {site_key} ({cfg['index']})")
@@ -268,6 +344,12 @@ def http_last_modified(url: str, timeout: float = 15.0) -> str | None:
         return None
 
 
+def _snapshot_for(site_key: str, url: str):
+    """snapshot() for an ordinary web page, or the site's own implementation."""
+    custom = SITES[site_key].get("snapshot")
+    return custom(url) if custom is not None else snapshot(url)
+
+
 def _page_title(tree: HTMLParser) -> str | None:
     h1 = tree.css_first("h1")
     if h1 and h1.text().strip():
@@ -357,7 +439,7 @@ def sync(db: Path = DEFAULT_DB, sites: list[str] | None = None,
         _tick(i, total, tp["title"] or tp["url"])
         seen.add(tp["url"])
         try:
-            h, page_title, sdate, kind = snapshot(tp["url"])
+            h, page_title, sdate, kind = _snapshot_for(sk, tp["url"])
         except Exception as e:                    # one bad page must not kill the run
             rep["errors"].append(f"{sk} {tp['url']}: {e}")
             continue

@@ -57,6 +57,17 @@ _STRUCTURAL_SEG_RE = re.compile(
 
 _ORG_ABOUT_RE = re.compile(r"^/about[-_]([a-z0-9]+)(/|$)", re.I)
 
+# A taxonomy archive — /tag/<slug>, /category/<slug>, /author/<slug>, /page/<n>
+# — lists articles, it never is one. The rule above rejects the bare section
+# root (/tags) but not these one-deep archives, so complycra.eu's six tag pages
+# ("Privacy by Design", "OWASP SAMM") entered as articles, and five
+# BleepingComputer author pages had already been through the LLM gate to be
+# thrown away. Deliberately anchored at the END: WordPress also serves real
+# posts as /category/<cat>/<post-slug>, which must survive.
+# Measured over the 6,632-row corpus: 11 hits, none of them an article.
+_TAXONOMY_ARCHIVE_RE = re.compile(
+    r"^/(tags?|categor(y|ies)|author|page)/[^/]+/?$", re.I)
+
 # europa.eu serves the same page under a per-language path prefix. The CRA
 # policy page was ingested 20 times — once per language — and 18 of those
 # translations were live on the site as separate articles, each summarised into
@@ -132,6 +143,8 @@ def _looks_like_article(href: str) -> bool:
     if _STRUCTURAL_SEG_RE.search(path):
         return False
     if _is_org_about_page(path):
+        return False
+    if _TAXONOMY_ARCHIVE_RE.match(path):
         return False
     if _is_translated_duplicate(p.netloc, path):
         return False
