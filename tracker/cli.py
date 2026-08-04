@@ -548,6 +548,48 @@ def write(
                   f"{month_file.name}, {year_file.name}, {root_file.name}")
 
 
+@app.command(name="cra-lib")
+def cra_lib(
+    db: Path = typer.Option(DEFAULT_DB),
+    out: Path = typer.Option(DEFAULT_OUT, "--out", help="HTML root dir (for --emit)"),
+    emit: bool = typer.Option(True, "--emit/--no-emit",
+                              help="write data/cra_library.js for the site view"),
+    list_only: bool = typer.Option(False, "--list", help="print the catalogue, don't sync"),
+) -> None:
+    """CRA reference-topic library: detect new topics and content updates on the
+    curated CRA reference sites (craevidence.com, cyberresilienceact.eu)."""
+    from .cra_library import sync, list_topics, emit_js, SITES
+
+    if list_only:
+        rows = list_topics(db)
+        tbl = Table(title=f"CRA library — {len(rows)} active topics")
+        tbl.add_column("source"); tbl.add_column("cluster"); tbl.add_column("title")
+        tbl.add_column("changed")
+        for r in rows:
+            tbl.add_row(r["source"], r["cluster"] or "-", (r["title"] or "")[:50],
+                        r["last_changed"] or "-")
+        console.print(tbl)
+        return
+
+    console.print(f"[bold]CRA library sync[/bold] — sites: {', '.join(SITES)}")
+    rep = sync(db)
+    console.print(f"[green]NEW[/green] {len(rep['new'])}  "
+                  f"[yellow]UPDATED[/yellow] {len(rep['updated'])}  "
+                  f"[dim]unchanged {rep['unchanged']}[/dim]  "
+                  f"[red]gone {len(rep['removed'])}[/red]")
+    for t in rep["new"]:
+        console.print(f"  [green]+ NEW[/green]     ({t['source']}/{t['cluster']}) {t['title']}")
+    for t in rep["updated"]:
+        console.print(f"  [yellow]~ UPDATED[/yellow] ({t['source']}/{t['cluster']}) {t['title']}")
+    for t in rep["removed"]:
+        console.print(f"  [red]- GONE[/red]    ({t['source']}) {t['title']}")
+    for e in rep["errors"]:
+        console.print(f"  [red]! {e}[/red]")
+    if emit:
+        p = emit_js(db, out)
+        console.print(f"[dim]wrote {p}[/dim]")
+
+
 @app.command()
 def pipeline(
     since: str = typer.Option("", help="YYYY-MM-DD (省略時用 --days，或預設近 7 天)"),
