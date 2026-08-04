@@ -184,6 +184,94 @@ def snapshot_stan4cra(url: str) -> tuple[str | None, str | None, str | None, str
     return h, title, _iso(act), ("modified" if act else None)
 
 
+# ── complycra.eu: a WordPress reference site ──────────────────────────────
+# Added to the news tracker first, where all 22 of its pages were dropped by
+# the L1 gate — correctly: "What is the CRA", "Who does CRA apply to?",
+# "CRA vs NIS2" are evergreen explainers, not something that happened on a day.
+# That is exactly what this library is for. Its REST API gives the published
+# set directly (13 posts + 33 pages) with each item's `modified` date, so no
+# scraping and no date guessing.
+COMPLYCRA_API = "https://complycra.eu/wp-json/wp/v2"
+#: Boilerplate that is not a CRA topic: legal pages (one per locale), the home
+#: page, a stray TEST page, and the news index (a listing, not a topic).
+_COMPLYCRA_SKIP_RE = re.compile(
+    r"^/((privacy|cookie|terms)[a-z0-9-]*|contact|home-page|test"
+    r"|cra-stories-and-news)/?$", re.I)
+_COMPLYCRA_CLUSTERS = (
+    (re.compile(r"-vs[.-]|vs-(nis2|cybersecurity-act)", re.I), "Related Regulations"),
+    (re.compile(r"cra-standards", re.I), "Harmonised Standards"),
+    (re.compile(r"(tool|assessment)", re.I), "Assessment Tools"),
+    (re.compile(r"(guide|prepare|navigating|how-to-comply|readiness)", re.I),
+     "Conformity & Documentation"),
+)
+#: Rendered bodies collected by discover_complycra(), consumed by its snapshot
+#: in the same run — the whole site is two API calls, so per-topic requests
+#: would be 30× the traffic for the same bytes. snapshot() re-queries on a miss,
+#: so nothing depends on the cache being warm.
+_COMPLYCRA_CACHE: dict[str, dict] = {}
+
+
+def _cluster_complycra(url: str) -> str:
+    slug = urlsplit(url).path.strip("/")
+    for rx, cluster in _COMPLYCRA_CLUSTERS:
+        if rx.search(slug):
+            return cluster
+    return "CRA Overview"
+
+
+def _wp_items(kind: str) -> list[dict]:
+    r = httpx.get(f"{COMPLYCRA_API}/{kind}",
+                  params={"per_page": 100, "status": "publish",
+                          "_fields": "link,title,modified,content"},
+                  headers={"User-Agent": UA}, timeout=30.0, follow_redirects=True)
+    r.raise_for_status()
+    return r.json()
+
+
+def _wp_title(item: dict) -> str:
+    import html as _html
+    raw = (item.get("title") or {}).get("rendered") or ""
+    return " ".join(_html.unescape(raw).split())[:160]
+
+
+def discover_complycra() -> list[dict]:
+    """Return [{url, title, cluster}] for every published post and page."""
+    _COMPLYCRA_CACHE.clear()
+    out = []
+    for kind in ("posts", "pages"):
+        for item in _wp_items(kind):
+            url = (item.get("link") or "").rstrip("/")
+            path = urlsplit(url).path
+            if not url or path in ("", "/") or _COMPLYCRA_SKIP_RE.match(path):
+                continue
+            _COMPLYCRA_CACHE[url] = item
+            out.append({"url": url, "title": _wp_title(item),
+                        "cluster": _cluster_complycra(url)})
+    return sorted(out, key=lambda t: t["url"])
+
+
+def snapshot_complycra(url: str) -> tuple[str | None, str | None, str | None, str | None]:
+    """(body hash, title, modified date, kind) straight from the WordPress API."""
+    item = _COMPLYCRA_CACHE.get(url)
+    if item is None:                       # cache miss: ask for this slug alone
+        slug = urlsplit(url).path.strip("/").rsplit("/", 1)[-1]
+        for kind in ("posts", "pages"):
+            r = httpx.get(f"{COMPLYCRA_API}/{kind}",
+                          params={"slug": slug, "_fields": "link,title,modified,content"},
+                          headers={"User-Agent": UA}, timeout=30.0, follow_redirects=True)
+            r.raise_for_status()
+            hits = r.json()
+            if hits:
+                item = hits[0]
+                break
+    if item is None:
+        return None, None, None, None
+    body = (item.get("content") or {}).get("rendered") or ""
+    norm = " ".join(HTMLParser(body).text().split()) if body else ""
+    h = hashlib.sha256(norm.encode("utf-8")).hexdigest() if len(norm) >= 80 else None
+    return h, _wp_title(item), _iso(item.get("modified")), "modified"
+
+
 # ── site registry ─────────────────────────────────────────────────────────
 SITES = {
     "craevidence": {
@@ -200,6 +288,14 @@ SITES = {
         # dated news + boilerplate pages are out of scope
         "exclude_re": re.compile(r"/(news|cra-news|privacy|terms|imprint|cookie)", re.I),
         "cluster": _cluster_cra_eu,
+    },
+    "complycra": {
+        "name": "ComplyCRA",
+        "index": "https://complycra.eu/",
+        # read through the site's own WordPress REST API
+        "discover": discover_complycra,
+        "snapshot": snapshot_complycra,
+        "cluster": _cluster_complycra,
     },
     "stan4cra": {
         "name": "ETSI Labs STAN4CRA",

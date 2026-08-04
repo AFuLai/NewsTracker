@@ -82,10 +82,12 @@ BUILTIN: dict[str, dict[str, object]] = {
     "source.android.com": {"method": "PATH", "search_path": "/docs/security/bulletin"},
     "jpcert.or.jp": {"method": "FEED",
                      "feed": "https://www.jpcert.or.jp/rss/jpcert.rdf"},
-    # WordPress, but every feed route (/feed/, /tag/<t>/feed/) answers HTTP 500
-    # — verified 2026-08-04 — so the news index has to be scraped. Its articles
-    # do carry real dates (both the visible "12 June, 2026" and JSON-LD).
-    "complycra.eu": {"method": "PATH", "search_path": "/cra-stories-and-news/"},
+    # NOTE: complycra.eu was configured here as a LISTING news source and then
+    # withdrawn. Its 23 pages are evergreen explainers ("What is the CRA",
+    # "CRA vs NIS2"), so the L1 gate dropped 22 of them and the 23rd fell
+    # outside the date window — the gate was right, the site simply is not a
+    # news source. It now lives in the CRA reference library instead
+    # (cra_library.SITES["complycra"]), which is built for exactly that.
 }
 
 
@@ -107,12 +109,6 @@ EXTRA_ENTRY_POINTS: dict[str, list[dict]] = {
          "method": "LISTING", "search_path": "/en/library"},
         {"name": "EC CRA 實施頁面（News）",
          "method": "LISTING", "search_path": "/en/news"},
-    ],
-    # complycra.eu files the same posts under a topic tag as well; the tag page
-    # surfaces compliance pieces the news index has already scrolled past.
-    "complycra.eu": [
-        {"name": "ComplyCRA（compliance tag）",
-         "method": "LISTING", "search_path": "/tag/compliance/"},
     ],
 }
 

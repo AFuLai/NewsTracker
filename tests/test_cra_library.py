@@ -192,6 +192,83 @@ def test_sync_stores_source_date_and_never_erases_it(tmp_path, monkeypatch):
     assert (row["source_date"], row["date_kind"]) == ("2026-07-20", "modified")
 
 
+# ── complycra.eu (read through the WordPress REST API) ─────────────────────
+_WP = {
+    "posts": [
+        {"link": "https://complycra.eu/cyber-resilience-act-cra-vs-nis2/",
+         "title": {"rendered": "CRA vs NIS2: Similarities &#038; Differences"},
+         "modified": "2026-03-30T03:53:02", "content": {"rendered": "<p>" + "body " * 40 + "</p>"}},
+        {"link": "https://complycra.eu/cra-fines/",
+         "title": {"rendered": "CRA fines: How much"},
+         "modified": "2026-07-30T09:00:00", "content": {"rendered": "<p>" + "fines " * 40 + "</p>"}},
+    ],
+    "pages": [
+        {"link": "https://complycra.eu/cra-scope-assessment-tool/",
+         "title": {"rendered": "CRA Scope Assessment Tool"},
+         "modified": "2026-06-12T00:00:00", "content": {"rendered": "<p>" + "tool " * 40 + "</p>"}},
+        # boilerplate that must not enter the catalogue
+        {"link": "https://complycra.eu/privacy-statement-uk/", "title": {"rendered": "Privacy"},
+         "modified": "2025-05-21T00:00:00", "content": {"rendered": "x"}},
+        {"link": "https://complycra.eu/cookie-policy-eu/", "title": {"rendered": "Cookies"},
+         "modified": "2025-05-21T00:00:00", "content": {"rendered": "x"}},
+        {"link": "https://complycra.eu/", "title": {"rendered": "Comply with CRA"},
+         "modified": "2026-06-24T00:00:00", "content": {"rendered": "x"}},
+        {"link": "https://complycra.eu/cra-stories-and-news/", "title": {"rendered": "Stories"},
+         "modified": "2026-06-12T00:00:00", "content": {"rendered": "x"}},
+        {"link": "https://complycra.eu/test/", "title": {"rendered": "TEST"},
+         "modified": "2026-03-26T00:00:00", "content": {"rendered": "x"}},
+    ],
+}
+
+
+def test_discover_complycra_skips_boilerplate_and_clusters_topics(monkeypatch):
+    monkeypatch.setattr(C, "_wp_items", lambda kind: _WP[kind])
+    topics = {t["url"]: t for t in C.discover_complycra()}
+    assert set(topics) == {
+        "https://complycra.eu/cyber-resilience-act-cra-vs-nis2",
+        "https://complycra.eu/cra-fines",
+        "https://complycra.eu/cra-scope-assessment-tool"}     # legal/home/index/test dropped
+    assert topics["https://complycra.eu/cyber-resilience-act-cra-vs-nis2"]["cluster"] \
+        == "Related Regulations"
+    assert topics["https://complycra.eu/cra-scope-assessment-tool"]["cluster"] == "Assessment Tools"
+    assert topics["https://complycra.eu/cra-fines"]["cluster"] == "CRA Overview"
+    # HTML entities in the API's rendered title are decoded
+    assert topics["https://complycra.eu/cyber-resilience-act-cra-vs-nis2"]["title"] \
+        == "CRA vs NIS2: Similarities & Differences"
+
+
+def test_snapshot_complycra_uses_the_modified_date_and_body_hash(monkeypatch):
+    monkeypatch.setattr(C, "_wp_items", lambda kind: _WP[kind])
+    C.discover_complycra()                       # warms the per-run cache
+    h, title, sdate, kind = C.snapshot_complycra("https://complycra.eu/cra-fines")
+    assert h and (title, sdate, kind) == ("CRA fines: How much", "2026-07-30", "modified")
+    # a different body must hash differently
+    h2, *_ = C.snapshot_complycra("https://complycra.eu/cyber-resilience-act-cra-vs-nis2")
+    assert h2 != h
+
+
+def test_snapshot_complycra_requeries_on_a_cache_miss(monkeypatch):
+    monkeypatch.setattr(C, "_wp_items", lambda kind: _WP[kind])
+    C.discover_complycra()
+    C._COMPLYCRA_CACHE.clear()                   # e.g. sync() called without discovery
+    asked = []
+
+    class _Resp:
+        def __init__(self, data): self._d = data
+        def raise_for_status(self): pass
+        def json(self): return self._d
+
+    def fake_get(url, params=None, **kw):
+        asked.append((url, params["slug"]))
+        kind = url.rsplit("/", 1)[-1]
+        return _Resp([i for i in _WP[kind]
+                      if i["link"].rstrip("/").endswith(params["slug"])])
+    monkeypatch.setattr(C.httpx, "get", fake_get)
+    h, title, sdate, kind = C.snapshot_complycra("https://complycra.eu/cra-fines")
+    assert (title, sdate) == ("CRA fines: How much", "2026-07-30") and h
+    assert asked and asked[0][1] == "cra-fines"
+
+
 # ── ETSI Labs STAN4CRA (standards drafts, read through the GitLab API) ─────
 _PROJECTS = [
     {"id": 411, "name": "EN 304 617 Browser", "path": "en-304-617",
