@@ -453,6 +453,10 @@ header {
               visibility var(--motion-medium) var(--ease-standard);
 }
 #sidebar-scrim.open { opacity: 1; visibility: visible; }
+/* CRA library mode has no date nav — hide the floating sidebar entirely */
+html[data-mode="lib"] #sidebar,
+html[data-mode="lib"] #sidebar-scrim,
+html[data-mode="lib"] #drawer-toggle { display: none !important; }
 
 /* ── Sidebar toggle button ───────────────────────── */
 #sidebar-toggle {
@@ -694,6 +698,24 @@ a.card-tag:hover { text-decoration: underline; }
 /* ★ 必須定義，否則 #no-data 會產生頂部空白 */
 .hidden { display: none; }
 
+/* ── CRA reference-library view ───────────────────────── */
+a.lib-card { text-decoration: none; color: inherit; }
+.cat-badge.lib-badge {
+  background: var(--surface-container-highest);
+  color: var(--on-surface);
+}
+.lib-chip {
+  display: inline-block;
+  padding: 0 0.4rem;
+  border-radius: var(--shape-full);
+  font-size: 12px;
+  font-weight: 700;
+  vertical-align: middle;
+  margin-right: 2px;
+}
+.lib-chip.new { background: var(--cra-oss-fill);  color: var(--cra-oss-on); }   /* green */
+.lib-chip.upd { background: var(--cra-apac-fill); color: var(--cra-apac-on); }  /* amber */
+
 /* ── Overlay ─────────────────────────────────────── */
 #overlay {
   position: fixed;
@@ -912,7 +934,9 @@ const state = {
   loadedFiles:   new Set(),
   loadedYears:   new Set(),   // keys: tracker + "/" + year
   loadedMonths:  new Set(),   // keys: tracker + "/" + month
-  pendingDates:  []
+  pendingDates:  [],
+  libActive:     false,       // CRA reference-library mode
+  libCluster:    null         // active cluster filter in library mode
 };
 
 // ── i18n (language toggle: 中文 ⇄ English) ────────────
@@ -1016,6 +1040,15 @@ function applyLang() {
     // in-panel ◀ is always a "collapse" control now (only visible while open)
     sbBtn.title = t('collapse');
     sbBtn.setAttribute('aria-label', t('collapse'));
+  }
+  if (state.libActive) {
+    buildTrackerPills(Object.keys(getTrackers()));   // re-labels the CRA pill
+    document.getElementById('tracker-title').textContent =
+      state.lang === 'en' ? 'CRA Reference Library' : 'CRA 參考圖書庫';
+    setActivePill('#tracker-pills', '[data-tracker="__cra"]');
+    buildClusterPills();
+    renderLibrary();
+    return;
   }
   if (state.currentTracker) {
     const mf = currentManifest();
@@ -1353,6 +1386,9 @@ function init() {
 function selectTracker(name) {
   const all = getTrackers();
   if (!all || !all[name]) return;
+  state.libActive = false;   // leaving the CRA library mode
+  if (document.documentElement.dataset.mode === 'lib') delete document.documentElement.dataset.mode;
+  const _srow = document.getElementById('search-row'); if (_srow) _srow.style.display = '';
   state.currentTracker = name;
   state.currentYear = null;
   state.currentMonth = null;
@@ -1386,6 +1422,116 @@ function buildTrackerPills(names) {
     btn.onclick = () => selectTracker(n);
     el.appendChild(btn);
   });
+  // CRA reference-library pill (a special mode, not a real tracker). The data
+  // (data/cra_library.js) loads on first click.
+  const lb = document.createElement('button');
+  lb.className = 'pill' + (state.libActive ? ' active' : '');
+  lb.dataset.tracker = '__cra';
+  lb.textContent = '📚 ' + (state.lang === 'en' ? 'CRA Library' : 'CRA 庫');
+  lb.title = 'CRA reference library';
+  lb.setAttribute('aria-pressed', state.libActive ? 'true' : 'false');
+  lb.onclick = selectLibrary;
+  el.appendChild(lb);
+}
+
+// ── CRA reference library (special mode) ──────────────────────────────
+function loadCraLibrary(cb) {
+  if (typeof CRA_LIBRARY !== 'undefined') { cb(); return; }
+  injectScript('data/cra_library.js', cb);
+}
+function selectLibrary() {
+  state.libActive = true;
+  document.documentElement.dataset.mode = 'lib';   // hides the date sidebar
+  state.searchQuery = ''; state.search = null;
+  setActivePill('#tracker-pills', '[data-tracker="__cra"]');
+  document.querySelectorAll('#tracker-pills .pill').forEach(b =>
+    b.setAttribute('aria-pressed', b.dataset.tracker === '__cra' ? 'true' : 'false'));
+  document.getElementById('tracker-title').textContent =
+    state.lang === 'en' ? 'CRA Reference Library' : 'CRA 參考圖書庫';
+  document.getElementById('year-pills').innerHTML = '';
+  document.getElementById('month-grid').innerHTML = '';
+  hideDateList();
+  const sr = document.getElementById('search-row'); if (sr) sr.style.display = 'none';
+  showMsg(state.lang === 'en' ? 'Loading CRA library…' : '載入 CRA 圖書庫…');
+  loadCraLibrary(() => { buildClusterPills(); renderLibrary(); });
+}
+function libData() {
+  return (typeof CRA_LIBRARY !== 'undefined') ? CRA_LIBRARY
+       : { topics: [], generated: '', sources: {} };
+}
+function buildClusterPills() {
+  const el = document.getElementById('cat-pills');
+  el.innerHTML = '';
+  const clusters = [...new Set(libData().topics.filter(t => t.status !== 'gone')
+    .map(t => t.cluster))].sort();
+  const items = [null, ...clusters];   // null = 全部
+  items.forEach(c => {
+    const btn = document.createElement('button');
+    btn.className = 'pill cat-pill';
+    btn.dataset.cluster = c || '';
+    btn.textContent = c || (state.lang === 'en' ? 'All' : '全部');
+    const on = c ? state.libCluster === c : !state.libCluster;
+    btn.classList.toggle('active', on);
+    btn.setAttribute('aria-pressed', String(on));
+    btn.onclick = () => { state.libCluster = c; buildClusterPills(); renderLibrary(); };
+    el.appendChild(btn);
+  });
+}
+function daysBetween(a, b) {
+  return Math.round((new Date(b + 'T00:00:00') - new Date(a + 'T00:00:00')) / 86400000);
+}
+function renderLibrary() {
+  const main = document.getElementById('main-content');
+  document.getElementById('loading-msg').style.display = 'none';
+  document.getElementById('no-data').classList.add('hidden');
+  Array.from(main.children).forEach(c => {
+    if (c.id !== 'loading-msg' && c.id !== 'no-data' && c.id !== 'search-row') c.remove();
+  });
+  const lib = libData();
+  let topics = lib.topics.filter(t => t.status !== 'gone');
+  if (state.libCluster) topics = topics.filter(t => t.cluster === state.libCluster);
+  document.getElementById('article-count').textContent = topics.length;
+  syncHash();   // keep the URL shareable (#lib=1&c=…)
+  if (!topics.length) {
+    const nd = document.getElementById('no-data');
+    nd.classList.remove('hidden');
+    nd.textContent = state.lang === 'en' ? 'No CRA topics.' : '沒有 CRA 主題';
+    return;
+  }
+  const groups = {};
+  topics.forEach(t => { (groups[t.cluster] = groups[t.cluster] || []).push(t); });
+  const frag = document.createDocumentFragment();
+  Object.keys(groups).sort().forEach(cl => {
+    const div = document.createElement('div');
+    div.className = 'date-divider';
+    div.textContent = cl + ' · ' + groups[cl].length;
+    frag.appendChild(div);
+    const grid = document.createElement('div');
+    grid.className = 'cards-grid';
+    groups[cl].forEach(t => grid.appendChild(buildLibCard(t, lib.generated, lib.sources)));
+    frag.appendChild(grid);
+  });
+  main.appendChild(frag);
+}
+function buildLibCard(t, gen, sources) {
+  const a = document.createElement('a');
+  a.className = 'card lib-card';
+  a.href = t.url; a.target = '_blank'; a.rel = 'noopener';
+  const srcName = (sources && sources[t.source]) || t.source;
+  const isNew = t.first_seen && gen && daysBetween(t.first_seen, gen) <= 14;
+  const isUpd = !isNew && t.last_changed && gen && t.last_changed !== t.first_seen
+             && daysBetween(t.last_changed, gen) <= 14;
+  const chip = isNew ? '<span class="lib-chip new">' + (state.lang === 'en' ? 'NEW' : '新') + '</span>'
+             : isUpd ? '<span class="lib-chip upd">' + (state.lang === 'en' ? 'UPDATED' : '更新') + '</span>'
+             : '';
+  a.innerHTML = [
+    '<span class="cat-badge lib-badge">' + escHtml(srcName) + '</span>',
+    '<h3 class="card-title">' + escHtml(t.title) + '</h3>',
+    '<div class="card-meta">' + chip + escHtml(t.cluster) +
+      (t.last_changed ? ' · ' + (state.lang === 'en' ? 'updated ' : '更新 ') + escHtml(t.last_changed) : '') +
+    '</div>'
+  ].join('');
+  return a;
 }
 
 // ── Year selection ────────────────────────────────────
@@ -1900,6 +2046,18 @@ var suppressHashChange = false;
 
 function syncHash() {
   if (restoring) return;
+  const skinOf = () => document.documentElement.dataset.skin;
+  if (state.libActive) {   // CRA library mode has its own compact hash
+    const lp = ['lib=1'];
+    if (state.libCluster) lp.push('c=' + encodeURIComponent(state.libCluster));
+    if (skinOf()) lp.push('s=' + skinOf());
+    const lh = '#' + lp.join('&');
+    if (lh !== location.hash) {
+      try { history.replaceState(null, '', lh); }
+      catch (e) { suppressHashChange = true; location.hash = lh; }
+    }
+    return;
+  }
   const p = [];
   if (state.currentTracker) p.push('t=' + state.currentTracker);
   if (state.currentYear) p.push('y=' + state.currentYear);
@@ -1931,6 +2089,12 @@ function parseHash() {
 // Restore the view named by the hash. Returns true if it handled the load.
 function applyHashRestore() {
   const h = parseHash();
+  if (h && h.lib) {          // CRA library deep-link
+    if (h.s === 'md3' || h.s === 'classic') document.documentElement.dataset.skin = h.s;
+    state.libCluster = h.c || null;
+    selectLibrary();
+    return true;
+  }
   if (!h || !h.t) return false;
   const all = getTrackers();
   if (!all || !all[h.t]) return false;
