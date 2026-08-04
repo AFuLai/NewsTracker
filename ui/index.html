@@ -376,6 +376,7 @@ header {
 }
 .pill.active { color: var(--on-primary); border-color: transparent; font-weight: 600; }
 .pill.year-pill.active { background: var(--primary); }
+.pill.sort-pill.active { background: var(--primary); color: var(--on-primary); }
 /* Fallback + 全部 (All): neutral primary chip. */
 .pill.cat-pill.active { background: var(--primary); color: var(--on-primary); }
 .pill.cat-pill[data-cat="全部"].active { background: var(--primary); color: var(--on-primary); }
@@ -698,27 +699,82 @@ a.card-tag:hover { text-decoration: underline; }
 /* ★ 必須定義，否則 #no-data 會產生頂部空白 */
 .hidden { display: none; }
 
-/* ── CRA reference-library view ───────────────────────── */
-a.lib-card { text-decoration: none; color: inherit; }
-.cat-badge.lib-badge {
-  background: var(--surface-container-highest);
-  color: var(--on-surface);
+/* ── CRA reference-library view ─────────────────────────
+   A library entry is a title, a date and a source — there is no summary to
+   read. Rendered as cards, the badge and the repeated cluster label outweighed
+   the one thing worth reading, so the view is a dense list: the title carries
+   the weight, everything else is muted, and whichever attribute is already the
+   group heading is not repeated on every row. */
+.lib-sort {
+  display: none;                 /* news mode has no grouping control */
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0 0 0.15rem;
+  flex-wrap: wrap;
 }
+html[data-mode="lib"] .lib-sort { display: flex; }
+.lib-sort-label {
+  font-size: 12px;
+  color: var(--on-surface-variant);
+  margin-right: 0.15rem;
+  white-space: nowrap;
+}
+.lib-list { display: flex; flex-direction: column; margin-bottom: 1rem; }
+.lib-row {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr) max-content;
+  gap: 0.85rem;
+  align-items: baseline;
+  padding: 0.4rem 0.55rem;
+  border-radius: var(--shape-xs);
+  text-decoration: none;
+  color: inherit;
+  transition: background var(--motion-short) var(--ease-standard);
+}
+.lib-row:nth-child(even) { background: var(--surface-container-low); }
+.lib-row:hover { background: var(--surface-container-high); }
+.lib-row:focus-visible { outline: 2px solid var(--primary); outline-offset: -2px; }
+.lib-name { font-size: 14px; font-weight: 500; color: var(--on-surface); line-height: 1.45; }
+.lib-row:hover .lib-name { text-decoration: underline; }
+.lib-side {
+  font-size: 12px;
+  color: var(--on-surface-variant);
+  text-align: right;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 24rem;
+}
+/* Kept as filled chips: the fill/on pairs are the only colour combinations
+   already validated for contrast across all four theme × skin combinations. */
 .lib-chip {
   display: inline-block;
-  padding: 0 0.4rem;
-  border-radius: var(--shape-full);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
-  vertical-align: middle;
-  margin-right: 2px;
+  letter-spacing: 0.04em;
+  padding: 0 0.35rem;
+  border-radius: var(--shape-full);
+  margin-left: 0.4rem;
+  vertical-align: 1px;
 }
 .lib-chip.new { background: var(--cra-oss-fill);  color: var(--cra-oss-on); }   /* green */
 .lib-chip.upd { background: var(--cra-apac-fill); color: var(--cra-apac-on); }  /* amber */
 /* The date the page itself states it was revised — the one that orders the
    official updates. `.weak` = only a site-wide build stamp was available. */
-.lib-date { font-variant-numeric: tabular-nums; font-weight: 600; }
-.lib-date.weak { font-weight: 400; text-decoration: underline dotted; }
+.lib-date {
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+  color: var(--on-surface-variant);
+}
+.lib-date.weak { opacity: 0.72; text-decoration: underline dotted; }
+@media (max-width: 700px) {
+  .lib-row {
+    grid-template-columns: max-content minmax(0, 1fr);
+    row-gap: 0.15rem;
+  }
+  .lib-name { grid-column: 1 / -1; }
+  .lib-side { text-align: left; max-width: none; }
+}
 
 /* ── Overlay ─────────────────────────────────────── */
 #overlay {
@@ -834,7 +890,7 @@ a.lib-card { text-decoration: none; color: inherit; }
   .cards-grid { grid-template-columns: minmax(0, 1fr); }
   /* row2 becomes one horizontally-scrolling strip instead of wrapping */
   .hd-row2 { flex-wrap: nowrap; overflow-x: auto; }
-  #year-pills, #cat-pills { flex-wrap: nowrap; }
+  #year-pills, #cat-pills, .lib-sort { flex-wrap: nowrap; }
   .hd-row1 { gap: 0.5rem; }
   /* Mobile has room to spare — enlarge the actual box instead of relying on
      the invisible ::after hit-slop (which is more prone to overlap in the
@@ -881,6 +937,7 @@ a.lib-card { text-decoration: none; color: inherit; }
   </div>
   <div class="hd-row2">
     <div id="year-pills"></div>
+    <div class="lib-sort" id="lib-sort" role="group"></div>
     <div class="hd-sep"></div>
     <div id="cat-pills"></div>
   </div>
@@ -940,8 +997,13 @@ const state = {
   loadedMonths:  new Set(),   // keys: tracker + "/" + month
   pendingDates:  [],
   libActive:     false,       // CRA reference-library mode
-  libCluster:    null         // active cluster filter in library mode
+  libCluster:    null,        // active cluster filter in library mode
+  libGroup:      "cluster"    // library grouping: "cluster" | "date" | "source"
 };
+try {
+  const g = localStorage.getItem('tracker_lib_group');
+  if (g === 'cluster' || g === 'date' || g === 'source') state.libGroup = g;
+} catch (e) {}
 
 // ── i18n (language toggle: 中文 ⇄ English) ────────────
 // Category keys stay Chinese internally (filter + colour CSS class); only the
@@ -1050,6 +1112,7 @@ function applyLang() {
     document.getElementById('tracker-title').textContent =
       state.lang === 'en' ? 'CRA Reference Library' : 'CRA 參考圖書庫';
     setActivePill('#tracker-pills', '[data-tracker="__cra"]');
+    buildLibSortPills();
     buildClusterPills();
     renderLibrary();
     return;
@@ -1457,7 +1520,7 @@ function selectLibrary() {
   hideDateList();
   const sr = document.getElementById('search-row'); if (sr) sr.style.display = 'none';
   showMsg(state.lang === 'en' ? 'Loading CRA library…' : '載入 CRA 圖書庫…');
-  loadCraLibrary(() => { buildClusterPills(); renderLibrary(); });
+  loadCraLibrary(() => { buildLibSortPills(); buildClusterPills(); renderLibrary(); });
 }
 function libData() {
   return (typeof CRA_LIBRARY !== 'undefined') ? CRA_LIBRARY
@@ -1492,7 +1555,11 @@ function renderLibrary() {
     if (c.id !== 'loading-msg' && c.id !== 'no-data' && c.id !== 'search-row') c.remove();
   });
   const lib = libData();
-  let topics = lib.topics.filter(t => t.status !== 'gone');
+  const active = lib.topics.filter(t => t.status !== 'gone');
+  // Decided over the whole catalogue, not the filtered view, so the chip does
+  // not appear and disappear as clusters are picked.
+  LIB_SHOW_NEW = libNewChipUseful(active, lib.generated);
+  let topics = active;
   if (state.libCluster) topics = topics.filter(t => t.cluster === state.libCluster);
   document.getElementById('article-count').textContent = topics.length;
   syncHash();   // keep the URL shareable (#lib=1&c=…)
@@ -1502,24 +1569,70 @@ function renderLibrary() {
     nd.textContent = state.lang === 'en' ? 'No CRA topics.' : '沒有 CRA 主題';
     return;
   }
-  const groups = {};
-  topics.forEach(t => { (groups[t.cluster] = groups[t.cluster] || []).push(t); });
-  // Newest official revision first inside each cluster: our crawl dates cannot
-  // order the sites' own updates, the pages' stated dates can.
-  Object.values(groups).forEach(g => g.sort((a, b) =>
-    (libWhen(b).date || '').localeCompare(libWhen(a).date || '')));
+  // Group by whatever the user is arranging on; inside every group the newest
+  // official revision comes first, because our crawl dates cannot order the
+  // sites' own updates and the pages' stated dates can.
+  const groups = new Map();
+  topics.forEach(t => {
+    const k = libGroupKey(t, lib.sources);
+    if (!groups.has(k)) groups.set(k, []);
+    groups.get(k).push(t);
+  });
+  const byDateDesc = (a, b) => (libWhen(b).date || '').localeCompare(libWhen(a).date || '');
+  groups.forEach(g => g.sort(byDateDesc));
+  // cluster/source read alphabetically; date reads newest month first
+  const keys = [...groups.keys()].sort();
+  if (state.libGroup === 'date') keys.reverse();
   const frag = document.createDocumentFragment();
-  Object.keys(groups).sort().forEach(cl => {
+  keys.forEach(k => {
     const div = document.createElement('div');
     div.className = 'date-divider';
-    div.textContent = cl + ' · ' + groups[cl].length;
+    div.textContent = k + ' · ' + groups.get(k).length;
     frag.appendChild(div);
-    const grid = document.createElement('div');
-    grid.className = 'cards-grid';
-    groups[cl].forEach(t => grid.appendChild(buildLibCard(t, lib.generated, lib.sources)));
-    frag.appendChild(grid);
+    const list = document.createElement('div');
+    list.className = 'lib-list';
+    groups.get(k).forEach(t =>
+      list.appendChild(buildLibRow(t, lib.generated, lib.sources)));
+    frag.appendChild(list);
   });
   main.appendChild(frag);
+}
+// The heading a topic files under, per the active arrangement.
+function libGroupKey(t, sources) {
+  if (state.libGroup === 'source') return (sources && sources[t.source]) || t.source;
+  if (state.libGroup === 'date') {
+    const d = libWhen(t).date;
+    return d ? d.slice(0, 7) : (state.lang === 'en' ? 'Undated' : '未標日期');
+  }
+  return t.cluster || (state.lang === 'en' ? 'Other' : '其他');
+}
+function buildLibSortPills() {
+  const el = document.getElementById('lib-sort');
+  if (!el) return;
+  el.innerHTML = '';
+  const en = state.lang === 'en';
+  el.setAttribute('aria-label', en ? 'Arrange library by' : '圖書庫排列方式');
+  const lbl = document.createElement('span');
+  lbl.className = 'lib-sort-label';
+  lbl.textContent = en ? 'Arrange' : '排列';
+  el.appendChild(lbl);
+  [['cluster', '分類', 'Category'], ['date', '日期', 'Date'], ['source', '來源', 'Source']]
+    .forEach(([key, zh, enLabel]) => {
+      const btn = document.createElement('button');
+      btn.className = 'pill sort-pill';
+      btn.dataset.group = key;
+      btn.textContent = en ? enLabel : zh;
+      const on = state.libGroup === key;
+      btn.classList.toggle('active', on);
+      btn.setAttribute('aria-pressed', String(on));
+      btn.onclick = () => {
+        state.libGroup = key;
+        try { localStorage.setItem('tracker_lib_group', key); } catch (e) {}
+        buildLibSortPills();
+        renderLibrary();
+      };
+      el.appendChild(btn);
+    });
 }
 // Which date to show for a topic, and how much it is worth. `source_date` is
 // what the page itself states (dateModified / datePublished, or the document's
@@ -1538,32 +1651,44 @@ function libWhen(t) {
   if (t.last_changed) return { date: t.last_changed, kind: 'detected' };
   return { date: t.first_seen || '', kind: 'added' };
 }
-function buildLibCard(t, gen, sources) {
+// A marker that fires on everything says nothing. A freshly seeded catalogue
+// has every topic "first seen" on the same day, which put a NEW chip on all 94
+// rows — pure noise. Below the threshold the chip is worth its ink again.
+const LIB_NEW_MAX_SHARE = 0.5;
+var LIB_SHOW_NEW = true;          // recomputed by renderLibrary()
+function libNewChipUseful(topics, gen) {
+  if (!gen || !topics.length) return false;
+  const n = topics.filter(t => t.first_seen && daysBetween(t.first_seen, gen) <= 14).length;
+  return n / topics.length <= LIB_NEW_MAX_SHARE;
+}
+function buildLibRow(t, gen, sources) {
   const a = document.createElement('a');
-  a.className = 'card lib-card';
+  a.className = 'lib-row';
   a.href = t.url; a.target = '_blank'; a.rel = 'noopener';
-  const srcName = (sources && sources[t.source]) || t.source;
+  const en = state.lang === 'en';
   const when = libWhen(t);
-  const isNew = t.first_seen && gen && daysBetween(t.first_seen, gen) <= 14;
-  // "Updated" now means the *page* says it was revised recently; only when the
-  // page states nothing do we fall back to the date we detected a change.
-  const isUpd = !isNew && when.date && gen && when.kind !== 'added'
-             && !(when.kind === 'detected' && t.last_changed === t.first_seen)
+  const isNew = LIB_SHOW_NEW && t.first_seen && gen && daysBetween(t.first_seen, gen) <= 14;
+  // "Updated" means the *page* says it was revised recently, or we detected its
+  // body changing. A `site` build stamp is not evidence that this topic changed
+  // — it moves for every page at once — so it never earns the chip.
+  const isUpd = !isNew && when.date && gen
+             && (when.kind === 'modified' || when.kind === 'published'
+                 || (when.kind === 'detected' && t.last_changed !== t.first_seen))
              && daysBetween(when.date, gen) <= 14;
-  const chip = isNew ? '<span class="lib-chip new">' + (state.lang === 'en' ? 'NEW' : '新') + '</span>'
-             : isUpd ? '<span class="lib-chip upd">' + (state.lang === 'en' ? 'UPDATED' : '更新') + '</span>'
+  const chip = isNew ? '<span class="lib-chip new">' + (en ? 'NEW' : '新') + '</span>'
+             : isUpd ? '<span class="lib-chip upd">' + (en ? 'UPDATED' : '更新') + '</span>'
              : '';
-  const lbl = (LIB_DATE_LABEL[when.kind] || LIB_DATE_LABEL.detected)[state.lang === 'en' ? 'en' : 'zh'];
+  const lbl = (LIB_DATE_LABEL[when.kind] || LIB_DATE_LABEL.detected)[en ? 'en' : 'zh'];
   const weak = (when.kind === 'site' || when.kind === 'detected' || when.kind === 'added');
-  const dateHtml = when.date
-    ? ' · <span class="lib-date' + (weak ? ' weak' : '') + '" title="' + escHtml(lbl) + '">' +
-      escHtml(lbl + ' ' + when.date) + '</span>'
-    : '';
-  a.innerHTML = [
-    '<span class="cat-badge lib-badge">' + escHtml(srcName) + '</span>',
-    '<h3 class="card-title">' + escHtml(t.title) + '</h3>',
-    '<div class="card-meta">' + chip + escHtml(t.cluster) + dateHtml + '</div>'
-  ].join('');
+  // Never repeat what the group heading already says.
+  const side = [];
+  if (state.libGroup !== 'cluster' && t.cluster) side.push(t.cluster);
+  if (state.libGroup !== 'source') side.push((sources && sources[t.source]) || t.source);
+  a.innerHTML =
+    '<span class="lib-date' + (weak ? ' weak' : '') + '" title="' + escHtml(lbl) + '">' +
+      escHtml(when.date || '—') + '</span>' +
+    '<span class="lib-name">' + escHtml(t.title) + chip + '</span>' +
+    '<span class="lib-side">' + escHtml(side.join(' · ')) + '</span>';
   return a;
 }
 
@@ -2083,6 +2208,7 @@ function syncHash() {
   if (state.libActive) {   // CRA library mode has its own compact hash
     const lp = ['lib=1'];
     if (state.libCluster) lp.push('c=' + encodeURIComponent(state.libCluster));
+    if (state.libGroup !== 'cluster') lp.push('g=' + state.libGroup);
     if (skinOf()) lp.push('s=' + skinOf());
     const lh = '#' + lp.join('&');
     if (lh !== location.hash) {
@@ -2125,6 +2251,7 @@ function applyHashRestore() {
   if (h && h.lib) {          // CRA library deep-link
     if (h.s === 'md3' || h.s === 'classic') document.documentElement.dataset.skin = h.s;
     state.libCluster = h.c || null;
+    if (h.g === 'cluster' || h.g === 'date' || h.g === 'source') state.libGroup = h.g;
     selectLibrary();
     return true;
   }
