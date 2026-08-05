@@ -180,10 +180,11 @@ debug Chrome (CDP) — opt-in; needs `chrome --remote-debugging-port=9999`.
 | Layer | Module | Role |
 |-------|--------|------|
 | L1 gate | `llm/gate.py` | batch relevance pre-filter (drops footer/ads/off-topic); lenient, all-keep on failure |
-| L2 summarize | `llm/summarize.py` |繁中 summary + category + tags |
+| L2 summarize | `llm/summarize.py` |繁中 summary + category + tags; repairs a summary that came back in the source language |
 | L3 review | `llm/review.py` | deterministic anti-hallucination (cited CVE/CVSS must appear in the source body); 1 retry then `review_failed` |
 | L4 probe | `llm/probe.py` | page-structure classification for auto-probe |
-| L5 translate | `llm/translate.py` | English mirror of title/summary/tags (zh→en; CVE IDs & proper nouns preserved) |
+| L5 translate | `llm/translate.py` | any language → English mirror, and → 繁中 repair; verifies its own output language, 1 retry |
+| L6 lang | `llm/lang.py` | Unicode-script detection (zh / ja / ko / ru / latin / …); no model call |
 
 ## Bilingual (中文 / English)
 
@@ -193,6 +194,20 @@ versions, and proper nouns are kept verbatim). The site has a **🌐 中 / EN**
 toggle in the top-right header — it switches article text, category labels,
 tracker names, and all UI chrome, and remembers the choice in `localStorage`.
 Items without an English mirror fall back to Chinese, so the toggle is always safe.
+
+**Sources in a third language.** Korean (Boannews) and Japanese (NISC) articles
+used to break the two-language contract: the model answers in the *article's*
+language however the prompt is worded, so raw Korean was stored in the Chinese
+column and then echoed, untranslated, into the English one. Asking the prompt
+more firmly is not enough — every produced summary is now **checked** with L6 and
+repaired when the check fails:
+
+* L2 detects a non-Chinese summary and translates it to 繁中 before storing it
+  (`zh-fix` in the run report). A failed repair keeps the original text rather
+  than dropping the article.
+* L5 detects a source language of its own and refuses to store an English
+  "translation" that is still in the source language.
+* `tracker fix-lang` audits and repairs history (see below).
 
 ## Site-wide search
 
@@ -230,6 +245,19 @@ tracker translate --no-rewrite   # DB only, skip the re-render
 tracker pipeline --days 7 --no-translate   # skip the English mirror for one run
 ```
 
+`tracker translate` only fills in *missing* English. Text stored in the **wrong**
+language (Korean/Japanese in either column) is a different problem — it looks
+translated, so nothing retries it. Audit and fix it with:
+
+```bash
+tracker fix-lang --dry-run   # list every article whose zh or en column is in
+                             # neither Chinese nor English, with its language
+tracker fix-lang             # re-translate them, then re-render affected days
+```
+
+Repairing a Chinese column also discards that article's English mirror and
+rebuilds it, because the old mirror was made from the wrong-language text.
+
 ## CLI
 
 | Command | Purpose |
@@ -239,6 +267,8 @@ tracker pipeline --days 7 --no-translate   # skip the English mirror for one run
 | `init-profiles` | seed `source_profiles` from searchinfo ENTRYs |
 | `probe <url> [--save]` | auto-detect a source's fetch method |
 | `fetch / summarize / write / cross-scan` | individual phases (still usable) |
+| `translate` | fill in missing English mirrors |
+| `fix-lang [--dry-run]` | audit/repair articles stored in the wrong language |
 | `migrate-v2` | one-shot legacy html/data layout migration |
 | `pack [--major]` | ChangeLog → commit → tag → tarball zip |
 
@@ -247,7 +277,7 @@ tracker pipeline --days 7 --no-translate   # skip the English mirror for one run
 | Path | Purpose |
 |------|---------|
 | `tracker/fetchers/` | pluggable fetch models (registry) |
-| `tracker/llm/` | ollama layers (gate/summarize/review/probe) |
+| `tracker/llm/` | ollama layers (gate/summarize/review/probe/translate/lang) |
 | `tracker/orchestrator.py` | single-process pipeline |
 | `tracker/prompts/` `tracker/templates/` | ollama prompts / Jinja2 `.js` output |
 | `db/articles.sqlite` | local store (gitignored) |

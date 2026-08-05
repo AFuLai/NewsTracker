@@ -75,6 +75,9 @@ class RunReport:
     summarized: int = 0
     review_failed: int = 0
     translated: int = 0
+    #: Summaries that came back in the article's own language (Korean,
+    #: Japanese, ...) and were translated into Chinese before storing.
+    lang_repaired: int = 0
     out_of_window: int = 0
     #: Rows left `pending` because the server returned 429. Not a failure —
     #: the next run retries them. Counted separately so a throttled source is
@@ -100,7 +103,8 @@ class RunReport:
                 f"sum {self.summarized}/{self.summarize_attempted} "
                 f"(oow:{self.out_of_window} rev_fail:{self.review_failed}"
                 f"{f' 429:{self.rate_limited}' if self.rate_limited else ''}) | "
-                f"i18n {self.translated} | "
+                f"i18n {self.translated}"
+                f"{f' zh-fix:{self.lang_repaired}' if self.lang_repaired else ''} | "
                 f"llm {self.summarize_backend[:3]}/{self.translate_backend[:3]}"
                 f"{f' fb{self.gemini_fallback}' if self.gemini_fallback else ''} | "
                 f"cross +{self.cross_added}/-{self.cross_removed} | "
@@ -514,6 +518,10 @@ def _phase_summarize(store, window, trackers, rep, log, limit, concurrency, rpt,
                 # rebuild_days, list_by_date, ...). update_summary's
                 # date=COALESCE(date, ?) means this never clobbers a genuine
                 # feed/meta date already stored in the row.
+                if result.get("repaired"):
+                    rep.lang_repaired += 1
+                    log.info("[%s] %s summary translated to zh (%s)",
+                             tname, r["url"], result.get("src_lang"))
                 fallback_date = dates[aid] or (r["fetched_at"] or "")[:10] or None
                 store.update_summary(
                     aid, title=result["title"] or r["title"],
@@ -532,11 +540,13 @@ def _phase_summarize(store, window, trackers, rep, log, limit, concurrency, rpt,
             except Exception as exc:
                 store.log_error(r["source"], f"summarize: {exc}", r["url"])
                 log.debug("summarize id=%s error: %s", aid, exc)
-    log.info("summarize complete: %d/%d (oow=%d rev_fail=%d cross+%d)",
+    log.info("summarize complete: %d/%d (oow=%d rev_fail=%d cross+%d zh-fix=%d)",
              rep.summarized, rep.summarize_attempted, rep.out_of_window,
-             rep.review_failed, rep.cross_added)
+             rep.review_failed, rep.cross_added, rep.lang_repaired)
     rpt.result("summarize", f"{rep.summarized}/{rep.summarize_attempted} "
-                            f"(oow {rep.out_of_window}, rev-fail {rep.review_failed})")
+                            f"(oow {rep.out_of_window}, rev-fail {rep.review_failed}"
+                            + (f", zh-fix {rep.lang_repaired}" if rep.lang_repaired else "")
+                            + ")")
 
 
 # ── Phase 3b: TRANSLATE (L5 — English mirror) ────────────────────────────────

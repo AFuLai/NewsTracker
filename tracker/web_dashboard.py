@@ -523,7 +523,8 @@ async function poll(){
       row('擷取', `${s.fetch_new} 新 / ${s.fetch_sources} 來源 (304:${s.fetch_304}, 失敗:${s.fetch_failed})`)+
       row('過濾掉', s.gated_out)+
       row('摘要', `${s.summarized} / ${s.summarize_attempted}（窗外 ${s.out_of_window}, 審核退回 ${s.review_failed}）`)+
-      row('LLM 後端', `Sum:${s.summarize_backend||'ollama'} · Tra:${s.translate_backend||'ollama'}${s.gemini_fallback? ' · Gemini退回 '+s.gemini_fallback:''}`)+
+      row('翻譯', `${s.translated} 篇 → EN${s.lang_repaired? '（外語摘要轉中文 '+s.lang_repaired+' 篇）':''}`)+
+      row('LLM 後端',`Sum:${s.summarize_backend||'ollama'} · Tra:${s.translate_backend||'ollama'}${s.gemini_fallback? ' · Gemini退回 '+s.gemini_fallback:''}`)+
       row('跨主類', `+${s.cross_added} / -${s.cross_removed}`)+
       row('寫入天數', s.days_written)+
       row('錯誤', (s.errors||[]).length)+

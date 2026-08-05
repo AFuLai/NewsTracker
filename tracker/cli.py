@@ -859,6 +859,118 @@ def translate_backfill(
         console.print(f"[green]已重寫 {n} 個日檔 → {out}[/green]")
 
 
+@app.command("fix-lang")
+def fix_language(
+    db: Path = typer.Option(DEFAULT_DB),
+    out: Path = typer.Option(DEFAULT_OUT, "--out"),
+    limit: int = typer.Option(100_000, help="max articles to repair this run"),
+    dry_run: bool = typer.Option(False, "--dry-run",
+                                 help="only report what is in the wrong language"),
+    rewrite: bool = typer.Option(True, "--rewrite/--no-rewrite",
+                                 help="Re-render affected day files + manifests afterwards"),
+) -> None:
+    """Audit and repair articles stored in the wrong language.
+
+    Both published columns have a language contract: `title`/`summary` are
+    Traditional Chinese, `title_en`/`summary_en` are English. Sources in a third
+    language (Boannews 韓國, NISC 日本, ...) used to break it — the model answered
+    in Korean/Japanese and that text was stored, then mirrored into the English
+    column untranslated. This scans every summarized article, re-translates the
+    ones that are in neither language, and re-renders the affected days.
+    """
+    from .llm.lang import needs_en_repair, needs_zh_repair
+    from .llm.translate import translate_article, translate_to_chinese
+    from .orchestrator import rebuild_days
+    from .preflight import ensure_ollama
+
+    store = Store(db)
+    rows = store.list_summarized(limit=limit, statuses=("ready", "written"))
+    def _tags(row, column):
+        return [t for t in (row[column] or "").split(",") if t.strip()]
+
+    zh_lang = {r["id"]: needs_zh_repair(r["title"] or "", r["summary"] or "",
+                                        _tags(r, "tags"))
+               for r in rows}
+    en_lang = {r["id"]: (needs_en_repair(r["title_en"] or "", r["summary_en"] or "",
+                                         _tags(r, "tags_en"))
+                         if (r["summary_en"] or "").strip() else None)
+               for r in rows}
+    zh_bad = [r for r in rows if zh_lang[r["id"]]]
+    en_bad = [r for r in rows if en_lang[r["id"]]]
+    console.print(f"掃描 {len(rows)} 篇：中文欄位語言錯誤 {len(zh_bad)} 篇、"
+                  f"英文欄位語言錯誤 {len(en_bad)} 篇")
+    for r in zh_bad[:20]:
+        console.print(f"  [yellow]zh id={r['id']} ({zh_lang[r['id']]}) "
+                      f"{r['source']}：{(r['title'] or '')[:50]}[/yellow]")
+    for r in en_bad[:20]:
+        console.print(f"  [yellow]en id={r['id']} ({en_lang[r['id']]}) "
+                      f"{r['source']}：{(r['title_en'] or '')[:50]}[/yellow]")
+    if dry_run:
+        raise typer.Exit(0)
+    if not zh_bad and not en_bad:
+        console.print("[green]所有文章的語言都正確。[/green]")
+        raise typer.Exit(0)
+    if not ensure_ollama():
+        console.print("[red]ollama 不可用，無法翻譯[/red]")
+        raise typer.Exit(1)
+
+    affected: set[str] = set()
+    zh_done = en_done = 0
+    # Chinese first: a repaired zh row is the input the English mirror needs.
+    for i, r in enumerate(zh_bad, 1):
+        tags = [t for t in (r["tags"] or "").split(",") if t]
+        try:
+            fixed = translate_to_chinese(title=r["title"] or "",
+                                         summary=r["summary"] or "", tags=tags,
+                                         src_lang=zh_lang[r["id"]])
+        except Exception as exc:
+            console.print(f"  [yellow]id={r['id']} 中文翻譯失敗：{exc}[/yellow]")
+            continue
+        if not fixed["summary"]:
+            console.print(f"  [yellow]id={r['id']} 中文翻譯無結果，保留原文[/yellow]")
+            continue
+        store.update_localized(r["id"], title=fixed["title"] or r["title"] or "",
+                               summary=fixed["summary"], tags=fixed["tags"] or tags)
+        # The English mirror was made from the wrong-language text; redo it.
+        store.update_translation(r["id"], title_en="", summary_en="", tags_en=[])
+        zh_done += 1
+        if r["date"]:
+            affected.add(r["date"])
+        console.print(f"  [green]zh {i}/{len(zh_bad)} id={r['id']} "
+                      f"→ {fixed['title'][:50]}[/green]")
+
+    # Rows whose English column is wrong but whose Chinese was fine, plus every
+    # row we just blanked above.
+    redo_en = {r["id"]: r for r in en_bad}
+    redo_en.update({r["id"]: r for r in zh_bad})
+    for i, r in enumerate(redo_en.values(), 1):
+        row = store.conn.execute("SELECT * FROM articles WHERE id=?", (r["id"],)).fetchone()
+        tags = [t for t in (row["tags"] or "").split(",") if t]
+        try:
+            tr = translate_article(title=row["title"] or "",
+                                   summary=row["summary"] or "", tags=tags)
+        except Exception as exc:
+            console.print(f"  [yellow]id={row['id']} 英文翻譯失敗：{exc}[/yellow]")
+            continue
+        if not tr["summary_en"]:
+            console.print(f"  [yellow]id={row['id']} 英文翻譯無結果[/yellow]")
+            continue
+        store.update_translation(row["id"], title_en=tr["title_en"] or row["title"] or "",
+                                 summary_en=tr["summary_en"], tags_en=tr["tags_en"])
+        en_done += 1
+        if row["date"]:
+            affected.add(row["date"])
+        console.print(f"  [green]en {i}/{len(redo_en)} id={row['id']} "
+                      f"→ {tr['title_en'][:50]}[/green]")
+
+    console.print(f"[green]修復完成：中文 {zh_done}/{len(zh_bad)}、"
+                  f"英文 {en_done}/{len(redo_en)}[/green]")
+    if rewrite and affected:
+        console.print(f"重新產生 {len(affected)} 個日期的資料檔與 manifest…")
+        n = rebuild_days(store, out, sorted(affected))
+        console.print(f"[green]已重寫 {n} 個日檔 → {out}[/green]")
+
+
 def _translate_backfill(*, db: Path, out: Path) -> dict:
     """Best-effort English backfill for still-untranslated ready/written rows.
 

@@ -1,10 +1,12 @@
 """Ollama interaction layers (gemma4:e4b, localhost only — no external API).
 
-Four roles:
+Six roles:
   L1 gate.py      — relevance gate (batch pre-filter, drops obvious noise)
   L2 summarize.py — article summary + classification (the original summarizer)
   L3 review.py    — deterministic quality self-review (anti-hallucination)
   L4 probe.py     — page-structure classification for source auto-probe (WP4)
+  L5 translate.py — any language → English mirror, and → zh-Hant repair
+  L6 lang.py      — script detection; the check that makes L2/L5 verifiable
 
 This package replaces the old single-file tracker/llm.py. Core HTTP helpers
 (call/self_test/_strip_code_fence/_coerce_category) live here so submodules and

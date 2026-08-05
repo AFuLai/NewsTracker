@@ -363,6 +363,33 @@ class Store:
             "ORDER BY date DESC, id LIMIT ?",
             (*statuses, limit)))
 
+    def list_summarized(self, limit: int = 100_000, *,
+                        statuses: tuple[str, ...] = ("ready", "written")) -> list[sqlite3.Row]:
+        """Every article that has a summary, translated or not. Used by the
+        language audit, which has to inspect the text itself (SQL cannot tell
+        Korean from Chinese) before deciding what needs re-translating."""
+        qs = ",".join("?" * len(statuses))
+        return list(self.conn.execute(
+            f"SELECT * FROM articles WHERE status IN ({qs}) "
+            "AND summary IS NOT NULL AND summary != '' "
+            "ORDER BY date DESC, id LIMIT ?",
+            (*statuses, limit)))
+
+    def update_localized(self, article_id: int, *, title: str, summary: str,
+                         tags: list[str] | None = None) -> None:
+        """Replace the Chinese title/summary/tags in place. Unlike
+        update_summary this touches neither `status` nor `summarized_at`: it
+        repairs the text of an article that is already published, so a
+        re-translation must not push a `written` row back through the pipeline."""
+        sets = ["title=?", "summary=?"]
+        params: list = [title or "", summary or ""]
+        if tags is not None:
+            sets.append("tags=?")
+            params.append(",".join(tags))
+        params.append(article_id)
+        self.conn.execute(f"UPDATE articles SET {', '.join(sets)} WHERE id=?", params)
+        self.conn.commit()
+
     def mark_written(self, article_ids: list[int]) -> None:
         self.conn.executemany(
             "UPDATE articles SET status='written', written_at=? WHERE id=?",
