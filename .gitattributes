@@ -1,3 +1,6 @@
+# Normalise line endings — the repo is edited from both WSL and Windows.
+* text=auto eol=lf
+
 # Files excluded from `git archive` output (zip 打包時不含)
 tests/        export-ignore
 .gitignore    export-ignore
