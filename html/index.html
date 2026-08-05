@@ -1,0 +1,2329 @@
+<!DOCTYPE html>
+<html lang="zh-TW" data-theme="dark" data-skin="md3">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>資安新聞追蹤系統</title>
+<script src="manifest.js"></script>
+<style>
+/* ═══════════════════════════════════════════════════════════════════
+   Design tokens — Material 3 role names.
+   Two orthogonal axes: data-theme (dark|light) × data-skin (md3|classic).
+   Skin differences live ENTIRELY in this token layer (audit B6): no rule
+   may target a component behind [data-skin]; only [data-skin]{--token:v}.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── Skin/theme-independent scales ──────────────────────────────── */
+:root {
+  /* shape scale (5 steps) */
+  --shape-xs: 4px;
+  --shape-s: 8px;
+  --shape-m: 12px;
+  --shape-l: 16px;
+  --shape-full: 9999px;
+  /* type */
+  --font: "Noto Sans TC", "Segoe UI", system-ui, -apple-system, sans-serif;
+  /* motion */
+  --motion-short: 200ms;
+  --motion-medium: 300ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-emphasized: cubic-bezier(0.05, 0.7, 0.1, 1);
+  /* state-layer opacities */
+  --state-hover: 0.08;
+  --state-press: 0.10;
+}
+
+/* ── md3 skin · dark ─────────────────────────────────────────────── */
+[data-skin="md3"][data-theme="dark"] {
+  --surface: #0f172a;
+  --surface-container-lowest: #0b1120;
+  --surface-container-low: #151f35;
+  --surface-container: #1b2740;
+  --surface-container-high: #22304c;
+  --surface-container-highest: #2a3a59;
+  --on-surface: #e8eef7;
+  --on-surface-variant: #a8b6cc;
+  --outline: #8492ab;
+  --outline-variant: #3c4a68;
+  --primary: #a8c7fa;
+  --on-primary: #0b2f66;
+  --primary-container: #1f4788;
+  --on-primary-container: #d6e3ff;
+  --elev-1: none; --elev-2: none; --elev-3: none;
+  --cat-law-fill:#172c4f;      --cat-law-on:#97bbf7;
+  --cat-vuln-fill:#4f1717;     --cat-vuln-on:#f7a1a1;
+  --cat-supply-fill:#4f3a17;   --cat-supply-on:#f5cb84;
+  --cat-incident-fill:#28174f; --cat-incident-on:#bba1f7;
+  --cat-tech-fill:#174f3c;     --cat-tech-on:#7cf4cc;
+  --cra-legis-fill:#17184f;    --cra-legis-on:#a1a3f7;
+  --cra-std-fill:#173e4f;      --cra-std-on:#8ed6f6;
+  --cra-comply-fill:#174f49;   --cra-comply-on:#87f2e6;
+  --cra-oss-fill:#1a4c2c;      --cra-oss-on:#92ecb3;
+  --cra-apac-fill:#4f4117;     --cra-apac-on:#f4d77b;
+  --cra-industry-fill:#4f1733; --cra-industry-on:#f59ec9;
+  --cra-event-fill:#34174f;    --cra-event-on:#cda1f7;
+  --os-linux-fill:#4f3e17;     --os-linux-on:#f5d080;
+  --os-windows-fill:#17374f;   --os-windows-on:#92cbf6;
+  --os-apple-fill:#263140;     --os-apple-on:#babec4;
+  --os-android-fill:#1a4c30;   --os-android-on:#93ecbb;
+  --os-focus-fill:#4f1717;     --os-focus-on:#f7a1a1;
+}
+/* ── md3 skin · light ────────────────────────────────────────────── */
+[data-skin="md3"][data-theme="light"] {
+  --surface: #fbfcfe;
+  --surface-container-lowest: #ffffff;
+  --surface-container-low: #f4f6fa;
+  --surface-container: #eceff5;
+  --surface-container-high: #e5e9f1;
+  --surface-container-highest: #dee3ed;
+  --on-surface: #111827;
+  --on-surface-variant: #454f68;
+  --outline: #6f7b95;
+  --outline-variant: #c4ccdb;
+  --primary: #1d4ed8;
+  --on-primary: #ffffff;
+  --primary-container: #dbe6fe;
+  --on-primary-container: #0d2f7a;
+  --elev-1: 0 1px 2px rgba(0,0,0,.10), 0 1px 3px 1px rgba(0,0,0,.06);
+  --elev-2: 0 1px 2px rgba(0,0,0,.10), 0 2px 6px 2px rgba(0,0,0,.06);
+  --elev-3: 0 1px 3px rgba(0,0,0,.10), 0 4px 8px 3px rgba(0,0,0,.06);
+  --cat-law-fill:#d1e0fa;      --cat-law-on:#08409b;
+  --cat-vuln-fill:#f9d2d2;     --cat-vuln-on:#880c0c;
+  --cat-supply-fill:#fbebd0;   --cat-supply-on:#6b4506;
+  --cat-incident-fill:#ddd1fa; --cat-incident-on:#420bc1;
+  --cat-tech-fill:#d2f9ec;     --cat-tech-on:#08593e;
+  --cra-legis-fill:#d2d3f9;    --cra-legis-on:#1216ce;
+  --cra-std-fill:#d1edfa;      --cra-std-on:#075273;
+  --cra-comply-fill:#d3f8f4;   --cra-comply-on:#0a574f;
+  --cra-oss-fill:#d5f6e1;      --cra-oss-on:#105b2c;
+  --cra-apac-fill:#fbf1d0;     --cra-apac-on:#614b05;
+  --cra-industry-fill:#f8d3e5; --cra-industry-on:#860e49;
+  --cra-event-fill:#e6d1fa;    --cra-event-on:#5b09aa;
+  --os-linux-fill:#fbeed0;     --os-linux-on:#664805;
+  --os-windows-fill:#d0e8fb;   --os-windows-on:#074a7e;
+  --os-apple-fill:#e4e5e7;     --os-apple-on:#444950;
+  --os-android-fill:#d6f5e4;   --os-android-on:#105b32;
+  --os-focus-fill:#f9d2d2;     --os-focus-on:#880c0c;
+}
+
+/* ── classic skin · saturated badges preserved (WCAG AA) ─────────── */
+/* category fills are theme-independent for classic */
+[data-skin="classic"] {
+  --cat-law-fill:#1a6df4;      --cat-law-on:#ffffff;
+  --cat-vuln-fill:#e61414;     --cat-vuln-on:#ffffff;
+  --cat-supply-fill:#f59e0b;   --cat-supply-on:#5c3b02;
+  --cat-incident-fill:#753ef4; --cat-incident-on:#ffffff;
+  --cat-tech-fill:#10b981;     --cat-tech-on:#02402b;
+  --cra-legis-fill:#4447ee;    --cra-legis-on:#ffffff;
+  --cra-std-fill:#0ea5e9;      --cra-std-on:#02364d;
+  --cra-comply-fill:#14b8a6;   --cra-comply-on:#04413a;
+  --cra-oss-fill:#22c55e;      --cra-oss-on:#094820;
+  --cra-apac-fill:#eab308;     --cra-apac-on:#5c4602;
+  --cra-industry-fill:#de1779; --cra-industry-on:#ffffff;
+  --cra-event-fill:#9b3cf6;    --cra-event-on:#ffffff;
+  --os-linux-fill:#f0a500;     --os-linux-on:#5c4002;
+  --os-windows-fill:#0076d1;   --os-windows-on:#ffffff;
+  --os-apple-fill:#6c747f;     --os-apple-on:#ffffff;
+  --os-android-fill:#3ddc84;   --os-android-on:#0c5a2f;
+  --os-focus-fill:#e61414;     --os-focus-on:#ffffff;
+}
+[data-skin="classic"][data-theme="dark"] {
+  --surface: #0f172a;
+  --surface-container-lowest: #0b1120;
+  --surface-container-low: #172136;
+  --surface-container: #1e293b;
+  --surface-container-high: #334155;
+  --surface-container-highest: #3d4c63;
+  --on-surface: #e2e8f0;
+  /* brightened from the legacy #94a3b8 so secondary text clears AA on every
+     surface level (the old value was 4.04 on --surface-container-high) */
+  --on-surface-variant: #b5c0ce;
+  --outline: #647996;
+  --outline-variant: #334155;
+  --primary: #60a5fa;
+  --on-primary: #0b2f66;
+  --primary-container: #1e3a5f;
+  --on-primary-container: #dbeafe;
+  --elev-1: none; --elev-2: none; --elev-3: none;
+}
+[data-skin="classic"][data-theme="light"] {
+  --surface: #f8fafc;
+  --surface-container-lowest: #ffffff;
+  --surface-container-low: #ffffff;
+  --surface-container: #ffffff;
+  --surface-container-high: #e2e8f0;
+  --surface-container-highest: #dbe2ea;
+  --on-surface: #0f172a;
+  --on-surface-variant: #475569;
+  --outline: #7e90a9;
+  --outline-variant: #cbd5e1;
+  --primary: #2563eb;
+  --on-primary: #ffffff;
+  --primary-container: #dbe6fe;
+  --on-primary-container: #0d2f7a;
+  --elev-1: 0 1px 2px rgba(0,0,0,.08), 0 1px 3px 1px rgba(0,0,0,.04);
+  --elev-2: 0 1px 2px rgba(0,0,0,.10), 0 2px 6px 2px rgba(0,0,0,.06);
+  --elev-3: 0 1px 3px rgba(0,0,0,.10), 0 4px 8px 3px rgba(0,0,0,.06);
+}
+
+/* ── card-model tokens (skin-varied; attribute-only, B6-safe) ────── */
+[data-skin="md3"]     { --card-bg: var(--surface-container-low); --card-border-width: 0; }
+[data-skin="classic"] { --card-bg: var(--surface-container);     --card-border-width: 1px; }
+[data-skin="md3"][data-theme="dark"]  { --card-shadow: none; }
+[data-skin="md3"][data-theme="light"] { --card-shadow: var(--elev-1); }
+[data-skin="classic"] { --card-shadow: none; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--surface);
+  color: var(--on-surface);
+  font-family: var(--font);
+  font-size: 14px;            /* body-medium base */
+  line-height: 1.5;
+  height: 100vh;
+  height: 100dvh;            /* app-shell: viewport-bounded, inner regions scroll */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ── Header ─────────────────────────────────────────── */
+header {
+  background: var(--surface-container);
+  border-bottom: 1px solid var(--outline-variant);
+  flex-shrink: 0;
+  z-index: 100;
+}
+.hd-row1 {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0 1.25rem;
+  height: 50px;
+}
+.hd-icon { font-size: 22px; line-height: 1; display: inline-flex; }
+#tracker-title {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--primary);
+  white-space: nowrap;
+}
+.hd-spacer { flex: 1; }
+.hd-stats {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 12px;
+  color: var(--on-surface-variant);
+  white-space: nowrap;
+}
+.hd-stats strong { color: var(--on-surface); font-size: 14px; font-weight: 600; }
+#last-updated { font-size: 12px; }
+#theme-btn, #lang-btn {
+  position: relative;
+  background: none;
+  border: 1px solid var(--outline);
+  color: var(--on-surface);
+  cursor: pointer;
+  padding: 0.3rem 0.55rem;
+  border-radius: var(--shape-full);
+  font-size: 14px;
+}
+.hamburger-btn {
+  position: relative;
+  display: inline-flex;   /* always visible: it IS the collapsed sidebar */
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: 1px solid var(--outline);
+  color: var(--on-surface);
+  cursor: pointer;
+  padding: 0.3rem 0.55rem;
+  border-radius: var(--shape-full);
+  font-size: 16px;
+  flex-shrink: 0;
+}
+#lang-btn { white-space: nowrap; }
+.hd-row2 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 1.25rem;
+  border-top: 1px solid var(--outline-variant);
+  flex-wrap: wrap;
+}
+.hd-sep {
+  width: 1px;
+  height: 18px;
+  background: var(--outline-variant);
+  margin: 0 0.25rem;
+  flex-shrink: 0;
+}
+/* Search row — first row of the news area, sticky within #main-content.
+   #main-content has no top padding so this pins flush under the header
+   (no gap for content to peek through); its own top padding gives spacing. */
+#search-row {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: var(--surface);
+  padding-top: 1rem;
+  padding-bottom: 0.7rem;
+  margin-bottom: 0.5rem;
+  border-bottom: 1px solid var(--outline-variant);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+#search-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--surface-container);
+  border: 1px solid var(--outline);
+  border-radius: var(--shape-full);
+  padding: 6px 14px;
+  flex: 1 1 300px;
+  max-width: 520px;
+  transition: border-color var(--motion-short) var(--ease-standard);
+}
+#search-scope {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+}
+.scope-label { font-size: 12px; color: var(--on-surface-variant); margin-right: 2px; }
+.scope-pill {
+  position: relative;
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--shape-full);
+  border: 1px solid var(--outline);
+  background: transparent;
+  color: var(--on-surface-variant);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: background-color var(--motion-short) var(--ease-standard),
+              color var(--motion-short) var(--ease-standard),
+              border-color var(--motion-short) var(--ease-standard);
+}
+.scope-pill.active { background: var(--primary); color: var(--on-primary); border-color: transparent; font-weight: 600; }
+#search-wrap:focus-within { border-color: var(--primary); }
+.search-ico { font-size: 14px; opacity: 0.7; display: inline-flex; }
+#search-box {
+  background: none;
+  border: none;
+  color: var(--on-surface);
+  font-size: 14px;
+  outline: none;   /* replaced by an explicit :focus-visible ring below (D8) */
+  flex: 1;
+  min-width: 0;
+}
+#search-box:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: var(--shape-xs);
+}
+#search-box::placeholder { color: var(--on-surface-variant); }
+#search-box::-webkit-search-cancel-button { -webkit-appearance: none; }
+#search-clear {
+  position: relative;
+  display: none;
+  background: none;
+  border: none;
+  color: var(--on-surface-variant);
+  cursor: pointer;
+  font-size: 14px;
+  padding: 0 2px;
+  line-height: 1;
+}
+#search-clear:hover { color: var(--on-surface); }
+/* year & cat pills */
+#tracker-pills {
+  display: inline-flex;
+  gap: 4px;
+  margin-right: 8px;
+}
+#tracker-pills .pill {
+  font-weight: 600;
+  border-color: var(--outline);
+}
+#tracker-pills .pill.active {
+  background: var(--primary);
+  color: var(--on-primary);
+}
+#year-pills, #cat-pills {
+  display: flex;
+  gap: 0.3rem;
+  flex-wrap: wrap;
+}
+.pill {
+  position: relative;
+  padding: 0.3rem 0.7rem;
+  border-radius: var(--shape-full);
+  border: 1px solid var(--outline);
+  background: transparent;
+  color: var(--on-surface-variant);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: background-color var(--motion-short) var(--ease-standard),
+              color var(--motion-short) var(--ease-standard),
+              border-color var(--motion-short) var(--ease-standard);
+}
+.pill.active { color: var(--on-primary); border-color: transparent; font-weight: 600; }
+.pill.year-pill.active { background: var(--primary); }
+.pill.sort-pill.active { background: var(--primary); color: var(--on-primary); }
+/* Fallback + 全部 (All): neutral primary chip. */
+.pill.cat-pill.active { background: var(--primary); color: var(--on-primary); }
+.pill.cat-pill[data-cat="全部"].active { background: var(--primary); color: var(--on-primary); }
+/* Category pills adopt their own tonal fill/on when active. */
+.pill.cat-pill[data-cat="法規與標準"].active { background: var(--cat-law-fill); color: var(--cat-law-on); }
+.pill.cat-pill[data-cat="漏洞與威脅情報"].active { background: var(--cat-vuln-fill); color: var(--cat-vuln-on); }
+.pill.cat-pill[data-cat="供應鏈與開源安全"].active { background: var(--cat-supply-fill); color: var(--cat-supply-on); }
+.pill.cat-pill[data-cat="重大事件"].active { background: var(--cat-incident-fill); color: var(--cat-incident-on); }
+.pill.cat-pill[data-cat="前瞻技術"].active { background: var(--cat-tech-fill); color: var(--cat-tech-on); }
+.pill.cat-pill[data-cat="法令更新"].active { background: var(--cra-legis-fill); color: var(--cra-legis-on); }
+.pill.cat-pill[data-cat="調和標準"].active { background: var(--cra-std-fill); color: var(--cra-std-on); }
+.pill.cat-pill[data-cat="合規指引"].active { background: var(--cra-comply-fill); color: var(--cra-comply-on); }
+.pill.cat-pill[data-cat="開源影響"].active { background: var(--cra-oss-fill); color: var(--cra-oss-on); }
+.pill.cat-pill[data-cat="亞太對應"].active { background: var(--cra-apac-fill); color: var(--cra-apac-on); }
+.pill.cat-pill[data-cat="產業動態"].active { background: var(--cra-industry-fill); color: var(--cra-industry-on); }
+.pill.cat-pill[data-cat="研討活動"].active { background: var(--cra-event-fill); color: var(--cra-event-on); }
+.pill.cat-pill[data-cat="Linux"].active { background: var(--os-linux-fill); color: var(--os-linux-on); }
+.pill.cat-pill[data-cat="Windows"].active { background: var(--os-windows-fill); color: var(--os-windows-on); }
+.pill.cat-pill[data-cat="Apple"].active { background: var(--os-apple-fill); color: var(--os-apple-on); }
+.pill.cat-pill[data-cat="Android"].active { background: var(--os-android-fill); color: var(--os-android-on); }
+.pill.cat-pill[data-cat="重點關注"].active { background: var(--os-focus-fill); color: var(--os-focus-on); }
+
+/* ── App body ─────────────────────────────────────── */
+.app-body {
+  display: flex;
+  flex: 1 1 0;
+  min-height: 0;           /* let children scroll instead of growing the body */
+  overflow: hidden;
+  position: relative;      /* anchor for the floating #sidebar + scrim */
+}
+
+/* ── Sidebar — floating overlay panel that collapses to the header's
+   small hamburger button. Never reserves layout space (main content is
+   full-width underneath); slides off-canvas when collapsed. ── */
+#sidebar {
+  position: absolute;
+  top: 8px;
+  bottom: 8px;
+  left: 8px;
+  z-index: 60;
+  width: 200px;
+  background: var(--surface-container);
+  border: 1px solid var(--outline-variant);
+  border-radius: var(--shape-l);
+  box-shadow: var(--elev-3, 0 8px 24px rgba(0,0,0,.4));
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0.4rem 0.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  /* collapsed (default): off-canvas + hidden from tab order / AT */
+  transform: translateX(calc(-100% - 16px));
+  visibility: hidden;
+  transition: transform var(--motion-medium) var(--ease-emphasized),
+              visibility 0s linear var(--motion-medium);
+}
+#sidebar.nav-open {
+  transform: translateX(0);
+  visibility: visible;
+  transition: transform var(--motion-medium) var(--ease-emphasized),
+              visibility 0s;
+}
+/* Scrim: shown (JS adds .open) only on the compact breakpoint, where the
+   drawer is modal. On wider screens the drawer is dismissible and leaves
+   the content interactive, so no scrim is applied. */
+#sidebar-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 55;
+  background: rgba(0,0,0,0.5);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity var(--motion-medium) var(--ease-standard),
+              visibility var(--motion-medium) var(--ease-standard);
+}
+#sidebar-scrim.open { opacity: 1; visibility: visible; }
+/* CRA library mode has no date nav — hide the floating sidebar entirely */
+html[data-mode="lib"] #sidebar,
+html[data-mode="lib"] #sidebar-scrim,
+html[data-mode="lib"] #drawer-toggle { display: none !important; }
+
+/* ── Sidebar toggle button ───────────────────────── */
+#sidebar-toggle {
+  position: relative;
+  width: 100%;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--outline-variant);
+  color: var(--on-surface-variant);
+  cursor: pointer;
+  padding: 0.3rem 0;
+  font-size: 14px;
+  text-align: center;
+  flex-shrink: 0;
+  margin-bottom: 0.3rem;
+}
+#sidebar-toggle:hover { color: var(--on-surface); background: var(--surface-container-high); }
+
+.sb-section { margin-bottom: 0.5rem; }
+#btn-full-year {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  width: 100%;
+  padding: 0.45rem 0.3rem;
+  background: var(--surface-container-high);
+  border: none;
+  border-radius: var(--shape-s);
+  color: var(--on-surface);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 0.4rem;
+  transition: background-color var(--motion-short) var(--ease-standard);
+}
+/* label lives in its own span (a flex sibling of the icon) so applyLang can set
+   its text without wiping the SVG, and it still ellipses on overflow */
+#btn-full-year .btn-label {
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+#month-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.2rem;
+}
+.month-btn {
+  position: relative;
+  padding: 0.35rem 0.1rem;
+  border-radius: var(--shape-s);
+  border: 1px solid var(--outline);
+  background: transparent;
+  color: var(--on-surface-variant);
+  font-size: 14px;
+  cursor: pointer;
+  text-align: center;
+  transition: background-color var(--motion-short) var(--ease-standard),
+              color var(--motion-short) var(--ease-standard),
+              border-color var(--motion-short) var(--ease-standard);
+}
+.month-btn.active { background: var(--primary); color: var(--on-primary); border-color: transparent; }
+.month-btn.empty { opacity: 0.35; cursor: default; }
+.month-btn.empty:hover { background: transparent; color: var(--on-surface-variant); }
+#date-section {
+  border-top: 1px solid var(--outline-variant);
+  padding-top: 0.4rem;
+  margin-top: 0.2rem;
+}
+.sb-label {
+  font-size: 12px;
+  color: var(--on-surface-variant);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0 0.2rem;
+  margin-bottom: 0.3rem;
+}
+.date-btn {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 0.4rem 0.3rem;
+  border-radius: var(--shape-s);
+  border: none;
+  background: transparent;
+  color: var(--on-surface-variant);
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color var(--motion-short) var(--ease-standard),
+              color var(--motion-short) var(--ease-standard);
+}
+.date-btn.active { background: var(--primary); color: var(--on-primary); }
+.date-btn .badge {
+  background: var(--surface-container-high);
+  border-radius: var(--shape-full);
+  padding: 0 0.35rem;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--on-surface-variant);
+  flex-shrink: 0;
+}
+.date-btn.active .badge { background: rgba(255,255,255,0.2); color: var(--on-primary); }
+
+/* ── Main content ────────────────────────────────── */
+#main-content {
+  flex: 1 1 0;
+  min-width: 0;
+  overflow-y: auto;
+  padding: 0 1rem 1rem;   /* no top padding: #search-row owns the top spacing */
+}
+#loading-msg {
+  text-align: center;
+  color: var(--on-surface-variant);
+  padding: 3rem;
+  font-size: 14px;
+}
+#no-data {
+  text-align: center;
+  color: var(--on-surface-variant);
+  padding: 3rem;
+  font-size: 14px;
+}
+.date-divider {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--on-surface-variant);
+  letter-spacing: 0.03em;
+  padding: 0.5rem 0 0.35rem;
+  border-bottom: 1px solid var(--outline-variant);
+  margin-bottom: 0.6rem;
+  margin-top: 0.5rem;
+}
+.date-divider:first-child { margin-top: 0; }
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+/* ── Cards ───────────────────────────────────────── */
+.card {
+  position: relative;
+  background: var(--card-bg);
+  border: var(--card-border-width) solid var(--outline-variant);
+  border-radius: var(--shape-m);
+  box-shadow: var(--card-shadow);
+  padding: 0.9rem;
+  cursor: pointer;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  transition: box-shadow var(--motion-short) var(--ease-standard),
+              transform var(--motion-short) var(--ease-standard);
+}
+.card:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--elev-2);
+}
+.cat-badge {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--shape-full);
+  font-size: 14px;
+  font-weight: 600;
+  width: fit-content;
+  /* default (uncategorized); specific .cat-* rules override */
+  background: var(--surface-container-highest);
+  color: var(--on-surface);
+}
+/* Security categories */
+.cat-法規與標準 { background: var(--cat-law-fill); color: var(--cat-law-on); }
+.cat-漏洞與威脅情報 { background: var(--cat-vuln-fill); color: var(--cat-vuln-on); }
+.cat-供應鏈與開源安全 { background: var(--cat-supply-fill); color: var(--cat-supply-on); }
+.cat-重大事件 { background: var(--cat-incident-fill); color: var(--cat-incident-on); }
+.cat-前瞻技術 { background: var(--cat-tech-fill); color: var(--cat-tech-on); }
+/* EU CRA categories */
+.cat-法令更新 { background: var(--cra-legis-fill); color: var(--cra-legis-on); }
+.cat-調和標準 { background: var(--cra-std-fill); color: var(--cra-std-on); }
+.cat-合規指引 { background: var(--cra-comply-fill); color: var(--cra-comply-on); }
+.cat-開源影響 { background: var(--cra-oss-fill); color: var(--cra-oss-on); }
+.cat-亞太對應 { background: var(--cra-apac-fill); color: var(--cra-apac-on); }
+.cat-產業動態 { background: var(--cra-industry-fill); color: var(--cra-industry-on); }
+.cat-研討活動 { background: var(--cra-event-fill); color: var(--cra-event-on); }
+/* OS categories */
+.cat-Linux { background: var(--os-linux-fill); color: var(--os-linux-on); }
+.cat-Windows { background: var(--os-windows-fill); color: var(--os-windows-on); }
+.cat-Apple { background: var(--os-apple-fill); color: var(--os-apple-on); }
+.cat-Android { background: var(--os-android-fill); color: var(--os-android-on); }
+.cat-重點關注 { background: var(--os-focus-fill); color: var(--os-focus-on); }
+.card-title {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.45;
+  color: var(--on-surface);
+}
+.card-title a.cve-link, .card-summary a.cve-link {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 700;
+}
+.card-title a.cve-link:hover, .card-summary a.cve-link:hover { text-decoration: underline; }
+.card-summary-preview {
+  font-size: 14px;
+  color: var(--on-surface-variant);
+  line-height: 1.55;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+.card-tag {
+  background: var(--surface-container-high);
+  color: var(--on-surface);
+  border-radius: var(--shape-xs);
+  padding: 0.15rem 0.45rem;
+  font-size: 12px;
+  text-decoration: none;
+}
+a.card-tag { color: var(--primary); font-weight: 500; }
+a.card-tag:hover { text-decoration: underline; }
+.card-meta {
+  font-size: 12px;
+  color: var(--on-surface-variant);
+  margin-top: auto;
+}
+
+/* ★ 必須定義，否則 #no-data 會產生頂部空白 */
+.hidden { display: none; }
+
+/* ── CRA reference-library view ─────────────────────────
+   A library entry is a title, a date and a source — there is no summary to
+   read. Rendered as cards, the badge and the repeated cluster label outweighed
+   the one thing worth reading, so the view is a dense list: the title carries
+   the weight, everything else is muted, and whichever attribute is already the
+   group heading is not repeated on every row. */
+.lib-sort {
+  display: none;                 /* news mode has no grouping control */
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0 0 0.15rem;
+  flex-wrap: wrap;
+}
+html[data-mode="lib"] .lib-sort { display: flex; }
+.lib-sort-label {
+  font-size: 12px;
+  color: var(--on-surface-variant);
+  margin-right: 0.15rem;
+  white-space: nowrap;
+}
+.lib-list { display: flex; flex-direction: column; margin-bottom: 1rem; }
+.lib-row {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr) max-content;
+  gap: 0.85rem;
+  align-items: baseline;
+  padding: 0.4rem 0.55rem;
+  border-radius: var(--shape-xs);
+  text-decoration: none;
+  color: inherit;
+  transition: background var(--motion-short) var(--ease-standard);
+}
+.lib-row:nth-child(even) { background: var(--surface-container-low); }
+.lib-row:hover { background: var(--surface-container-high); }
+.lib-row:focus-visible { outline: 2px solid var(--primary); outline-offset: -2px; }
+.lib-name { font-size: 14px; font-weight: 500; color: var(--on-surface); line-height: 1.45; }
+.lib-row:hover .lib-name { text-decoration: underline; }
+.lib-side {
+  font-size: 12px;
+  color: var(--on-surface-variant);
+  text-align: right;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 24rem;
+}
+/* Kept as filled chips: the fill/on pairs are the only colour combinations
+   already validated for contrast across all four theme × skin combinations. */
+.lib-chip {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 0 0.35rem;
+  border-radius: var(--shape-full);
+  margin-left: 0.4rem;
+  vertical-align: 1px;
+}
+.lib-chip.new { background: var(--cra-oss-fill);  color: var(--cra-oss-on); }   /* green */
+.lib-chip.upd { background: var(--cra-apac-fill); color: var(--cra-apac-on); }  /* amber */
+/* The date the page itself states it was revised — the one that orders the
+   official updates. `.weak` = only a site-wide build stamp was available. */
+.lib-date {
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+  color: var(--on-surface-variant);
+}
+.lib-date.weak { opacity: 0.72; text-decoration: underline dotted; }
+@media (max-width: 700px) {
+  .lib-row {
+    grid-template-columns: max-content minmax(0, 1fr);
+    row-gap: 0.15rem;
+  }
+  .lib-name { grid-column: 1 / -1; }
+  .lib-side { text-align: left; max-width: none; }
+}
+
+/* ── Overlay ─────────────────────────────────────── */
+#overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.65);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+#overlay.hidden { display: none; }
+.overlay-box {
+  background: var(--surface-container-high);
+  border: 1px solid var(--outline-variant);
+  border-radius: var(--shape-l);
+  box-shadow: var(--elev-3);
+  padding: 1.5rem;
+  max-width: 680px;
+  width: 100%;
+  max-height: 85vh;
+  overflow-y: auto;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+#overlay-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: var(--surface-container-highest);
+  border: none;
+  color: var(--on-surface);
+  cursor: pointer;
+  border-radius: var(--shape-s);
+  padding: 0.3rem 0.6rem;
+  font-size: 14px;
+}
+.overlay-box h2 { font-size: 22px; line-height: 1.35; font-weight: 400; padding-right: 2.5rem; }
+.overlay-box .card-summary {
+  font-size: 16px;
+  color: var(--on-surface-variant);
+  line-height: 1.7;
+}
+.overlay-box hr { border: none; border-top: 1px solid var(--outline-variant); }
+.overlay-box h4 { font-size: 12px; color: var(--on-surface-variant); }
+.overlay-box ul { padding-left: 1.2rem; }
+.overlay-box ul li { font-size: 16px; margin-bottom: 0.35rem; }
+.overlay-box ul li a { color: var(--primary); text-decoration: none; }
+.overlay-box ul li a:hover { text-decoration: underline; }
+
+/* ── State layers (MD3): faint currentColor overlay on interaction ── */
+.pill::before, .scope-pill::before, .month-btn::before, .date-btn::before,
+.card::before, #btn-full-year::before, #theme-btn::before, #lang-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: currentColor;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--motion-short) var(--ease-standard);
+}
+.pill:hover::before, .scope-pill:hover::before, .month-btn:not(.empty):hover::before,
+.date-btn:hover::before, .card:hover::before, #btn-full-year:hover::before,
+#theme-btn:hover::before, #lang-btn:hover::before { opacity: var(--state-hover); }
+.pill:active::before, .scope-pill:active::before, .month-btn:not(.empty):active::before,
+.date-btn:active::before, .card:active::before, #btn-full-year:active::before,
+#theme-btn:active::before, #lang-btn:active::before { opacity: var(--state-press); }
+
+/* ── 48dp hit targets (C4/D9): an invisible ::after centred on the element's
+   own box, expanding the clickable/tappable region to >=48x48 without
+   changing the visible (compact) size. Requires the element to NOT clip its
+   own overflow — see the overflow:hidden removals above. ── */
+.pill::after, .scope-pill::after, .month-btn:not(.empty)::after, .date-btn::after,
+#btn-full-year::after, #theme-btn::after, #lang-btn::after, #sidebar-toggle::after,
+#search-clear::after, #overlay-close::after, .hamburger-btn::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 48px;
+  height: 48px;
+  transform: translate(-50%, -50%);
+}
+
+/* ── Focus-visible ring (C3/D8): keyboard-only focus indicator. Outlines
+   automatically conform to the element's own border-radius in modern
+   browsers, so one rule covers pills, buttons and cards alike. ── */
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ── Responsive — MD3 window size classes ──────────────────────────
+   Default rules above = expanded (840–1239px). */
+@media (min-width: 1600px) {                      /* extra-large */
+  .cards-grid { grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); }
+}
+@media (max-width: 1239px) {
+  .cards-grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+}
+@media (max-width: 839px) {                       /* medium */
+  #sidebar { width: 80px; min-width: 80px; }
+  .cards-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+}
+@media (max-width: 599px) {                       /* compact */
+  /* Sidebar is already a floating drawer at all widths; compact just widens
+     it a touch and makes it modal (scrim + inert applied from JS). */
+  #sidebar { width: min(280px, 82vw); }
+  .cards-grid { grid-template-columns: minmax(0, 1fr); }
+  /* row2 becomes one horizontally-scrolling strip instead of wrapping */
+  .hd-row2 { flex-wrap: nowrap; overflow-x: auto; }
+  #year-pills, #cat-pills, .lib-sort { flex-wrap: nowrap; }
+  .hd-row1 { gap: 0.5rem; }
+  /* Mobile has room to spare — enlarge the actual box instead of relying on
+     the invisible ::after hit-slop (which is more prone to overlap in the
+     dense month/date lists at this width). */
+  .pill, .scope-pill, .month-btn {
+    min-height: 48px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .date-btn { min-height: 48px; }
+  #theme-btn, #lang-btn, #sidebar-toggle, #search-clear, #overlay-close {
+    min-width: 48px;
+    min-height: 48px;
+  }
+}
+
+/* Respect prefers-reduced-motion: disable animations and transitions */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hd-row1">
+    <button id="drawer-toggle" class="hamburger-btn" aria-label="選單" aria-expanded="false"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg></button>
+    <span class="hd-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12 2L3 6v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V6l-9-4z"/></svg></span>
+    <div id="tracker-pills"></div>
+    <span id="tracker-title">資安新聞追蹤</span>
+    <div class="hd-spacer"></div>
+    <div class="hd-stats" aria-live="polite" aria-atomic="true">
+      <span id="lbl-showing">顯示</span> <strong id="article-count">0</strong> <span id="lbl-articles">篇</span>
+      <span id="last-updated"></span>
+      <button id="skin-btn" onclick="toggleSkin()" aria-label="切換外觀"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/></svg></button>
+      <button id="theme-btn" onclick="toggleTheme()" aria-label="切換主題"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" id="theme-icon-light"><path d="M12 18C8.68 18 6 15.32 6 12s2.68-6 6-6 6 2.68 6 6-2.68 6-6 6zm0-10c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zM12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" id="theme-icon-dark" style="display:none"><path d="M21.64 10.75c-.5-.3-1.19-.26-1.63.13-.87.78-2.14 1.22-3.5 1.22-2.97 0-5.38-2.41-5.38-5.38 0-1.36.44-2.63 1.22-3.5.39-.44.43-1.13.13-1.63-.3-.5-.92-.74-1.53-.74-6.14 0-11.13 5-11.13 11.13 0 6.14 5 11.13 11.13 11.13 6.14 0 11.13-5 11.13-11.13 0-.61-.24-1.23-.74-1.53z"/></svg></button>
+      <button id="lang-btn" onclick="toggleLang()" title="Language / 語言" aria-label="切換語言"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H4v3h10.52C9.47 7.69 8.96 8.99 8.19 10H4v3h4.52c.7 1.43 1.72 2.81 2.97 3.85l-2.55 2.54.96.96c1.66-1.44 3.01-3.38 3.89-5.58h.11l-.04.04c.3-.45.51-.95.65-1.46.46 1.29.76 2.61.76 4v1h3v-1c0-1.13-.21-2.22-.62-3.26z"/></svg></button>
+    </div>
+  </div>
+  <div class="hd-row2">
+    <div id="year-pills"></div>
+    <div class="lib-sort" id="lib-sort" role="group"></div>
+    <div class="hd-sep"></div>
+    <div id="cat-pills"></div>
+  </div>
+</header>
+
+<div class="app-body">
+  <aside id="sidebar">
+    <button id="sidebar-toggle" onclick="closeNav(true)" aria-label="收起側欄"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M15 18l-6-6 6-6"/></svg></button>
+    <div class="sb-section">
+      <button id="btn-full-year" onclick="selectFullYear()"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="flex-shrink:0"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg><span class="btn-label">全年</span></button>
+      <div id="month-grid"></div>
+    </div>
+    <div id="date-section" style="display:none">
+      <div class="sb-label" id="lbl-dates">日期</div>
+      <div id="date-list"></div>
+    </div>
+  </aside>
+  <div id="sidebar-scrim"></div>
+  <main id="main-content">
+    <div id="search-row">
+      <div id="search-wrap">
+        <span class="search-ico"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M9.5 2C5.36 2 2 5.36 2 9.5S5.36 17 9.5 17c1.89 0 3.64-.73 4.93-1.92l6.99 6.99c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41l-6.99-6.99C16.27 13.14 17 11.39 17 9.5 17 5.36 13.64 2 9.5 2zm0 2C12.54 4 15 6.46 15 9.5S12.54 15 9.5 15 4 12.54 4 9.5 6.46 4 9.5 4z"/></svg></span>
+        <input id="search-box" type="search" placeholder="搜尋全站新聞…" autocomplete="off" spellcheck="false">
+        <button id="search-clear" title="清除搜尋" aria-label="清除搜尋"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button>
+      </div>
+      <div id="search-scope">
+        <span class="scope-label" id="scope-label">範圍</span>
+        <button class="scope-pill active" data-scope="title" aria-pressed="true">標題</button>
+        <button class="scope-pill active" data-scope="body" aria-pressed="true">內文</button>
+        <button class="scope-pill active" data-scope="tags" aria-pressed="true">標籤</button>
+      </div>
+    </div>
+    <div id="loading-msg">載入中…</div>
+    <div id="no-data" class="hidden"></div>
+  </main>
+</div>
+
+<div id="overlay" class="hidden">
+  <div class="overlay-box" id="overlay-box" role="dialog" aria-modal="true" aria-labelledby="overlay-title"></div>
+</div>
+
+<script>
+// ── State ────────────────────────────────────────────
+const state = {
+  currentTracker: null,
+  currentYear:   null,
+  currentMode:   null,   // "month" | "full-year" | "date"
+  currentMonth:  null,
+  currentDate:   null,
+  filterCats:    new Set(),   // empty = 全部; multi-select otherwise
+  lang:          "zh",   // "zh" | "en"
+  searchQuery:   "",     // "" = not searching
+  search:        null,   // { countByDate:{date:n}, years:[...] } when searching
+  searchScope:   { title: true, body: true, tags: true },  // which fields to match
+  loadedFiles:   new Set(),
+  loadedYears:   new Set(),   // keys: tracker + "/" + year
+  loadedMonths:  new Set(),   // keys: tracker + "/" + month
+  pendingDates:  [],
+  libActive:     false,       // CRA reference-library mode
+  libCluster:    null,        // active cluster filter in library mode
+  libGroup:      "cluster"    // library grouping: "cluster" | "date" | "source"
+};
+try {
+  const g = localStorage.getItem('tracker_lib_group');
+  if (g === 'cluster' || g === 'date' || g === 'source') state.libGroup = g;
+} catch (e) {}
+
+// ── i18n (language toggle: 中文 ⇄ English) ────────────
+// Category keys stay Chinese internally (filter + colour CSS class); only the
+// DISPLAY label is localized. Article title/summary/tags read the *_en mirror
+// fields when lang==='en' and they exist, otherwise fall back to Chinese.
+const CAT_EN = {
+  '重大事件':'Major Incidents', '法規與標準':'Regulations & Standards',
+  '漏洞與威脅情報':'Vulnerabilities & Threat Intel',
+  '供應鏈與開源安全':'Supply Chain & OSS Security', '前瞻技術':'Emerging Tech',
+  '法令更新':'Legislative Updates', '調和標準':'Harmonised Standards',
+  '合規指引':'Compliance Guidance', '開源影響':'Open-Source Impact',
+  '亞太對應':'APAC Response', '產業動態':'Industry News',
+  '研討活動':'Events & Workshops',
+  '重點關注':'Watchlist',   // OS tracker (Linux/Windows/Apple/Android show as-is)
+  'uncategorized':'Uncategorized'
+};
+const TRACKER_TITLE_EN = { security:'Security News Tracker', eu_cra:'EU CRA Tracker', os:'OS Tracker' };
+const I18N = {
+  zh: {
+    short: { security:'資安', eu_cra:'EU CRA', os:'作業系統' },
+    months: ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'],
+    ui: {
+      all:'全部', fullYear:'全年', dates:'日期', showing:'顯示', articles:'篇',
+      updated:'更新：', sources:'來源', langBtn:'🌐 中',
+      expand:'展開側欄', collapse:'收起側欄',
+      menu:'選單', skinBtn:'切換外觀', themeBtn:'切換主題', langLabel:'切換語言',
+      clearSearch:'清除搜尋', close:'關閉',
+      searchPlaceholder:'搜尋全站新聞…', searching:'搜尋中…',
+      scopeLabel:'範圍', scope:{title:'標題', body:'內文', tags:'標籤'},
+      noResults:q=>'找不到符合「'+q+'」的新聞',
+      noData:'尚無資料，請選擇日期或月份',
+      noCat:c=>'沒有「'+c+'」類別的文章',
+      loadYear:y=>'載入 '+y+' 年資料…', loadMonth:m=>'載入 '+m+'…',
+      loadFullYear:'載入全年資料…',
+      noManifest:'無法載入 manifest.js，請確認檔案存在',
+      noTracker:'manifest 內無任何 tracker'
+    }
+  },
+  en: {
+    short: { security:'Security', eu_cra:'EU CRA', os:'Operating Systems' },
+    months: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+    ui: {
+      all:'All', fullYear:'Full Year', dates:'Dates', showing:'Showing', articles:'',
+      updated:'Updated: ', sources:'Sources', langBtn:'🌐 EN',
+      expand:'Expand', collapse:'Collapse',
+      menu:'Menu', skinBtn:'Toggle appearance', themeBtn:'Toggle theme', langLabel:'Toggle language',
+      clearSearch:'Clear search', close:'Close',
+      searchPlaceholder:'Search all news…', searching:'Searching…',
+      scopeLabel:'In', scope:{title:'Title', body:'Body', tags:'Tags'},
+      noResults:q=>'No results for “'+q+'”',
+      noData:'No data — pick a date or month',
+      noCat:c=>'No articles in “'+c+'”',
+      loadYear:y=>'Loading '+y+'…', loadMonth:m=>'Loading '+m+'…',
+      loadFullYear:'Loading full year…',
+      noManifest:'Could not load manifest.js',
+      noTracker:'No trackers in manifest'
+    }
+  }
+};
+function L() { return I18N[state.lang] || I18N.zh; }
+function t(k) { return L().ui[k]; }
+function catLabel(c) {
+  if (c === '全部' || c === 'All') return t('all');
+  return state.lang === 'en' ? (CAT_EN[c] || c) : c;
+}
+function trackerLabel(n) { return L().short[n] || n; }
+function trackerTitle(n, mf) {
+  if (state.lang === 'en') return TRACKER_TITLE_EN[n] || (mf && mf.title) || n;
+  return (mf && mf.title) || n;
+}
+function artTitle(a)   { return (state.lang === 'en' && a.title_en)   ? a.title_en   : (a.title || ''); }
+function artSummary(a) { return (state.lang === 'en' && a.summary_en) ? a.summary_en : (a.summary || ''); }
+function artTags(a)    { return (state.lang === 'en' && a.tags_en && a.tags_en.length) ? a.tags_en : (a.tags || []); }
+
+function applyLang() {
+  try { localStorage.setItem('tracker_lang', state.lang); } catch (e) {}
+  document.documentElement.lang = state.lang === 'en' ? 'en' : 'zh-TW';
+  // Localize icon-only buttons' accessible names (aria-label only — lang-btn's
+  // bilingual title stays as-is; sidebar-toggle's label is set below).
+  [['drawer-toggle', 'menu'], ['skin-btn', 'skinBtn'], ['theme-btn', 'themeBtn'],
+   ['lang-btn', 'langLabel'], ['search-clear', 'clearSearch']].forEach(([id, key]) => {
+    const el = document.getElementById(id);
+    if (el && t(key)) el.setAttribute('aria-label', t(key));
+  });
+  const sbx = document.getElementById('search-box');
+  if (sbx) sbx.placeholder = t('searchPlaceholder');
+  const scl = document.getElementById('scope-label');
+  if (scl) scl.textContent = t('scopeLabel');
+  document.querySelectorAll('#search-scope .scope-pill').forEach(b => {
+    b.textContent = L().ui.scope[b.dataset.scope] || b.dataset.scope;
+  });
+  document.getElementById('lbl-showing').textContent  = t('showing');
+  document.getElementById('lbl-articles').textContent = t('articles');
+  const fyLabel = document.querySelector('#btn-full-year .btn-label'); if (fyLabel) fyLabel.textContent = t('fullYear');
+  const ld = document.getElementById('lbl-dates');     if (ld) ld.textContent = t('dates');
+  if (typeof TRACKER_LAST_UPDATED !== 'undefined')
+    document.getElementById('last-updated').textContent = t('updated') + TRACKER_LAST_UPDATED;
+  const sbBtn = document.getElementById('sidebar-toggle');
+  if (sbBtn) {
+    // in-panel ◀ is always a "collapse" control now (only visible while open)
+    sbBtn.title = t('collapse');
+    sbBtn.setAttribute('aria-label', t('collapse'));
+  }
+  if (state.libActive) {
+    buildTrackerPills(Object.keys(getTrackers()));   // re-labels the CRA pill
+    document.getElementById('tracker-title').textContent =
+      state.lang === 'en' ? 'CRA Reference Library' : 'CRA 參考圖書庫';
+    setActivePill('#tracker-pills', '[data-tracker="__cra"]');
+    buildLibSortPills();
+    buildClusterPills();
+    renderLibrary();
+    return;
+  }
+  if (state.currentTracker) {
+    const mf = currentManifest();
+    document.getElementById('tracker-title').textContent = trackerTitle(state.currentTracker, mf);
+    buildTrackerPills(Object.keys(getTrackers()));
+    setActivePill('#tracker-pills', '[data-tracker="' + state.currentTracker + '"]');
+    buildCatPills((mf && mf.categories) || []);   // buildCatPills → refreshCatPills
+    if (state.searchQuery && state.search) {
+      // Matched set depends on language (we search the displayed fields) → redo it.
+      refreshSearchView();
+      return;
+    }
+    if (state.currentYear) {
+      buildMonthGrid(state.currentYear);
+      if (state.currentMonth) setActiveMonthBtn(state.currentMonth);
+    }
+    if (state.currentMonth) {
+      buildDateList(state.currentMonth);
+      if (state.currentMode === 'date' && state.currentDate) {
+        document.querySelectorAll('.date-btn').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-pressed', 'false'); });
+        const b = document.querySelector('.date-btn[data-date="' + state.currentDate + '"]');
+        if (b) { b.classList.add('active'); b.setAttribute('aria-pressed', 'true'); }
+      }
+    }
+    renderArticles();
+  }
+}
+function toggleLang() { state.lang = state.lang === 'en' ? 'zh' : 'en'; applyLang(); }
+
+// ── Site-wide search ──────────────────────────────────
+// Matches across title/summary/tags in BOTH languages so a query works
+// regardless of the display language. Space-separated terms are ANDed.
+function searchHaystack(a) {
+  // Search only what is DISPLAYED in the current language — artTitle/artSummary/
+  // artTags return the en fields in EN mode, the zh fields in 中文 mode (with
+  // fallback). So a 中文 search never matches a hidden English title, and vice-versa.
+  const sc = state.searchScope;
+  const parts = [];
+  if (sc.title) parts.push(artTitle(a));
+  if (sc.body)  parts.push(artSummary(a));
+  if (sc.tags)  parts.push(artTags(a).join(' '));
+  return parts.join(' ').toLowerCase();
+}
+// Match one term against the haystack on a WORD boundary (alphanumeric edges),
+// so a short acronym like "CRA" matches "EU CRA"/"(CRA)" but NOT a fragment
+// inside a word like "crash". CJK has no a-z0-9 neighbours, so CJK terms still
+// match as substrings (e.g. 資安 inside 網路資安). Boundary chars are [a-z0-9];
+// the haystack is already lower-cased.
+function termMatches(hay, term) {
+  const esc = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const re = new RegExp('(?:^|[^a-z0-9])' + esc + '(?:[^a-z0-9]|$)');
+  return re.test(hay);
+}
+function matchesQuery(a, q) {
+  if (!q) return true;
+  const hay = searchHaystack(a);
+  return q.toLowerCase().split(/\s+/).filter(Boolean)
+          .every(term => termMatches(hay, term));
+}
+
+// Toggle a search-scope field (標題/內文/標籤). Keeps at least one active.
+function toggleScope(name, btn) {
+  const sc = state.searchScope;
+  const activeCount = Object.values(sc).filter(Boolean).length;
+  if (sc[name] && activeCount === 1) return;   // never leave all scopes off
+  sc[name] = !sc[name];
+  btn.classList.toggle('active', sc[name]);
+  btn.setAttribute('aria-pressed', sc[name] ? 'true' : 'false');
+  if (state.searchQuery && state.search) refreshSearchView();
+}
+
+// Promise wrappers around the cb-style loaders so we can await the full set.
+function pLoadYear(y)  { return new Promise(r => loadYearManifest(y, r)); }
+function pLoadMonth(m) { return new Promise(r => loadMonthManifest(m, r)); }
+function pLoadDay(f)   { return new Promise(r => loadDayFile(f, r)); }
+
+// Load every year/month manifest + every day file for the current tracker, so
+// search can see the whole site. Cached via the loaded* sets → instant after 1st.
+async function ensureAllLoaded() {
+  const mf = currentManifest();
+  if (!mf) return;
+  for (const y of (mf.years || [])) {
+    await pLoadYear(y);
+    const ym = getYearManifest(y);
+    for (const m of ((ym && ym.months) || [])) await pLoadMonth(m);
+  }
+  const files = new Set();
+  for (const y of (mf.years || [])) {
+    const ym = getYearManifest(y);
+    for (const m of ((ym && ym.months) || []))
+      for (const d of manifestDatesForMonth(m)) files.add(d.file);
+  }
+  await Promise.all([...files].map(f => pLoadDay(f)));
+}
+
+// Recompute which dates (and how many articles) match the query, honouring the
+// current tracker + category filter. This is what the date menu is rebuilt from.
+function buildSearchIndex() {
+  const q = state.searchQuery.toLowerCase();
+  const counts = {}; const years = new Set();
+  const days = window.TRACKER_DAYS || {};
+  for (const date in days) {
+    let n = 0;
+    for (const a of days[date]) {
+      if (!itemBelongsToTracker(a, state.currentTracker)) continue;
+      if (state.filterCats.size &&
+          !state.filterCats.has(effectiveCat(a, state.currentTracker))) continue;
+      if (matchesQuery(a, q)) n++;
+    }
+    if (n > 0) { counts[date] = n; years.add(date.slice(0, 4)); }
+  }
+  state.search = { countByDate: counts, years: [...years].sort().reverse() };
+}
+
+function searchDatesInYear(year) {
+  return Object.keys(state.search.countByDate)
+    .filter(d => d.slice(0, 4) === year).sort().reverse();
+}
+
+async function runSearch() {
+  const box = document.getElementById('search-box');
+  const q = (box.value || '').trim();
+  document.getElementById('search-clear').style.display = q ? 'inline' : 'none';
+  if (!q) { clearSearch(); return; }
+  state.searchQuery = q;
+  showMsg(t('searching'));
+  await ensureAllLoaded();
+  if (state.searchQuery !== q) return;   // superseded by a newer keystroke
+  buildSearchIndex();
+  const years = state.search.years;
+  buildYearPills(years);
+  if (!years.length) {
+    document.getElementById('month-grid').innerHTML = '';
+    hideDateList();
+    state.currentYear = null;
+    renderArticles([]);
+    return;
+  }
+  selectYear(years[0]);   // search-aware: month grid + this year's matches
+}
+
+function clearSearch() {
+  if (!state.searchQuery && !state.search) {  // already idle: just restore box
+    document.getElementById('search-clear').style.display = 'none';
+  }
+  state.searchQuery = '';
+  state.search = null;
+  const box = document.getElementById('search-box');
+  if (box) box.value = '';
+  document.getElementById('search-clear').style.display = 'none';
+  const mf = currentManifest();
+  if (!mf) return;
+  buildYearPills(mf.years || []);
+  if (mf.years && mf.years[0]) selectYear(mf.years[0]);
+}
+
+// Cat-filter changed while searching → recompute matches + refresh the menu.
+function refreshSearchView() {
+  buildSearchIndex();
+  const years = state.search.years;
+  buildYearPills(years);
+  if (!years.length) {
+    document.getElementById('month-grid').innerHTML = '';
+    hideDateList(); renderArticles([]); return;
+  }
+  selectYear(years.includes(state.currentYear) ? state.currentYear : years[0]);
+}
+
+// ── Multi-tracker helpers ─────────────────────────────
+function getTrackers() {
+  if (typeof TRACKER_MANIFESTS !== 'undefined') return TRACKER_MANIFESTS;
+  // Back-compat: synthesize a single tracker from legacy TRACKER_MANIFEST.
+  if (typeof TRACKER_MANIFEST !== 'undefined') {
+    return { security: TRACKER_MANIFEST };
+  }
+  return null;
+}
+function currentManifest() {
+  const all = getTrackers();
+  return all ? all[state.currentTracker] : null;
+}
+function itemBelongsToTracker(item, tracker) {
+  if (item.trackers && Array.isArray(item.trackers) && item.trackers.length) {
+    return item.trackers.includes(tracker);
+  }
+  // Legacy items without trackers field are implicitly "security".
+  return tracker === 'security';
+}
+
+// Cross-belonging articles keep their *home* tracker's category (a single
+// `category` field). When viewed under a different tracker that category is
+// not one of that tracker's pills, so it would only ever surface under 全部.
+// CAT_MAP remaps a foreign category onto the nearest local subcategory so the
+// item is findable (and colour-coded) under a real pill of the viewing tracker.
+const CAT_MAP = {
+  security: {
+    // os platforms → treated as vuln/threat intel under a security lens
+    'Linux':'漏洞與威脅情報', 'Windows':'漏洞與威脅情報', 'Apple':'漏洞與威脅情報',
+    'Android':'漏洞與威脅情報', '重點關注':'前瞻技術',
+    // eu_cra → security
+    '法令更新':'法規與標準', '調和標準':'法規與標準', '合規指引':'法規與標準',
+    '亞太對應':'法規與標準', '開源影響':'供應鏈與開源安全',
+    '產業動態':'重大事件', '研討活動':'前瞻技術',
+  },
+  eu_cra: {
+    // security → eu_cra
+    '法規與標準':'法令更新', '供應鏈與開源安全':'開源影響', '漏洞與威脅情報':'合規指引',
+    '前瞻技術':'產業動態', '重大事件':'產業動態',
+    // os → eu_cra
+    'Linux':'開源影響', 'Windows':'產業動態', 'Apple':'產業動態',
+    'Android':'產業動態', '重點關注':'產業動態',
+  },
+  os: {
+    // no platform signal from a foreign article → cross-platform watchlist
+    '漏洞與威脅情報':'重點關注', '法規與標準':'重點關注', '供應鏈與開源安全':'重點關注',
+    '前瞻技術':'重點關注', '重大事件':'重點關注',
+    '法令更新':'重點關注', '調和標準':'重點關注', '合規指引':'重點關注',
+    '開源影響':'重點關注', '產業動態':'重點關注', '亞太對應':'重點關注', '研討活動':'重點關注',
+  },
+};
+
+// The category an article should display/filter under for the given tracker.
+function effectiveCat(a, tracker) {
+  const cat = a.category;
+  const mf = (getTrackers() || {})[tracker];
+  const own = (mf && mf.categories) || [];
+  if (own.includes(cat)) return cat;      // native category → unchanged
+  const m = CAT_MAP[tracker];
+  return (m && m[cat]) || cat;            // remap foreign; else leave as-is
+}
+
+// ── Sidebar toggle ────────────────────────────────────
+// ── Floating navigation drawer (all widths) ───────────────────────────
+// The sidebar floats over the content and collapses off-canvas, leaving the
+// header hamburger as the "small button". Modal (scrim + inert) only on the
+// compact breakpoint; dismissible elsewhere so content stays interactive.
+function isCompact() { return matchMedia('(max-width: 599px)').matches; }
+let navReturnFocus = null;
+function navFocusables() {
+  const sidebar = document.getElementById('sidebar');
+  return [...sidebar.querySelectorAll('button, [href], input, [tabindex]:not([tabindex="-1"])')]
+    .filter(el => el.offsetParent !== null);
+}
+function openNav(persist) {
+  const sidebar = document.getElementById('sidebar');
+  const scrim = document.getElementById('sidebar-scrim');
+  const ham = document.getElementById('drawer-toggle');
+  const main = document.getElementById('main-content');
+  navReturnFocus = document.activeElement;
+  sidebar.classList.add('nav-open');
+  if (ham) ham.setAttribute('aria-expanded', 'true');
+  if (isCompact()) { if (scrim) scrim.classList.add('open'); main.inert = true; }
+  if (persist) { try { localStorage.setItem('tracker_nav', 'open'); } catch (e) {} }
+  const first = navFocusables()[0];
+  if (first) first.focus();
+}
+function closeNav(persist) {
+  const sidebar = document.getElementById('sidebar');
+  const scrim = document.getElementById('sidebar-scrim');
+  const ham = document.getElementById('drawer-toggle');
+  const main = document.getElementById('main-content');
+  const wasOpen = sidebar.classList.contains('nav-open');
+  sidebar.classList.remove('nav-open');
+  if (scrim) scrim.classList.remove('open');
+  if (ham) ham.setAttribute('aria-expanded', 'false');
+  main.inert = false;
+  if (persist) { try { localStorage.setItem('tracker_nav', 'collapsed'); } catch (e) {} }
+  if (wasOpen) {
+    if (navReturnFocus && document.body.contains(navReturnFocus) && navReturnFocus.offsetParent !== null) navReturnFocus.focus();
+    else if (ham) ham.focus();
+  }
+  navReturnFocus = null;
+}
+function toggleNav() {
+  if (document.getElementById('sidebar').classList.contains('nav-open')) closeNav(true);
+  else openNav(true);
+}
+
+// ── Boot ─────────────────────────────────────────────
+function init() {
+  // Load persisted preferences (lang, theme, skin)
+  try {
+    const saved_lang = localStorage.getItem('tracker_lang');
+    if (saved_lang === 'en' || saved_lang === 'zh') state.lang = saved_lang;
+  } catch (e) {}
+  try {
+    const saved_theme = localStorage.getItem('tracker_theme');
+    if (saved_theme === 'light' || saved_theme === 'dark') {
+      document.documentElement.dataset.theme = saved_theme;
+    } else if (matchMedia('(prefers-color-scheme: dark)').matches) {
+      document.documentElement.dataset.theme = 'dark';
+    } else {
+      document.documentElement.dataset.theme = 'light';
+    }
+    // Initialize theme icon display (dark mode → show dark icon)
+    const isDark = document.documentElement.dataset.theme === 'dark';
+    const lightIcon = document.getElementById('theme-icon-light');
+    const darkIcon = document.getElementById('theme-icon-dark');
+    if (lightIcon && darkIcon) {
+      lightIcon.style.display = isDark ? 'none' : 'inline-block';
+      darkIcon.style.display = isDark ? 'inline-block' : 'none';
+    }
+  } catch (e) {}
+  try {
+    const saved_skin = localStorage.getItem('tracker_skin');
+    if (saved_skin === 'classic' || saved_skin === 'md3') {
+      document.documentElement.dataset.skin = saved_skin;
+    }
+  } catch (e) {}
+  // Floating nav: default open on desktop, collapsed on compact; persisted.
+  // Set the class directly (no openNav — avoid stealing focus on boot).
+  try {
+    const navPref = localStorage.getItem('tracker_nav');
+    const startOpen = navPref !== 'collapsed' && !isCompact();
+    const sb = document.getElementById('sidebar');
+    const ham = document.getElementById('drawer-toggle');
+    if (sb && startOpen) sb.classList.add('nav-open');
+    if (ham) ham.setAttribute('aria-expanded', String(!!startOpen));
+  } catch (e) {}
+  const all = getTrackers();
+  if (!all) {
+    showMsg(t('noManifest'));
+    return;
+  }
+  const names = Object.keys(all);
+  if (!names.length) {
+    showMsg(t('noTracker')); return;
+  }
+  buildTrackerPills(names);
+  if (!applyHashRestore()) selectTracker(names[0]);   // deep-link wins over default
+  applyLang();   // sync all static labels + lang button to the active language
+}
+
+// ── Tracker selection ─────────────────────────────────
+function selectTracker(name) {
+  const all = getTrackers();
+  if (!all || !all[name]) return;
+  state.libActive = false;   // leaving the CRA library mode
+  if (document.documentElement.dataset.mode === 'lib') delete document.documentElement.dataset.mode;
+  const _srow = document.getElementById('search-row'); if (_srow) _srow.style.display = '';
+  state.currentTracker = name;
+  state.currentYear = null;
+  state.currentMonth = null;
+  state.currentDate = null;
+  state.currentMode = null;
+  state.filterCats = new Set();
+  state.searchQuery = '';        // a fresh tracker starts unsearched
+  state.search = null;
+  const _sb = document.getElementById('search-box'); if (_sb) _sb.value = '';
+  const _sc = document.getElementById('search-clear'); if (_sc) _sc.style.display = 'none';
+  setActivePill('#tracker-pills', '[data-tracker="' + name + '"]');
+  const mf = all[name];
+  document.getElementById('tracker-title').textContent = trackerTitle(name, mf);
+  buildYearPills(mf.years || []);
+  buildCatPills(mf.categories || []);
+  // During a hash restore, applyHashRestore drives year/month/date itself.
+  if (!restoring && mf.years && mf.years[0]) selectYear(mf.years[0]);
+}
+
+function buildTrackerPills(names) {
+  const el = document.getElementById('tracker-pills');
+  el.innerHTML = '';
+  names.forEach((n, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'pill' + (i === 0 ? ' active' : '');
+    btn.dataset.tracker = n;
+    const title = (typeof TRACKER_TITLES !== 'undefined' && TRACKER_TITLES[n]) || n;
+    btn.textContent = trackerLabel(n);   // localized short label (資安 / Security)
+    btn.title = title;
+    btn.setAttribute('aria-pressed', i === 0 ? 'true' : 'false');
+    btn.onclick = () => selectTracker(n);
+    el.appendChild(btn);
+  });
+  // CRA reference-library pill (a special mode, not a real tracker). The data
+  // (data/cra_library.js) loads on first click.
+  const lb = document.createElement('button');
+  lb.className = 'pill' + (state.libActive ? ' active' : '');
+  lb.dataset.tracker = '__cra';
+  lb.textContent = '📚 ' + (state.lang === 'en' ? 'CRA Library' : 'CRA 庫');
+  lb.title = 'CRA reference library';
+  lb.setAttribute('aria-pressed', state.libActive ? 'true' : 'false');
+  lb.onclick = selectLibrary;
+  el.appendChild(lb);
+}
+
+// ── CRA reference library (special mode) ──────────────────────────────
+function loadCraLibrary(cb) {
+  if (typeof CRA_LIBRARY !== 'undefined') { cb(); return; }
+  injectScript('data/cra_library.js', cb);
+}
+function selectLibrary() {
+  state.libActive = true;
+  document.documentElement.dataset.mode = 'lib';   // hides the date sidebar
+  state.searchQuery = ''; state.search = null;
+  setActivePill('#tracker-pills', '[data-tracker="__cra"]');
+  document.querySelectorAll('#tracker-pills .pill').forEach(b =>
+    b.setAttribute('aria-pressed', b.dataset.tracker === '__cra' ? 'true' : 'false'));
+  document.getElementById('tracker-title').textContent =
+    state.lang === 'en' ? 'CRA Reference Library' : 'CRA 參考圖書庫';
+  document.getElementById('year-pills').innerHTML = '';
+  document.getElementById('month-grid').innerHTML = '';
+  hideDateList();
+  const sr = document.getElementById('search-row'); if (sr) sr.style.display = 'none';
+  showMsg(state.lang === 'en' ? 'Loading CRA library…' : '載入 CRA 圖書庫…');
+  loadCraLibrary(() => { buildLibSortPills(); buildClusterPills(); renderLibrary(); });
+}
+function libData() {
+  return (typeof CRA_LIBRARY !== 'undefined') ? CRA_LIBRARY
+       : { topics: [], generated: '', sources: {} };
+}
+function buildClusterPills() {
+  const el = document.getElementById('cat-pills');
+  el.innerHTML = '';
+  const clusters = [...new Set(libData().topics.filter(t => t.status !== 'gone')
+    .map(t => t.cluster))].sort();
+  const items = [null, ...clusters];   // null = 全部
+  items.forEach(c => {
+    const btn = document.createElement('button');
+    btn.className = 'pill cat-pill';
+    btn.dataset.cluster = c || '';
+    btn.textContent = c || (state.lang === 'en' ? 'All' : '全部');
+    const on = c ? state.libCluster === c : !state.libCluster;
+    btn.classList.toggle('active', on);
+    btn.setAttribute('aria-pressed', String(on));
+    btn.onclick = () => { state.libCluster = c; buildClusterPills(); renderLibrary(); };
+    el.appendChild(btn);
+  });
+}
+function daysBetween(a, b) {
+  return Math.round((new Date(b + 'T00:00:00') - new Date(a + 'T00:00:00')) / 86400000);
+}
+function renderLibrary() {
+  const main = document.getElementById('main-content');
+  document.getElementById('loading-msg').style.display = 'none';
+  document.getElementById('no-data').classList.add('hidden');
+  Array.from(main.children).forEach(c => {
+    if (c.id !== 'loading-msg' && c.id !== 'no-data' && c.id !== 'search-row') c.remove();
+  });
+  const lib = libData();
+  const active = lib.topics.filter(t => t.status !== 'gone');
+  // Decided over the whole catalogue, not the filtered view, so the chip does
+  // not appear and disappear as clusters are picked.
+  LIB_SHOW_NEW = libNewChipUseful(active, lib.generated);
+  let topics = active;
+  if (state.libCluster) topics = topics.filter(t => t.cluster === state.libCluster);
+  document.getElementById('article-count').textContent = topics.length;
+  syncHash();   // keep the URL shareable (#lib=1&c=…)
+  if (!topics.length) {
+    const nd = document.getElementById('no-data');
+    nd.classList.remove('hidden');
+    nd.textContent = state.lang === 'en' ? 'No CRA topics.' : '沒有 CRA 主題';
+    return;
+  }
+  // Group by whatever the user is arranging on; inside every group the newest
+  // official revision comes first, because our crawl dates cannot order the
+  // sites' own updates and the pages' stated dates can.
+  const groups = new Map();
+  topics.forEach(t => {
+    const k = libGroupKey(t, lib.sources);
+    if (!groups.has(k)) groups.set(k, []);
+    groups.get(k).push(t);
+  });
+  const byDateDesc = (a, b) => (libWhen(b).date || '').localeCompare(libWhen(a).date || '');
+  groups.forEach(g => g.sort(byDateDesc));
+  // cluster/source read alphabetically; date reads newest month first
+  const keys = [...groups.keys()].sort();
+  if (state.libGroup === 'date') keys.reverse();
+  const frag = document.createDocumentFragment();
+  keys.forEach(k => {
+    const div = document.createElement('div');
+    div.className = 'date-divider';
+    div.textContent = k + ' · ' + groups.get(k).length;
+    frag.appendChild(div);
+    const list = document.createElement('div');
+    list.className = 'lib-list';
+    groups.get(k).forEach(t =>
+      list.appendChild(buildLibRow(t, lib.generated, lib.sources)));
+    frag.appendChild(list);
+  });
+  main.appendChild(frag);
+}
+// The heading a topic files under, per the active arrangement.
+function libGroupKey(t, sources) {
+  if (state.libGroup === 'source') return (sources && sources[t.source]) || t.source;
+  if (state.libGroup === 'date') {
+    const d = libWhen(t).date;
+    return d ? d.slice(0, 7) : (state.lang === 'en' ? 'Undated' : '未標日期');
+  }
+  return t.cluster || (state.lang === 'en' ? 'Other' : '其他');
+}
+function buildLibSortPills() {
+  const el = document.getElementById('lib-sort');
+  if (!el) return;
+  el.innerHTML = '';
+  const en = state.lang === 'en';
+  el.setAttribute('aria-label', en ? 'Arrange library by' : '圖書庫排列方式');
+  const lbl = document.createElement('span');
+  lbl.className = 'lib-sort-label';
+  lbl.textContent = en ? 'Arrange' : '排列';
+  el.appendChild(lbl);
+  [['cluster', '分類', 'Category'], ['date', '日期', 'Date'], ['source', '來源', 'Source']]
+    .forEach(([key, zh, enLabel]) => {
+      const btn = document.createElement('button');
+      btn.className = 'pill sort-pill';
+      btn.dataset.group = key;
+      btn.textContent = en ? enLabel : zh;
+      const on = state.libGroup === key;
+      btn.classList.toggle('active', on);
+      btn.setAttribute('aria-pressed', String(on));
+      btn.onclick = () => {
+        state.libGroup = key;
+        try { localStorage.setItem('tracker_lib_group', key); } catch (e) {}
+        buildLibSortPills();
+        renderLibrary();
+      };
+      el.appendChild(btn);
+    });
+}
+// Which date to show for a topic, and how much it is worth. `source_date` is
+// what the page itself states (dateModified / datePublished, or the document's
+// HTTP build stamp); only that can put the official updates in order. Our own
+// crawl dates are the last resort — they say when *we* noticed, not when the
+// site changed.
+const LIB_DATE_LABEL = {
+  modified:  { zh: '官方更新', en: 'official update' },
+  published: { zh: '官方發佈', en: 'published' },
+  site:      { zh: '站台部署', en: 'site build' },
+  detected:  { zh: '偵測變更', en: 'change detected' },
+  added:     { zh: '收錄',     en: 'catalogued' }
+};
+function libWhen(t) {
+  if (t.source_date) return { date: t.source_date, kind: t.date_kind || 'modified' };
+  if (t.last_changed) return { date: t.last_changed, kind: 'detected' };
+  return { date: t.first_seen || '', kind: 'added' };
+}
+// A marker that fires on everything says nothing. A freshly seeded catalogue
+// has every topic "first seen" on the same day, which put a NEW chip on all 94
+// rows — pure noise. Below the threshold the chip is worth its ink again.
+const LIB_NEW_MAX_SHARE = 0.5;
+var LIB_SHOW_NEW = true;          // recomputed by renderLibrary()
+function libNewChipUseful(topics, gen) {
+  if (!gen || !topics.length) return false;
+  const n = topics.filter(t => t.first_seen && daysBetween(t.first_seen, gen) <= 14).length;
+  return n / topics.length <= LIB_NEW_MAX_SHARE;
+}
+function buildLibRow(t, gen, sources) {
+  const a = document.createElement('a');
+  a.className = 'lib-row';
+  a.href = t.url; a.target = '_blank'; a.rel = 'noopener';
+  const en = state.lang === 'en';
+  const when = libWhen(t);
+  const isNew = LIB_SHOW_NEW && t.first_seen && gen && daysBetween(t.first_seen, gen) <= 14;
+  // "Updated" means the *page* says it was revised recently, or we detected its
+  // body changing. A `site` build stamp is not evidence that this topic changed
+  // — it moves for every page at once — so it never earns the chip.
+  const isUpd = !isNew && when.date && gen
+             && (when.kind === 'modified' || when.kind === 'published'
+                 || (when.kind === 'detected' && t.last_changed !== t.first_seen))
+             && daysBetween(when.date, gen) <= 14;
+  const chip = isNew ? '<span class="lib-chip new">' + (en ? 'NEW' : '新') + '</span>'
+             : isUpd ? '<span class="lib-chip upd">' + (en ? 'UPDATED' : '更新') + '</span>'
+             : '';
+  const lbl = (LIB_DATE_LABEL[when.kind] || LIB_DATE_LABEL.detected)[en ? 'en' : 'zh'];
+  const weak = (when.kind === 'site' || when.kind === 'detected' || when.kind === 'added');
+  // Never repeat what the group heading already says.
+  const side = [];
+  if (state.libGroup !== 'cluster' && t.cluster) side.push(t.cluster);
+  if (state.libGroup !== 'source') side.push((sources && sources[t.source]) || t.source);
+  a.innerHTML =
+    '<span class="lib-date' + (weak ? ' weak' : '') + '" title="' + escHtml(lbl) + '">' +
+      escHtml(when.date || '—') + '</span>' +
+    '<span class="lib-name">' + escHtml(t.title) + chip + '</span>' +
+    '<span class="lib-side">' + escHtml(side.join(' · ')) + '</span>';
+  return a;
+}
+
+// ── Year selection ────────────────────────────────────
+function selectYear(year) {
+  state.currentYear = year;
+  setActivePill('#year-pills', '[data-year="' + year + '"]');
+  if (state.searchQuery && state.search) {
+    // Search mode: show all matched articles in this year; menu reflects matches.
+    buildMonthGrid(year);
+    clearActiveMonthBtn();
+    hideDateList();
+    state.currentMode = 'search';
+    state.currentMonth = null;
+    state.currentDate = null;
+    renderArticles(searchDatesInYear(year));
+    return;
+  }
+  showMsg(L().ui.loadYear(year));
+  loadYearManifest(year, () => {
+    buildMonthGrid(year);
+    const ym = getYearManifest(year);
+    const months = (ym && ym.months) || [];
+    if (pendingRestore && pendingRestore.fullYear) {
+      pendingRestore = null; restoring = false; selectFullYear(); return;
+    }
+    const target = (pendingRestore && pendingRestore.month && months.includes(pendingRestore.month))
+      ? pendingRestore.month : months[0];
+    if (target) selectMonth(target);
+    else { pendingRestore = null; restoring = false; }
+  });
+}
+
+// ── Month selection ───────────────────────────────────
+function selectMonth(month) {
+  state.currentMode  = 'month';
+  state.currentMonth = month;
+  state.currentDate  = null;
+  setActiveMonthBtn(month);
+  showMsg(L().ui.loadMonth(month));
+
+  loadMonthManifest(month, () => {
+    buildDateList(month);
+    const dates = getDatesForMonth(month);
+    if (!dates.length) { renderArticles([]); pendingRestore = null; restoring = false; return; }
+    // Renders the whole month, then (deep-link) jumps to a specific date once
+    // its day file is present. In the normal flow jumpDate is null → no-op.
+    const done = () => {
+      const jumpDate = (pendingRestore && pendingRestore.date &&
+        dates.some(x => x.date === pendingRestore.date)) ? pendingRestore.date : null;
+      pendingRestore = null; restoring = false;
+      renderArticles(dates.map(d2 => d2.date));
+      if (jumpDate) selectDate(jumpDate);
+    };
+    const toLoad = dates.filter(d => !state.loadedFiles.has(d.file));
+    if (!toLoad.length) { done(); return; }
+    let pending = toLoad.length;
+    toLoad.forEach(d => loadDayFile(d.file, () => { if (--pending === 0) done(); }));
+  });
+}
+
+// ── Full-year ─────────────────────────────────────────
+function selectFullYear() {
+  state.currentMode  = 'full-year';
+  state.currentMonth = null;
+  state.currentDate  = null;
+  clearActiveMonthBtn();
+  hideDateList();
+  if (state.searchQuery && state.search) {
+    renderArticles(searchDatesInYear(state.currentYear));
+    return;
+  }
+  showMsg(t('loadFullYear'));
+
+  const ym = getYearManifest(state.currentYear);
+  if (!ym || !ym.months || !ym.months.length) { renderArticles([]); return; }
+  let pending = ym.months.length;
+  ym.months.forEach(m => loadMonthManifest(m, () => {
+    if (--pending > 0) return;
+    // Use the tracker-aware helper instead of reading TRACKER_MONTH flat —
+    // the new layout nests by tracker: window.TRACKER_MONTH[tracker][month].
+    const allDates = ym.months.flatMap(m2 => getDatesForMonth(m2));
+    const toLoad = allDates.filter(d => !state.loadedFiles.has(d.file));
+    if (!toLoad.length) { renderArticles(allDates.map(d => d.date)); return; }
+    let dp = toLoad.length;
+    toLoad.forEach(d => loadDayFile(d.file, () => {
+      if (--dp === 0) renderArticles(allDates.map(d2 => d2.date));
+    }));
+  }));
+}
+
+// ── Date selection ────────────────────────────────────
+function selectDate(date) {
+  state.currentMode = 'date';
+  state.currentDate = date;
+  document.querySelectorAll('.date-btn').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-pressed', 'false'); });
+  const btn = document.querySelector('.date-btn[data-date="' + date + '"]');
+  if (btn) { btn.classList.add('active'); btn.setAttribute('aria-pressed', 'true'); }
+  renderArticles([date]);
+  // On compact the drawer is modal — dismiss it after picking a date so the
+  // results aren't hidden behind it. (Not during a deep-link restore.)
+  if (!restoring && isCompact()) closeNav(false);
+}
+
+// ── Build UI helpers ──────────────────────────────────
+function buildYearPills(years) {
+  const el = document.getElementById('year-pills');
+  el.innerHTML = '';
+  years.forEach((y, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'pill year-pill' + (i === 0 ? ' active' : '');
+    btn.dataset.year = y;
+    btn.textContent = y;
+    btn.setAttribute('aria-pressed', i === 0 ? 'true' : 'false');
+    btn.onclick = () => selectYear(y);
+    el.appendChild(btn);
+  });
+}
+
+function buildCatPills(cats) {
+  const el = document.getElementById('cat-pills');
+  el.innerHTML = '';
+  const all = ['全部', ...cats];
+  const icons = { '全部':'', '法規與標準':'📋 ', '漏洞與威脅情報':'🔴 ', '供應鏈與開源安全':'🔗 ', '重大事件':'🚨 ', '前瞻技術':'🚀 ',
+                  'Linux':'🐧 ', 'Windows':'🪟 ', 'Apple':'🍎 ', 'Android':'🤖 ', '重點關注':'⭐ ' };
+  all.forEach((c) => {
+    const btn = document.createElement('button');
+    btn.className = 'pill cat-pill';
+    btn.dataset.cat = c;   // key stays Chinese; only the label is localized
+    btn.dataset.icon = icons[c] || '';
+    btn.onclick = () => setFilter(c);
+    el.appendChild(btn);
+  });
+  refreshCatPills();   // sets textContent (icon + label + selected-checkmark), active, aria-pressed
+}
+
+// Multi-select: 全部 is active when nothing is picked; otherwise every picked
+// category pill is highlighted (more than one can be on at once). Selected
+// chips get a leading "✓ " per the MD3 filter-chip convention (background
+// colour alone is not a reliable selected-state signal here, since the
+// selected fill IS the category's own hue).
+function refreshCatPills() {
+  document.querySelectorAll('#cat-pills .cat-pill').forEach(btn => {
+    const c = btn.dataset.cat;
+    const on = c === '全部' ? state.filterCats.size === 0 : state.filterCats.has(c);
+    btn.classList.toggle('active', on);
+    btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    const check = (on && c !== '全部') ? '✓ ' : '';
+    btn.textContent = check + (btn.dataset.icon || '') + catLabel(c);
+  });
+}
+
+function buildMonthGrid(year) {
+  let availMonths;
+  if (state.searchQuery && state.search) {
+    // Only months that contain matched dates are selectable.
+    availMonths = new Set(Object.keys(state.search.countByDate)
+      .filter(d => d.slice(0, 4) === year).map(d => d.slice(0, 7)));
+  } else {
+    const ym = getYearManifest(year);
+    availMonths = new Set(ym?.months || []);
+  }
+  const grid = document.getElementById('month-grid');
+  grid.innerHTML = '';
+  const monthNames = L().months;
+  for (let m = 1; m <= 12; m++) {
+    const key = year + '-' + String(m).padStart(2, '0');
+    const btn = document.createElement('button');
+    btn.className = 'month-btn' + (availMonths.has(key) ? '' : ' empty');
+    btn.dataset.month = key;
+    btn.textContent = monthNames[m - 1];
+    if (availMonths.has(key)) {
+      btn.setAttribute('aria-pressed', 'false');
+      btn.onclick = () => selectMonth(key);
+    } else {
+      btn.setAttribute('aria-disabled', 'true');
+    }
+    grid.appendChild(btn);
+  }
+}
+
+function setActiveMonthBtn(month) {
+  document.querySelectorAll('.month-btn').forEach(b => { b.classList.remove('active'); if (!b.classList.contains('empty')) b.setAttribute('aria-pressed', 'false'); });
+  const btn = document.querySelector('.month-btn[data-month="' + month + '"]');
+  if (btn) { btn.classList.add('active'); btn.setAttribute('aria-pressed', 'true'); }
+}
+function clearActiveMonthBtn() {
+  document.querySelectorAll('.month-btn').forEach(b => { b.classList.remove('active'); if (!b.classList.contains('empty')) b.setAttribute('aria-pressed', 'false'); });
+}
+
+function buildDateList(month) {
+  const dates = getDatesForMonth(month);
+  const section = document.getElementById('date-section');
+  const list = document.getElementById('date-list');
+  list.innerHTML = '';
+  if (!dates.length) { section.style.display = 'none'; return; }
+  section.style.display = 'block';
+  dates.forEach((d, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'date-btn' + (i === 0 ? ' active' : '');
+    btn.dataset.date = d.date;
+    btn.setAttribute('aria-pressed', i === 0 ? 'true' : 'false');
+    btn.innerHTML = '<span>' + d.date.slice(5) + '</span><span class="badge">' + d.count + '</span>';
+    btn.onclick = () => selectDate(d.date);
+    list.appendChild(btn);
+  });
+}
+function hideDateList() {
+  document.getElementById('date-section').style.display = 'none';
+}
+
+// ── Filter ────────────────────────────────────────────
+function setFilter(cat) {
+  if (cat === '全部') {
+    state.filterCats.clear();                 // 全部 resets the multi-select
+  } else if (state.filterCats.has(cat)) {
+    state.filterCats.delete(cat);             // toggle off
+  } else {
+    state.filterCats.add(cat);                // toggle on (multi-select)
+  }
+  refreshCatPills();
+  if (state.searchQuery && state.search) {
+    refreshSearchView();   // date menu + counts depend on the category too
+  } else {
+    renderArticles();
+  }
+}
+
+// ── Render ────────────────────────────────────────────
+function renderArticles(dateList) {
+  if (dateList !== undefined) state.pendingDates = dateList;
+  const dates = state.pendingDates;
+
+  const main = document.getElementById('main-content');
+  document.getElementById('loading-msg').style.display = 'none';
+  document.getElementById('no-data').classList.add('hidden');
+
+  // Collect articles
+  let articles = [];
+  (dates || []).forEach(date => {
+    const day = (window.TRACKER_DAYS || {})[date];
+    if (day) articles = articles.concat(day.map(a => ({ ...a, _date: date })));
+  });
+
+  // Filter by current tracker (multi-belong: keep items whose `trackers`
+  // includes the current tracker; legacy items default to security).
+  if (state.currentTracker) {
+    articles = articles.filter(a => itemBelongsToTracker(a, state.currentTracker));
+  }
+
+  if (state.filterCats.size) {
+    articles = articles.filter(a =>
+      state.filterCats.has(effectiveCat(a, state.currentTracker)));
+  }
+
+  // Site-wide search: keep only items matching the query (in either language).
+  if (state.searchQuery) {
+    const q = state.searchQuery.toLowerCase();
+    articles = articles.filter(a => matchesQuery(a, q));
+  }
+
+  document.getElementById('article-count').textContent = articles.length;
+  syncHash();   // keep the URL in step with the current view
+
+  // Clear old cards (keep search row + loading/no-data divs)
+  Array.from(main.children).forEach(c => {
+    if (c.id !== 'loading-msg' && c.id !== 'no-data' && c.id !== 'search-row') c.remove();
+  });
+
+  if (!articles.length) {
+    const noData = document.getElementById('no-data');
+    noData.classList.remove('hidden');
+    noData.textContent = state.searchQuery
+      ? L().ui.noResults(state.searchQuery)
+      : (state.filterCats.size === 0
+          ? t('noData')
+          : L().ui.noCat([...state.filterCats].map(catLabel).join(' / ')));
+    return;
+  }
+
+  // Group by date descending
+  const grouped = {};
+  articles.forEach(a => {
+    const d = a._date;
+    if (!grouped[d]) grouped[d] = [];
+    grouped[d].push(a);
+  });
+  const sortedDates = Object.keys(grouped).sort((a, b) => b.localeCompare(a));
+
+  const frag = document.createDocumentFragment();
+  sortedDates.forEach(date => {
+    const divider = document.createElement('div');
+    divider.className = 'date-divider';
+    divider.textContent = date;
+    frag.appendChild(divider);
+
+    const grid = document.createElement('div');
+    grid.className = 'cards-grid';
+    grouped[date].forEach(a => grid.appendChild(buildCard(a)));
+    frag.appendChild(grid);
+  });
+  main.appendChild(frag);
+}
+
+function buildCard(a) {
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.tabIndex = 0;
+  card.setAttribute('role', 'button');
+  card.setAttribute('aria-label', artTitle(a));
+  const ecat = effectiveCat(a, state.currentTracker);
+  const catClass = 'cat-' + ecat;   // colour class keyed on the viewing tracker's category
+  const title = artTitle(a), summary = artSummary(a);
+  const preview = summary;
+  const srcName = a.sources && a.sources[0] ? escHtml(a.sources[0].name) : '';
+  const tagsHtml = artTags(a).map(tg => {
+    if (/^CVE-\d{4}-\d{4,}$/.test(tg)) {
+      return '<a class="card-tag" href="https://www.cve.org/CVERecord?id=' + tg + '" target="_blank" rel="noopener">' + escHtml(tg) + '</a>';
+    }
+    return '<span class="card-tag">' + escHtml(tg) + '</span>';
+  }).join('');
+  card.innerHTML = [
+    '<span class="cat-badge ' + catClass + '">' + escHtml(catLabel(ecat)) + '</span>',
+    '<h3 class="card-title">' + linkifyCVE(escHtml(title)) + '</h3>',
+    '<p class="card-summary-preview">' + escHtml(preview) + '</p>',
+    '<div class="card-tags">' + tagsHtml + '</div>',
+    '<div class="card-meta">' + srcName + (srcName ? ' · ' : '') + escHtml(a._date) + '</div>'
+  ].join('');
+  card.onclick = () => openOverlay(a, card);
+  card.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); openOverlay(a, card); }
+    else if (e.key === ' ' || e.key === 'Spacebar') { e.preventDefault(); openOverlay(a, card); }  // prevent page scroll
+  });
+  return card;
+}
+
+// Focus that gets restored to the triggering card once the dialog closes.
+let overlayReturnFocus = null;
+function overlayTabTrap(e) {
+  if (e.key !== 'Tab') return;
+  const box = document.getElementById('overlay-box');
+  const focusables = [...box.querySelectorAll('button, [href], input, [tabindex]:not([tabindex="-1"])')]
+    .filter(el => el.offsetParent !== null);
+  if (!focusables.length) return;
+  const first = focusables[0], last = focusables[focusables.length - 1];
+  if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+  else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+}
+function openOverlay(a, triggerEl) {
+  overlayReturnFocus = triggerEl || document.activeElement;
+  const box = document.getElementById('overlay-box');
+  const ecat = effectiveCat(a, state.currentTracker);
+  const catClass = 'cat-' + ecat;
+  const srcHtml = (a.sources || []).map(s =>
+    '<li><a href="' + escHtml(s.url) + '" target="_blank" rel="noopener">[' + escHtml(s.lang) + '] ' + escHtml(s.name) + '</a></li>'
+  ).join('');
+  const tagsHtml = artTags(a).map(tg => {
+    if (/^CVE-\d{4}-\d{4,}$/.test(tg)) {
+      return '<a class="card-tag" href="https://www.cve.org/CVERecord?id=' + tg + '" target="_blank" rel="noopener">' + escHtml(tg) + '</a>';
+    }
+    return '<span class="card-tag">' + escHtml(tg) + '</span>';
+  }).join('');
+  box.innerHTML = [
+    '<button id="overlay-close" onclick="closeOverlay()" aria-label="' + escHtml(t('close')) + '"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button>',
+    '<span class="cat-badge ' + catClass + '">' + escHtml(catLabel(ecat)) + '</span>',
+    '<h2 id="overlay-title">' + linkifyCVE(escHtml(artTitle(a))) + '</h2>',
+    '<p class="card-summary">' + linkifyCVE(escHtml(artSummary(a))) + '</p>',
+    '<div class="card-tags">' + tagsHtml + '</div>',
+    '<hr>',
+    '<h4>' + escHtml(t('sources')) + '</h4>',
+    '<ul>' + srcHtml + '</ul>'
+  ].join('');
+  document.getElementById('overlay').classList.remove('hidden');
+  document.addEventListener('keydown', overlayTabTrap);
+  const closeBtn = document.getElementById('overlay-close');
+  if (closeBtn) closeBtn.focus();
+}
+function closeOverlay() {
+  const overlay = document.getElementById('overlay');
+  const wasOpen = !overlay.classList.contains('hidden');
+  overlay.classList.add('hidden');
+  document.removeEventListener('keydown', overlayTabTrap);
+  if (wasOpen && overlayReturnFocus && document.body.contains(overlayReturnFocus)) {
+    overlayReturnFocus.focus();
+  }
+  overlayReturnFocus = null;
+}
+
+// ── Load helpers ──────────────────────────────────────
+function loadYearManifest(year, cb) {
+  const key = state.currentTracker + '/' + year;
+  if (state.loadedYears.has(key)) { cb(); return; }
+  const mf = currentManifest();
+  const file = mf && mf.yearFiles && mf.yearFiles[year];
+  if (!file) { state.loadedYears.add(key); cb(); return; }
+  injectScript(file, () => { state.loadedYears.add(key); cb(); });
+}
+
+function loadMonthManifest(month, cb) {
+  const key = state.currentTracker + '/' + month;
+  if (state.loadedMonths.has(key)) { cb(); return; }
+  const ym = getYearManifest(month.slice(0, 4));
+  const monthFile = ym && ym.monthFiles && ym.monthFiles[month];
+  if (!monthFile) { state.loadedMonths.add(key); cb(); return; }
+  // monthFiles are relative to the year manifest's own dir (data/{tracker}/).
+  const file = 'data/' + state.currentTracker + '/' + monthFile;
+  injectScript(file, () => { state.loadedMonths.add(key); cb(); });
+}
+
+function loadDayFile(file, cb) {
+  // `file` may be "../data-20260528.js" (from a tracker month manifest); resolve
+  // relative to the per-tracker manifest's own dir.
+  let resolved = file;
+  if (file.startsWith('../')) {
+    resolved = 'data/' + file.slice(3);  // -> data/data-YYYYMMDD.js
+  }
+  if (state.loadedFiles.has(resolved)) { cb(); return; }
+  injectScript(resolved, () => { state.loadedFiles.add(resolved); cb(); });
+}
+
+function injectScript(src, cb) {
+  const s = document.createElement('script');
+  s.src = src;
+  s.onload = cb;
+  s.onerror = () => { console.warn('Failed to load:', src); cb(); };
+  document.head.appendChild(s);
+}
+
+// ── Helpers ───────────────────────────────────────────
+function getYearManifest(year) {
+  const tk = state.currentTracker;
+  const byTracker = (window.TRACKER_YEAR || {})[tk];
+  if (byTracker && byTracker[year]) return byTracker[year];
+  // Legacy single-tracker structure: TRACKER_YEAR[year]
+  return (window.TRACKER_YEAR || {})[year] || null;
+}
+function manifestDatesForMonth(month) {
+  const tk = state.currentTracker;
+  const byTracker = (window.TRACKER_MONTH || {})[tk];
+  const mm = (byTracker && byTracker[month]) || (window.TRACKER_MONTH || {})[month];
+  return mm ? (mm.dates || []) : [];
+}
+function getDatesForMonth(month) {
+  if (state.searchQuery && state.search) {
+    // Search mode: keep only matched dates, override counts with match counts.
+    const counts = state.search.countByDate;
+    return manifestDatesForMonth(month)
+      .filter(d => counts[d.date] > 0)
+      .map(d => ({ date: d.date, file: d.file, count: counts[d.date] }));
+  }
+  return manifestDatesForMonth(month);
+}
+function setActivePill(containerSel, btnSel) {
+  const container = document.querySelector(containerSel);
+  if (!container) return;
+  container.querySelectorAll('.pill').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-pressed', 'false'); });
+  const btn = container.querySelector(btnSel);
+  if (btn) { btn.classList.add('active'); btn.setAttribute('aria-pressed', 'true'); }
+}
+function showMsg(msg) {
+  const el = document.getElementById('loading-msg');
+  el.style.display = 'block';
+  el.textContent = msg;
+  document.getElementById('no-data').classList.add('hidden');
+  Array.from(document.getElementById('main-content').children).forEach(c => {
+    if (c.id !== 'loading-msg' && c.id !== 'no-data' && c.id !== 'search-row') c.remove();
+  });
+}
+function linkifyCVE(html) {
+  return html.replace(/CVE-(\d{4})-(\d{4,})/g, (m) =>
+    '<a class="cve-link" href="https://www.cve.org/CVERecord?id=' + m +
+    '" target="_blank" rel="noopener">' + m + '</a>'
+  );
+}
+function escHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+function toggleTheme() {
+  const isDark = document.documentElement.dataset.theme !== 'light';
+  document.documentElement.dataset.theme = isDark ? 'light' : 'dark';
+  // Toggle SVG icons (light ↔ dark)
+  const lightIcon = document.getElementById('theme-icon-light');
+  const darkIcon = document.getElementById('theme-icon-dark');
+  if (lightIcon && darkIcon) {
+    lightIcon.style.display = isDark ? 'none' : 'inline-block';
+    darkIcon.style.display = isDark ? 'inline-block' : 'none';
+  }
+  try { localStorage.setItem('tracker_theme', isDark ? 'light' : 'dark'); } catch (e) {}
+}
+
+function toggleSkin() {
+  const isMd3 = document.documentElement.dataset.skin !== 'classic';
+  document.documentElement.dataset.skin = isMd3 ? 'classic' : 'md3';
+  try { localStorage.setItem('tracker_skin', isMd3 ? 'classic' : 'md3'); } catch (e) {}
+  syncHash();   // skin is part of the shareable view
+}
+
+// ── Deep-linking (URL hash ⇄ view state) ──────────────
+// The hash mirrors the current view so a link restores it: tracker / year /
+// month (or * for full-year) / date / category filter / search query / skin.
+// Writes go through history.replaceState (no history spam, no hashchange), so
+// they never trigger the restore path below. `restoring` suppresses writes
+// while a restore drills through the async select* chain; `pendingRestore`
+// carries the month/date targets that the year/month load callbacks consume.
+var restoring = false;
+var pendingRestore = null;
+var suppressHashChange = false;
+
+function syncHash() {
+  if (restoring) return;
+  const skinOf = () => document.documentElement.dataset.skin;
+  if (state.libActive) {   // CRA library mode has its own compact hash
+    const lp = ['lib=1'];
+    if (state.libCluster) lp.push('c=' + encodeURIComponent(state.libCluster));
+    if (state.libGroup !== 'cluster') lp.push('g=' + state.libGroup);
+    if (skinOf()) lp.push('s=' + skinOf());
+    const lh = '#' + lp.join('&');
+    if (lh !== location.hash) {
+      try { history.replaceState(null, '', lh); }
+      catch (e) { suppressHashChange = true; location.hash = lh; }
+    }
+    return;
+  }
+  const p = [];
+  if (state.currentTracker) p.push('t=' + state.currentTracker);
+  if (state.currentYear) p.push('y=' + state.currentYear);
+  if (state.currentMode === 'full-year') p.push('m=*');
+  else if (state.currentMonth) p.push('m=' + state.currentMonth);
+  if (state.currentDate) p.push('d=' + state.currentDate);
+  if (state.filterCats.size) p.push('c=' + [...state.filterCats].map(encodeURIComponent).join(','));
+  if (state.searchQuery) p.push('q=' + encodeURIComponent(state.searchQuery));
+  const skin = document.documentElement.dataset.skin;
+  if (skin) p.push('s=' + skin);
+  const hash = '#' + p.join('&');
+  if (hash === location.hash) return;
+  try { history.replaceState(null, '', hash); }
+  catch (e) { suppressHashChange = true; location.hash = hash; }
+}
+
+function parseHash() {
+  const h = (location.hash || '').replace(/^#/, '');
+  if (!h) return null;
+  const o = {};
+  h.split('&').forEach(kv => {
+    const i = kv.indexOf('=');
+    if (i < 0) return;
+    o[kv.slice(0, i)] = decodeURIComponent(kv.slice(i + 1));
+  });
+  return o;
+}
+
+// Restore the view named by the hash. Returns true if it handled the load.
+function applyHashRestore() {
+  const h = parseHash();
+  if (h && h.lib) {          // CRA library deep-link
+    if (h.s === 'md3' || h.s === 'classic') document.documentElement.dataset.skin = h.s;
+    state.libCluster = h.c || null;
+    if (h.g === 'cluster' || h.g === 'date' || h.g === 'source') state.libGroup = h.g;
+    selectLibrary();
+    return true;
+  }
+  if (!h || !h.t) return false;
+  const all = getTrackers();
+  if (!all || !all[h.t]) return false;
+  if (h.s === 'md3' || h.s === 'classic') document.documentElement.dataset.skin = h.s;
+  restoring = true;
+  selectTracker(h.t);          // restoring=true makes it skip its default year auto-select
+  // category filter
+  if (h.c) {
+    h.c.split(',').filter(Boolean).forEach(c => state.filterCats.add(c));
+    refreshCatPills();
+  }
+  // search query takes its own (search-aware) path
+  if (h.q) {
+    state.searchQuery = h.q;
+    const sb = document.getElementById('search-box'); if (sb) sb.value = h.q;
+    const sc = document.getElementById('search-clear'); if (sc) sc.style.display = 'inline';
+    restoring = false; pendingRestore = null;
+    runSearch();
+    return true;
+  }
+  const years = all[h.t].years || [];
+  const year = (h.y && years.includes(h.y)) ? h.y : years[0];
+  if (!year) { restoring = false; return true; }
+  pendingRestore = { month: h.m === '*' ? null : h.m, date: h.d, fullYear: h.m === '*' };
+  selectYear(year);            // async chain consumes pendingRestore for month/date
+  return true;
+}
+
+// ── Events ────────────────────────────────────────────
+window.addEventListener('hashchange', () => {
+  if (suppressHashChange) { suppressHashChange = false; return; }
+  if (!restoring) applyHashRestore();
+});
+document.getElementById('overlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('overlay')) closeOverlay();
+});
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Escape') return;
+  if (!document.getElementById('overlay').classList.contains('hidden')) closeOverlay();
+  else if (document.getElementById('sidebar').classList.contains('nav-open')) closeNav(true);
+});
+
+// Floating nav drawer: hamburger toggles it, scrim (compact) click closes it.
+(function wireDrawer() {
+  const btn = document.getElementById('drawer-toggle');
+  const scrim = document.getElementById('sidebar-scrim');
+  if (btn) btn.addEventListener('click', toggleNav);
+  if (scrim) scrim.addEventListener('click', () => closeNav(true));
+})();
+
+// Search box: debounced live search + Enter + Esc/clear.
+(function wireSearch() {
+  const box = document.getElementById('search-box');
+  if (!box) return;
+  let timer;
+  box.addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(runSearch, 300); });
+  box.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { clearTimeout(timer); runSearch(); }
+    else if (e.key === 'Escape') { box.value = ''; clearSearch(); box.blur(); }
+  });
+  document.getElementById('search-clear').addEventListener('click', () => {
+    box.value = ''; clearSearch(); box.focus();
+  });
+  document.querySelectorAll('#search-scope .scope-pill').forEach(btn => {
+    btn.addEventListener('click', () => toggleScope(btn.dataset.scope, btn));
+  });
+})();
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>

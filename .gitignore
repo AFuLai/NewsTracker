@@ -18,5 +18,6 @@ logs/
 db/query_cache.json
 db/*.bak*
 db/*.sqlite.*
-# generated static site (moved to ext4 for native, cross-write-free output)
-/html/
+# generated static site is tracked; skip stale hand-kept backups
+html/*.bak
+html/*.bak.*
