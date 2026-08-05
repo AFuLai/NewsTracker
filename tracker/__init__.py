@@ -2,7 +2,7 @@
 from pathlib import Path
 
 ROOT = Path("/opt/tracker")
-PROJECT_ROOT = Path("/mnt/d/Claude/Track Security")
+PROJECT_ROOT = Path("/mnt/d/Claude/Tool/NewsTracker")
 # Static site output lives on ext4 (native to render.py): ~90x faster small-file
 # writes than drvfs(/mnt/d) and none of the cross-write pitfalls (drvfs speed
 # tax, 777/CRLF git noise, AV locking, ADS streams). The tarball stays on /mnt/d
@@ -15,10 +15,13 @@ OLLAMA_MODEL = "gemma4:e4b"
 
 # Multi-tracker support. Each top-level "tracker" is a self-contained
 # topic with its own searchinfo file, categories, and manifest tree.
+# These live IN the repo (not on /mnt/d) so the source lists, categories and
+# keywords are versioned and published alongside the engine that reads them —
+# a checkout is runnable as-is instead of needing three files nobody has.
 SEARCHINFOS: dict[str, Path] = {
-    "security": PROJECT_ROOT / "searchinfo_security.md",
-    "eu_cra":   PROJECT_ROOT / "searchinfo_eu_cra.md",
-    "os":       PROJECT_ROOT / "searchinfo_os.md",
+    "security": ROOT / "searchinfo" / "searchinfo_security.md",
+    "eu_cra":   ROOT / "searchinfo" / "searchinfo_eu_cra.md",
+    "os":       ROOT / "searchinfo" / "searchinfo_os.md",
 }
 DEFAULT_TRACKER = "security"
 

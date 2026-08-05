@@ -290,7 +290,8 @@ WP2 schema（先行，其他 WP 依賴 source_profiles/runs 表）
 
 - 開發環境：WSL Ubuntu 26.04、`/opt/tracker`（git repo）、venv 在 `.venv/`、
   Python 3.14、ollama 0.23.2 跑 `gemma4:e4b`（~19s/篇摘要）
-- Windows 端輸出：`/mnt/d/Claude/Track Security/html`、tarball 同目錄 `tarball/`
+- 靜態站輸出：`/opt/tracker/html`（ext4）；Windows 端只留 tarball 與 status.json，
+  在 `/mnt/d/Claude/Tool/NewsTracker/`（`PROJECT_ROOT`）
 - 從 Windows 呼叫：`wsl.exe -e bash -c 'cd /opt/tracker && source .venv/bin/activate && …'`
 - 檔案編輯可走 UNC：`\\wsl.localhost\Ubuntu\opt\tracker\…`
 - **小心 bash heredoc 內的中文與括號**（本輪曾因 commit message 內 `()` 炸掉，

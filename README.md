@@ -4,17 +4,23 @@ Self-driving security / regulation news tracker. Runs entirely on WSL with a
 local Ollama model (`gemma4:e4b`) — **no external API**. Claude Code triggers it
 with one command and reads one line back; everything else (fetch, relevance
 gating, summarize, self-review, write, cleanup) happens locally. Outputs a static
-HTML site to `D:\Claude\Track Security\html\`.
+HTML site to `/opt/tracker/html/`.
 
 **Trackers** (top-level topics, switchable in the UI; each has its own
-`searchinfo_*.md`, categories, and manifest tree):
+`searchinfo/searchinfo_*.md`, categories, and manifest tree):
 - `security` — 資安新聞（5 類）
 - `eu_cra` — EU CRA 法令與標準（7 類）
 - `os` — 作業系統 Linux / Windows / Apple / Android（依平台 5 類，含 NVD CVE API）
 
-Adding a tracker = one `searchinfo_*.md` + one line in `SEARCHINFOS`
+Adding a tracker = one `searchinfo/searchinfo_*.md` + one line in `SEARCHINFOS`
 (`tracker/__init__.py`); the orchestrator, cross-detection, manifest, and UI
 tracker pill all pick it up generically.
+
+**Paths.** The repo (engine + `searchinfo/`) lives on WSL's ext4 at
+`/opt/tracker` — `/mnt/d` is a 9p mount whose per-file latency makes both git
+and the site render crawl. Only the Windows-side artefacts (`tarball/`,
+`status.json`) sit on the D: drive, at `D:\Claude\Tool\NewsTracker\`
+(`PROJECT_ROOT`).
 
 ## One-command operation (zero-touch)
 
@@ -130,11 +136,11 @@ Key tables (`db/articles.sqlite`, all migrations idempotent):
 
 ## Adding a new source — name + URL only
 
-`searchinfo_*.md` stays the source of truth. To add a source you only need a
-name and URL; the method is auto-detected:
+`searchinfo/searchinfo_*.md` stays the source of truth. To add a source you only
+need a name and URL; the method is auto-detected:
 
 ```bash
-# 1. add one ENTRY row to searchinfo_security.md (or _eu_cra.md):
+# 1. add one ENTRY row to searchinfo/searchinfo_security.md (or _eu_cra.md):
 #    | My Source | https://example.com/news | description |
 # 2. seed/refresh profiles:
 tracker init-profiles
