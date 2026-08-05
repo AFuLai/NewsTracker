@@ -9,3 +9,4 @@ db/           export-ignore
 *.sqlite      export-ignore
 # The generated site is tracked in git, but release zips ship the engine only.
 html/         export-ignore
+ops/          export-ignore
