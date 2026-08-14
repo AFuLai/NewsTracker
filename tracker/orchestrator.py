@@ -247,6 +247,7 @@ def run_pipeline(*, since: str, until: str, trackers: list[str],
 
     # ── Phase 0: ollama preflight (auto-start if down) ───────────────────────
     rpt.enter("preflight", "checking ollama")
+    from . import preflight as preflight_mod
     from .preflight import ensure_ollama
     if not ensure_ollama():
         rep.ok = False
@@ -255,7 +256,18 @@ def run_pipeline(*, since: str, until: str, trackers: list[str],
         rpt.result("preflight", "ollama unreachable", failed=True)
         _finalize(store, rep, t0, log, stats0)
         return rep
-    log.info("ollama ready")
+    # WP2: say which of the two cases we are in, because they have different
+    # throughput. We only control OLLAMA_NUM_PARALLEL for a daemon we started;
+    # otherwise the LLM pool may be queueing behind a 1-slot daemon and the
+    # `x4` in the report would be workers asked for, not work done in parallel.
+    if preflight_mod.started_here:
+        log.info("ollama ready (started here, OLLAMA_NUM_PARALLEL=%d)",
+                 llm_concurrency())
+    else:
+        log.info("ollama ready (was already running — its OLLAMA_NUM_PARALLEL "
+                 "is whatever it was started with; if that is 1 the %d LLM "
+                 "workers will queue rather than run in parallel)",
+                 llm_concurrency())
     rpt.result("preflight", "ollama ready")
 
     try:

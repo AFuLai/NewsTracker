@@ -28,13 +28,26 @@ def ollama_up(timeout: float = 3.0) -> bool:
         return False
 
 
+#: Whether *this* process started the ollama daemon. WP2 matches the daemon's
+#: OLLAMA_NUM_PARALLEL to TRACKER_LLM_CONCURRENCY, but only for a daemon we
+#: start ourselves — one already running keeps whatever slot count it was given,
+#: and against a 1-slot daemon a 4-wide pool just queues (measured: 1.36x rather
+#: than 2.35x). The orchestrator reads this so the run log distinguishes
+#: "4 workers against 4 known slots" from "4 workers against an unknown daemon",
+#: instead of printing a worker count that implies a speed-up nobody verified.
+started_here: bool = False
+
+
 def ensure_ollama(*, start_timeout: int = 40, console=None) -> bool:
     """Return True if ollama is (now) reachable. Auto-starts it in the
     background if down, and leaves it running."""
+    global started_here
+
     def _say(msg):
         (console.print if console else print)(msg)
 
     if ollama_up():
+        started_here = False
         return True
     _say("[dim]ollama not running — starting it in the background…[/dim]"
          if console else "ollama not running — starting it in the background…")
@@ -59,6 +72,7 @@ def ensure_ollama(*, start_timeout: int = 40, console=None) -> bool:
     for _ in range(start_timeout):
         time.sleep(1)
         if ollama_up():
+            started_here = True
             _say("[green]ollama is up.[/green]" if console else "ollama is up.")
             return True
     return False
