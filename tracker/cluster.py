@@ -13,6 +13,12 @@ import re
 from typing import Any
 
 THRESHOLD = 0.45
+#: WP6 cosine threshold for the semantic signal. 0.85 is the plan's starting
+#: value and is deliberately strict — bge-m3 puts two unrelated security
+#: articles around 0.5-0.6, so a loose threshold here merges distinct events
+#: and makes one of them vanish from the site. Calibrate in shadow before
+#: turning `semantic=True` on.
+SIM_THRESHOLD = 0.85
 CJK_RE = re.compile(r"[㐀-鿿]")
 WORD_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9\-]*")
 CVE_RE = re.compile(r"CVE-\d{4}-\d{4,7}", re.I)
@@ -40,6 +46,18 @@ def _tokens(title: str) -> set[str]:
     return toks
 
 
+def _cosine(a: list[float], b: list[float]) -> float:
+    """Local copy rather than importing tracker.rerank: cluster.py is pure and
+    has no service dependency, and merging must keep working with the llama
+    servers down."""
+    num = sum(x * y for x, y in zip(a, b))
+    na = sum(x * x for x in a) ** 0.5
+    nb = sum(x * x for x in b) ** 0.5
+    if na == 0.0 or nb == 0.0:
+        return 0.0
+    return num / (na * nb)
+
+
 def _jaccard(a: set[str], b: set[str]) -> float:
     if not a or not b:
         return 0.0
@@ -59,8 +77,25 @@ def _make_source(row: dict[str, Any]) -> dict[str, str]:
 
 
 def merge_by_title(rows: list[dict[str, Any]],
-                   threshold: float = THRESHOLD) -> list[dict[str, Any]]:
-    """Greedy single-link cluster; primary = longest summary."""
+                   threshold: float = THRESHOLD,
+                   *, embeddings: dict[int, list[float]] | None = None,
+                   sim_threshold: float = SIM_THRESHOLD,
+                   semantic: bool = False,
+                   on_semantic_pair=None) -> list[dict[str, Any]]:
+    """Greedy single-link cluster; primary = longest summary.
+
+    WP6 adds embedding similarity as a THIRD signal beside the existing CVE
+    bridge and title Jaccard, and does not replace either: Jaccard cannot see
+    that a Chinese and an English write-up of the same ENISA announcement share
+    almost no tokens, while a multilingual embedding can.
+
+    embeddings: {article_id: vector}. A row without one simply does not take
+    part in the semantic signal. WP6 deliberately does not backfill old rows,
+    so "missing" is the normal case and must never be read as "dissimilar".
+    semantic: False keeps the signal in shadow — candidate pairs are reported
+    through `on_semantic_pair(id_a, id_b, similarity)` and nothing is merged on
+    them, which is how tau2 gets calibrated before it can hide an article.
+    """
     if len(rows) <= 1:
         out = []
         for r in rows:
@@ -72,6 +107,13 @@ def merge_by_title(rows: list[dict[str, Any]],
     token_sets = [_tokens(r.get("title") or "") for r in rows]
     cve_sets = [_cves(r.get("title") or "") for r in rows]
     parent = list(range(len(rows)))
+    # Positional view of the embeddings, so the pair loop does not re-look-up
+    # by id. None when the caller passed none — meaning "no semantic signal",
+    # which is not the same as "every row is dissimilar".
+    vecs: dict[int, list[float]] | None = None
+    if embeddings:
+        vecs = {i: embeddings[r["id"]] for i, r in enumerate(rows)
+                if r.get("id") in embeddings}
 
     def find(i: int) -> int:
         while parent[i] != i:
@@ -95,6 +137,20 @@ def merge_by_title(rows: list[dict[str, Any]],
                 continue
             if _jaccard(token_sets[i], token_sets[j]) >= threshold:
                 union(i, j)
+                continue
+            # Third signal (WP6): cross-lingual semantic similarity. Reached
+            # only when the two cheap signals already declined, so it adds
+            # merges rather than changing existing ones.
+            if vecs is not None:
+                va, vb = vecs.get(i), vecs.get(j)
+                if va is None or vb is None:
+                    continue
+                sim = _cosine(va, vb)
+                if sim >= sim_threshold:
+                    if on_semantic_pair is not None:
+                        on_semantic_pair(rows[i].get("id"), rows[j].get("id"), sim)
+                    if semantic:
+                        union(i, j)
 
     clusters: dict[int, list[int]] = {}
     for i in range(len(rows)):

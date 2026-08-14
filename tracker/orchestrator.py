@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 import time
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import contextmanager
@@ -149,6 +150,13 @@ class RunReport:
     cra_would_drop: int = 0
     cra_enforced: bool = False
     cra_unavailable: bool = False
+    #: WP6 — semantic dedup. `semantic_pairs` counts candidate pairs above the
+    #: cosine threshold; in shadow mode that is the calibration signal, and
+    #: when enforcing it is the number of merges the embedding contributed.
+    embedded: int = 0
+    embed_unavailable: bool = False
+    semantic_pairs: int = 0
+    crosstag_hits: int = 0
     errors: list[str] = field(default_factory=list)
     elapsed_s: float = 0.0
     ok: bool = True
@@ -190,7 +198,9 @@ class RunReport:
                 f"{f' fb{self.gemini_fallback}' if self.gemini_fallback else ''}"
                 f" x{self.llm_concurrency} | "
                 f"schema_miss {self.schema_miss} pfb {self.parse_fallback} | "
-                f"cross +{self.cross_added}/-{self.cross_removed} | "
+                f"cross +{self.cross_added}/-{self.cross_removed}"
+                f"{f' emb{self.embedded}' if self.embedded else ''}"
+                f"{f' sem~{self.semantic_pairs}' if self.semantic_pairs else ''} | "
                 f"write {self.days_written}d | err {len(self.errors)} | "
                 f"phases {self._phase_times()} | "
                 f"{self.elapsed_s:.0f}s")
@@ -324,6 +334,9 @@ def run_pipeline(*, since: str, until: str, trackers: list[str],
             _ck()
             with _timed("cleanup"):
                 _phase_cross_cleanup(store, rep, log, rpt)
+                # After the reverse cleanup, so a tag this adds is not demoted
+                # by the very same run.
+                _phase_cross_tag(store, rep, log)
     except ControlAbort:
         rep.errors.append("restart requested")
         log.info("control: restart requested mid-run")
@@ -732,6 +745,12 @@ def _phase_summarize(store, window, trackers, rep, log, limit, concurrency, rpt,
                                       narrow_domains=NARROW_DOMAINS.get(oname)):
                             if store.add_tracker(aid, oname):
                                 rep.cross_added += 1
+    # WP6: embed what this run summarised, new rows only — the plan is
+    # explicit about not backfilling the whole table. Failure is silent by
+    # design: an embedding is an optimisation for clustering, and no article
+    # should be lost because a CPU side-service was down.
+    _embed_new_rows(store, trackers, rep, log)
+
     log.info("summarize complete: %d/%d (oow=%d rev_fail=%d cross+%d zh-fix=%d)",
              rep.summarized, rep.summarize_attempted, rep.out_of_window,
              rep.review_failed, rep.cross_added, rep.lang_repaired)
@@ -739,6 +758,95 @@ def _phase_summarize(store, window, trackers, rep, log, limit, concurrency, rpt,
                             f"(oow {rep.out_of_window}, rev-fail {rep.review_failed}"
                             + (f", zh-fix {rep.lang_repaired}" if rep.lang_repaired else "")
                             + ")")
+
+
+def _phase_cross_tag(store, rep, log, *, limit: int = 300) -> None:
+    """WP6 — rerank-based cross-tagging: an article in the security/os pool
+    that scores CRA-relevant gets `eu_cra` added.
+
+    This complements `cross.py`'s token signals rather than replacing them.
+    cross.py matches strings like "CRA" or "ENISA" in the title, which misses
+    an article that discusses the regulation without naming it and fires on one
+    that merely mentions ENISA in passing; the rerank score is about meaning.
+
+    **Off by default, and it is cost that makes it opt-in, not caution alone:**
+    measured at 6.8 s per candidate over 17 queries, scoring a 267-article run
+    would add ~30 minutes. `TRACKER_CRA_CROSSTAG=shadow` reports what it would
+    add; `=enforce` actually adds the tracker.
+    """
+    mode = os.environ.get("TRACKER_CRA_CROSSTAG", "").strip().lower()
+    if mode not in ("shadow", "enforce"):
+        return
+    from . import cra_gate
+    rows = store.conn.execute(
+        "SELECT id, title, summary FROM articles "
+        "WHERE status IN ('ready','written') "
+        "AND (','||trackers||',') NOT LIKE '%,eu_cra,%' "
+        "AND summary IS NOT NULL ORDER BY id DESC LIMIT ?", (limit,)).fetchall()
+    if not rows:
+        return
+    log.info("cross-tag: scoring %d non-eu_cra rows (%s mode)", len(rows), mode)
+    scored = cra_gate.score_candidates(
+        [{"id": r["id"], "title": r["title"], "snippet": r["summary"]}
+         for r in rows])
+    if scored is None:
+        log.warning("cross-tag: rerank unavailable — skipping (fail-open)")
+        return
+    t = cra_gate.tau()
+    hits = [(aid, sc, q) for aid, (sc, q) in scored.items() if sc >= t]
+    for aid, sc, q in hits:
+        if mode == "enforce":
+            if store.add_tracker(aid, "eu_cra"):
+                rep.cross_added += 1
+                log.info("cross-tag: +eu_cra on %s (score %.2f)", aid, sc)
+        else:
+            log.info("cross-tag SHADOW: would add eu_cra to %s (score %.2f, %s)",
+                     aid, sc, q[:60])
+    rep.crosstag_hits = len(hits)
+    log.info("cross-tag: %d/%d rows at or above tau=%.2f (%s)",
+             len(hits), len(rows), t, mode)
+
+
+def _embed_new_rows(store, trackers, rep, log, *, batch: int = 32) -> None:
+    """WP6 — store a bge-m3 vector for rows summarised in this run.
+
+    Only rows that lack one, and only ready/written rows, so a re-run is cheap
+    and old rows stay untouched. Every failure path leaves the column NULL,
+    which every consumer already reads as "no semantic opinion".
+    """
+    from . import rerank as rr
+    try:
+        ids = [r[0] for r in store.conn.execute(
+            f"SELECT id FROM articles WHERE status IN ('ready','written') "
+            f"AND embedding IS NULL AND summary IS NOT NULL "
+            f"AND ({_tracker_or(trackers)})")]
+        ids = store.ids_needing_embedding(ids)
+        if not ids:
+            return
+        if not rr.embed_available():
+            log.info("embeddings service down — skipping %d rows (clustering "
+                     "falls back to CVE + Jaccard only)", len(ids))
+            rep.embed_unavailable = True
+            return
+        done = 0
+        for start in range(0, len(ids), batch):
+            chunk = ids[start:start + batch]
+            rows = store.conn.execute(
+                f"SELECT id, title, summary FROM articles "
+                f"WHERE id IN ({','.join('?' * len(chunk))})", chunk).fetchall()
+            texts = [f"{r['title'] or ''}. {(r['summary'] or '')[:600]}"
+                     for r in rows]
+            vecs = rr.embed(texts, timeout=600.0)
+            if vecs is None:
+                log.warning("embedding batch failed — stopping (%d done)", done)
+                rep.embed_unavailable = True
+                break
+            done += store.store_embeddings(
+                {r["id"]: v for r, v in zip(rows, vecs)})
+        rep.embedded = done
+        log.info("embedded %d new rows", done)
+    except Exception as exc:
+        log.warning("embedding step skipped: %s", exc)
 
 
 # ── Phase 3b: TRANSLATE (L5 — English mirror) ────────────────────────────────
@@ -824,7 +932,27 @@ def _phase_write(store, trackers, rep, log, out, rpt):
             if not tracker_rows:
                 continue
             all_rows = [dict(r) for r in store.list_writable_for_day(d)]
-            all_rows = merge_by_title(all_rows)
+            # WP6: hand the clusterer the day's embeddings as a third signal.
+            # Shadow unless TRACKER_SEMANTIC_DEDUP=enforce — merging is
+            # destructive from a reader's point of view (the merged article
+            # stops appearing on its own), so it stays behind an opt-in until
+            # tau2 has been calibrated on recorded pairs.
+            embeddings = {}
+            try:
+                embeddings = store.load_embeddings([r["id"] for r in all_rows])
+            except Exception as exc:
+                log.debug("no embeddings for %s: %s", d, exc)
+            semantic = (os.environ.get("TRACKER_SEMANTIC_DEDUP", "")
+                        .strip().lower() == "enforce")
+
+            def _pair(a, b, sim, _day=d):
+                rep.semantic_pairs += 1
+                log.info("[semdedup] %s %s ~ %s cos=%.3f%s", _day, a, b, sim,
+                         "" if semantic else "  (shadow, not merged)")
+
+            all_rows = merge_by_title(all_rows, embeddings=embeddings,
+                                      semantic=semantic,
+                                      on_semantic_pair=_pair)
             render_day(day=d, rows=all_rows, out_dir=data_dir,
                        allowed_categories=all_categories)
             update_month_manifest(month=d[:7], data_root=data_dir, tracker=tname)

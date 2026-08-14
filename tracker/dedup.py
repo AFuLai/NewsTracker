@@ -4,6 +4,7 @@ from __future__ import annotations
 import hashlib
 import re
 import sqlite3
+import struct
 from datetime import datetime, timedelta
 from pathlib import Path
 from urllib.parse import urlparse, urlunparse, parse_qsl, urlencode
@@ -118,6 +119,24 @@ def _ensure_i18n_columns(conn) -> None:
         if col not in cols:
             conn.execute(f"ALTER TABLE articles ADD COLUMN {col} TEXT")
     conn.commit()
+
+
+def _ensure_embedding_column(conn) -> None:
+    """Idempotent ALTER for the bge-m3 sentence embedding (v3, WP6).
+
+    NULL means 'not embedded', which is the normal state for every row written
+    before WP6: the plan is explicit that old rows are not backfilled, so every
+    consumer has to treat a missing vector as 'no semantic opinion' rather than
+    as a zero vector (which would be maximally dissimilar to everything and
+    would quietly suppress merges).
+
+    Stored as a raw float32 BLOB rather than JSON: 1024 floats is 4 KB packed
+    against ~20 KB of text, and this column is written for every new article.
+    """
+    cols = [r[1] for r in conn.execute("PRAGMA table_info(articles)").fetchall()]
+    if "embedding" not in cols:
+        conn.execute("ALTER TABLE articles ADD COLUMN embedding BLOB")
+        conn.commit()
 
 
 def _ensure_profile_dormancy_columns(conn) -> None:
@@ -246,10 +265,51 @@ class Store:
         _ensure_trackers_column(self.conn)
         _ensure_v2_columns(self.conn)
         _ensure_i18n_columns(self.conn)
+        _ensure_embedding_column(self.conn)
         _ensure_profile_dormancy_columns(self.conn)
         _ensure_profile_source_key(self.conn)
         self.conn.commit()
         _reconcile_stale_runs(self.conn)
+
+    # ── WP6: sentence embeddings ─────────────────────────────────────────
+    def store_embeddings(self, vectors: dict[int, list[float]]) -> int:
+        """Persist bge-m3 vectors as float32 BLOBs. New rows only — WP6 does
+        not backfill, so absence is normal and means 'no semantic opinion'."""
+        if not vectors:
+            return 0
+        self.conn.executemany(
+            "UPDATE articles SET embedding = ? WHERE id = ?",
+            [(struct.pack(f"<{len(v)}f", *v), aid) for aid, v in vectors.items()])
+        self.conn.commit()
+        return len(vectors)
+
+    def load_embeddings(self, ids: list[int]) -> dict[int, list[float]]:
+        """Vectors for the ids that have one. Ids without an embedding are
+        simply absent from the result rather than mapped to a zero vector: a
+        zero vector reads as 'dissimilar to everything', which would silently
+        suppress the merges this feature exists to make."""
+        if not ids:
+            return {}
+        out: dict[int, list[float]] = {}
+        for chunk in (ids[i:i + 500] for i in range(0, len(ids), 500)):
+            q = ",".join("?" * len(chunk))
+            for aid, blob in self.conn.execute(
+                    f"SELECT id, embedding FROM articles "
+                    f"WHERE id IN ({q}) AND embedding IS NOT NULL", chunk):
+                if blob:
+                    out[aid] = list(struct.unpack(f"<{len(blob)//4}f", blob))
+        return out
+
+    def ids_needing_embedding(self, ids: list[int]) -> list[int]:
+        if not ids:
+            return []
+        got = set()
+        for chunk in (ids[i:i + 500] for i in range(0, len(ids), 500)):
+            q = ",".join("?" * len(chunk))
+            got.update(r[0] for r in self.conn.execute(
+                f"SELECT id FROM articles WHERE id IN ({q}) "
+                f"AND embedding IS NOT NULL", chunk))
+        return [i for i in ids if i not in got]
 
     # ── WP5: EU CRA rerank scores ────────────────────────────────────────
     def record_cra_scores(self, scores: list[tuple[int, float, str]], *,

@@ -104,3 +104,56 @@ sqlite3 /opt/tracker/db/articles.sqlite \
 sqlite3 /opt/tracker/db/articles.sqlite \
   "select a.title, c.score from cra_scores c join articles a on a.id=c.article_id order by c.score desc limit 40"
 ```
+
+---
+
+# WP6 — semantic dedup threshold (τ₂)
+
+`cluster.SIM_THRESHOLD`, cosine over bge-m3-FP16 embeddings of
+`title + summary[:600]`.
+
+## Measured (2026-08-14)
+
+All 154 articles of the busiest day in the DB (2026-06-30) embedded, then every
+pair compared — 11 781 pairs:
+
+| p50 | p90 | p99 | p99.9 | max |
+|---|---|---|---|---|
+| 0.463 | 0.584 | 0.845 | 0.908 | 0.941 |
+
+Unrelated security articles sit around 0.46–0.58, so the plan's starting value
+of **0.85 lands at roughly p99** — strict, as intended. This is the number that
+justifies it; a threshold near 0.6 would merge a large share of the day.
+
+Two pairs cleared 0.85, and both are genuine duplicates that the existing
+CVE-bridge and title-Jaccard signals missed:
+
+| cos | pair |
+|---|---|
+| 0.941 | Google phasing out the Tenor GIF API — two independent write-ups |
+| 0.872 | Apple v. Epic, Supreme Court agreeing to hear the App Store appeal — two write-ups |
+
+Clusters for that day: 150 with CVE+Jaccard only, **148** with the semantic
+signal added. No false merge in this sample.
+
+**One day, two positive pairs is a small sample** — enough to show the
+threshold is not absurd and that the signal finds real duplicates, not enough
+to put a false-merge rate on it. So `semantic=False` (shadow) remains the
+default; a wrong merge deletes an article from the reader's view, because only
+the cluster primary is rendered.
+
+```bash
+TRACKER_SEMANTIC_DEDUP=enforce tracker pipeline ...   # opt in
+TRACKER_CRA_CROSSTAG=shadow|enforce ...               # rerank cross-tagging
+```
+
+Cross-tagging is off unless asked for, and cost is why as much as caution: at
+6.8 s per candidate, scoring a 267-article run adds roughly 30 minutes.
+
+Re-derive:
+
+```bash
+sqlite3 /opt/tracker/db/articles.sqlite \
+  "select count(*) from articles where embedding is not null"
+grep semdedup /opt/tracker/logs/run-*.log       # shadow pairs, with cosines
+```
