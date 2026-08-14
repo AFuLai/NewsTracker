@@ -140,6 +140,15 @@ class RunReport:
     #: declined (non-ollama backend, or an override), so the report never
     #: implies parallelism that did not happen.
     llm_concurrency: int = 1
+    #: WP5 — EU CRA rerank gate. `cra_would_drop` is the shadow-mode answer to
+    #: "what would enforcement have done", which is the number the threshold is
+    #: calibrated against; `cra_unavailable` records a fail-open, so a run that
+    #: dropped nothing because the service was down never reads as a run where
+    #: everything was on topic.
+    cra_scored: int = 0
+    cra_would_drop: int = 0
+    cra_enforced: bool = False
+    cra_unavailable: bool = False
     errors: list[str] = field(default_factory=list)
     elapsed_s: float = 0.0
     ok: bool = True
@@ -153,13 +162,25 @@ class RunReport:
                  for p in PHASES if p in self.phase_s]
         return " ".join(parts) or "none"
 
+    def _cra(self) -> str:
+        """`cra 41sc shadow(-18)` / `cra 41sc ENFORCED` / `cra DOWN`. Silent
+        when the gate did not run at all, so non-eu_cra runs stay readable."""
+        if self.cra_unavailable:
+            return " | cra DOWN(fail-open)"
+        if not self.cra_scored:
+            return ""
+        if self.cra_enforced:
+            return f" | cra {self.cra_scored}sc ENFORCED"
+        return f" | cra {self.cra_scored}sc shadow(-{self.cra_would_drop})"
+
     def one_line(self) -> str:
         status = "OK" if self.ok else "FAIL"
         return (f"run#{self.run_id} {status} {self.since}..{self.until} "
                 f"[{','.join(self.trackers)}] | "
                 f"fetch {self.fetch_new}new/{self.fetch_sources}src "
                 f"(304:{self.fetch_304} fail:{self.fetch_failed}) | "
-                f"gate -{self.gated_out} | "
+                f"gate -{self.gated_out}"
+                f"{self._cra()} | "
                 f"sum {self.summarized}/{self.summarize_attempted} "
                 f"(oow:{self.out_of_window} rev_fail:{self.review_failed}"
                 f"{f' 429:{self.rate_limited}' if self.rate_limited else ''}) | "
@@ -475,16 +496,56 @@ def _phase_gate(store, trackers, rep, log, rpt):
         rows = pending[tname]
         if not rows:
             continue
-        for start in range(0, len(rows), BATCH):
-            batch = rows[start:start + BATCH]
+
+        # WP5: the eu_cra tracker additionally gets a quantitative rerank
+        # score. Shadow by default — it records scores and drops nothing —
+        # so this cannot change what the site publishes until someone sets
+        # TRACKER_CRA_GATE=enforce. When it IS enforcing it replaces the L1
+        # prompt gate for this tracker only; the others are untouched.
+        cra_dropped: set[int] = set()
+        if tname == "eu_cra":
             try:
-                from .llm.gate import _gate_batch
-                topic = f"{info.title}（分類：{', '.join(info.categories)}）"
-                keep = _gate_batch(topic, [{"title": r["title"], "snippet": r["raw_text"]}
-                                           for r in batch])
+                from . import cra_gate
+                res = cra_gate.run(
+                    [{"id": r["id"], "title": r["title"], "snippet": r["raw_text"]}
+                     for r in rows], store, log=log)
+                cra_dropped = set(res["dropped_ids"])
+                rep.cra_scored = len(res["scores"])
+                rep.cra_enforced = res["enforced"]
+                rep.cra_unavailable = res["unavailable"]
+                if not res["enforced"] and res["scores"]:
+                    below = sum(1 for s, _ in res["scores"].values()
+                                if s < res["tau"])
+                    rep.cra_would_drop = below
+                for aid in cra_dropped:
+                    store.mark_status(aid, "gated_out")
+                    rep.gated_out += 1
             except Exception as exc:
-                log.warning("[%s] gate batch failed, keeping all: %s", tname, exc)
+                # Same philosophy as L1: a broken gate keeps everything.
+                log.warning("[eu_cra] rerank gate failed, keeping all: %s", exc)
+                rep.cra_unavailable = True
+                cra_dropped = set()
+
+        for start in range(0, len(rows), BATCH):
+            batch = [r for r in rows[start:start + BATCH]
+                     if r["id"] not in cra_dropped]
+            if not batch:
+                done_batches += 1
+                continue
+            # When the rerank gate is enforcing for eu_cra it IS the gate:
+            # running the lenient prompt gate on top would only add its false
+            # negatives to a decision that already has a calibrated threshold.
+            if tname == "eu_cra" and rep.cra_enforced:
                 keep = [True] * len(batch)
+            else:
+                try:
+                    from .llm.gate import _gate_batch
+                    topic = f"{info.title}（分類：{', '.join(info.categories)}）"
+                    keep = _gate_batch(topic, [{"title": r["title"], "snippet": r["raw_text"]}
+                                               for r in batch])
+                except Exception as exc:
+                    log.warning("[%s] gate batch failed, keeping all: %s", tname, exc)
+                    keep = [True] * len(batch)
             for r, k in zip(batch, keep):
                 if not k:
                     store.mark_status(r["id"], "gated_out")

@@ -1,0 +1,47 @@
+# EU CRA rerank query set (PLAN-v3.md WP5) — single source of truth.
+#
+# One to three English queries per CATEGORY class in
+# searchinfo/searchinfo_eu_cra.md. A candidate is scored against every query
+# and keeps its MAXIMUM: a CRA article belongs to one of these seven classes,
+# not to all of them, so requiring a broad match would drop the specialists.
+#
+# English only, deliberately. bge-reranker-v2-m3 is multilingual on the
+# DOCUMENT side — measured at deploy, Chinese/Japanese/Korean documents beat
+# English noise on every gate query — so translating the queries would add
+# variants without adding signal.
+#
+# Lines starting with # and blank lines are ignored. Changing this file changes
+# every score, so the calibrated threshold in tracker/cra_gate.py must be
+# re-derived when it changes; ops/llama-server/MANIFEST.md pins the model the
+# scores depend on.
+
+# ── 法令更新 — Commission acts, transposition, timetable ────────────────────
+Cyber Resilience Act delegated act implementing regulation adopted by the European Commission
+EU Cyber Resilience Act entry into application timeline obligations for manufacturers
+Cyber Resilience Act published in the Official Journal, corrigendum or amendment to the regulation
+
+# ── 調和標準 — harmonised standards ─────────────────────────────────────────
+CRA harmonised standard progress CEN CENELEC JTC 13 work programme
+ETSI EN standard for cyber resilience of products with digital elements
+standardisation request to support the Cyber Resilience Act, prEN draft standard
+
+# ── 合規指引 — conformity assessment and guidance ───────────────────────────
+ENISA technical guidance on Cyber Resilience Act essential requirements
+conformity assessment module notified body CE marking for products with digital elements
+BSI or ANSSI implementation guidance for CRA compliance by manufacturers
+
+# ── 開源影響 — open source stewards ─────────────────────────────────────────
+open source steward obligations under the Cyber Resilience Act
+SBOM and coordinated vulnerability disclosure duties for open source projects under the CRA
+
+# ── 產業動態 — industry response, legal analysis ────────────────────────────
+industry reaction and legal analysis of Cyber Resilience Act compliance costs
+manufacturer product certification case study under the EU Cyber Resilience Act
+
+# ── 亞太對應 — Asia-Pacific alignment ───────────────────────────────────────
+Asia-Pacific manufacturers exporting to the EU adapting to the Cyber Resilience Act
+Japan Korea Taiwan Singapore national cybersecurity regulation aligning with the EU CRA
+
+# ── 研討活動 — workshops and training ───────────────────────────────────────
+ENISA workshop or European Commission stakeholder event about the Cyber Resilience Act
+training course or webinar on preparing for Cyber Resilience Act compliance

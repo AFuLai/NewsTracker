@@ -70,6 +70,22 @@ CREATE TABLE IF NOT EXISTS runs (
   errors      TEXT,                          -- JSON array of error strings
   ok          INTEGER                        -- 1 success / 0 failure / NULL in-progress
 );
+
+-- v3 (WP5): rerank scores for the EU CRA gate, written in shadow mode too.
+-- Its own table rather than a column on `articles`: a score belongs to a
+-- (model, query-set) pair rather than to the article, so re-calibrating means
+-- writing rows under a new model_tag instead of overwriting the history that
+-- justified the threshold currently in force.
+CREATE TABLE IF NOT EXISTS cra_scores (
+  article_id  INTEGER NOT NULL,
+  score       REAL    NOT NULL,             -- max over the query set (raw logit)
+  best_query  TEXT,                         -- which query carried the max
+  model_tag   TEXT    NOT NULL,             -- model build + query-set version
+  scored_at   TEXT    NOT NULL,
+  enforced    INTEGER NOT NULL DEFAULT 0,   -- 0 = shadow only, 1 = this score gated
+  PRIMARY KEY (article_id, model_tag)
+);
+CREATE INDEX IF NOT EXISTS idx_cra_scores_score ON cra_scores(score);
 """
 
 
@@ -234,6 +250,42 @@ class Store:
         _ensure_profile_source_key(self.conn)
         self.conn.commit()
         _reconcile_stale_runs(self.conn)
+
+    # ── WP5: EU CRA rerank scores ────────────────────────────────────────
+    def record_cra_scores(self, scores: list[tuple[int, float, str]], *,
+                          model_tag: str, enforced: bool) -> int:
+        """Persist shadow/enforced rerank scores. scores: [(article_id, score,
+        best_query)]. Upsert on (article_id, model_tag) so a re-run replaces
+        its own numbers but never another model_tag's."""
+        if not scores:
+            return 0
+        now = datetime.utcnow().isoformat()
+        self.conn.executemany(
+            "INSERT INTO cra_scores (article_id, score, best_query, model_tag, "
+            "scored_at, enforced) VALUES (?, ?, ?, ?, ?, ?) "
+            "ON CONFLICT(article_id, model_tag) DO UPDATE SET "
+            "score=excluded.score, best_query=excluded.best_query, "
+            "scored_at=excluded.scored_at, enforced=excluded.enforced",
+            [(aid, sc, bq, model_tag, now, int(enforced))
+             for aid, sc, bq in scores])
+        self.conn.commit()
+        return len(scores)
+
+    def cra_score_stats(self, model_tag: str | None = None) -> dict:
+        """Counts and quantiles for calibration; the command that re-derives
+        the numbers lives in ops/llama-server/MANIFEST.md."""
+        q = "SELECT score FROM cra_scores"
+        args: tuple = ()
+        if model_tag:
+            q += " WHERE model_tag = ?"
+            args = (model_tag,)
+        v = sorted(r[0] for r in self.conn.execute(q + " ORDER BY score", args))
+        if not v:
+            return {"n": 0}
+        def p(f):
+            return v[min(int(len(v) * f), len(v) - 1)]
+        return {"n": len(v), "min": v[0], "p25": p(.25), "median": p(.5),
+                "p75": p(.75), "max": v[-1]}
 
     def upsert_candidate(self, *, url: str, source: str, title: str | None = None,
                          date: str | None = None, raw_text: str | None = None,
