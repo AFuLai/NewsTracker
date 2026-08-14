@@ -11,13 +11,14 @@ and let them start it then retry, or cancel.
 """
 from __future__ import annotations
 
+import os
 import subprocess
 import sys
 import time
 
 import httpx
 
-from . import OLLAMA_URL
+from . import OLLAMA_URL, llm_concurrency
 
 
 def ollama_up(timeout: float = 3.0) -> bool:
@@ -38,10 +39,19 @@ def ensure_ollama(*, start_timeout: int = 40, console=None) -> bool:
     _say("[dim]ollama not running — starting it in the background…[/dim]"
          if console else "ollama not running — starting it in the background…")
     try:
+        # WP2: ollama serves one request per slot and queues the rest, so the
+        # daemon's slot count caps the orchestrator's LLM pool however wide the
+        # pool is. Starting the daemon is the only moment we own its
+        # environment, so match the two here. A daemon someone else already
+        # started keeps whatever slot count it was given — that case is the
+        # `already up` return above, and is why the run report prints the
+        # worker count rather than claiming a speed-up.
+        env = dict(os.environ)
+        env.setdefault("OLLAMA_NUM_PARALLEL", str(llm_concurrency()))
         # detached: keeps running after tracker exits (start_new_session)
         subprocess.Popen(["ollama", "serve"],
                          stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-                         start_new_session=True)
+                         start_new_session=True, env=env)
     except FileNotFoundError:
         _say("[red]ollama executable not found on PATH.[/red]"
              if console else "ollama executable not found on PATH.")

@@ -12,7 +12,7 @@ import json
 import logging
 from typing import Any
 
-from . import _coerce_category, _prompt, _strip_code_fence, call
+from . import _coerce_category, _prompt, _strip_code_fence, bump, call, category_schema
 from .lang import needs_zh_repair
 
 _log = logging.getLogger("tracker.llm.summarize")
@@ -35,10 +35,17 @@ def summarize_article(*, url: str, raw_text: str, categories: list[str],
     else:
         cat_block = " / ".join(categories)
     prompt = tmpl.format(url=url, category_defs=cat_block, body=raw_text[:6000])
-    response = call(prompt, format_json=True, backend=backend)
+    # WP1: the enum is built from THIS tracker's categories, so the model cannot
+    # answer with a category that does not exist here.
+    response = call(prompt, backend=backend, schema=category_schema(categories))
     try:
         data = json.loads(_strip_code_fence(response))
     except (json.JSONDecodeError, ValueError):
+        # Kept as a fuse (a schema-constrained decode cannot land here) and
+        # counted, so a silent regression shows up in the run report rather
+        # than as 400 characters of raw article text published as a summary.
+        bump("parse_fallback")
+        _log.warning("summary did not parse as JSON (%s) — degraded fallback", url)
         return {"title": "", "summary": response[:400], "category": "uncategorized",
                 "tags": [], "src_lang": "unknown", "repaired": False}
     result = {

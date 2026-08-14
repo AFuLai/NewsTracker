@@ -1,4 +1,5 @@
 """Tracker — local-LLM security news pipeline."""
+import os
 from pathlib import Path
 
 ROOT = Path("/opt/tracker")
@@ -12,6 +13,24 @@ DEFAULT_TARBALL = PROJECT_ROOT / "tarball"
 DEFAULT_DB = ROOT / "db" / "articles.sqlite"
 OLLAMA_URL = "http://localhost:11434"
 OLLAMA_MODEL = "gemma4:e4b"
+
+# WP2: how many LLM calls the summarize/translate phases may have in flight.
+# Lives here rather than in orchestrator.py because preflight also needs it —
+# it starts the ollama daemon with a matching OLLAMA_NUM_PARALLEL, and reading
+# it from the orchestrator would make preflight import it, which is a cycle.
+DEFAULT_LLM_CONCURRENCY = 4
+
+
+def llm_concurrency() -> int:
+    """Worker count for the LLM phases, from TRACKER_LLM_CONCURRENCY.
+
+    Floor of 1 so a nonsense value degrades to the pre-WP2 serial behaviour
+    instead of raising in the middle of a run."""
+    try:
+        return max(1, int(os.environ.get("TRACKER_LLM_CONCURRENCY",
+                                         DEFAULT_LLM_CONCURRENCY)))
+    except (TypeError, ValueError):
+        return DEFAULT_LLM_CONCURRENCY
 
 # Multi-tracker support. Each top-level "tracker" is a self-contained
 # topic with its own searchinfo file, categories, and manifest tree.

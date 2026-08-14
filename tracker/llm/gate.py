@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import json
 
-from . import _prompt, _strip_code_fence, call
+from . import GATE_SCHEMA, _prompt, _strip_code_fence, bump, call
 
 BATCH = 10
 
@@ -25,7 +25,10 @@ def _gate_batch(topic: str, items: list[dict]) -> list[bool]:
         lines.append(f"{i}. {title}\n   {snip}")
     prompt = tmpl.format(topic=topic, items="\n".join(lines))
     try:
-        resp = call(prompt, format_json=True, timeout=60.0)
+        # WP1: the schema pins {results:[{i:int, keep:bool}]}, so the bare-list
+        # and missing-`keep` shapes below are now only reachable on the Gemini
+        # backend. They stay because fail-open is this layer's whole philosophy.
+        resp = call(prompt, timeout=60.0, schema=GATE_SCHEMA)
         data = json.loads(_strip_code_fence(resp))
         # accept {"results":[...]} or a bare list
         arr = data["results"] if isinstance(data, dict) and "results" in data else data
@@ -36,6 +39,10 @@ def _gate_batch(topic: str, items: list[dict]) -> list[bool]:
                 keep[i] = bool(entry.get("keep", True))
         return keep
     except Exception:
+        # Fail-open: keep everything. Counted so a gate that has quietly stopped
+        # gating — and is therefore passing every candidate through to the
+        # expensive summarize phase — is visible in the run report.
+        bump("parse_fallback")
         return [True] * len(items)
 
 

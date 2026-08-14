@@ -23,7 +23,7 @@ import json
 import logging
 from typing import Any
 
-from . import _prompt, _strip_code_fence, call
+from . import TRANSLATE_SCHEMA, _prompt, _strip_code_fence, bump, call
 from .lang import needs_en_repair, needs_zh_repair, source_lang
 
 _log = logging.getLogger("tracker.llm.translate")
@@ -48,13 +48,21 @@ _RETRY_ZH = "\n\n注意：上一次的回覆仍然是原文語言。請重新回
 
 
 def _ask_json(prompt: str, backend: str) -> dict[str, Any] | None:
-    """One model call returning the parsed JSON object, or None if unparseable."""
-    response = call(prompt, format_json=True, backend=backend)
+    """One model call returning the parsed JSON object, or None if unparseable.
+
+    WP1: the schema pins the three keys and their types, which removes the
+    "tags came back as a comma-joined string" shape on the ollama path — but
+    _fields() still handles it, because the Gemini backend has no grammar."""
+    response = call(prompt, backend=backend, schema=TRANSLATE_SCHEMA)
     try:
         data = json.loads(_strip_code_fence(response))
     except (json.JSONDecodeError, ValueError):
+        bump("parse_fallback")
         return None
-    return data if isinstance(data, dict) else None
+    if not isinstance(data, dict):
+        bump("parse_fallback")
+        return None
+    return data
 
 
 def _fields(data: dict[str, Any]) -> tuple[str, str, list[str]]:

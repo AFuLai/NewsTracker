@@ -17,12 +17,14 @@ import json
 import logging
 import time
 from concurrent.futures import ThreadPoolExecutor
+from contextlib import contextmanager
 from dataclasses import asdict, dataclass, field
 from datetime import date as _date
 from datetime import datetime
 from pathlib import Path
 
-from . import DEFAULT_DB, DEFAULT_OUT, PROJECT_ROOT, SEARCHINFOS
+from . import (DEFAULT_DB, DEFAULT_OUT, PROJECT_ROOT, SEARCHINFOS,
+               llm_concurrency)
 from .config import load_tracker
 from .dedup import Store
 from .fetchers import DateWindow, Profile, get_fetcher
@@ -58,6 +60,38 @@ TRACKER_FETCH: dict[str, dict] = {
 # The L1 gate is driven directly in _phase_gate (so it can report per-batch).
 from .llm.review import review as REVIEW_FN        # noqa: E402
 
+# ── WP2: LLM concurrency ─────────────────────────────────────────────────────
+# Summarize and translate were both a serial for-loop of HTTP round trips, so
+# the GPU idled between articles. They now run their model calls through a pool.
+#
+# The width must be matched on the ollama side by OLLAMA_NUM_PARALLEL: ollama
+# serves one request per slot and queues the rest, so a client pool wider than
+# the daemon's slot count buys almost nothing. Measured 2026-08-14 on the RTX
+# 2000 Ada 8 GB box, 16 calls each: slots=1 → 12.3 s/call; slots=4, pool 4 →
+# 5.23 s/call (2.35x); slots=8, pool 8 → 4.08 s/call (3.01x).
+# preflight.ensure_ollama() exports the matching value when it starts the
+# daemon itself.
+#
+# VRAM was not the constraint it looked like: ollama preallocates num_ctx per
+# slot, so peak usage is fixed at startup rather than growing with article
+# length — 4 slots × 8192 ctx measured 4453 MiB, 8 slots 5715 MiB, of 8188.
+
+
+def _llm_workers(backend: str, controller=None) -> int:
+    """How many workers this phase may actually use.
+
+    Serial (1) whenever the backend is not ollama: `backend="gemini"` drives a
+    single Chrome tab through one CDP session, and firing four translations at
+    it concurrently interleaves them into each other's replies. A controller can
+    switch backend mid-run, so the check is per phase, not per run.
+    """
+    if backend != "ollama":
+        return 1
+    if controller is not None and any(b != "ollama"
+                                      for b in controller.backends.values()):
+        return 1
+    return llm_concurrency()
+
 
 @dataclass
 class RunReport:
@@ -89,9 +123,35 @@ class RunReport:
     summarize_backend: str = "ollama"
     translate_backend: str = "ollama"
     gemini_fallback: int = 0
+    #: WP3 — per-phase wall clock, keyed by phase name. The pre-v3 report
+    #: carried only the total, so "translate got slower" stayed invisible until
+    #: someone re-read the DEBUG log by hand; every Phase 0/1/2 acceptance
+    #: number in PLAN-v3.md is read off this field.
+    phase_s: dict[str, float] = field(default_factory=dict)
+    #: WP3 — LLM output-quality counters, taken from llm.STATS at finalize.
+    #: schema_miss: the model produced a category outside the enum the schema
+    #: pins, so _coerce_category had to step in. Once WP1's schemas are in
+    #: force this is a blown fuse rather than a routine event: expected 0.
+    schema_miss: int = 0
+    #: parse_fallback: a reply would not parse as JSON at all and the caller
+    #: took its degraded path. Also expected 0 with schemas on.
+    parse_fallback: int = 0
+    #: WP2 — LLM worker count actually used. 1 whenever concurrency was
+    #: declined (non-ollama backend, or an override), so the report never
+    #: implies parallelism that did not happen.
+    llm_concurrency: int = 1
     errors: list[str] = field(default_factory=list)
     elapsed_s: float = 0.0
     ok: bool = True
+
+    def _phase_times(self) -> str:
+        """`fetch 41s gate 156s sum 3180s` — only the phases that ran."""
+        short = {"fetch": "fetch", "gate": "gate", "summarize": "sum",
+                 "translate": "i18n", "write": "write", "cleanup": "clean"}
+        from .control import PHASES
+        parts = [f"{short.get(p, p)} {self.phase_s[p]:.0f}s"
+                 for p in PHASES if p in self.phase_s]
+        return " ".join(parts) or "none"
 
     def one_line(self) -> str:
         status = "OK" if self.ok else "FAIL"
@@ -106,9 +166,12 @@ class RunReport:
                 f"i18n {self.translated}"
                 f"{f' zh-fix:{self.lang_repaired}' if self.lang_repaired else ''} | "
                 f"llm {self.summarize_backend[:3]}/{self.translate_backend[:3]}"
-                f"{f' fb{self.gemini_fallback}' if self.gemini_fallback else ''} | "
+                f"{f' fb{self.gemini_fallback}' if self.gemini_fallback else ''}"
+                f" x{self.llm_concurrency} | "
+                f"schema_miss {self.schema_miss} pfb {self.parse_fallback} | "
                 f"cross +{self.cross_added}/-{self.cross_removed} | "
                 f"write {self.days_written}d | err {len(self.errors)} | "
+                f"phases {self._phase_times()} | "
                 f"{self.elapsed_s:.0f}s")
 
 
@@ -170,6 +233,18 @@ def run_pipeline(*, since: str, until: str, trackers: list[str],
         if controller is not None:
             controller.checkpoint()
 
+    @contextmanager
+    def _timed(name):
+        """WP3 — record the phase's wall clock in rep.phase_s. `finally`, so a
+        phase that raised still reports the time it burned before dying; a
+        report that silently omits a crashed phase's cost is how a slow failure
+        hides."""
+        pt0 = time.time()
+        try:
+            yield
+        finally:
+            rep.phase_s[name] = rep.phase_s.get(name, 0.0) + (time.time() - pt0)
+
     # ── Phase 0: ollama preflight (auto-start if down) ───────────────────────
     rpt.enter("preflight", "checking ollama")
     from .preflight import ensure_ollama
@@ -185,27 +260,37 @@ def run_pipeline(*, since: str, until: str, trackers: list[str],
 
     try:
         if _do("fetch"):
-            _ck(); _phase_fetch(store, window, trackers, rep, log, concurrency, rpt, browser_base,
-                                include_dormant=include_dormant)
+            _ck()
+            with _timed("fetch"):
+                _phase_fetch(store, window, trackers, rep, log, concurrency, rpt,
+                             browser_base, include_dormant=include_dormant)
         if gate and _do("gate"):
-            _ck(); _phase_gate(store, trackers, rep, log, rpt)
+            _ck()
+            with _timed("gate"):
+                _phase_gate(store, trackers, rep, log, rpt)
         if _do("summarize"):
             _ck()
             if force and start_at == "summarize":
                 _reset_resummarize(store, window, trackers, log)
-            _phase_summarize(store, window, trackers, rep, log, summarize_limit,
-                             concurrency, rpt, controller=controller,
-                             backend=summarize_backend)
+            with _timed("summarize"):
+                _phase_summarize(store, window, trackers, rep, log, summarize_limit,
+                                 concurrency, rpt, controller=controller,
+                                 backend=summarize_backend)
         if translate and _do("translate"):
             _ck()
             if force and start_at == "translate":
                 _reset_retranslate(store, window, trackers, log)
-            _phase_translate(store, rep, log, rpt, controller=controller,
-                             backend=translate_backend)
+            with _timed("translate"):
+                _phase_translate(store, rep, log, rpt, controller=controller,
+                                 backend=translate_backend)
         if _do("write"):
-            _ck(); _phase_write(store, trackers, rep, log, out, rpt)
+            _ck()
+            with _timed("write"):
+                _phase_write(store, trackers, rep, log, out, rpt)
         if cleanup and _do("cleanup"):
-            _ck(); _phase_cross_cleanup(store, rep, log, rpt)
+            _ck()
+            with _timed("cleanup"):
+                _phase_cross_cleanup(store, rep, log, rpt)
     except ControlAbort:
         rep.errors.append("restart requested")
         log.info("control: restart requested mid-run")
@@ -461,15 +546,13 @@ def _phase_summarize(store, window, trackers, rep, log, limit, concurrency, rpt,
                     if mdate:
                         dates[aid] = mdate
 
-        # Phase B: serial summarize + review + cross-detect (pausable per article)
+        # Phase B0: dispositions that need no model call, decided serially.
+        # Splitting these out first is what lets the pool below contain nothing
+        # but LLM work — every branch here writes to sqlite, and sqlite has one
+        # writer.
+        eligible = []
         for r in rows:
             aid = r["id"]
-            if controller is not None:
-                controller.checkpoint()
-            bk = controller.backend_for("summarize") if controller is not None else backend
-            processed += 1
-            rpt.tick(processed, grand_total,
-                     f"[{tname}] {(r['title'] or '')[:70]}")
             body = bodies[aid]
             # F2: the feed/API pubDate is authoritative. Some sites' article
             # HTML carries a bogus meta date (e.g. a site-wide static value),
@@ -481,6 +564,7 @@ def _phase_summarize(store, window, trackers, rep, log, limit, concurrency, rpt,
                (until and eff_date and eff_date > until):
                 store.mark_status(aid, "skipped_window", date=dates[aid])
                 rep.out_of_window += 1
+                processed += 1
                 continue
             if aid in throttled and not body:
                 # The page exists; the server just told us to slow down. Leave
@@ -489,16 +573,33 @@ def _phase_summarize(store, window, trackers, rep, log, limit, concurrency, rpt,
                 # a dead source for months.
                 store.log_error(r["source"], "rate limited (HTTP 429)", r["url"])
                 rep.rate_limited += 1
+                processed += 1
                 continue
             if not body:
                 store.log_error(r["source"], "empty body after fetch", r["url"])
+                processed += 1
                 continue
+            eligible.append(r)
+
+        # Phase B: summarize + review in a pool; sqlite writes and cross-detect
+        # back on this thread (WP2). L3 review is pure regex, so it rides along
+        # in the worker and its retry stays adjacent to the call it retries.
+        bk = controller.backend_for("summarize") if controller is not None else backend
+        workers = _llm_workers(bk, controller)
+        rep.llm_concurrency = max(rep.llm_concurrency, workers)
+        log.info("[%s] summarize %d eligible, %d worker(s), backend=%s",
+                 tname, len(eligible), workers, bk)
+
+        def _summarize_one(r):
+            """Pool side: model calls + review only, no DB. Returns
+            (row, result, failure) where exactly one of result/failure is set."""
+            body = bodies[r["id"]]
             try:
                 result = summarize_article(
                     url=r["url"], raw_text=body, categories=info.categories,
                     category_defs=info.category_defs, backend=bk)
                 if REVIEW_FN is not None:
-                    ok, reason = REVIEW_FN(result, body, info)
+                    ok, _reason = REVIEW_FN(result, body, info)
                     if not ok:
                         # one retry
                         result = summarize_article(
@@ -506,40 +607,58 @@ def _phase_summarize(store, window, trackers, rep, log, limit, concurrency, rpt,
                             category_defs=info.category_defs, backend=bk)
                         ok2, reason2 = REVIEW_FN(result, body, info)
                         if not ok2:
-                            store.mark_status(aid, "review_failed", date=dates[aid])
-                            store.log_error(r["source"], f"review: {reason2}", r["url"])
-                            rep.review_failed += 1
-                            continue
-                # F3: if neither the feed nor the meta extraction produced a
-                # date, fall back to the discovery date (fetched_at — when
-                # this candidate was first inserted) so the article still
-                # gets a non-NULL `date` and isn't permanently invisible to
-                # every downstream date-keyed query (_ready_dates,
-                # rebuild_days, list_by_date, ...). update_summary's
-                # date=COALESCE(date, ?) means this never clobbers a genuine
-                # feed/meta date already stored in the row.
-                if result.get("repaired"):
-                    rep.lang_repaired += 1
-                    log.info("[%s] %s summary translated to zh (%s)",
-                             tname, r["url"], result.get("src_lang"))
-                fallback_date = dates[aid] or (r["fetched_at"] or "")[:10] or None
-                store.update_summary(
-                    aid, title=result["title"] or r["title"],
-                    summary=result["summary"], category=result["category"],
-                    tags=result["tags"], date=fallback_date)
-                rep.summarized += 1
-                for oname, oinfo in others.items():
-                    if belongs_to(article_url=r["url"],
-                                  article_title=result["title"] or r["title"] or "",
-                                  article_tags=result["tags"] or [],
-                                  article_category=result["category"],
-                                  other=oinfo, other_name=oname,
-                                  narrow_domains=NARROW_DOMAINS.get(oname)):
-                        if store.add_tracker(aid, oname):
-                            rep.cross_added += 1
+                            return r, None, ("review", reason2)
+                return r, result, None
             except Exception as exc:
-                store.log_error(r["source"], f"summarize: {exc}", r["url"])
-                log.debug("summarize id=%s error: %s", aid, exc)
+                return r, None, ("error", str(exc))
+
+        with ThreadPoolExecutor(max_workers=workers) as pool:
+            for start in range(0, len(eligible), workers):
+                if controller is not None:
+                    controller.checkpoint()
+                batch = eligible[start:start + workers]
+                for r, result, failure in pool.map(_summarize_one, batch):
+                    aid = r["id"]
+                    processed += 1
+                    rpt.tick(processed, grand_total,
+                             f"[{tname}] {(r['title'] or '')[:70]}")
+                    if failure is not None:
+                        kind, detail = failure
+                        if kind == "review":
+                            store.mark_status(aid, "review_failed", date=dates[aid])
+                            store.log_error(r["source"], f"review: {detail}", r["url"])
+                            rep.review_failed += 1
+                        else:
+                            store.log_error(r["source"], f"summarize: {detail}", r["url"])
+                            log.debug("summarize id=%s error: %s", aid, detail)
+                        continue
+                    if result.get("repaired"):
+                        rep.lang_repaired += 1
+                        log.info("[%s] %s summary translated to zh (%s)",
+                                 tname, r["url"], result.get("src_lang"))
+                    # F3: if neither the feed nor the meta extraction produced a
+                    # date, fall back to the discovery date (fetched_at — when
+                    # this candidate was first inserted) so the article still
+                    # gets a non-NULL `date` and isn't permanently invisible to
+                    # every downstream date-keyed query (_ready_dates,
+                    # rebuild_days, list_by_date, ...). update_summary's
+                    # date=COALESCE(date, ?) means this never clobbers a genuine
+                    # feed/meta date already stored in the row.
+                    fallback_date = dates[aid] or (r["fetched_at"] or "")[:10] or None
+                    store.update_summary(
+                        aid, title=result["title"] or r["title"],
+                        summary=result["summary"], category=result["category"],
+                        tags=result["tags"], date=fallback_date)
+                    rep.summarized += 1
+                    for oname, oinfo in others.items():
+                        if belongs_to(article_url=r["url"],
+                                      article_title=result["title"] or r["title"] or "",
+                                      article_tags=result["tags"] or [],
+                                      article_category=result["category"],
+                                      other=oinfo, other_name=oname,
+                                      narrow_domains=NARROW_DOMAINS.get(oname)):
+                            if store.add_tracker(aid, oname):
+                                rep.cross_added += 1
     log.info("summarize complete: %d/%d (oow=%d rev_fail=%d cross+%d zh-fix=%d)",
              rep.summarized, rep.summarize_attempted, rep.out_of_window,
              rep.review_failed, rep.cross_added, rep.lang_repaired)
@@ -553,7 +672,13 @@ def _phase_summarize(store, window, trackers, rep, log, limit, concurrency, rpt,
 
 def _phase_translate(store, rep, log, rpt, controller=None, backend="ollama"):
     """Translate freshly-summarized (ready) articles into English so the write
-    phase emits both languages. Forward-only: only rows lacking summary_en."""
+    phase emits both languages. Forward-only: only rows lacking summary_en.
+
+    WP2: the model calls run in a pool, the sqlite writes stay on this thread.
+    Work is cut into batches of `workers` so `controller.checkpoint()` still has
+    somewhere to land — the pause/restart granularity goes from one article to
+    one batch, which is the price of the parallelism.
+    """
     rpt.enter("translate", "translating to English")
     from .llm.translate import translate_article
     rows = store.list_untranslated(limit=100_000, statuses=("ready",))
@@ -561,23 +686,37 @@ def _phase_translate(store, rep, log, rpt, controller=None, backend="ollama"):
     if not total:
         rpt.result("translate", "0 (nothing new)")
         return
-    for i, r in enumerate(rows, 1):
-        if controller is not None:
-            controller.checkpoint()
-        bk = controller.backend_for("translate") if controller is not None else backend
-        rpt.tick(i, total, f"{(r['title'] or '')[:70]}")
-        tags = [t for t in (r["tags"] or "").split(",") if t]
+
+    bk = controller.backend_for("translate") if controller is not None else backend
+    workers = _llm_workers(bk, controller)
+    rep.llm_concurrency = max(rep.llm_concurrency, workers)
+    log.info("translate: %d rows, %d worker(s), backend=%s", total, workers, bk)
+
+    def _one(r):
+        """Pool side: model call only. Returns (row, result_or_None)."""
         try:
-            tr = translate_article(title=r["title"] or "", summary=r["summary"] or "",
-                                   tags=tags, backend=bk)
+            tags = [t for t in (r["tags"] or "").split(",") if t]
+            return r, translate_article(title=r["title"] or "",
+                                        summary=r["summary"] or "",
+                                        tags=tags, backend=bk)
         except Exception as exc:
             log.debug("translate id=%s error: %s", r["id"], exc)
-            continue
-        if tr["summary_en"]:
-            store.update_translation(
-                r["id"], title_en=tr["title_en"] or r["title"] or "",
-                summary_en=tr["summary_en"], tags_en=tr["tags_en"])
-            rep.translated += 1
+            return r, None
+
+    done = 0
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        for start in range(0, total, workers):
+            if controller is not None:
+                controller.checkpoint()
+            batch = rows[start:start + workers]
+            for r, tr in pool.map(_one, batch):
+                done += 1
+                rpt.tick(done, total, f"{(r['title'] or '')[:70]}")
+                if tr and tr["summary_en"]:
+                    store.update_translation(
+                        r["id"], title_en=tr["title_en"] or r["title"] or "",
+                        summary_en=tr["summary_en"], tags_en=tr["tags_en"])
+                    rep.translated += 1
     log.info("translate complete: %d/%d", rep.translated, total)
     rpt.result("translate", f"{rep.translated}/{total} → EN")
 
@@ -760,7 +899,11 @@ def _finalize(store, rep, t0, log, stats0=None):
     rep.elapsed_s = time.time() - t0
     if stats0 is not None:
         from . import llm
-        rep.gemini_fallback = llm.STATS["gemini_fallback"] - stats0.get("gemini_fallback", 0)
+        # Deltas, not absolutes: llm.STATS is per-process and a dashboard
+        # session runs several pipelines in one process, so an absolute read
+        # would charge this run with the previous one's misses.
+        for name in ("gemini_fallback", "schema_miss", "parse_fallback"):
+            setattr(rep, name, llm.STATS.get(name, 0) - stats0.get(name, 0))
     stats = asdict(rep)
     store.finish_run(rep.run_id, stats_json=json.dumps(stats, ensure_ascii=False),
                      errors_json=json.dumps(rep.errors, ensure_ascii=False), ok=rep.ok)
