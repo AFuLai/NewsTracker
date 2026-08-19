@@ -141,6 +141,15 @@ class RunReport:
     #: declined (non-ollama backend, or an override), so the report never
     #: implies parallelism that did not happen.
     llm_concurrency: int = 1
+    #: Per-model-call wall clock for the two LLM phases, keyed by phase name:
+    #: {"translate": {"n": 143, "p50": 5.5, "p95": 9.1, "max": 22.0}}.
+    #: phase_s alone cannot separate "many articles" from "each article slow":
+    #: run #65 reported translate 6042s over 143 rows, and settling which of
+    #: the two it was took a bench against a copy of the DB, because the run
+    #: itself recorded no per-call number. Only the summary is kept — the whole
+    #: report is serialised into status.json and the runs table, where a few
+    #: hundred raw floats would be noise rather than evidence.
+    llm_call_s: dict[str, dict] = field(default_factory=dict)
     #: WP5 — EU CRA rerank gate. `cra_would_drop` is the shadow-mode answer to
     #: "what would enforcement have done", which is the number the threshold is
     #: calibrated against; `cra_unavailable` records a fail-open, so a run that
@@ -169,6 +178,14 @@ class RunReport:
         parts = [f"{short.get(p, p)} {self.phase_s[p]:.0f}s"
                  for p in PHASES if p in self.phase_s]
         return " ".join(parts) or "none"
+
+    def _calls(self) -> str:
+        """` | call sum 7.9/14.0s i18n 5.5/9.1s` — p50/p95 per model call.
+        Empty for a run that made none, so a fetch-only run stays readable."""
+        short = {"summarize": "sum", "translate": "i18n"}
+        parts = [f"{short.get(name, name)} {d['p50']:.1f}/{d['p95']:.1f}s"
+                 for name, d in self.llm_call_s.items() if d.get("n")]
+        return f" | call {' '.join(parts)}" if parts else ""
 
     def _cra(self) -> str:
         """`cra 41sc shadow(-18)` / `cra 41sc ENFORCED` / `cra DOWN`. Silent
@@ -202,7 +219,8 @@ class RunReport:
                 f"{f' emb{self.embedded}' if self.embedded else ''}"
                 f"{f' sem~{self.semantic_pairs}' if self.semantic_pairs else ''} | "
                 f"write {self.days_written}d | err {len(self.errors)} | "
-                f"phases {self._phase_times()} | "
+                f"phases {self._phase_times()}"
+                f"{self._calls()} | "
                 f"{self.elapsed_s:.0f}s")
 
 
@@ -569,6 +587,27 @@ def _phase_gate(store, trackers, rep, log, rpt):
     rpt.result("gate", f"dropped {rep.gated_out} noise")
 
 
+def _record_call_times(rep, phase: str, durations: list[float], log) -> None:
+    """Fold a phase's per-call wall clocks into rep.llm_call_s, and log them.
+
+    Called once per phase with every call that phase made — summarize runs one
+    pool per tracker, so the percentiles describe the phase and not its last
+    tracker. Nearest-rank percentiles: the samples are few enough that
+    interpolating between them would imply a precision they do not have.
+    """
+    if not durations:
+        return
+    ordered = sorted(durations)
+
+    def pct(q: float) -> float:
+        return ordered[min(len(ordered) - 1, int(round(q * (len(ordered) - 1))))]
+
+    rep.llm_call_s[phase] = {"n": len(ordered), "p50": pct(0.50),
+                             "p95": pct(0.95), "max": ordered[-1]}
+    log.info("%s per-call: n=%d p50=%.1fs p95=%.1fs max=%.1fs",
+             phase, len(ordered), pct(0.50), pct(0.95), ordered[-1])
+
+
 # ── Phase 3: SUMMARIZE (+ L3 review hook + cross-detect) ─────────────────────
 
 def _phase_summarize(store, window, trackers, rep, log, limit, concurrency, rpt,
@@ -583,6 +622,7 @@ def _phase_summarize(store, window, trackers, rep, log, limit, concurrency, rpt,
     pending_by_tracker = {t: store.list_pending(limit=limit, tracker=t) for t in trackers}
     grand_total = sum(len(v) for v in pending_by_tracker.values())
     processed = 0
+    call_s: list[float] = []
     for tname in trackers:
         info = load_tracker(tname)
         rows = pending_by_tracker[tname]
@@ -678,8 +718,11 @@ def _phase_summarize(store, window, trackers, rep, log, limit, concurrency, rpt,
 
         def _summarize_one(r):
             """Pool side: model calls + review only, no DB. Returns
-            (row, result, failure) where exactly one of result/failure is set."""
+            (row, result, failure, seconds) where exactly one of result and
+            failure is set. `seconds` spans the L3 review retry too, because
+            that retry is part of what the article actually cost."""
             body = bodies[r["id"]]
+            t0 = time.time()
             try:
                 result = summarize_article(
                     url=r["url"], raw_text=body, categories=info.categories,
@@ -693,19 +736,20 @@ def _phase_summarize(store, window, trackers, rep, log, limit, concurrency, rpt,
                             category_defs=info.category_defs, backend=bk)
                         ok2, reason2 = REVIEW_FN(result, body, info)
                         if not ok2:
-                            return r, None, ("review", reason2)
-                return r, result, None
+                            return r, None, ("review", reason2), time.time() - t0
+                return r, result, None, time.time() - t0
             except Exception as exc:
-                return r, None, ("error", str(exc))
+                return r, None, ("error", str(exc)), time.time() - t0
 
         with ThreadPoolExecutor(max_workers=workers) as pool:
             for start in range(0, len(eligible), workers):
                 if controller is not None:
                     controller.checkpoint()
                 batch = eligible[start:start + workers]
-                for r, result, failure in pool.map(_summarize_one, batch):
+                for r, result, failure, secs in pool.map(_summarize_one, batch):
                     aid = r["id"]
                     processed += 1
+                    call_s.append(secs)
                     rpt.tick(processed, grand_total,
                              f"[{tname}] {(r['title'] or '')[:70]}")
                     if failure is not None:
@@ -745,6 +789,8 @@ def _phase_summarize(store, window, trackers, rep, log, limit, concurrency, rpt,
                                       narrow_domains=NARROW_DOMAINS.get(oname)):
                             if store.add_tracker(aid, oname):
                                 rep.cross_added += 1
+    _record_call_times(rep, "summarize", call_s, log)
+
     # WP6: embed what this run summarised, new rows only — the plan is
     # explicit about not backfilling the whole table. Failure is silent by
     # design: an embedding is an optimisation for clustering, and no article
@@ -874,30 +920,34 @@ def _phase_translate(store, rep, log, rpt, controller=None, backend="ollama"):
     log.info("translate: %d rows, %d worker(s), backend=%s", total, workers, bk)
 
     def _one(r):
-        """Pool side: model call only. Returns (row, result_or_None)."""
+        """Pool side: model call only. Returns (row, result_or_None, seconds)."""
+        t0 = time.time()
         try:
             tags = [t for t in (r["tags"] or "").split(",") if t]
             return r, translate_article(title=r["title"] or "",
                                         summary=r["summary"] or "",
-                                        tags=tags, backend=bk)
+                                        tags=tags, backend=bk), time.time() - t0
         except Exception as exc:
             log.debug("translate id=%s error: %s", r["id"], exc)
-            return r, None
+            return r, None, time.time() - t0
 
     done = 0
+    call_s: list[float] = []
     with ThreadPoolExecutor(max_workers=workers) as pool:
         for start in range(0, total, workers):
             if controller is not None:
                 controller.checkpoint()
             batch = rows[start:start + workers]
-            for r, tr in pool.map(_one, batch):
+            for r, tr, secs in pool.map(_one, batch):
                 done += 1
+                call_s.append(secs)
                 rpt.tick(done, total, f"{(r['title'] or '')[:70]}")
                 if tr and tr["summary_en"]:
                     store.update_translation(
                         r["id"], title_en=tr["title_en"] or r["title"] or "",
                         summary_en=tr["summary_en"], tags_en=tr["tags_en"])
                     rep.translated += 1
+    _record_call_times(rep, "translate", call_s, log)
     log.info("translate complete: %d/%d", rep.translated, total)
     rpt.result("translate", f"{rep.translated}/{total} → EN")
 

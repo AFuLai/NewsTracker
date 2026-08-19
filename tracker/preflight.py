@@ -15,6 +15,7 @@ import os
 import subprocess
 import sys
 import time
+from pathlib import Path
 
 import httpx
 
@@ -36,6 +37,14 @@ def ollama_up(timeout: float = 3.0) -> bool:
 #: "4 workers against 4 known slots" from "4 workers against an unknown daemon",
 #: instead of printing a worker count that implies a speed-up nobody verified.
 started_here: bool = False
+
+#: Where the daemon's own stdout/stderr goes. It used to go to DEVNULL, which
+#: left two failures unreadable: an auto-start that failed reported only
+#: "ollama down (auto-start failed)" with nothing to read, and a daemon that
+#: degraded mid-run left no trace at all — run #65's translate phase cost
+#: 42.3 s/article against a 5.5 s bench, and those 100 minutes are blank in
+#: every artefact we keep. Appended, with a header per start.
+OLLAMA_LOG = Path("/opt/tracker/logs/ollama-serve.log")
 
 
 def ensure_ollama(*, start_timeout: int = 40, console=None) -> bool:
@@ -61,10 +70,22 @@ def ensure_ollama(*, start_timeout: int = 40, console=None) -> bool:
         # worker count rather than claiming a speed-up.
         env = dict(os.environ)
         env.setdefault("OLLAMA_NUM_PARALLEL", str(llm_concurrency()))
+        OLLAMA_LOG.parent.mkdir(parents=True, exist_ok=True)
+        logf = open(OLLAMA_LOG, "a", encoding="utf-8", errors="replace")
+        print("", file=logf)
+        print("=== ollama serve started by tracker at %s "
+              "(OLLAMA_NUM_PARALLEL=%s) ==="
+              % (time.strftime("%Y-%m-%d %H:%M:%S"),
+                 env.get("OLLAMA_NUM_PARALLEL", "?")), file=logf)
+        logf.flush()
         # detached: keeps running after tracker exits (start_new_session)
         subprocess.Popen(["ollama", "serve"],
-                         stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                         stdout=logf, stderr=subprocess.STDOUT,
                          start_new_session=True, env=env)
+        # The child holds its own dup of the fd, so this process does not need
+        # its own copy; keeping it open would leave a daemon log fd alive in
+        # every tracker process that ever started one.
+        logf.close()
     except FileNotFoundError:
         _say("[red]ollama executable not found on PATH.[/red]"
              if console else "ollama executable not found on PATH.")
@@ -75,6 +96,8 @@ def ensure_ollama(*, start_timeout: int = 40, console=None) -> bool:
             started_here = True
             _say("[green]ollama is up.[/green]" if console else "ollama is up.")
             return True
+    msg = "ollama did not come up within %ds — see %s" % (start_timeout, OLLAMA_LOG)
+    _say("[red]%s[/red]" % msg if console else msg)
     return False
 
 

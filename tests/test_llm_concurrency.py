@@ -222,3 +222,80 @@ def test_finalize_reports_this_runs_counters_not_the_processes(tmp_path):
     llm.STATS["schema_miss"] = 7           # this run added two
     orch._finalize(store, rep, 0.0, logging.getLogger("t"), stats0)
     assert rep.schema_miss == 2
+
+
+# ── per-call timing (the follow-up WP3 missed) ───────────────────────────────
+#
+# phase_s says a phase took 6042s; it cannot say whether that was 143 articles
+# at 42s or 1100 articles at 5.5s. Run #65 needed a bench against a copy of the
+# production DB to answer that, which is exactly the question the run should
+# have answered itself.
+
+def test_record_call_times_uses_nearest_rank_percentiles():
+    import logging
+    rep = RunReport()
+    orch._record_call_times(rep, "translate", [1.0, 2.0, 3.0, 4.0, 100.0],
+                            logging.getLogger("t"))
+    d = rep.llm_call_s["translate"]
+    assert d["n"] == 5
+    assert d["p50"] == 3.0        # nearest rank, not interpolated
+    assert d["p95"] == 100.0
+    assert d["max"] == 100.0
+
+
+def test_record_call_times_is_silent_for_a_phase_that_made_no_calls():
+    import logging
+    rep = RunReport()
+    orch._record_call_times(rep, "translate", [], logging.getLogger("t"))
+    # Absent, not zero: a phase that made no model call has no per-call cost,
+    # and "p50 0.0s" would read as an impossibly fast one.
+    assert rep.llm_call_s == {}
+
+
+def test_translate_records_per_call_times(monkeypatch):
+    monkeypatch.setenv("TRACKER_LLM_CONCURRENCY", "4")
+    import tracker.llm.translate as tr
+    monkeypatch.setattr(tr, "translate_article",
+                        lambda **k: {"title_en": "T", "summary_en": "S",
+                                     "tags_en": []})
+    rep = RunReport()
+    import logging
+    orch._phase_translate(_FakeStore(_rows(8)), rep, logging.getLogger("t"),
+                          _NullRpt())
+    d = rep.llm_call_s["translate"]
+    assert d["n"] == 8            # every call timed, not just the successful ones
+    assert d["p50"] >= 0.0 and d["max"] >= d["p50"]
+
+
+def test_translate_times_the_calls_that_failed_too(monkeypatch):
+    monkeypatch.setenv("TRACKER_LLM_CONCURRENCY", "4")
+    import tracker.llm.translate as tr
+
+    def flaky(*, title, summary, tags, backend):
+        if title == "t3":
+            raise RuntimeError("model exploded")
+        return {"title_en": "T", "summary_en": "S", "tags_en": []}
+
+    monkeypatch.setattr(tr, "translate_article", flaky)
+    rep = RunReport()
+    import logging
+    orch._phase_translate(_FakeStore(_rows(8)), rep, logging.getLogger("t"),
+                          _NullRpt())
+    # 7 translated, 8 timed: a call that burned 90s and then threw is exactly
+    # the one worth seeing in the percentiles.
+    assert rep.translated == 7
+    assert rep.llm_call_s["translate"]["n"] == 8
+
+
+def test_one_line_carries_per_call_times():
+    r = RunReport(phase_s={"summarize": 3180.0, "translate": 6042.0},
+                  llm_call_s={"summarize": {"n": 143, "p50": 7.9, "p95": 14.0,
+                                            "max": 18.0},
+                              "translate": {"n": 143, "p50": 5.5, "p95": 9.1,
+                                            "max": 22.0}})
+    assert "call sum 7.9/14.0s i18n 5.5/9.1s" in r.one_line()
+
+
+def test_one_line_omits_the_call_segment_when_nothing_ran():
+    assert RunReport()._calls() == ""
+    assert "| call " not in RunReport().one_line()
