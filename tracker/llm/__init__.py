@@ -23,7 +23,7 @@ from typing import Any
 
 import httpx
 
-from .. import OLLAMA_MODEL, OLLAMA_URL
+from .. import OLLAMA_MODEL
 
 _log = logging.getLogger("tracker.llm")
 
@@ -42,7 +42,12 @@ GEMINI_TIMEOUT = float(os.environ.get("TRACKER_GEMINI_TIMEOUT", "45"))
 #   parse_fallback — the reply would not parse as JSON at all and a caller took
 #                    its degraded path (truncated raw text, all-keep gate, empty
 #                    translation). Expected 0 once schemas are on.
-STATS = {"gemini_ok": 0, "gemini_fallback": 0, "schema_miss": 0, "parse_fallback": 0}
+#   endpoint_failover — a request could not be delivered to the selected
+#                    ollama endpoint and was retried on the next one
+#                    (tracker/ollama_hosts.py). Non-zero means a host went
+#                    away mid-run, which is survivable but worth seeing.
+STATS = {"gemini_ok": 0, "gemini_fallback": 0, "schema_miss": 0,
+         "parse_fallback": 0, "endpoint_failover": 0}
 
 # WP2 put these layers behind a thread pool. `STATS[k] += 1` is a read-modify-
 # write and drops increments under contention, which matters precisely because
@@ -84,9 +89,36 @@ def _call_ollama(prompt: str, *, model: str = OLLAMA_MODEL, timeout: float = 120
         payload["format"] = schema
     elif format_json:
         payload["format"] = "json"
-    r = httpx.post(f"{OLLAMA_URL}/api/generate", json=payload, timeout=timeout)
-    r.raise_for_status()
-    return r.json().get("response", "")
+    return _post_ollama(payload, timeout)
+
+
+def _post_ollama(payload: dict[str, Any], timeout: float) -> str:
+    """POST to the selected endpoint; on a delivery failure, demote it and
+    retry once on the next one.
+
+    Only connection-level failures demote. A 500, or a read timeout, can be
+    this prompt rather than this host, and moving a whole run off an
+    endpoint because one article upset the model is the wrong trade. One
+    retry, not a loop: fail-open means the caller's degraded path is an
+    acceptable outcome, and a retry storm across dead hosts is not.
+    """
+    from .. import ollama_hosts as hosts
+    url = hosts.current()
+    if url is None:
+        raise RuntimeError("no ollama endpoint available")
+    try:
+        r = httpx.post(f"{url}/api/generate", json=payload, timeout=timeout)
+        r.raise_for_status()
+        return r.json().get("response", "")
+    except (httpx.ConnectError, httpx.ConnectTimeout, httpx.ReadError,
+            httpx.RemoteProtocolError) as exc:
+        nxt = hosts.demote(url, type(exc).__name__)
+        if nxt is None:
+            raise
+        bump("endpoint_failover")
+        r = httpx.post(f"{nxt}/api/generate", json=payload, timeout=timeout)
+        r.raise_for_status()
+        return r.json().get("response", "")
 
 
 def _call_gemini(prompt: str, *, timeout: float = 120.0, format_json: bool = False) -> str:

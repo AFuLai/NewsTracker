@@ -55,9 +55,28 @@ def ensure_ollama(*, start_timeout: int = 40, console=None) -> bool:
     def _say(msg):
         (console.print if console else print)(msg)
 
-    if ollama_up():
+    from . import ollama_hosts as hosts
+
+    # A fresh selection per run: an endpoint that was down an hour ago may be
+    # back, and a run must not inherit the previous one's verdict.
+    hosts.reset()
+    url = hosts.select()
+    if url is not None:
         started_here = False
+        if not hosts.is_local(url):
+            msg = "using remote ollama at %s" % hosts.label(url)
+            _say("[green]%s[/green]" % msg if console else msg)
         return True
+
+    # Nothing answered. Starting a daemon is only meaningful for a local
+    # endpoint — we cannot start ollama on someone else's machine, and
+    # pretending otherwise would report a success nobody can use.
+    if not any(hosts.is_local(u) for u in hosts.candidates()):
+        msg = ("no ollama endpoint answered (%s) and none of them is local, "
+               "so there is nothing to start here"
+               % ", ".join(hosts.label(u) for u in hosts.candidates()))
+        _say("[red]%s[/red]" % msg if console else msg)
+        return False
     _say("[dim]ollama not running — starting it in the background…[/dim]"
          if console else "ollama not running — starting it in the background…")
     try:
@@ -94,6 +113,7 @@ def ensure_ollama(*, start_timeout: int = 40, console=None) -> bool:
         time.sleep(1)
         if ollama_up():
             started_here = True
+            hosts.select(force=True)
             _say("[green]ollama is up.[/green]" if console else "ollama is up.")
             return True
     msg = "ollama did not come up within %ds — see %s" % (start_timeout, OLLAMA_LOG)

@@ -91,7 +91,13 @@ def _llm_workers(backend: str, controller=None) -> int:
     if controller is not None and any(b != "ollama"
                                       for b in controller.backends.values()):
         return 1
-    return llm_concurrency()
+    # A remote endpoint carries its own cap: the local number matches an
+    # OLLAMA_NUM_PARALLEL we set ourselves, which on someone else's machine is
+    # not ours to assume. selected() rather than current(): preflight has
+    # already chosen, and probing here would put a network timeout inside a
+    # per-phase decision.
+    from . import ollama_hosts as hosts
+    return hosts.concurrency_for(hosts.selected())
 
 
 @dataclass
@@ -150,6 +156,14 @@ class RunReport:
     #: report is serialised into status.json and the runs table, where a few
     #: hundred raw floats would be noise rather than evidence.
     llm_call_s: dict[str, dict] = field(default_factory=dict)
+    #: Which ollama endpoint served this run (`local`, or `host:port`). A run
+    #: that is four times faster because it ran on a LAN machine rather than
+    #: this one must say so, or the next person compares two runs that were
+    #: never on the same hardware.
+    ollama_endpoint: str = ""
+    #: Requests that could not be delivered to the selected endpoint and were
+    #: retried on the next one. Survivable; non-zero means a host went away.
+    endpoint_failover: int = 0
     #: WP5 — EU CRA rerank gate. `cra_would_drop` is the shadow-mode answer to
     #: "what would enforcement have done", which is the number the threshold is
     #: calibrated against; `cra_unavailable` records a fail-open, so a run that
@@ -187,6 +201,14 @@ class RunReport:
                  for name, d in self.llm_call_s.items() if d.get("n")]
         return f" | call {' '.join(parts)}" if parts else ""
 
+    def _endpoint(self) -> str:
+        """` | via 10.139.180.21:11434` — silent for an ordinary local run, so
+        the line only grows when something about it needs explaining."""
+        if not self.ollama_endpoint or self.ollama_endpoint == "local":
+            return ""
+        fo = f" fo{self.endpoint_failover}" if self.endpoint_failover else ""
+        return f" | via {self.ollama_endpoint}{fo}"
+
     def _cra(self) -> str:
         """`cra 41sc shadow(-18)` / `cra 41sc ENFORCED` / `cra DOWN`. Silent
         when the gate did not run at all, so non-eu_cra runs stay readable."""
@@ -220,7 +242,7 @@ class RunReport:
                 f"{f' sem~{self.semantic_pairs}' if self.semantic_pairs else ''} | "
                 f"write {self.days_written}d | err {len(self.errors)} | "
                 f"phases {self._phase_times()}"
-                f"{self._calls()} | "
+                f"{self._calls()}{self._endpoint()} | "
                 f"{self.elapsed_s:.0f}s")
 
 
@@ -309,15 +331,18 @@ def run_pipeline(*, since: str, until: str, trackers: list[str],
     # throughput. We only control OLLAMA_NUM_PARALLEL for a daemon we started;
     # otherwise the LLM pool may be queueing behind a 1-slot daemon and the
     # `x4` in the report would be workers asked for, not work done in parallel.
+    from . import ollama_hosts as hosts
+    rep.ollama_endpoint = hosts.label(hosts.current() or "")
+    log.info("ollama endpoints: %s", hosts.describe())
     if preflight_mod.started_here:
         log.info("ollama ready (started here, OLLAMA_NUM_PARALLEL=%d)",
                  llm_concurrency())
     else:
-        log.info("ollama ready (was already running — its OLLAMA_NUM_PARALLEL "
-                 "is whatever it was started with; if that is 1 the %d LLM "
-                 "workers will queue rather than run in parallel)",
-                 llm_concurrency())
-    rpt.result("preflight", "ollama ready")
+        log.info("ollama ready on %s (not started here — its "
+                 "OLLAMA_NUM_PARALLEL is whatever it was given; if that is 1 "
+                 "the %d LLM workers will queue rather than run in parallel)",
+                 rep.ollama_endpoint, _llm_workers("ollama"))
+    rpt.result("preflight", f"ollama ready ({rep.ollama_endpoint})")
 
     try:
         if _do("fetch"):
@@ -1153,7 +1178,8 @@ def _finalize(store, rep, t0, log, stats0=None):
         # Deltas, not absolutes: llm.STATS is per-process and a dashboard
         # session runs several pipelines in one process, so an absolute read
         # would charge this run with the previous one's misses.
-        for name in ("gemini_fallback", "schema_miss", "parse_fallback"):
+        for name in ("gemini_fallback", "schema_miss", "parse_fallback",
+                     "endpoint_failover"):
             setattr(rep, name, llm.STATS.get(name, 0) - stats0.get(name, 0))
     stats = asdict(rep)
     store.finish_run(rep.run_id, stats_json=json.dumps(stats, ensure_ascii=False),

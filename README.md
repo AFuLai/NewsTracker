@@ -109,6 +109,45 @@ debug Chrome isn't reachable, you're told to start it
 (`chrome --remote-debugging-port=9999`) and retry, or cancel (browser sources
 are then skipped).
 
+### Remote ollama endpoints (optional)
+
+`gemma4:e4b` is 9.61 GB and this box has 8 GB of VRAM, so 42 of its 43 layers
+fit on the GPU and the output layer runs on the CPU. Two machines on the LAN
+run the **same** model file (digest `c6eb396dbd5992bb`) and answer roughly 4x
+faster; measured 2026-08-19 on translate, same articles:
+
+| endpoint | serial | 4 workers |
+|---|---|---|
+| local | 11.68 s/call | 6.18 s/article |
+| TWTY3PC1875 `10.139.180.21` | 2.16 s/call | 1.61 s/article |
+| TWTY3PC1876 `10.139.180.22` | 2.34 s/call | 1.62 s/article |
+
+Neither remote gets faster past 4 concurrent calls. Full numbers and method:
+`ops/phase0/ACCEPTANCE.md`.
+
+**Off unless configured.** With `TRACKER_OLLAMA_URLS` unset the pipeline uses
+the local daemon exactly as before and nothing leaves the machine. Naming a
+remote is what turns it on, so the safe default is a property of the
+configuration rather than a flag someone has to remember.
+
+```bash
+# priority order; the first endpoint that answers /api/tags carries the run
+export TRACKER_OLLAMA_URLS=http://10.139.180.21:11434,http://10.139.180.22:11434,http://localhost:11434
+
+# those are machines other people use — bound what we take
+export TRACKER_OLLAMA_REMOTE_WINDOW=18:00-08:00   # outside it, remotes are skipped
+export TRACKER_OLLAMA_REMOTE_CONCURRENCY=4        # in-flight calls against a remote
+```
+
+Selection happens once per run, in preflight, and the run report names the
+endpoint that served it (`| via 10.139.180.21:11434`) so two runs on different
+hardware are never compared as if they were the same. A request that cannot be
+**delivered** (refused connection, host gone) demotes that endpoint and retries
+once on the next one, counted as `endpoint_failover`; a slow or unhappy answer
+does not, because that is the prompt rather than the host. A local daemon is
+auto-started only when a local endpoint is the one being used — ollama on
+someone else machine is not ours to start.
+
 ## Architecture (v2)
 
 ```
