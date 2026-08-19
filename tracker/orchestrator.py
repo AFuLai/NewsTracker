@@ -816,11 +816,10 @@ def _phase_summarize(store, window, trackers, rep, log, limit, concurrency, rpt,
                                 rep.cross_added += 1
     _record_call_times(rep, "summarize", call_s, log)
 
-    # WP6: embed what this run summarised, new rows only — the plan is
-    # explicit about not backfilling the whole table. Failure is silent by
-    # design: an embedding is an optimisation for clustering, and no article
-    # should be lost because a CPU side-service was down.
-    _embed_new_rows(store, trackers, rep, log)
+    # WP6: embed the rows this run may cluster. Failure is silent by design:
+    # an embedding is an optimisation for clustering, and no article should be
+    # lost because a CPU side-service was down.
+    _embed_new_rows(store, window, trackers, rep, log)
 
     log.info("summarize complete: %d/%d (oow=%d rev_fail=%d cross+%d zh-fix=%d)",
              rep.summarized, rep.summarize_attempted, rep.out_of_window,
@@ -878,22 +877,54 @@ def _phase_cross_tag(store, rep, log, *, limit: int = 300) -> None:
              len(hits), len(rows), t, mode)
 
 
-def _embed_new_rows(store, trackers, rep, log, *, batch: int = 32) -> None:
-    """WP6 — store a bge-m3 vector for rows summarised in this run.
+#: Rows one run may embed. The write phase clusters the days in the run window
+#: and nothing else, so a vector outside that window is cost with no consumer.
+#: The unbounded form this replaces was a real defect: against a table where no
+#: row had a vector it selected the whole table — run #65 logged "skipping 6177
+#: rows" — while the plan asks for new rows only.
+DEFAULT_EMBED_MAX_ROWS = 500
 
-    Only rows that lack one, and only ready/written rows, so a re-run is cheap
-    and old rows stay untouched. Every failure path leaves the column NULL,
-    which every consumer already reads as "no semantic opinion".
+
+def _embed_new_rows(store, window, trackers, rep, log, *, batch: int = 32) -> None:
+    """WP6 — store a bge-m3 vector for the rows this run may cluster.
+
+    Bounded three ways: the run window, rows that lack a vector, and a row cap.
+    `TRACKER_EMBED_BACKFILL=all` drops the window for a deliberate one-off
+    backfill; the cap still applies, and whatever it leaves behind is logged
+    rather than silently dropped, because a run that embedded 500 of 6177 rows
+    and said nothing reads as a run that embedded everything.
+
+    Every failure path leaves the column NULL, which every consumer already
+    reads as "no semantic opinion".
     """
     from . import rerank as rr
     try:
-        ids = [r[0] for r in store.conn.execute(
-            f"SELECT id FROM articles WHERE status IN ('ready','written') "
-            f"AND embedding IS NULL AND summary IS NOT NULL "
-            f"AND ({_tracker_or(trackers)})")]
+        backfill = (os.environ.get("TRACKER_EMBED_BACKFILL", "")
+                    .strip().lower() == "all")
+        try:
+            cap = max(1, int(os.environ.get("TRACKER_EMBED_MAX_ROWS",
+                                            DEFAULT_EMBED_MAX_ROWS)))
+        except (TypeError, ValueError):
+            cap = DEFAULT_EMBED_MAX_ROWS
+        sql = (f"SELECT id FROM articles WHERE status IN ('ready','written') "
+               f"AND embedding IS NULL AND summary IS NOT NULL "
+               f"AND ({_tracker_or(trackers)})")
+        params: tuple = ()
+        if not backfill:
+            # A row with no date cannot be clustered into a day either, so
+            # excluding it here costs nothing the write phase would have used.
+            sql += " AND date >= ? AND date <= ?"
+            params = (window.since.isoformat(), window.until.isoformat())
+        sql += " ORDER BY date DESC, id DESC"
+        ids = [r[0] for r in store.conn.execute(sql, params)]
         ids = store.ids_needing_embedding(ids)
         if not ids:
             return
+        if len(ids) > cap:
+            log.info("embedding %d of %d eligible rows (cap "
+                     "TRACKER_EMBED_MAX_ROWS=%d); %d left for a later run",
+                     cap, len(ids), cap, len(ids) - cap)
+            ids = ids[:cap]
         if not rr.embed_available():
             log.info("embeddings service down — skipping %d rows (clustering "
                      "falls back to CVE + Jaccard only)", len(ids))
