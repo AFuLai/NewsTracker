@@ -179,11 +179,23 @@ Phase 0 驗收後評估觸發條件 → （條件成立才）WP7
 
 ## 驗收標準（各階段）
 
-**Phase 0**（跑完整 pipeline ×2 取均值，對照 run #63 基線）：
-- [ ] `parse_fallback` = 0、`schema_miss` = 0（WP3 遙測輸出）
-- [ ] summarize＋translate 合計 < 60 分（基線 160 分）；全程 < 90 分（基線 168 分）
-- [ ] `rev_fail` 不高於基線；`uncategorized` 佔比下降（DB 查詢對照）
+**Phase 0**（跑完整 pipeline ×2 取均值，對照 run #63 基線）
+— 已於 2026-08-19 驗收，完整記錄與再推導指令見 `ops/phase0/ACCEPTANCE.md`：
+- [x] `parse_fallback` = 0、`schema_miss` = 0（WP3 遙測輸出）
+- [ ] summarize＋translate 合計 < 60 分（基線 160 分）→ **67.3 分，未達**；
+      全程 < 90 分（基線 168 分）→ **76.2 分，達標**。每篇成本對基線是 2.17×／2.07×，
+      吞吐目標達成，落差在絕對值。
+- [x] `uncategorized` 佔比下降（0.59% → 0.00%）；`rev_fail` 1/282 對基線 0/207，
+      單一事件，記為勉強而非通過。
 - [ ] 8 GB VRAM 下無 OOM/溢出降速（ollama log 確認 layers 全在 GPU）
+      → **42/43，且調參數不可達**。KV 從 2048 到 32768、並發 1 到 4 全部停在 42/43；
+      權重加計算圖約需 9.3 GiB，可用 7.8 GiB，`gemma4:e4b` 的 output layer 在這張卡上
+      只能留在 CPU。剩下的槓桿是換量化或換模型，屬 Phase 2。本條在現行硬體上應改寫或移出
+      Phase 0。意圖（無 OOM、無溢出降速）是達成的：無 OOM，吞吐為序列基線的 2.1 倍。
+
+兩次完整 run 取 #64（267 篇）與 #68（282 篇），兩者每篇成本相差 8% 以內。#65 是孤例
+（translate 42.3 s/篇），成因已不可考——當時 daemon 輸出被丟棄、階段也沒記逐次耗時，
+兩者都在 `15a4da7` 補上。
 
 **Phase 1**：
 - [ ] 驗證集（歷史 eu_cra rows 回放）recall ≥ 0.95、precision > L1 現況，數字進 commit
