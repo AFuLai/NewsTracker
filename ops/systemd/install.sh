@@ -16,6 +16,14 @@ if [ "$(id -u)" -ne 0 ]; then
   exit 1
 fi
 
+# Anything started by hand still holds the ports, and a unit that cannot bind
+# restarts forever under Restart=always. pkill -x matches the process name
+# exactly, so it cannot match this script.
+echo "stopping any hand-started instances..."
+pkill -x ollama 2>/dev/null || true
+pkill -f "llama.cpp/llama-b10423/llama-server" 2>/dev/null || true
+sleep 2
+
 for u in $UNITS; do
   install -m 0644 "$SRC/$u" "/etc/systemd/system/$u"
   echo "installed /etc/systemd/system/$u"
