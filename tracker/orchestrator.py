@@ -161,6 +161,10 @@ class RunReport:
     #: this one must say so, or the next person compares two runs that were
     #: never on the same hardware.
     ollama_endpoint: str = ""
+    #: OLLAMA_NUM_PARALLEL actually in force, when it can be known: this run
+    #: started the daemon, or systemd did and the unit names it. 0 means
+    #: unknown, which is not the same as 1 and must not be read as one.
+    ollama_slots: int = 0
     #: Requests that could not be delivered to the selected endpoint and were
     #: retried on the next one. Survivable; non-zero means a host went away.
     endpoint_failover: int = 0
@@ -173,7 +177,8 @@ class RunReport:
     cra_would_drop: int = 0
     cra_enforced: bool = False
     cra_unavailable: bool = False
-    #: WP6 — semantic dedup. `semantic_pairs` counts candidate pairs above the
+    #: WP6 — semantic dedup. `semantic_pairs` counts *distinct* article pairs
+    #: above the
     #: cosine threshold; in shadow mode that is the calibration signal, and
     #: when enforcing it is the number of merges the embedding contributed.
     embedded: int = 0
@@ -239,7 +244,7 @@ class RunReport:
                 f"schema_miss {self.schema_miss} pfb {self.parse_fallback} | "
                 f"cross +{self.cross_added}/-{self.cross_removed}"
                 f"{f' emb{self.embedded}' if self.embedded else ''}"
-                f"{f' sem~{self.semantic_pairs}' if self.semantic_pairs else ''} | "
+                f"{f' sem{self.semantic_pairs}' if self.semantic_pairs else ''} | "
                 f"write {self.days_written}d | err {len(self.errors)} | "
                 f"phases {self._phase_times()}"
                 f"{self._calls()}{self._endpoint()} | "
@@ -337,14 +342,35 @@ def run_pipeline(*, since: str, until: str, trackers: list[str],
     # every test that mocks preflight away.
     rep.ollama_endpoint = hosts.label(hosts.selected() or "")
     log.info("ollama endpoints: %s", hosts.describe())
+    workers = _llm_workers("ollama")
     if preflight_mod.started_here:
+        rep.ollama_slots = llm_concurrency()
         log.info("ollama ready (started here, OLLAMA_NUM_PARALLEL=%d)",
-                 llm_concurrency())
+                 rep.ollama_slots)
     else:
-        log.info("ollama ready on %s (not started here — its "
-                 "OLLAMA_NUM_PARALLEL is whatever it was given; if that is 1 "
-                 "the %d LLM workers will queue rather than run in parallel)",
-                 rep.ollama_endpoint, _llm_workers("ollama"))
+        # A daemon we did not start is normally an unknown, but a systemd unit
+        # we ship states its own slot count — see preflight.local_slot_count.
+        slots = (preflight_mod.local_slot_count()
+                 if hosts.is_local(hosts.selected() or "") else None)
+        if slots:
+            rep.ollama_slots = slots
+            log.info("ollama ready on %s (systemd unit, OLLAMA_NUM_PARALLEL=%d)",
+                     rep.ollama_endpoint, slots)
+            if slots < workers:
+                # The pool cannot be wider than the daemon: ollama serves one
+                # request per slot and queues the rest, so the extra workers
+                # buy nothing and the report would otherwise show a
+                # parallelism that did not happen.
+                log.warning("%d LLM workers against %d ollama slot(s) — the "
+                            "extra workers will queue. Match "
+                            "OLLAMA_NUM_PARALLEL in %s to "
+                            "TRACKER_LLM_CONCURRENCY.",
+                            workers, slots, preflight_mod.OLLAMA_UNIT)
+        else:
+            log.info("ollama ready on %s (not started here — its "
+                     "OLLAMA_NUM_PARALLEL is whatever it was given; if that is "
+                     "1 the %d LLM workers will queue rather than run in "
+                     "parallel)", rep.ollama_endpoint, workers)
     rpt.result("preflight", f"ollama ready ({rep.ollama_endpoint})")
 
     try:
@@ -1013,6 +1039,26 @@ def _phase_translate(store, rep, log, rpt, controller=None, backend="ollama"):
 
 # ── Phase 4: WRITE ───────────────────────────────────────────────────────────
 
+def _record_semantic_pair(rep, seen_pairs, log, *, day, a, b, sim,
+                          merged: bool) -> bool:
+    """Record one semantic-dedup candidate pair. True if it was new.
+
+    Counted per distinct article pair, not per sighting: one article
+    cross-tagged into two trackers makes its day render twice and the same
+    duplicate surfaces in each pass. Run #72 reported 30 sightings of 17 pairs,
+    which reads as more evidence than the run found — and tau2 is calibrated
+    against exactly this number.
+    """
+    key = (min(a, b), max(a, b))
+    if key in seen_pairs:
+        return False
+    seen_pairs.add(key)
+    rep.semantic_pairs = len(seen_pairs)
+    log.info("[semdedup] %s %s ~ %s cos=%.3f%s", day, a, b, sim,
+             "" if merged else "  (shadow, not merged)")
+    return True
+
+
 def _phase_write(store, trackers, rep, log, out, rpt):
     rpt.enter("write", "rendering data files")
     from .cluster import merge_by_title
@@ -1020,6 +1066,10 @@ def _phase_write(store, trackers, rep, log, out, rpt):
                          update_root_manifest, update_year_manifest)
 
     data_dir = out / "data"
+    # Distinct article pairs the semantic signal flagged, across every
+    # tracker-day this phase renders. A set rather than a counter: the same
+    # pair reappears once per tracker the article belongs to.
+    seen_pairs: set[tuple[int, int]] = set()
     # union of categories across all trackers (so a cross-belong item keeps its
     # category regardless of which tracker triggers the write)
     all_categories: list[str] = []
@@ -1055,9 +1105,8 @@ def _phase_write(store, trackers, rep, log, out, rpt):
                         .strip().lower() == "enforce")
 
             def _pair(a, b, sim, _day=d):
-                rep.semantic_pairs += 1
-                log.info("[semdedup] %s %s ~ %s cos=%.3f%s", _day, a, b, sim,
-                         "" if semantic else "  (shadow, not merged)")
+                _record_semantic_pair(rep, seen_pairs, log, day=_day,
+                                      a=a, b=b, sim=sim, merged=semantic)
 
             all_rows = merge_by_title(all_rows, embeddings=embeddings,
                                       semantic=semantic,

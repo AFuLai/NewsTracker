@@ -46,6 +46,11 @@ started_here: bool = False
 #: every artefact we keep. Appended, with a header per start.
 OLLAMA_LOG = Path("/opt/tracker/logs/ollama-serve.log")
 
+#: The unit ops/systemd/ollama.service installs. Named here because it is the
+#: only daemon whose slot count this process can learn without having started
+#: it (see local_slot_count).
+OLLAMA_UNIT = "ollama.service"
+
 
 def ensure_ollama(*, start_timeout: int = 40, console=None) -> bool:
     """Return True if ollama is (now) reachable. Auto-starts it in the
@@ -81,6 +86,38 @@ def ensure_ollama(*, start_timeout: int = 40, console=None) -> bool:
         return False
     hosts.select(force=True)
     return True
+
+
+def local_slot_count() -> int | None:
+    """OLLAMA_NUM_PARALLEL of the local daemon, or None when it is unknowable.
+
+    ollama does not report its slot count over the API — `/api/ps` gives the
+    per-slot context length, not the number of slots — so a daemon this process
+    did not start is normally an honest unknown, and the run report says so.
+
+    systemd is the exception. When the unit ships the value, it *is* the value,
+    and printing "whatever it was given" next to a number sitting in
+    `systemctl show` is false modesty. Only trusted while the unit is active:
+    an inactive unit describes a daemon that is not the one answering.
+    """
+    try:
+        active = subprocess.run(["systemctl", "is-active", OLLAMA_UNIT],
+                                capture_output=True, text=True, timeout=5)
+        if active.stdout.strip() != "active":
+            return None
+        env = subprocess.run(["systemctl", "show", OLLAMA_UNIT,
+                              "-p", "Environment", "--value"],
+                             capture_output=True, text=True, timeout=5)
+    except (OSError, subprocess.SubprocessError):
+        return None                      # no systemd here, which is not an error
+    for token in env.stdout.split():
+        name, _, value = token.partition("=")
+        if name == "OLLAMA_NUM_PARALLEL":
+            try:
+                return max(1, int(value))
+            except ValueError:
+                return None
+    return None
 
 
 def start_local_daemon(*, start_timeout: int = 40, console=None) -> bool:
