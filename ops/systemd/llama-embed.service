@@ -1,0 +1,23 @@
+[Unit]
+# bge-m3 embeddings for WP6 semantic dedup. Flags mirror ops/llama-server/llama_up.sh.
+Description=llama-server bge-m3 embeddings (tracker WP6), CPU only
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=exec
+User=afu
+Group=afu
+Environment=LD_LIBRARY_PATH=/opt/llama.cpp/llama-b10423
+# -ngl 0 keeps every layer on the CPU: all 8 GB of VRAM stays with ollama.
+# 127.0.0.1 only -- this endpoint has no auth.
+ExecStart=/opt/llama.cpp/llama-b10423/llama-server \
+  --model /opt/llama.cpp/models/bge-m3-FP16.gguf \
+  --embedding --pooling cls \
+  -ngl 0 --threads 6 --ctx-size 8192 --batch-size 8192 \
+  --host 127.0.0.1 --port 8081
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,22 @@
+[Unit]
+# Tracker LLM backend. See ops/systemd/README.md.
+Description=ollama (tracker LLM backend)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=exec
+User=afu
+Group=afu
+# MUST match TRACKER_LLM_CONCURRENCY (tracker/__init__.py, default 4): ollama
+# serves one request per slot and queues the rest, so a 4-wide pool against a
+# 1-slot daemon just queues. Nothing detects a mismatch -- /api/ps reports
+# per-slot context length, not the slot count.
+Environment=OLLAMA_NUM_PARALLEL=4
+Environment=OLLAMA_HOST=127.0.0.1:11434
+ExecStart=/usr/local/bin/ollama serve
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
