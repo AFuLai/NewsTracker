@@ -103,9 +103,11 @@ def _post_ollama(payload: dict[str, Any], timeout: float) -> str:
     acceptable outcome, and a retry storm across dead hosts is not.
     """
     from .. import ollama_hosts as hosts
-    url = hosts.current()
-    if url is None:
-        raise RuntimeError("no ollama endpoint available")
+    # selected(), not current(): the call path must not probe. preflight (or
+    # the dashboard picker) has already chosen, and a caller that never went
+    # through either gets the local default, which is exactly the behaviour
+    # this had before endpoints existed.
+    url = hosts.selected() or hosts.LOCAL_URL
     try:
         r = httpx.post(f"{url}/api/generate", json=payload, timeout=timeout)
         r.raise_for_status()

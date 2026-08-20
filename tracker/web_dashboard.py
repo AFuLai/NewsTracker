@@ -105,7 +105,9 @@ class WebReporter(NullReporter):
                     eta = (p["total"] - p["done"]) * avg
             control = self.controller.snapshot() if self.controller is not None else None
             cralib = self.cra_job.snapshot() if self.cra_job is not None else None
+            from . import ollama_hosts as hosts
             return {
+                "ollama": hosts.overview(),
                 "cralib": cralib,
                 "title": self.title,
                 "elapsed": now - self.t0,
@@ -119,32 +121,42 @@ class WebReporter(NullReporter):
             }
 
 
-def _apply_control(controller, cmd: dict, cra_job=None) -> bool:
+def _apply_control(controller, cmd: dict, cra_job=None) -> tuple[bool, str]:
+    """Apply one command. Returns (ok, message) — the message is what the page
+    shows the user, and endpoint selection needs one: "10.139.180.21 is not
+    answering" and "the remote window is closed" are different refusals, and a
+    bare red X makes the user guess which."""
     action = cmd.get("cmd")
     if action == "cralib":
-        return bool(cra_job is not None and cra_job.start())
+        return bool(cra_job is not None and cra_job.start()), ""
+    if action == "endpoint":
+        # Deliberately before the controller check: which ollama serves this
+        # box is a process-wide setting, and the picker is most useful exactly
+        # when no run is in flight yet.
+        from . import ollama_hosts as hosts
+        return hosts.use(cmd.get("url") or "")
     if controller is None:
-        return False
+        return False, "no run to control"
     if action == "start":
-        return controller.request_start(cmd.get("config"))
+        return controller.request_start(cmd.get("config")), ""
     if action == "pause":
-        controller.pause(); return True
+        controller.pause(); return True, ""
     if action == "resume":
-        controller.resume(); return True
+        controller.resume(); return True, ""
     if action == "restart":
         phase = cmd.get("phase")
         if phase:
             controller.request_restart(phase, bool(cmd.get("force")))
-            return True
-        return False
+            return True, ""
+        return False, "no phase given"
     if action == "backend":
         role, backend = cmd.get("role"), cmd.get("backend")
         if role and backend:
             controller.set_backend(role, backend)
-            return True
+            return True, ""
     if action == "close":
-        controller.close(); return True
-    return False
+        controller.close(); return True, ""
+    return False, "unknown command"
 
 
 def serve(reporter: WebReporter, *, port: int = DEFAULT_PORT) -> ThreadingHTTPServer:
@@ -169,16 +181,17 @@ def serve(reporter: WebReporter, *, port: int = DEFAULT_PORT) -> ThreadingHTTPSe
                 self.wfile.write(body)
 
         def do_POST(self):
-            ok = False
-            if self.path.startswith("/control") and (
-                    reporter.controller is not None or reporter.cra_job is not None):
+            ok, msg = False, ""
+            if self.path.startswith("/control"):
                 try:
                     n = int(self.headers.get("Content-Length", 0))
                     cmd = json.loads(self.rfile.read(n) or b"{}")
-                    ok = _apply_control(reporter.controller, cmd, reporter.cra_job)
-                except Exception:
-                    ok = False
-            body = json.dumps({"ok": ok}).encode("utf-8")
+                    ok, msg = _apply_control(reporter.controller, cmd,
+                                             reporter.cra_job)
+                except Exception as exc:
+                    ok, msg = False, str(exc)
+            body = json.dumps({"ok": ok, "msg": msg},
+                              ensure_ascii=False).encode("utf-8")
             self.send_response(200 if ok else 400)
             self.send_header("Content-Type", "application/json")
             self.end_headers()
@@ -323,6 +336,11 @@ _HTML = r"""<!DOCTYPE html>
       <span class="chk">Translate <select id="cfgTra"><option value="ollama">Ollama</option><option value="gemini">Gemini</option></select></span>
     </div>
     <div class="cfgrow">
+      <label>模型端點</label>
+      <select id="cfgEnd" style="min-width:210px"></select>
+      <span id="cfgEndMsg" style="color:var(--dim); margin-left:8px;"></span>
+    </div>
+    <div class="cfgrow">
       <label>選項</label>
       <label class="chk"><input type="checkbox" id="cfgGate"> Gate 過濾</label>
       <label class="chk"><input type="checkbox" id="cfgTranslate"> 翻譯</label>
@@ -340,6 +358,10 @@ _HTML = r"""<!DOCTYPE html>
     <select id="beSum"><option value="ollama">Ollama</option><option value="gemini">Gemini</option></select>
     <label>Translate</label>
     <select id="beTra"><option value="ollama">Ollama</option><option value="gemini">Gemini</option></select>
+    <span class="sep"></span>
+    <label>端點</label>
+    <select id="beEnd" style="min-width:190px"></select>
+    <span id="beEndMsg" style="color:var(--dim);"></span>
     <span class="sep"></span>
     <label>從</label>
     <select id="reFrom">
@@ -380,6 +402,52 @@ async function ctl(cmd){ try{ await fetch('/control',{method:'POST',
 $('btnPause').onclick = ()=> ctl({cmd:(CTRL&&CTRL.paused)?'resume':'pause'});
 $('beSum').onchange = e=> ctl({cmd:'backend', role:'summarize', backend:e.target.value});
 $('beTra').onchange = e=> ctl({cmd:'backend', role:'translate', backend:e.target.value});
+
+// ── model endpoint picker ────────────────────────────────────────────────
+// Two selects, one state: the pre-run panel and the live control bar show the
+// same list, because which ollama answers is a property of the box and not of
+// a particular run.
+let ENDBUSY = false;
+function endDot(e){
+  if(!e.allowed) return '\u26d4';           // outside the remote window
+  if(e.up===null) return '\u25cb';          // not probed yet - not the same as down
+  return e.up ? '\u25cf' : '\u25cb';
+}
+function endLabel(e){
+  const dot = endDot(e);
+  const tail = e.local ? (e.up ? '' : ' (\u9ede\u9078\u5373\u555f\u52d5)')
+                       : (e.allowed ? '' : ' (\u6642\u6bb5\u5916)');
+  return dot + ' ' + e.label + tail;
+}
+function fillEnd(sel, ov){
+  if(!ov || document.activeElement===sel) return;
+  const want = (ov.endpoints||[]).map(e=> e.url+'|'+endLabel(e)).join(',');
+  if(sel.dataset.sig !== want){
+    sel.innerHTML = (ov.endpoints||[]).map(e=>
+      `<option value="${e.url}">${endLabel(e)}</option>`).join('');
+    sel.dataset.sig = want;
+  }
+  if(ov.selected_url) sel.value = ov.selected_url;
+}
+async function pickEnd(url, msgEl){
+  if(ENDBUSY) return;
+  ENDBUSY = true;
+  // Starting a local daemon takes seconds, so say something rather than
+  // leaving a dropdown that looks like it ignored the click.
+  msgEl.textContent = '\u5207\u63db\u4e2d\u2026';
+  try{
+    const r = await fetch('/control',{method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({cmd:'endpoint', url})});
+    const j = await r.json();
+    msgEl.textContent = j.msg || (j.ok ? '' : '\u5931\u6557');
+    msgEl.style.color = j.ok ? 'var(--green)' : 'var(--red)';
+  }catch(e){
+    msgEl.textContent = String(e); msgEl.style.color = 'var(--red)';
+  }finally{ ENDBUSY = false; }
+}
+$('cfgEnd').onchange = e=> pickEnd(e.target.value, $('cfgEndMsg'));
+$('beEnd').onchange  = e=> pickEnd(e.target.value, $('beEndMsg'));
 $('btnRestart').onclick = ()=> ctl({cmd:'restart', phase:$('reFrom').value, force:$('reForce').checked});
 $('btnClose').onclick = ()=> { ctl({cmd:'close'}); };
 let CFG_INIT=false;
@@ -471,6 +539,7 @@ function syncControl(st){
   CTRL = st.control;
   if(!st.control.started){
     buildConfig(st.control.config||{});
+    fillEnd($('cfgEnd'), st.ollama);
     $('config').classList.remove('hidden');
     $('control').classList.add('hidden');
     return;
@@ -481,6 +550,7 @@ function syncControl(st){
   $('pausedTag').innerHTML = st.control.paused ? '<span class="pausedBadge">⏸ 已暫停</span>' : '';
   if(document.activeElement!==$('beSum')) $('beSum').value = st.control.backends.summarize;
   if(document.activeElement!==$('beTra')) $('beTra').value = st.control.backends.translate;
+  fillEnd($('beEnd'), st.ollama);
   // pause toggle is only meaningful while a run is live
   $('btnPause').disabled = !!st.finished;
 }

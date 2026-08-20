@@ -33,6 +33,7 @@ from __future__ import annotations
 import logging
 import os
 import threading
+import time
 from datetime import datetime, time as _time
 from urllib.parse import urlsplit
 
@@ -50,9 +51,20 @@ DEFAULT_REMOTE_CONCURRENCY = 4
 #: articles.
 PROBE_TIMEOUT = 3.0
 
+#: How long a cached health verdict is good for. The dashboard polls /state
+#: about once a second, and probing every endpoint on every poll would put a
+#: network timeout per dead host inside the page refresh.
+HEALTH_TTL = 15.0
+
 _lock = threading.Lock()
 _current: str | None = None
 _down: set[str] = set()
+
+#: url -> (monotonic timestamp, reachable). Empty entry means never probed,
+#: which the dashboard draws as "unknown" rather than as "down" — the two are
+#: not the same thing and only one of them is worth a red dot.
+_health: dict[str, tuple[float, bool]] = {}
+_refreshing = False
 
 
 def endpoints() -> list[str]:
@@ -213,3 +225,89 @@ def describe() -> str:
     if window:
         bits.append(f"remote window {window} ({'open' if remote_allowed() else 'closed'})")
     return "; ".join(bits)
+
+
+# ── what the dashboard needs ────────────────────────────────────────────────
+
+def _refresh_health() -> None:
+    global _refreshing
+    try:
+        for url in endpoints():
+            ok = healthy(url, timeout=2.0)
+            with _lock:
+                _health[url] = (time.monotonic(), ok)
+    finally:
+        with _lock:
+            _refreshing = False
+
+
+def _refresh_async() -> None:
+    """Probe in the background when the cache is stale, and never block.
+
+    The page asks for this on every poll; a host that is merely unplugged
+    answers by timing out, and doing that on the request thread would stall the
+    dashboard for as long as the probe takes.
+    """
+    global _refreshing
+    with _lock:
+        if _refreshing:
+            return
+        now = time.monotonic()
+        if all(now - _health.get(u, (0.0, False))[0] < HEALTH_TTL
+               for u in endpoints()):
+            return
+        _refreshing = True
+    threading.Thread(target=_refresh_health, daemon=True).start()
+
+
+def overview() -> dict:
+    """The endpoint picker, as data: what is configured, what answers, what is
+    in use, and whether the window currently permits the remotes."""
+    _refresh_async()
+    cur = selected()
+    allowed = remote_allowed()
+    rows = []
+    for url in endpoints():
+        ts, ok = _health.get(url, (0.0, False))
+        rows.append({"url": url, "label": label(url), "local": is_local(url),
+                     "up": ok if ts else None,
+                     "allowed": allowed or is_local(url),
+                     "current": url == cur,
+                     "demoted": url in _down})
+    return {"selected": label(cur) if cur else None,
+            "selected_url": cur,
+            "window": os.environ.get("TRACKER_OLLAMA_REMOTE_WINDOW", "").strip(),
+            "remote_allowed": allowed,
+            "endpoints": rows}
+
+
+def use(url: str, *, start_timeout: int = 40) -> tuple[bool, str]:
+    """Pin the endpoint the panel chose. Returns (ok, message for the user).
+
+    The one thing this does that select() does not: choosing the local endpoint
+    while no daemon is running starts one. That is the point of the option — a
+    picker that offers `local` and then reports it dead is a picker that made
+    the user do the obvious next step by hand.
+
+    A remote is never started, only checked: we cannot start ollama on a
+    machine we do not own, and there is nothing useful to do about it here.
+    """
+    global _current
+    url = (url or "").strip().rstrip("/")
+    if url not in endpoints():
+        return False, "%s is not in TRACKER_OLLAMA_URLS" % (url or "(nothing)")
+    if not is_local(url) and not remote_allowed():
+        return False, ("the remote window %s is closed right now"
+                       % os.environ.get("TRACKER_OLLAMA_REMOTE_WINDOW", ""))
+    if not healthy(url):
+        if not is_local(url):
+            return False, "%s is not answering" % label(url)
+        from .preflight import start_local_daemon
+        if not start_local_daemon(start_timeout=start_timeout):
+            return False, "local ollama did not start — see logs/ollama-serve.log"
+    with _lock:
+        _down.discard(url)
+        _current = url
+        _health[url] = (time.monotonic(), True)
+    _log.info("ollama endpoint pinned to %s", label(url))
+    return True, "using %s" % label(url)

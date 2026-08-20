@@ -77,6 +77,25 @@ def ensure_ollama(*, start_timeout: int = 40, console=None) -> bool:
                % ", ".join(hosts.label(u) for u in hosts.candidates()))
         _say("[red]%s[/red]" % msg if console else msg)
         return False
+    if not start_local_daemon(start_timeout=start_timeout, console=console):
+        return False
+    hosts.select(force=True)
+    return True
+
+
+def start_local_daemon(*, start_timeout: int = 40, console=None) -> bool:
+    """Start `ollama serve` here and wait for it. Selection is the caller's job.
+
+    Split out of ensure_ollama because the dashboard needs exactly this half:
+    choosing `local` in the panel while nothing is running should start the
+    daemon and then pin local — not re-run the whole priority order and land on
+    a remote the user just chose against.
+    """
+    global started_here
+
+    def _say(msg):
+        (console.print if console else print)(msg)
+
     _say("[dim]ollama not running — starting it in the background…[/dim]"
          if console else "ollama not running — starting it in the background…")
     try:
@@ -113,7 +132,6 @@ def ensure_ollama(*, start_timeout: int = 40, console=None) -> bool:
         time.sleep(1)
         if ollama_up():
             started_here = True
-            hosts.select(force=True)
             _say("[green]ollama is up.[/green]" if console else "ollama is up.")
             return True
     msg = "ollama did not come up within %ds — see %s" % (start_timeout, OLLAMA_LOG)

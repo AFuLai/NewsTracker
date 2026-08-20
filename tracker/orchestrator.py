@@ -332,7 +332,10 @@ def run_pipeline(*, since: str, until: str, trackers: list[str],
     # otherwise the LLM pool may be queueing behind a 1-slot daemon and the
     # `x4` in the report would be workers asked for, not work done in parallel.
     from . import ollama_hosts as hosts
-    rep.ollama_endpoint = hosts.label(hosts.current() or "")
+    # selected(), not current(): preflight has just chosen, and probing again
+    # here would add a network timeout per dead endpoint to every run — and to
+    # every test that mocks preflight away.
+    rep.ollama_endpoint = hosts.label(hosts.selected() or "")
     log.info("ollama endpoints: %s", hosts.describe())
     if preflight_mod.started_here:
         log.info("ollama ready (started here, OLLAMA_NUM_PARALLEL=%d)",
