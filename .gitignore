@@ -21,3 +21,5 @@ db/*.sqlite.*
 # generated static site is tracked; skip stale hand-kept backups
 html/*.bak
 html/*.bak.*
+# machine-local ollama endpoint list, edited by the dashboard
+/endpoints.json

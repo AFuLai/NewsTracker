@@ -129,12 +129,14 @@ def _apply_control(controller, cmd: dict, cra_job=None) -> tuple[bool, str]:
     action = cmd.get("cmd")
     if action == "cralib":
         return bool(cra_job is not None and cra_job.start()), ""
-    if action == "endpoint":
+    if action in ("endpoint", "endpoint-add", "endpoint-remove"):
         # Deliberately before the controller check: which ollama serves this
         # box is a process-wide setting, and the picker is most useful exactly
         # when no run is in flight yet.
         from . import ollama_hosts as hosts
-        return hosts.use(cmd.get("url") or "")
+        fn = {"endpoint": hosts.use, "endpoint-add": hosts.add_endpoint,
+              "endpoint-remove": hosts.remove_endpoint}[action]
+        return fn(cmd.get("url") or "")
     if controller is None:
         return False, "no run to control"
     if action == "start":
@@ -277,6 +279,10 @@ _HTML = r"""<!DOCTYPE html>
   .cfgrow > label { color:var(--dim); min-width:74px; }
   .config input, .config select { background:#222b34; color:var(--txt);
             border:1px solid var(--line); border-radius:7px; padding:5px 9px; font-size:.85rem; }
+  .config .cfgrow button { background:#222b34; color:var(--txt); border:1px solid var(--line);
+            border-radius:7px; padding:5px 10px; cursor:pointer; font-size:.85rem; }
+  .config .cfgrow button:hover:not(:disabled) { border-color:var(--accent); }
+  .config .cfgrow button:disabled { opacity:.4; cursor:default; }
   .config input[type=checkbox] { width:auto; min-width:0; }
   .config .chk { color:var(--txt); display:inline-flex; align-items:center; gap:5px; }
   #btnStart { background:var(--green); color:#04210b; border:none; border-radius:8px;
@@ -338,6 +344,9 @@ _HTML = r"""<!DOCTYPE html>
     <div class="cfgrow">
       <label>模型端點</label>
       <select id="cfgEnd" style="min-width:210px"></select>
+      <input id="cfgEndNew" placeholder="http://主機:11434" style="width:168px">
+      <button id="btnEndAdd" title="加入清單">＋</button>
+      <button id="btnEndDel" title="移除下拉選單目前選取的端點">✕</button>
       <span id="cfgEndMsg" style="color:var(--dim); margin-left:8px;"></span>
     </div>
     <div class="cfgrow">
@@ -429,25 +438,36 @@ function fillEnd(sel, ov){
   }
   if(ov.selected_url) sel.value = ov.selected_url;
 }
+async function ctlMsg(cmd, msgEl){
+  try{
+    const r = await fetch('/control',{method:'POST',
+      headers:{'Content-Type':'application/json'}, body:JSON.stringify(cmd)});
+    const j = await r.json();
+    msgEl.textContent = j.msg || (j.ok ? '' : '\u5931\u6557');
+    msgEl.style.color = j.ok ? 'var(--green)' : 'var(--red)';
+    return j;
+  }catch(e){
+    msgEl.textContent = String(e); msgEl.style.color = 'var(--red)'; return null;
+  }
+}
 async function pickEnd(url, msgEl){
   if(ENDBUSY) return;
   ENDBUSY = true;
   // Starting a local daemon takes seconds, so say something rather than
   // leaving a dropdown that looks like it ignored the click.
   msgEl.textContent = '\u5207\u63db\u4e2d\u2026';
-  try{
-    const r = await fetch('/control',{method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({cmd:'endpoint', url})});
-    const j = await r.json();
-    msgEl.textContent = j.msg || (j.ok ? '' : '\u5931\u6557');
-    msgEl.style.color = j.ok ? 'var(--green)' : 'var(--red)';
-  }catch(e){
-    msgEl.textContent = String(e); msgEl.style.color = 'var(--red)';
-  }finally{ ENDBUSY = false; }
+  try{ await ctlMsg({cmd:'endpoint', url}, msgEl); }
+  finally{ ENDBUSY = false; }
 }
 $('cfgEnd').onchange = e=> pickEnd(e.target.value, $('cfgEndMsg'));
 $('beEnd').onchange  = e=> pickEnd(e.target.value, $('beEndMsg'));
+$('btnEndAdd').onclick = async ()=>{
+  const url = $('cfgEndNew').value.trim();
+  if(!url){ $('cfgEndMsg').textContent = '\u5148\u8f38\u5165\u7db2\u5740'; return; }
+  const j = await ctlMsg({cmd:'endpoint-add', url}, $('cfgEndMsg'));
+  if(j && j.ok) $('cfgEndNew').value = '';
+};
+$('btnEndDel').onclick = ()=> ctlMsg({cmd:'endpoint-remove', url:$('cfgEnd').value}, $('cfgEndMsg'));
 $('btnRestart').onclick = ()=> ctl({cmd:'restart', phase:$('reFrom').value, force:$('reForce').checked});
 $('btnClose').onclick = ()=> { ctl({cmd:'close'}); };
 let CFG_INIT=false;
@@ -540,6 +560,10 @@ function syncControl(st){
   if(!st.control.started){
     buildConfig(st.control.config||{});
     fillEnd($('cfgEnd'), st.ollama);
+    // Editing goes to endpoints.json; with TRACKER_OLLAMA_URLS set that file
+    // is not consulted, so the buttons would edit something nobody reads.
+    const canEdit = !!(st.ollama && st.ollama.editable);
+    $('btnEndAdd').disabled = $('btnEndDel').disabled = !canEdit;
     $('config').classList.remove('hidden');
     $('control').classList.add('hidden');
     return;

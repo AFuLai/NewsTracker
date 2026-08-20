@@ -125,10 +125,21 @@ faster; measured 2026-08-19 on translate, same articles:
 Neither remote gets faster past 4 concurrent calls. Full numbers and method:
 `ops/phase0/ACCEPTANCE.md`.
 
-**Off unless configured.** With `TRACKER_OLLAMA_URLS` unset the pipeline uses
-the local daemon exactly as before and nothing leaves the machine. Naming a
-remote is what turns it on, so the safe default is a property of the
-configuration rather than a flag someone has to remember.
+**Off unless configured.** With nothing configured the pipeline uses the
+local daemon exactly as before and nothing leaves the machine. Naming a remote
+is what turns it on, so the safe default is a property of the configuration
+rather than a flag someone has to remember.
+
+The list comes from, in precedence order:
+
+1. `TRACKER_OLLAMA_URLS` — set it and the file below is ignored;
+2. `endpoints.json` at the repo root — the list the `--ui` dashboard shows and
+   edits (add ＋ / remove ✕ / pick in the 模型端點 dropdown). Machine-local,
+   ignored by git. Picking an endpoint in the panel is remembered
+   (`preferred`) and tried first on later runs, health and window permitting.
+   The env var rarely reaches the dashboard in practice — launches via
+   `wsl -e` skip login shells — which is exactly why the file exists;
+3. the local daemon, always the fallback.
 
 ```bash
 # priority order; the first endpoint that answers /api/tags carries the run

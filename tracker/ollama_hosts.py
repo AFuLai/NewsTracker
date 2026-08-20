@@ -9,14 +9,29 @@ Measured 2026-08-19, translate, same rows:
     TWTY3PC1875      1.61 s/article at 4 workers   (plateaus there; 8 adds nothing)
     TWTY3PC1876      1.62 s/article at 4 workers
 
-**Everything here is opt-in.** With `TRACKER_OLLAMA_URLS` unset the list is the
-single local endpoint the pipeline has always used, and nothing reaches the
-network. Naming a remote is what turns it on, so the conservative default is a
-property of the configuration rather than a flag someone has to remember.
+**Everything here is opt-in.** With nothing configured the list is the single
+local endpoint the pipeline has always used, and nothing reaches the network.
+Naming a remote is what turns it on, so the conservative default is a property
+of the configuration rather than a flag someone has to remember.
+
+Where the list comes from, in precedence order:
+
+  1. TRACKER_OLLAMA_URLS        ordered, comma-separated; set it and the file
+                                below is not consulted at all
+  2. endpoints.json (repo root) the dashboard's editable list — `urls` in
+                                priority order, plus `preferred`, the endpoint
+                                the panel last pinned; machine-local, ignored
+                                by git
+  3. the local daemon           http://localhost:11434, always the fallback
+
+The file exists because the env var never reaches the dashboard in practice:
+the pipeline is launched through `wsl -e` (no login shell), so an `export` in
+a profile is invisible there, and a picker whose list depends on ambient shell
+state shows `local` and nothing else. A file next to the code is readable no
+matter how the process was started, and the panel can edit it.
 
 Those remotes are other people's machines. Two levers bound what we take:
 
-  TRACKER_OLLAMA_URLS               ordered, comma-separated; first healthy wins
   TRACKER_OLLAMA_REMOTE_WINDOW      "HH:MM-HH:MM" local time; outside it the
                                     remotes are skipped and selection falls
                                     through to whatever else is listed
@@ -30,11 +45,13 @@ Example:
 """
 from __future__ import annotations
 
+import json
 import logging
 import os
 import threading
 import time
 from datetime import datetime, time as _time
+from pathlib import Path
 from urllib.parse import urlsplit
 
 import httpx
@@ -67,13 +84,62 @@ _health: dict[str, tuple[float, bool]] = {}
 _refreshing = False
 
 
+#: The dashboard-editable endpoint list. Machine-local (the LAN addresses it
+#: names mean nothing on another network), so it sits next to the code and
+#: stays out of git.
+CONFIG_PATH = Path(__file__).resolve().parent.parent / "endpoints.json"
+
+
+def _load_config() -> dict:
+    try:
+        raw = json.loads(CONFIG_PATH.read_text("utf-8"))
+    except FileNotFoundError:
+        return {}
+    except (OSError, ValueError) as exc:
+        _log.warning("%s is unreadable (%s) — ignoring it", CONFIG_PATH, exc)
+        return {}
+    return raw if isinstance(raw, dict) else {}
+
+
+def _save_config(urls: list[str], preferred: str | None) -> None:
+    data: dict = {"urls": urls}
+    if preferred:
+        data["preferred"] = preferred
+    tmp = CONFIG_PATH.with_name(CONFIG_PATH.name + ".tmp")
+    tmp.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", "utf-8")
+    os.replace(tmp, CONFIG_PATH)
+
+
+def _file_urls() -> list[str]:
+    urls = _load_config().get("urls")
+    if not isinstance(urls, list):
+        return []
+    return [str(u).strip().rstrip("/") for u in urls if str(u).strip()]
+
+
+def config_editable() -> bool:
+    """Whether the panel may edit the list. With TRACKER_OLLAMA_URLS set the
+    file is not consulted, and editing something nobody reads is worse than
+    refusing: the refusal says where the real list lives."""
+    return not os.environ.get("TRACKER_OLLAMA_URLS", "").strip()
+
+
 def endpoints() -> list[str]:
-    """The configured endpoints, in priority order. Local-only when unset."""
+    """The configured endpoints, in priority order. Local-only when nothing is
+    configured. Env var > endpoints.json > local (see the module docstring)."""
     raw = os.environ.get("TRACKER_OLLAMA_URLS", "").strip()
-    if not raw:
-        return [LOCAL_URL]
-    listed = [u.strip().rstrip("/") for u in raw.split(",") if u.strip()]
-    return listed or [LOCAL_URL]
+    if raw:
+        listed = [u.strip().rstrip("/") for u in raw.split(",") if u.strip()]
+        return listed or [LOCAL_URL]
+    return _file_urls() or [LOCAL_URL]
+
+
+def preferred() -> str | None:
+    """The endpoint the panel last pinned, if it is still on the list."""
+    if not config_editable():
+        return None
+    url = str(_load_config().get("preferred") or "").strip().rstrip("/")
+    return url if url and url in endpoints() else None
 
 
 def is_local(url: str) -> bool:
@@ -143,9 +209,15 @@ def healthy(url: str, timeout: float = PROBE_TIMEOUT) -> bool:
 
 
 def candidates(now: datetime | None = None) -> list[str]:
-    """Configured endpoints minus the ones policy currently forbids."""
+    """Configured endpoints minus the ones policy currently forbids, with the
+    panel's remembered choice tried first. The preference reorders, it never
+    admits: an endpoint the window forbids stays out however preferred."""
     allowed = remote_allowed(now)
-    return [u for u in endpoints() if allowed or is_local(u)]
+    order = [u for u in endpoints() if allowed or is_local(u)]
+    pref = preferred()
+    if pref in order:
+        order = [pref] + [u for u in order if u != pref]
+    return order
 
 
 def select(*, force: bool = False, now: datetime | None = None) -> str | None:
@@ -278,6 +350,7 @@ def overview() -> dict:
             "selected_url": cur,
             "window": os.environ.get("TRACKER_OLLAMA_REMOTE_WINDOW", "").strip(),
             "remote_allowed": allowed,
+            "editable": config_editable(),
             "endpoints": rows}
 
 
@@ -309,5 +382,47 @@ def use(url: str, *, start_timeout: int = 40) -> tuple[bool, str]:
         _down.discard(url)
         _current = url
         _health[url] = (time.monotonic(), True)
+    if config_editable():
+        # Remember the choice across runs: a picker that forgets what was
+        # picked makes the user repeat themselves every launch.
+        _save_config(_file_urls() or endpoints(), url)
     _log.info("ollama endpoint pinned to %s", label(url))
     return True, "using %s" % label(url)
+
+
+def add_endpoint(url: str) -> tuple[bool, str]:
+    """Append an endpoint to the editable list. Returns (ok, message)."""
+    url = (url or "").strip().rstrip("/")
+    if not config_editable():
+        return False, "TRACKER_OLLAMA_URLS is set — edit the variable, not the list"
+    parts = urlsplit(url)
+    if parts.scheme not in ("http", "https") or not parts.hostname:
+        return False, "need a full URL like http://host:11434"
+    listed = endpoints()
+    if url in listed:
+        return False, "%s is already listed" % label(url)
+    # Appended, not prepended: adding a machine to the list must not change
+    # which endpoint a run picks on its own.
+    _save_config(listed + [url], preferred())
+    return True, "added %s" % label(url)
+
+
+def remove_endpoint(url: str) -> tuple[bool, str]:
+    """Drop an endpoint from the editable list. Returns (ok, message)."""
+    global _current
+    url = (url or "").strip().rstrip("/")
+    if not config_editable():
+        return False, "TRACKER_OLLAMA_URLS is set — edit the variable, not the list"
+    listed = endpoints()
+    if url not in listed:
+        return False, "%s is not on the list" % (label(url) if url else "(nothing)")
+    if len(listed) == 1:
+        return False, "cannot remove the last endpoint"
+    pref = preferred()
+    _save_config([u for u in listed if u != url], None if pref == url else pref)
+    with _lock:
+        if _current == url:
+            _current = None
+        _down.discard(url)
+        _health.pop(url, None)
+    return True, "removed %s" % label(url)
