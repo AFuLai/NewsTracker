@@ -20,6 +20,7 @@ from .pack import pack as run_pack
 from .pack import read_version
 from .sources import dispatch
 from .sources.feed import fetch_all as fetch_feeds
+from . import utcnow
 
 app = typer.Typer(add_completion=False, no_args_is_help=True,
                   help="Tracker — local security/regulation news pipeline (WSL+Ollama)")
@@ -629,6 +630,8 @@ def pipeline(
                                help="No dashboard; print only the one-line summary"),
     verbose: bool = typer.Option(False, "--verbose",
                                  help="Also print the full RunReport JSON"),
+    git_commit: bool = typer.Option(True, "--git-commit/--no-git-commit",
+                                    help="成功後自動 commit html/（產出納版控）"),
 ) -> None:
     """One-shot in-process pipeline: fetch → gate → summarize → write → cleanup.
 
@@ -750,6 +753,7 @@ def pipeline(
                 continue
             reporter.summary(rep)
             print(rep.one_line())
+            _commit_site_outputs(rep, enabled=git_commit)
             # Stay up: let the user restart a stage or close from the dashboard.
             while not controller.closed and not controller.restart_pending():
                 _t.sleep(0.3)
@@ -778,7 +782,24 @@ def pipeline(
     if not live:
         # headless: the single machine-readable line
         print(rep.one_line())
+    _commit_site_outputs(rep, enabled=git_commit)
     raise typer.Exit(0 if rep.ok else 1)
+
+
+def _commit_site_outputs(rep, *, enabled: bool) -> None:
+    """Land html/ in git after a successful run. Failure to commit is reported
+    but never fails the run — the site on disk is already correct."""
+    if not (enabled and rep is not None and rep.ok):
+        return
+    from .pack import commit_site
+    try:
+        short = commit_site(f"run#{rep.run_id} {rep.since}..{rep.until} "
+                            f"({rep.fetch_new} new, {rep.days_written} days)")
+    except Exception as exc:
+        console.print(f"[yellow]html/ 未提交：{exc}[/yellow]")
+        return
+    if short:
+        console.print(f"[dim]html/ 已提交（{short}）[/dim]")
 
 
 def _start_dashboard(reporter, port: int):
@@ -1098,7 +1119,7 @@ def daily(
     ok = rep.ok
     status = {
         "command": "daily",
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": utcnow().isoformat(),
         "days": days, "since": since, "until": until, "trackers": targets,
         "ok": ok,
         "pipeline": {
@@ -1125,6 +1146,7 @@ def daily(
            f"translate {translate_stats.get('translated', 0)}/{translate_stats.get('attempted', 0)} | "
            f"rebuilt {rebuilt}d | newest {newest or '-'} | err {len(errors)}")
     print(line)
+    _commit_site_outputs(rep, enabled=True)
     raise typer.Exit(0 if ok else 1)
 
 

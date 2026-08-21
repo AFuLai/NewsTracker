@@ -16,6 +16,7 @@ from pathlib import Path
 
 from . import Candidate, DateWindow, FetchResult, Profile, register
 from ..sources.site import site_keyword_search, throttle
+from .. import utcnow
 
 _CACHE_PATH = Path("/opt/tracker/db/query_cache.json")
 _TTL = timedelta(hours=24)
@@ -53,7 +54,7 @@ class SearchFetcher:
             return FetchResult(error="no keywords for SEARCH")
         since, until = window.since.isoformat(), window.until.isoformat()
         cache = _load_cache()
-        now = datetime.utcnow()
+        now = utcnow()
         seen: set[str] = set()
         items: list[Candidate] = []
         cache_dirty = False

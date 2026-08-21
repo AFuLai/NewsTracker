@@ -8,6 +8,7 @@ import struct
 from datetime import datetime, timedelta
 from pathlib import Path
 from urllib.parse import urlparse, urlunparse, parse_qsl, urlencode
+from . import utcnow
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS articles (
@@ -233,7 +234,7 @@ def _reconcile_stale_runs(conn) -> None:
     finish_run(). If it started more than 24h ago it is definitely not still
     running, so flip it to ok=0 rather than leaving it NULL forever. Rows
     younger than 24h are left alone — they may be genuinely in-flight."""
-    cutoff = (datetime.utcnow() - timedelta(hours=24)).isoformat()
+    cutoff = (utcnow() - timedelta(hours=24)).isoformat()
     conn.execute("UPDATE runs SET ok=0 WHERE ok IS NULL AND started_at < ?", (cutoff,))
     conn.commit()
 
@@ -319,7 +320,7 @@ class Store:
         its own numbers but never another model_tag's."""
         if not scores:
             return 0
-        now = datetime.utcnow().isoformat()
+        now = utcnow().isoformat()
         self.conn.executemany(
             "INSERT INTO cra_scores (article_id, score, best_query, model_tag, "
             "scored_at, enforced) VALUES (?, ?, ?, ?, ?, ?) "
@@ -365,7 +366,7 @@ class Store:
             "INSERT INTO articles (url_hash, url, source, title, date, raw_text, trackers, fetched_at) "
             "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
             (h, normalize_url(url), source, title, date, raw_text, tracker,
-             datetime.utcnow().isoformat()),
+             utcnow().isoformat()),
         )
         self.conn.commit()
         return True
@@ -443,14 +444,14 @@ class Store:
                 "UPDATE articles SET title=?, summary=?, category=?, tags=?, "
                 "date=COALESCE(date, ?), status='ready', summarized_at=? WHERE id=?",
                 (title, summary, category, ",".join(tags), date,
-                 datetime.utcnow().isoformat(), article_id),
+                 utcnow().isoformat(), article_id),
             )
         else:
             self.conn.execute(
                 "UPDATE articles SET title=?, summary=?, category=?, tags=?, "
                 "status='ready', summarized_at=? WHERE id=?",
                 (title, summary, category, ",".join(tags),
-                 datetime.utcnow().isoformat(), article_id),
+                 utcnow().isoformat(), article_id),
             )
         self.conn.commit()
 
@@ -505,7 +506,7 @@ class Store:
     def mark_written(self, article_ids: list[int]) -> None:
         self.conn.executemany(
             "UPDATE articles SET status='written', written_at=? WHERE id=?",
-            [(datetime.utcnow().isoformat(), aid) for aid in article_ids],
+            [(utcnow().isoformat(), aid) for aid in article_ids],
         )
         self.conn.commit()
 
@@ -522,7 +523,7 @@ class Store:
     def log_error(self, source: str, error: str, url: str | None = None) -> None:
         self.conn.execute(
             "INSERT INTO fetch_errors (source, url, error, occurred_at) VALUES (?, ?, ?, ?)",
-            (source, url, error, datetime.utcnow().isoformat()),
+            (source, url, error, utcnow().isoformat()),
         )
         self.conn.commit()
 
@@ -548,7 +549,7 @@ class Store:
         """
         if not candidates:
             return 0
-        now = datetime.utcnow().isoformat()
+        now = utcnow().isoformat()
         rows = []
         for c in candidates:
             url = c["url"]
@@ -668,7 +669,7 @@ class Store:
 
         last_attempt_utc is stamped on every call so dormancy checks know how
         fresh this is."""
-        now = datetime.utcnow().isoformat()
+        now = utcnow().isoformat()
         looked_empty = (items_seen if items_seen is not None else new_count) == 0
         if failed:
             self.conn.execute(
@@ -698,7 +699,7 @@ class Store:
         self.conn.execute(
             "UPDATE source_profiles SET total_runs=total_runs+1, "
             "consecutive_failures=0, consecutive_empty=0, last_attempt_utc=? "
-            "WHERE source_key=?", (datetime.utcnow().isoformat(), key))
+            "WHERE source_key=?", (utcnow().isoformat(), key))
         self.conn.commit()
 
     def is_dormant(self, profile_row, now: datetime | None = None) -> bool:
@@ -724,7 +725,7 @@ class Store:
             last_dt = datetime.fromisoformat(last_attempt)
         except (TypeError, ValueError):
             return False
-        now = now or datetime.utcnow()
+        now = now or utcnow()
         return (now - last_dt) < timedelta(days=7)
 
     def list_reprobe_candidates(self, *, failure_threshold: int = 3,
@@ -758,14 +759,14 @@ class Store:
     def start_run(self, args_json: str) -> int:
         cur = self.conn.execute(
             "INSERT INTO runs (started_at, args) VALUES (?, ?)",
-            (datetime.utcnow().isoformat(), args_json))
+            (utcnow().isoformat(), args_json))
         self.conn.commit()
         return cur.lastrowid
 
     def finish_run(self, run_id: int, *, stats_json: str, errors_json: str, ok: bool) -> None:
         self.conn.execute(
             "UPDATE runs SET finished_at=?, stats=?, errors=?, ok=? WHERE run_id=?",
-            (datetime.utcnow().isoformat(), stats_json, errors_json, int(ok), run_id))
+            (utcnow().isoformat(), stats_json, errors_json, int(ok), run_id))
         self.conn.commit()
 
     def last_run(self) -> sqlite3.Row | None:

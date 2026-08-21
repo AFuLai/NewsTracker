@@ -25,6 +25,7 @@ import httpx
 from .methods import ARCHIVE, FEED, LISTING, SEARCH
 from .sources.path import _looks_like_article
 from .sources.stealth import fetch as stealth_fetch
+from . import utcnow
 
 UA = "Mozilla/5.0 (X11; Linux x86_64) Chrome/120.0 tracker/2.x probe"
 COMMON_FEED_PATHS = ("/feed", "/rss", "/rss.xml", "/atom.xml", "/index.xml",
@@ -173,7 +174,7 @@ def probe_and_save(store, url: str, name: str, tracker: str, *,
     domain = urlparse(url if url.startswith("http") else f"https://{url}").netloc \
         .lower().removeprefix("www.")
     verdict = probe_source(url, use_ollama=use_ollama)
-    now = datetime.utcnow().isoformat()
+    now = utcnow().isoformat()
     existing = store.get_profile(domain)
     if existing:
         store.set_profile_method(domain, verdict["method"],

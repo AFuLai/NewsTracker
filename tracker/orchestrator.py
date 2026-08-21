@@ -60,6 +60,7 @@ TRACKER_FETCH: dict[str, dict] = {
 # ollama L3 review hook (WP3): REVIEW_FN(result, raw_text, info) -> (ok, reason).
 # The L1 gate is driven directly in _phase_gate (so it can report per-batch).
 from .llm.review import review as REVIEW_FN        # noqa: E402
+from . import utcnow
 
 # ── WP2: LLM concurrency ─────────────────────────────────────────────────────
 # Summarize and translate were both a serial for-loop of HTTP round trips, so
@@ -277,7 +278,7 @@ def run_pipeline(*, since: str, until: str, trackers: list[str],
     from . import llm
     rpt = reporter or NullReporter()
 
-    run_ts = datetime.utcnow().strftime("%Y%m%d-%H%M%S")
+    run_ts = utcnow().strftime("%Y%m%d-%H%M%S")
     log = _setup_logger(run_ts)
     t0 = time.time()
     window = DateWindow(_date.fromisoformat(since), _date.fromisoformat(until))
@@ -1271,7 +1272,7 @@ def _finalize(store, rep, t0, log, stats0=None):
         status_path = PROJECT_ROOT / "status.json"
         status_path.write_text(json.dumps({
             "run_id": rep.run_id, "ok": rep.ok, "one_line": rep.one_line(),
-            "finished_at": datetime.utcnow().isoformat(), **stats,
+            "finished_at": utcnow().isoformat(), **stats,
         }, ensure_ascii=False, indent=2), encoding="utf-8")
     except Exception as exc:
         log.warning("could not write status.json: %s", exc)

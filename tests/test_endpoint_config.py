@@ -213,3 +213,75 @@ def test_control_routes_add_and_remove():
     ok, _ = _apply_control(None, {"cmd": "endpoint-remove", "url": R1})
     assert ok is True
     assert hosts.endpoints() == [LOCAL]
+
+
+# -- labels ------------------------------------------------------------------
+
+def test_a_labelled_endpoint_shows_its_machine_name():
+    hosts.CONFIG_PATH.write_text(json.dumps(
+        {"urls": [LOCAL, R1], "labels": {R1: "TWTY3PC1875"}}), "utf-8")
+    assert hosts.label(R1) == "TWTY3PC1875 (10.139.180.21:11434)"
+    assert hosts.label(LOCAL) == "local"
+    assert hosts.label(R2) == "10.139.180.22:11434"
+
+
+def test_editing_the_list_keeps_the_labels(monkeypatch):
+    hosts.CONFIG_PATH.write_text(json.dumps(
+        {"urls": [LOCAL, R1], "labels": {R1: "TWTY3PC1875"}}), "utf-8")
+    assert hosts.add_endpoint(R2)[0] is True
+    _healthy(monkeypatch, lambda u: True)
+    assert hosts.use(R1)[0] is True
+    assert _read()["labels"] == {R1: "TWTY3PC1875"}
+
+
+# -- remote policy in the file -----------------------------------------------
+
+def test_window_falls_back_to_the_file(monkeypatch):
+    hosts.CONFIG_PATH.write_text(json.dumps(
+        {"urls": [LOCAL, R1], "remote_window": "00:00-00:01"}), "utf-8")
+    assert hosts.remote_allowed() is False
+    monkeypatch.setenv("TRACKER_OLLAMA_REMOTE_WINDOW", "00:00-23:59")
+    assert hosts.remote_allowed() is True   # env wins over the file
+
+
+def test_concurrency_falls_back_to_the_file(monkeypatch):
+    hosts.CONFIG_PATH.write_text(json.dumps(
+        {"urls": [LOCAL, R1], "remote_concurrency": 2}), "utf-8")
+    assert hosts.concurrency_for(R1) == 2
+    monkeypatch.setenv("TRACKER_OLLAMA_REMOTE_CONCURRENCY", "7")
+    assert hosts.concurrency_for(R1) == 7
+
+
+def test_set_policy_saves_and_clears():
+    _write([LOCAL, R1])
+    ok, _ = hosts.set_policy(window="18:00-08:00", concurrency="3")
+    assert ok is True
+    assert _read()["remote_window"] == "18:00-08:00"
+    assert _read()["remote_concurrency"] == 3
+    ok, _ = hosts.set_policy(window="", concurrency="")
+    assert ok is True
+    assert "remote_window" not in _read()
+    assert "remote_concurrency" not in _read()
+
+
+def test_set_policy_validates():
+    ok, msg = hosts.set_policy(window="whenever")
+    assert ok is False and "HH:MM" in msg
+    ok, msg = hosts.set_policy(concurrency="0")
+    assert ok is False and "positive" in msg
+    ok, msg = hosts.set_policy(concurrency="abc")
+    assert ok is False
+
+
+def test_set_policy_refuses_an_env_pinned_field(monkeypatch):
+    monkeypatch.setenv("TRACKER_OLLAMA_REMOTE_WINDOW", "18:00-08:00")
+    ok, msg = hosts.set_policy(window="09:00-17:00")
+    assert ok is False and "TRACKER_OLLAMA_REMOTE_WINDOW" in msg
+
+
+def test_control_routes_policy():
+    _write([LOCAL])
+    ok, _ = _apply_control(None, {"cmd": "endpoint-policy",
+                                  "window": "18:00-08:00", "concurrency": "4"})
+    assert ok is True
+    assert _read()["remote_window"] == "18:00-08:00"

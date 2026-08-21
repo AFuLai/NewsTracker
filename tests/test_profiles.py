@@ -10,6 +10,7 @@ from pathlib import Path
 
 from tracker.dedup import Store
 from tracker.methods import FEED
+from tracker import utcnow
 
 
 def _store(path: Path | None = None) -> Store:
@@ -80,7 +81,7 @@ def test_is_dormant_false_when_last_attempt_stale():
     assert p["consecutive_empty"] >= 8
     # last_attempt_utc is "now" (real UTC) — evaluate is_dormant as if it were
     # more than 7 days in the future, i.e. the attempt is >7 days stale.
-    future = datetime.utcnow() + timedelta(days=8)
+    future = utcnow() + timedelta(days=8)
     assert s.is_dormant(p, now=future) is False
 
 
@@ -129,8 +130,8 @@ def test_dormancy_migration_idempotent():
 def test_stale_ok_null_runs_older_than_24h_marked_failed():
     tmp = Path(tempfile.mkdtemp()) / "t.sqlite"
     s = _store(tmp)
-    old_ts = (datetime.utcnow() - timedelta(hours=25)).isoformat()
-    recent_ts = (datetime.utcnow() - timedelta(minutes=1)).isoformat()
+    old_ts = (utcnow() - timedelta(hours=25)).isoformat()
+    recent_ts = (utcnow() - timedelta(minutes=1)).isoformat()
     s.conn.execute("INSERT INTO runs (started_at, args) VALUES (?, ?)", (old_ts, "{}"))
     s.conn.execute("INSERT INTO runs (started_at, args) VALUES (?, ?)", (recent_ts, "{}"))
     s.conn.commit()

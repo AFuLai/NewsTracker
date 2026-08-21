@@ -129,11 +129,13 @@ def _apply_control(controller, cmd: dict, cra_job=None) -> tuple[bool, str]:
     action = cmd.get("cmd")
     if action == "cralib":
         return bool(cra_job is not None and cra_job.start()), ""
-    if action in ("endpoint", "endpoint-add", "endpoint-remove"):
+    if action in ("endpoint", "endpoint-add", "endpoint-remove", "endpoint-policy"):
         # Deliberately before the controller check: which ollama serves this
         # box is a process-wide setting, and the picker is most useful exactly
         # when no run is in flight yet.
         from . import ollama_hosts as hosts
+        if action == "endpoint-policy":
+            return hosts.set_policy(cmd.get("window"), cmd.get("concurrency"))
         fn = {"endpoint": hosts.use, "endpoint-add": hosts.add_endpoint,
               "endpoint-remove": hosts.remove_endpoint}[action]
         return fn(cmd.get("url") or "")
@@ -350,6 +352,13 @@ _HTML = r"""<!DOCTYPE html>
       <span id="cfgEndMsg" style="color:var(--dim); margin-left:8px;"></span>
     </div>
     <div class="cfgrow">
+      <label>遠端政策</label>
+      <span class="chk">時段窗 <input id="cfgWin" placeholder="18:00-08:00（空=不限）" style="width:150px"></span>
+      <span class="chk">並發 <input id="cfgConc" type="number" min="1" style="width:64px"></span>
+      <button id="btnPolicy">套用</button>
+      <span id="cfgPolMsg" style="color:var(--dim); margin-left:8px;"></span>
+    </div>
+    <div class="cfgrow">
       <label>選項</label>
       <label class="chk"><input type="checkbox" id="cfgGate"> Gate 過濾</label>
       <label class="chk"><input type="checkbox" id="cfgTranslate"> 翻譯</label>
@@ -468,6 +477,18 @@ $('btnEndAdd').onclick = async ()=>{
   if(j && j.ok) $('cfgEndNew').value = '';
 };
 $('btnEndDel').onclick = ()=> ctlMsg({cmd:'endpoint-remove', url:$('cfgEnd').value}, $('cfgEndMsg'));
+$('btnPolicy').onclick = ()=> ctlMsg({cmd:'endpoint-policy',
+  window:$('cfgWin').value, concurrency:$('cfgConc').value}, $('cfgPolMsg'));
+let POL_INIT=false;
+function fillPolicy(ov){
+  if(!ov || POL_INIT) return; POL_INIT=true;
+  $('cfgWin').value = ov.window || '';
+  $('cfgConc').value = ov.remote_concurrency || '';
+  // an env-pinned field is read-only here: the file edit would be shadowed
+  $('cfgWin').disabled = !!ov.window_env;
+  $('cfgConc').disabled = !!ov.concurrency_env;
+  $('btnPolicy').disabled = !!(ov.window_env && ov.concurrency_env);
+}
 $('btnRestart').onclick = ()=> ctl({cmd:'restart', phase:$('reFrom').value, force:$('reForce').checked});
 $('btnClose').onclick = ()=> { ctl({cmd:'close'}); };
 let CFG_INIT=false;
@@ -560,6 +581,7 @@ function syncControl(st){
   if(!st.control.started){
     buildConfig(st.control.config||{});
     fillEnd($('cfgEnd'), st.ollama);
+    fillPolicy(st.ollama);
     // Editing goes to endpoints.json; with TRACKER_OLLAMA_URLS set that file
     // is not consulted, so the buttons would edit something nobody reads.
     const canEdit = !!(st.ollama && st.ollama.editable);

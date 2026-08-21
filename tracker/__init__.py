@@ -1,6 +1,18 @@
 """Tracker — local-LLM security news pipeline."""
 import os
+from datetime import datetime, timezone
 from pathlib import Path
+
+
+def utcnow() -> datetime:
+    """Naive UTC now — datetime.utcnow() without the 3.12+ deprecation.
+
+    Naive on purpose: every timestamp already stored is naive UTC, and these
+    strings are compared lexicographically (watermarks, the stale-run cutoff).
+    An aware now() would isoformat() with an offset suffix and break those
+    comparisons against the existing rows.
+    """
+    return datetime.now(timezone.utc).replace(tzinfo=None)
 
 ROOT = Path("/opt/tracker")
 PROJECT_ROOT = Path("/mnt/d/Claude/Tool/NewsTracker")

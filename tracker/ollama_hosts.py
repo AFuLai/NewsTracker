@@ -101,10 +101,15 @@ def _load_config() -> dict:
     return raw if isinstance(raw, dict) else {}
 
 
-def _save_config(urls: list[str], preferred: str | None) -> None:
-    data: dict = {"urls": urls}
-    if preferred:
-        data["preferred"] = preferred
+def _save_config(**changes) -> None:
+    """Merge changes into the config file. A key set to None is removed; keys
+    not named (labels, policy) survive an unrelated write untouched."""
+    data = _load_config()
+    for key, value in changes.items():
+        if value is None:
+            data.pop(key, None)
+        else:
+            data[key] = value
     tmp = CONFIG_PATH.with_name(CONFIG_PATH.name + ".tmp")
     tmp.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", "utf-8")
     os.replace(tmp, CONFIG_PATH)
@@ -147,11 +152,17 @@ def is_local(url: str) -> bool:
 
 
 def label(url: str) -> str:
-    """`local` / `10.139.180.21:11434` — what a log line should say."""
+    """`local` / `TWTY3PC1875 (10.139.180.21:11434)` / `10.139.180.21:11434`
+    — what a log line and the picker should say. A machine name comes from the
+    config file's `labels` map; the address stays alongside it because the
+    name is a courtesy and the address is the fact."""
     if is_local(url):
         return "local"
     parts = urlsplit(url)
-    return f"{parts.hostname}:{parts.port}" if parts.port else (parts.hostname or url)
+    host = f"{parts.hostname}:{parts.port}" if parts.port else (parts.hostname or url)
+    labels = _load_config().get("labels")
+    name = labels.get(url.rstrip("/")) if isinstance(labels, dict) else None
+    return f"{name} ({host})" if name else host
 
 
 def _parse_window(raw: str) -> tuple[_time, _time] | None:
@@ -166,6 +177,14 @@ def _parse_window(raw: str) -> tuple[_time, _time] | None:
         return None
 
 
+def window_raw() -> str:
+    """The configured remote window: env var first, then the config file."""
+    raw = os.environ.get("TRACKER_OLLAMA_REMOTE_WINDOW", "").strip()
+    if raw:
+        return raw
+    return str(_load_config().get("remote_window") or "").strip()
+
+
 def remote_allowed(now: datetime | None = None) -> bool:
     """Whether the remotes may be used at this moment.
 
@@ -173,7 +192,7 @@ def remote_allowed(now: datetime | None = None) -> bool:
     the normal case for "outside office hours", so it is handled rather than
     read as an empty range.
     """
-    raw = os.environ.get("TRACKER_OLLAMA_REMOTE_WINDOW", "").strip()
+    raw = window_raw()
     if not raw:
         return True
     window = _parse_window(raw)
@@ -194,9 +213,16 @@ def concurrency_for(url: str | None) -> int:
     """
     if url is None or is_local(url):
         return llm_concurrency()
+    return remote_concurrency()
+
+
+def remote_concurrency() -> int:
+    """The remote cap: env var first, then the config file, then the default."""
+    raw = (os.environ.get("TRACKER_OLLAMA_REMOTE_CONCURRENCY", "").strip()
+           or _load_config().get("remote_concurrency")
+           or DEFAULT_REMOTE_CONCURRENCY)
     try:
-        return max(1, int(os.environ.get("TRACKER_OLLAMA_REMOTE_CONCURRENCY",
-                                         DEFAULT_REMOTE_CONCURRENCY)))
+        return max(1, int(raw))
     except (TypeError, ValueError):
         return DEFAULT_REMOTE_CONCURRENCY
 
@@ -291,7 +317,7 @@ def describe() -> str:
     listed = endpoints()
     if len(listed) == 1 and is_local(listed[0]):
         return "local only"
-    window = os.environ.get("TRACKER_OLLAMA_REMOTE_WINDOW", "").strip()
+    window = window_raw()
     bits = [f"{len(listed)} endpoints ({', '.join(label(u) for u in listed)})",
             f"using {label(current() or listed[0])}"]
     if window:
@@ -348,7 +374,10 @@ def overview() -> dict:
                      "demoted": url in _down})
     return {"selected": label(cur) if cur else None,
             "selected_url": cur,
-            "window": os.environ.get("TRACKER_OLLAMA_REMOTE_WINDOW", "").strip(),
+            "window": window_raw(),
+            "window_env": bool(os.environ.get("TRACKER_OLLAMA_REMOTE_WINDOW", "").strip()),
+            "remote_concurrency": remote_concurrency(),
+            "concurrency_env": bool(os.environ.get("TRACKER_OLLAMA_REMOTE_CONCURRENCY", "").strip()),
             "remote_allowed": allowed,
             "editable": config_editable(),
             "endpoints": rows}
@@ -385,7 +414,7 @@ def use(url: str, *, start_timeout: int = 40) -> tuple[bool, str]:
     if config_editable():
         # Remember the choice across runs: a picker that forgets what was
         # picked makes the user repeat themselves every launch.
-        _save_config(_file_urls() or endpoints(), url)
+        _save_config(urls=_file_urls() or endpoints(), preferred=url)
     _log.info("ollama endpoint pinned to %s", label(url))
     return True, "using %s" % label(url)
 
@@ -403,7 +432,7 @@ def add_endpoint(url: str) -> tuple[bool, str]:
         return False, "%s is already listed" % label(url)
     # Appended, not prepended: adding a machine to the list must not change
     # which endpoint a run picks on its own.
-    _save_config(listed + [url], preferred())
+    _save_config(urls=listed + [url])
     return True, "added %s" % label(url)
 
 
@@ -419,10 +448,50 @@ def remove_endpoint(url: str) -> tuple[bool, str]:
     if len(listed) == 1:
         return False, "cannot remove the last endpoint"
     pref = preferred()
-    _save_config([u for u in listed if u != url], None if pref == url else pref)
+    if pref == url:
+        _save_config(urls=[u for u in listed if u != url], preferred=None)
+    else:
+        _save_config(urls=[u for u in listed if u != url])
     with _lock:
         if _current == url:
             _current = None
         _down.discard(url)
         _health.pop(url, None)
     return True, "removed %s" % label(url)
+
+
+def set_policy(window: str | None = None,
+               concurrency: str | int | None = None) -> tuple[bool, str]:
+    """Store the remote window / remote concurrency in the config file.
+
+    None leaves a field unchanged; "" clears it back to the default. A field
+    whose env var is set is refused rather than silently shadowed — the env
+    var wins at read time and an edit nobody can observe is a lie.
+    """
+    changes: dict = {}
+    if window is not None:
+        if os.environ.get("TRACKER_OLLAMA_REMOTE_WINDOW", "").strip():
+            return False, "TRACKER_OLLAMA_REMOTE_WINDOW is set — unset it first"
+        window = window.strip()
+        if window and _parse_window(window) is None:
+            return False, "window must be HH:MM-HH:MM"
+        changes["remote_window"] = window or None
+    if concurrency is not None:
+        if os.environ.get("TRACKER_OLLAMA_REMOTE_CONCURRENCY", "").strip():
+            return False, "TRACKER_OLLAMA_REMOTE_CONCURRENCY is set — unset it first"
+        raw = str(concurrency).strip()
+        if raw:
+            try:
+                value = int(raw)
+            except ValueError:
+                value = 0
+            if value < 1:
+                return False, "concurrency must be a positive integer"
+            changes["remote_concurrency"] = value
+        else:
+            changes["remote_concurrency"] = None
+    if not changes:
+        return False, "nothing to change"
+    _save_config(**changes)
+    return True, "policy saved: window=%s, concurrency=%d" % (
+        window_raw() or "(always)", remote_concurrency())
