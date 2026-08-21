@@ -3,8 +3,10 @@ window.TRACKER_MONTH = window.TRACKER_MONTH || {};
 window.TRACKER_MONTH["eu_cra"] = window.TRACKER_MONTH["eu_cra"] || {};
 window.TRACKER_MONTH["eu_cra"]["2026-08"] = {
   dates: [
-    { date: "2026-08-19", file: "../data-20260819.js", count: 8 },
-    { date: "2026-08-18", file: "../data-20260818.js", count: 3 },
+    { date: "2026-08-21", file: "../data-20260821.js", count: 1 },
+    { date: "2026-08-20", file: "../data-20260820.js", count: 9 },
+    { date: "2026-08-19", file: "../data-20260819.js", count: 6 },
+    { date: "2026-08-18", file: "../data-20260818.js", count: 1 },
     { date: "2026-08-17", file: "../data-20260817.js", count: 1 },
     { date: "2026-08-16", file: "../data-20260816.js", count: 3 },
     { date: "2026-08-15", file: "../data-20260815.js", count: 3 },
@@ -16,6 +18,6 @@ window.TRACKER_MONTH["eu_cra"]["2026-08"] = {
     { date: "2026-08-03", file: "../data-20260803.js", count: 1 },
     { date: "2026-08-02", file: "../data-20260802.js", count: 10 }
   ],
-  totalArticles: 54,
-  lastUpdated: "2026-08-19"
+  totalArticles: 60,
+  lastUpdated: "2026-08-21"
 };

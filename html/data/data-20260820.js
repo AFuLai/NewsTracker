@@ -2133,5 +2133,131 @@ window.TRACKER_DAYS["2026-08-20"] = [
     sources: [
       { name: "The Register", url: "https://theregister.com/ai-and-ml/2026/08/20/openai-glitch-locks-out-vetted-cyber-researchers-and-some-cant-get-back-in/5290238", lang: "EN" }
     ]
+  },
+  {
+    id: "20260820-153",
+    trackers: ["eu_cra", "security"],
+    category: "產業動態",
+    title: "拉脫維亞交通安全局遭駭，120萬公民個人資料外洩，涉及車輛支付與身份資訊",
+    summary: "拉脫維亞交通安全局（CSDD）遭受大規模駭客攻擊，導致約120萬名公民的個人資料外洩。攻擊者非法存取了自2008年累積的車輛支付收據資料庫，並竊取了多達20萬個企業的資訊。外洩的敏感資料包括居民身份證號碼、企業營業號、車牌號、支付明細和住址等。拉脫維亞事件應對小組（CERT.LV）警告，犯罪分子可能利用這些資料進行網路釣魚和社會工程金融詐騙。調查顯示，駭客利用了CSDD系統未經保護的漏洞，而CSDD本身也未能遵守基本的安全規範。CSDD指出，由於其與負責IT基礎設施和安全監控的拉脫維亞電信公司Tet簽訂了5年合約，責任不應僅歸於CSDD。然而，Tet則強烈反駁，聲稱其僅是部分系統管理合約，預計雙方之間將爆發激烈的法律爭議。事件後，CSDD高層已相繼辭職。",
+    tags: ["拉脫維亞", "CSDD", "CERT.LV", "駭客攻擊", "個人資料外洩", "網路安全"],
+    title_en: "Latvian Traffic Safety Agency Hacked, 1.2 Million Citizens' Personal Data Leaked, Including Vehicle Payment and Identity Information",
+    summary_en: "The Latvian Traffic Safety Agency (CSDD) suffered a massive cyberattack, resulting in the leak of personal data belonging to approximately 1.2 million citizens. Attackers illegally accessed a vehicle payment receipt database accumulated since 2008, and stole information belonging to up to 200,000 businesses. The leaked sensitive data includes residents' ID numbers, business registration numbers, license plates, payment details, and addresses. The Latvian Incident Response Team (CERT.LV) warned that criminals may use this data for phishing and social engineering financial fraud. Investigations revealed that the hackers exploited unprotected vulnerabilities in the CSDD system, and CSDD itself failed to adhere to basic security standards. CSDD pointed out that since it signed a five-year contract with Latvian telecommunications company Tet, which is responsible for IT infrastructure and security monitoring, the responsibility should not rest solely with CSDD. However, Tet strongly refuted this, claiming it was only a partial system management contract, suggesting that a fierce legal dispute is expected between the two parties. Following the incident, several high-ranking CSDD officials resigned.",
+    tags_en: ["Latvia", "CSDD", "CERT.LV", "Cyberattack", "Data Leakage", "Cybersecurity"],
+    sources: [
+      { name: "Boannews 韓國", url: "https://boannews.com/news/articleView.html?idxno=145307", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260820-154",
+    trackers: ["eu_cra", "security"],
+    category: "產業動態",
+    title: "CISA與FBI揭露：Medusa勒索軟體組織擴張，攻擊目標鎖定醫療與關鍵基礎設施",
+    summary: "美國網路安全與基礎設施安全局（CISA）和聯邦調查局（FBI）宣布，自2021年Medusa勒索軟體組織成立以來，累積受害者已超過500個機構。Medusa的攻擊規模在過去一年內擴大，目標集中於關鍵基礎設施和醫療部門。該組織曾攻擊密西西比大學醫療中心（UMMC），癱瘓了包括兒科和重症監護室在內的關鍵醫療網路。Medusa的攻擊手法包括在漏洞公開前夕取得漏洞利用程式（exploit）並惡用，或在官方公告後24小時內迅速武器化，以利用修補的時差。他們透過RaaS（Ransomware as a Service）模式運營，並向初期入侵經紀商（IAB）提供高額資金，擴大了勢力。攻擊者利用AnyDesk和Atera等正常遠端控制程式進行活動，以規避偵測。安全專家警告，Medusa已將從初期入侵到資料竊取的所需時間大幅縮短，從數天縮短至數小時。",
+    tags: ["Medusa", "CISA", "FBI", "勒索軟體", "RaaS", "關鍵基礎設施", "醫療部門"],
+    title_en: "CISA and FBI Reveal: Medusa Ransomware Group Expands, Targeting Healthcare and Critical Infrastructure",
+    summary_en: "The Cybersecurity and Infrastructure Security Agency (CISA) and the Federal Bureau of Investigation (FBI) announced that since the establishment of the Medusa ransomware group in 2021, they have affected over 500 organizations. Medusa's attack scope has expanded over the past year, focusing on critical infrastructure and the healthcare sector. The group previously attacked the University of Mississippi Medical Center (UMMC), paralyzing critical medical networks including pediatrics and intensive care units. Medusa's tactics include acquiring and exploiting vulnerabilities just before they are publicly disclosed, or rapidly weaponizing them within 24 hours of an official announcement to exploit patching delays. They operate using a Ransomware as a Service (RaaS) model, providing high funding to Initial Access Brokers (IABs) to expand their reach. Attackers utilize legitimate remote control programs such as AnyDesk and Atera to evade detection. Security experts warn that Medusa has significantly reduced the time required from initial intrusion to data exfiltration, shortening it from days to mere hours.",
+    tags_en: ["Medusa", "CISA", "FBI", "Ransomware", "RaaS", "Critical Infrastructure", "Healthcare Sector"],
+    sources: [
+      { name: "Boannews 韓國", url: "https://boannews.com/news/articleView.html?idxno=145303", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260820-155",
+    trackers: ["eu_cra"],
+    category: "產業動態",
+    title: "導入 AI 的最大障礙是「資訊洩漏的擔憂」：企業資料治理與文件一元化的重要性",
+    summary: "本調查彙整了由文件中央化及 AI 專業企業 엠클라우독（M CloudDock）針對參加 ISEC 2026 的 373 位實務人員所進行的「AI 準備度診斷」結果。調查結果顯示，企業猶豫導入 AI 的最大障礙是「資訊洩漏的擔憂」，有 56.6% 的受訪者提出此點。這個比例高於希望基於自家資料建立專用 AI 的群體（16.6%）的三倍以上。然而，在抱持安全疑慮的受訪者中，實際能適切管理文件存取權限的比例卻偏低，此落差被指出。此外，關於 AI 的實際應用情況，有 83.1% 的受訪者仍停留在「AI 自動化未完成」的初期階段，顯示決策流程仍依賴人工。專家強調，若要成功利用 AI，首先必須建立一個能安全彙集分散式內部資料的「文件中央化」環境，並將其作為安全基礎，這是不可或缺的。",
+    tags: ["AI", "資訊洩漏", "文件中央化", "資料治理", "ISEC 2026", "엠클라우독"],
+    title_en: "The Biggest Barrier to Adopting AI is 'Concerns Over Information Leakage': The Importance of Enterprise Data Governance and Document Unification",
+    summary_en: "This survey compiles the results of an 'AI Readiness Assessment' conducted by M CloudDock, a professional enterprise specializing in document centralization and AI, for 373 practitioners attending ISEC 2026. The findings show that the biggest obstacle preventing enterprises from adopting AI is 'concerns over information leakage,' cited by 56.6% of respondents. This proportion is more than three times higher than the group that wishes to build dedicated AI based on proprietary data (16.6%). However, among respondents who expressed security concerns, the actual proportion who can properly manage document access permissions was found to be relatively low, highlighting a significant gap. Furthermore, regarding actual AI application, 83.1% of respondents remain in the early stage of 'incomplete AI automation,' indicating that decision-making processes still rely on manual labor. Experts emphasize that to successfully utilize AI, it is first necessary to establish a 'centralized document' environment that can safely aggregate dispersed internal data, and this must serve as an indispensable security foundation.",
+    tags_en: ["AI", "Information Leakage", "Document Centralization", "Data Governance", "ISEC 2026", "M CloudDock"],
+    sources: [
+      { name: "Boannews 韓國", url: "https://boannews.com/news/articleView.html?idxno=145299", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260820-156",
+    trackers: ["eu_cra"],
+    category: "產業動態",
+    title: "CISO 面臨「責任過重、權限不足」的悖論：企業治理結構亟需改革",
+    summary: "本文深入探討當代企業中「資訊安全最高責任人」（CISO）所面臨的「CISO 悖論」（CISO Paradox）。儘管 CISO 在企業中擁有如同 CEO 或 CFO 一般的權威地位，負責制定整體安全策略，但實際上他們往往缺乏實質的決策權、預算控制權和人力資源的支配權。這導致 CISO 必須耗費大量時間向其他高階主管「銷售」安全投資的必要性，而非專注於預防性防禦，使其只能處於事後應變的「反應式消防員」角色。\n\n全球趨勢顯示，CISO 面臨的挑戰包括：預算難以確保、需兼任其他職務、以及因 SEC 等法規要求（如 SolarWinds 和 Uber 案例）而面臨的極大法律責任。這種「責任無限大，權限最小」的結構性失衡，已成為全球治理層面的重大危機。\n\n文章提出三種改善 CISO 治理結構的建議：\n1. **建立獨立報告體系**：將 CISO 直接匯報給 CEO 或董事會風險/審計委員會，避免與專注於成本的 CIO 產生利益衝突。\n2. **賦予獨立預算控制權**：建議將至少 10%~15% 的 IT 預算獨立分配給 CISO，能顯著提高新威脅的應對速度。\n3. **提升戰略地位**：將 CISO 從「技術顧問」提升為具備全公司「戰略風險管理權限」的執行層級，甚至賦予對新服務或併購的「否決權」（Veto）。\n\n作者呼籲，企業高階主管和董事會必須將 CISO 定位為具備實質控制權的 C-Level 領導者，才能建立起穩固的防禦生態系統。",
+    tags: ["CISO", "CISO Paradox", "企業治理", "資訊安全", "風險管理", "SEC"],
+    title_en: "The CISO Paradox: Navigating the Dilemma of Overwhelming Responsibility and Insufficient Authority in Corporate Governance",
+    summary_en: "This article delves into the 'CISO Paradox' faced by Chief Information Security Officers (CISOs) in modern enterprises. Although CISOs hold an authoritative position comparable to a CEO or CFO, responsible for setting overall security strategy, they often lack substantive decision-making power, budget control, and human resource authority. This forces CISOs to spend significant time 'selling' the necessity of security investments to other senior executives, rather than focusing on proactive defense, relegating them to a reactive 'firefighter' role. Global trends indicate that CISO challenges include difficulty securing budgets, having to juggle multiple roles, and facing immense legal liability due to regulatory requirements (such as those from the SEC, citing the SolarWinds and Uber cases). This structural imbalance—of 'infinite responsibility and minimal authority'—has become a major crisis in global governance. The article proposes three ways to improve CISO governance structure: 1. **Establish an Independent Reporting Structure**: Having the CISO report directly to the CEO or the Board's Risk/Audit Committee, thereby avoiding conflicts of interest with the CIO, who often focuses on cost. 2. **Grant Independent Budgetary Control**: Suggesting that at least 10%–15% of the IT budget be allocated independently to the CISO, which can significantly improve the speed of responding to new threats. 3. **Elevate Strategic Status**: Promoting the CISO from a 'technical advisor' to an executive level with company-wide 'strategic risk management authority,' even granting a 'veto' power over new services or mergers and acquisitions. The author urges that corporate senior management and the board must position the CISO as a C-Level leader with genuine control to build a robust defense ecosystem.",
+    tags_en: ["CISO", "CISO Paradox", "Corporate Governance", "Information Security", "Risk Management", "SEC"],
+    sources: [
+      { name: "Boannews 韓國", url: "https://boannews.com/news/articleView.html?idxno=145290", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260820-157",
+    trackers: ["eu_cra"],
+    category: "產業動態",
+    title: "Softcamp與Inmi-rae Strategy Institute簽署合作協議，深化公有及國防市場佈局",
+    summary: "資安企業Softcamp與戰略諮詢機構Inmi-rae Strategy Institute於19日簽署了業務合作協議。此次合作旨在結合Softcamp的資安技術能力與Inmi-rae Strategy Institute的政策諮詢資源，共同拓展公有採購市場及國防市場的業務版圖。隨著公有機構和國防領域推動雲端轉型及AI導入，對文件安全、網路間資料傳輸、供應鏈安全等需求日益增加。然而，公有及國防採購流程複雜，即使技術能力強，若缺乏政策和制度理解，進入市場也會耗時。本次合作將利用Inmi-rae Strategy Institute的政策諮詢經驗，協助Softcamp將其資安解決方案與公有政策及國家安全領域深度結合，擴大業務範圍。Inmi-rae Strategy Institute將在政府支援事業發掘、公有採購增長、國防採購業務進入可能性檢視等五個領域提供諮詢服務，助力Softcamp擴大公有採購註冊，並進軍國防資安市場。",
+    tags: ["Softcamp", "Inmi-rae Strategy Institute", "公有採購", "國防市場", "資安", "AI"],
+    title_en: "Softcamp and Inmi-rae Strategy Institute Sign Cooperation Agreement to Deepen Public and Defense Market Penetration",
+    summary_en: "Cybersecurity company Softcamp and strategic consulting firm Inmi-rae Strategy Institute signed a business cooperation agreement on the 19th. This collaboration aims to combine Softcamp's cybersecurity technical capabilities with Inmi-rae Strategy Institute's policy consulting resources to jointly expand their market presence in the public procurement and defense sectors. As public institutions and the defense sector drive cloud transformation and AI adoption, the demand for document security, inter-network data transmission, and supply chain security is increasing. However, public and defense procurement processes are complex; even with strong technical capabilities, entering the market is time-consuming without understanding the policies and systems. This cooperation will utilize Inmi-rae Strategy Institute's policy consulting expertise to help Softcamp deeply integrate its cybersecurity solutions with public policy and national security domains, thereby expanding its business scope. Inmi-rae Strategy Institute will provide consulting services in five areas: identifying government-supported projects, public procurement growth, and feasibility assessment for defense procurement entry, helping Softcamp expand its public procurement registrations and enter the defense cybersecurity market.",
+    tags_en: ["Softcamp", "Inmi-rae Strategy Institute", "Public Procurement", "Defense Market", "Cybersecurity", "AI"],
+    sources: [
+      { name: "Boannews 韓國", url: "https://boannews.com/news/articleView.html?idxno=145287", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260820-158",
+    trackers: ["eu_cra"],
+    category: "產業動態",
+    title: "Fortinet 收購 Virtue AI，強化 AI 應用與 Agent 的全生命週期安全保護",
+    summary: "網路安全解決方案公司 Fortinet 宣布收購 AI 安全公司 Virtue AI。此舉旨在將 Virtue AI 的技術整合到 FortiGate HyperScale 防火牆等現有的 AI 安全產品線，強化企業在導入和營運 AI 系統時的安全性。隨著 AI 應用和自律 Agent 的快速普及，攻擊面已擴展至 Prompt、模型、Agent、API 呼叫和 AI 基礎設施等環節，企業必須同時確保 AI 的安全營運。Fortinet 透過其 FortiAIGate 已能保護 LLM 免受 Prompt Injection、資料外洩和模型中毒等威脅。收購 Virtue AI 後，Fortinet 的安全範圍擴展至 AI 模型和應用程式、Agent 的開發到實際營運全週期。主要功能包括：在超過 50 個虛擬環境和 14 個高風險領域預先診斷 AI Agent 的漏洞（Red Teaming）；尋找未授權的 AI 工具並預先阻止惡意指令執行（Agent 保護與治理）；以及提供持續驗證功能，自動檢查模型更新或政策調整帶來的風險，並生成稽核證據。此外，系統能對文字、圖像、影音等內容應用安全政策，實時防禦敏感資訊洩露、AI 越獄（jailbreak）嘗試和惡意程式碼外洩。此整合使 Fortinet 能提供涵蓋網路、端點、雲端、應用程式乃至 AI 系統的整合式 AI 原生安全結構。",
+    tags: ["Fortinet", "Virtue AI", "AI 安全", "FortiAIGate", "AI Agent", "Prompt Injection"],
+    title_en: "Fortinet Acquires Virtue AI to Enhance Full Lifecycle Security for AI Applications and Agents",
+    summary_en: "Cybersecurity solutions company Fortinet announced the acquisition of AI security company Virtue AI. This move aims to integrate Virtue AI's technology into existing AI security product lines, such as the FortiGate HyperScale firewall, thereby strengthening enterprise security when deploying and operating AI systems. With the rapid proliferation of AI applications and autonomous Agents, the attack surface has expanded to include prompts, models, Agents, API calls, and AI infrastructure. Enterprises must ensure secure AI operation across all these areas. Fortinet's FortiAIGate already protects LLMs from threats like Prompt Injection, data leakage, and model poisoning. Following the acquisition of Virtue AI, Fortinet's security scope expands to cover the entire lifecycle of AI models and applications, from development to actual operation. Key capabilities include: pre-diagnosing vulnerabilities in AI Agents through Red Teaming across over 50 virtual environments and 14 high-risk domains; identifying and preemptively blocking unauthorized AI tools and malicious command execution (Agent Protection and Governance); and providing continuous validation functionality that automatically checks risks introduced by model updates or policy adjustments, while generating audit evidence. Furthermore, the system can apply security policies to various content types, including text, images, and video, providing real-time defense against sensitive information leakage, AI jailbreak attempts, and malicious code exfiltration. This integration enables Fortinet to offer an integrated, AI-native security architecture covering networks, endpoints, cloud, applications, and even AI systems.",
+    tags_en: ["Fortinet", "Virtue AI", "AI Security", "FortiAIGate", "AI Agent", "Prompt Injection"],
+    sources: [
+      { name: "Boannews 韓國", url: "https://boannews.com/news/articleView.html?idxno=145272", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260820-159",
+    trackers: ["eu_cra", "security"],
+    category: "產業動態",
+    title: "AI自動化攻擊工具在暗網流通，降低複雜漏洞攻擊門檻，威脅級別升級",
+    summary: "資安公司Trellix發布報告指出，目前暗網地下論壇上正大量流通各種AI驅動的駭客工具與服務。這些工具包括偵察工具、憑證販售、以及AI即服務(AIaaS)平台等高階攻擊工具。其中，如APEX AI可僅輸入目標網域，便自動生成國家級駭客水準的客製化攻擊情境與勒索軟體傳播計畫。另有Metamorphic Crypter等工具，能規避Windows Defender等主流防毒解決方案的特徵碼偵測。更令人擔憂的是，MessiahGPT等AI模型已移除倫理安全機制，可無限支援惡意程式碼生成和漏洞攻擊(exploit)代碼的製作。專家警告，AI自動化工具大幅降低了過去需要高度專業知識才能執行的複雜漏洞攻擊的技術門檻，使得原本只有APT組織能使用的複雜攻擊手法，現在已商品化，甚至低價販售。Proofpoint也發現，用於操縱AI代理的間接提示注入攻擊工具，正以低價在暗網交易，加速了網路犯罪的普及化。",
+    tags: ["Trellix", "AIaaS", "暗網", "APEX AI", "MessiahGPT", "漏洞攻擊", "網路犯罪"],
+    title_en: "AI Automation Attack Tools Circulate on Dark Web, Lowering the Barrier for Complex Vulnerability Exploits, Escalating Threat Levels",
+    summary_en: "A report released by cybersecurity firm Trellix indicates that various AI-driven hacking tools and services are currently circulating widely on dark web forums. These tools include advanced attack utilities such as reconnaissance tools, credential marketplaces, and AI-as-a-Service (AIaaS) platforms. For instance, APEX AI can automatically generate customized, nation-state level attack scenarios and ransomware propagation plans merely by inputting a target domain. Other tools, such as Metamorphic Crypter, can evade signature detection by mainstream antivirus solutions like Windows Defender. Of greater concern is that AI models like MessiahGPT have removed ethical safety mechanisms, allowing for unlimited support in generating malicious code and exploit code for vulnerability attacks. Experts warn that AI automation tools significantly lower the technical barrier for complex vulnerability exploits, which previously required highly specialized knowledge. Consequently, complex attack methods once exclusive to APT organizations are now commoditized and even sold cheaply. Proofpoint has also found that tools for indirect prompt injection attacks, used to manipulate AI agents, are being traded cheaply on the dark web, accelerating the popularization of cybercrime.",
+    tags_en: ["Trellix", "AIaaS", "Dark Web", "APEX AI", "MessiahGPT", "Vulnerability Exploits", "Cybercrime"],
+    sources: [
+      { name: "Boannews 韓國", url: "https://boannews.com/news/articleView.html?idxno=145252", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260820-160",
+    trackers: ["eu_cra"],
+    category: "研討活動",
+    title: "韓國安全專家在DEF CON 34雲端村嶄露實力，主導頂級駭客競賽內容設計",
+    summary: "韓國安全專家團隊在美國拉斯維加斯舉行的DEF CON 34駭客大會雲端村（Cloud Village）的CTF「Apex Park」中表現出色。該競賽結合了AWS、GCP、Azure等主流雲端環境，旨在檢驗頂尖駭客的雲端安全能力。韓國團隊不僅在競賽中表現優異，更在內容設計環節發揮了關鍵作用。他們主導了本次大會共47道題目中的15道，特別是最高難度的「Insane」級別題目全部由韓國團隊負責。這證明了韓國安全社群已能從單純的參與者，躍升為能夠主導全球頂級安全活動的內容設計者和協作者。這場活動展示了跨國、跨語言的技術交流與深度合作，為韓國安全社群在全球舞台上建立更穩固的基礎奠定了重要基礎。",
+    tags: ["DEF CON 34", "Cloud Village", "CTF", "AWS", "GCP", "Azure", "雲端安全"],
+    title_en: "South Korean Security Experts Shine at DEF CON 34 Cloud Village, Leading Top-Tier Hacking Competition Design",
+    summary_en: "A team of South Korean security experts performed exceptionally well at the CTF 'Apex Park' held in the Cloud Village at DEF CON 34 in Las Vegas, USA. This competition combined mainstream cloud environments such as AWS, GCP, and Azure, aiming to test the cloud security capabilities of top hackers. The Korean team not only excelled in the competition but also played a crucial role in the content design. They were responsible for 15 out of the total 47 questions, including all the highest difficulty 'Insane' level questions. This demonstrates that the Korean security community has advanced from merely being participants to becoming content designers and collaborators capable of leading global top-tier security events. This activity showcased international, cross-language technical exchange and deep cooperation, laying an important foundation for the Korean security community to establish a more solid presence on the global stage.",
+    tags_en: ["DEF CON 34", "Cloud Village", "CTF", "AWS", "GCP", "Azure", "Cloud Security"],
+    sources: [
+      { name: "Boannews 韓國", url: "https://boannews.com/news/articleView.html?idxno=145258", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260820-161",
+    trackers: ["eu_cra"],
+    category: "研討活動",
+    title: "2026 KISIA資訊保護競賽舉辦：檢驗下一代資安人才能力",
+    summary: "科學技術情報通信部（과학기술정보통신부）與韓國資訊保護產業協會（KISIA）為發掘下一代資安人才，成功舉辦了「2026 KISIA資訊保護競賽」本賽。本次競賽採用CTF（Capture The Flag）模式，讓全國大學（研究生）學生以團隊形式比拼駭客防禦實力。共有163支隊伍報名，展現了極高的競爭率。本賽的參賽者挑戰了系統駭客、逆向工程（리버싱）、鑑識（포렌식）等高難度問題。特別是，本次競賽的題目經過主要AI模型進行事前驗證，設計上確保了無法僅靠簡單提問就能解決，展現了要求參賽者深入探究原理的高完成度。在激烈的競爭之後，「트레저」(Trezor) 隊伍榮獲最高獎，KISIA表示未來將持續連結公私學界，支持年輕人才與產業現場接軌的決心。",
+    tags: ["KISIA", "資訊保護", "CTF", "資安", "科學技術情報通信部", "人才培育"],
+    title_en: "2026 KISIA Information Protection Competition Held: Testing Next-Generation Cybersecurity Talent",
+    summary_en: "The Ministry of Science and ICT (과학기술정보통신부) and the Korea Information Security Industry Association (KISIA) successfully hosted the '2026 KISIA Information Protection Competition' to discover next-generation cybersecurity talent. This competition utilized the Capture The Flag (CTF) format, allowing university (graduate) students nationwide to compete in team-based hacking defense skills. A total of 163 teams registered, demonstrating extremely high competition. Participants challenged themselves with high-difficulty problems such as system hacking, reverse engineering (리버싱), and forensics (포렌식). Notably, the competition questions were pre-verified by major AI models, ensuring that they could not be solved merely by simple questioning, thus demonstrating a high level of difficulty that required participants to deeply investigate the underlying principles. Following the intense competition, the 'Trezor' team won the highest prize. KISIA stated its commitment to continuously connecting the public, private, and academic sectors to help young talent align with industry demands.",
+    tags_en: ["KISIA", "Information Protection", "CTF", "Cybersecurity", "Ministry of Science and ICT", "Talent Development"],
+    sources: [
+      { name: "Boannews 韓國", url: "https://boannews.com/news/articleView.html?idxno=145253", lang: "EN" }
+    ]
   }
 ];
