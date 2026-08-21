@@ -16,6 +16,17 @@
 <h1>Tracker ChangeLog</h1>
 <p class="meta">本檔由 <code>tracker pack</code> 自動維護；每次打包前由本地 ollama 生成版本重點並 prepend 於下方。</p>
 <!-- CHANGELOG_INSERTION_POINT -->
+<section class="release" id="v2.29">
+  <h2>v2.29 — 2026-08-21</h2>
+<ul>
+    <li><strong>【API/CLI 穩定性提升】</strong> 增強了端點（Endpoint）配置的可靠性。現在即使在非標準啟動環境下，系統也能透過本地檔案（`endpoints.json`）作為備援，確保使用者可透過儀表板管理並記住首選端點。</li>
+    <li><strong>【Ollama 模型支援優化】</strong> 針對 Ollama 服務的整合進行了重大優化。新增了本地端點的自動偵測機制，並修正了系統報告中的資源佔用（如 Slot Count）邏輯，提升了運行報告的準確性。</li>
+    <li><strong>【資料來源與覆蓋率】</strong> 進行了多個資料來源的維護與修補，包括更新了 2026 年 8 月份的 EU、OS 與 <strong>資安新聞抓取覆蓋率</strong> 相關的 Manifest 檔案。同時修復了 Boannews 和 ETSI 等來源的 RSS 網址重定向問題。</li>
+    <li><strong>【核心數據準確性修補】</strong> 修正了運行報告中的關鍵數據錯誤。特別修復了重複文章對（duplicate pairs）的計算邏輯，確保統計數據與實際抓取結果一致，提升了數據分析的可靠性。</li>
+    <li><strong>【系統健康檢查與使用者體驗】</strong> 改善了系統的健康檢查流程，使其能自動化地提交網站更新，並優化了儀表板的端點選擇器，使其能更準確地顯示遠端資源資訊。</li>
+</ul>
+</section>
+
 <section class="release" id="v2.28">
   <h2>v2.28 — 2026-07-29</h2>
 <ul>

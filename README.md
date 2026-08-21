@@ -137,6 +137,10 @@ The list comes from, in precedence order:
    edits (add ＋ / remove ✕ / pick in the 模型端點 dropdown). Machine-local,
    ignored by git. Picking an endpoint in the panel is remembered
    (`preferred`) and tried first on later runs, health and window permitting.
+   Optional keys: `labels` maps a URL to a machine name shown in the picker
+   and the logs; `remote_window` and `remote_concurrency` are the same
+   policies as the env vars below, editable from the panel's 遠端政策 row
+   (an env-pinned field is read-only there — the env var wins at read time).
    The env var rarely reaches the dashboard in practice — launches via
    `wsl -e` skip login shells — which is exactly why the file exists;
 3. the local daemon, always the fallback.
