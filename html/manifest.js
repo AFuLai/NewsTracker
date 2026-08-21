@@ -42,6 +42,6 @@ const TRACKER_TITLES = {
   "eu_cra": "EU CRA 追蹤",
   "os": "作業系統追蹤"
 };
-const TRACKER_LAST_UPDATED = "2026-08-05";
+const TRACKER_LAST_UPDATED = "2026-08-21";
 // Back-compat shim for the legacy single-tracker UI loader.
 const TRACKER_MANIFEST = TRACKER_MANIFESTS[TRACKER_LIST[0]];
