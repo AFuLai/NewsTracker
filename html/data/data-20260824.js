@@ -998,6 +998,62 @@ window.TRACKER_DAYS["2026-08-24"] = [
   },
   {
     id: "20260824-072",
+    trackers: ["os", "security"],
+    category: "漏洞與威脅情報",
+    title: "Windows 11 更新導致遊戲崩潰：微軟發布臨時修復，建議禁用 inpoutx64 驅動程式",
+    summary: "微軟針對 Windows 11 24H2 和 25H2 版本在 2026 年 8 月更新後出現的遊戲穩定性問題，發布了臨時解決方案。用戶報告指出，運行如 ARC Raiders、MARVEL Tōkon: Fighting Souls 等遊戲時，系統會發生崩潰、無法啟動或意外重啟，並伴隨 \"EXCEPTION_ACCESS_VIOLATION\" 錯誤。\n\n調查顯示，此問題與安裝在受影響 Windows 系統上的 RGB 照明設備周邊裝置驅動程式或組件有關。具體來說，懷疑是 `inpoutx64.sys` 這個驅動程式導致的。開發商 Embark Studios 也證實了這一點。\n\n微軟建議用戶透過修改 Windows Registry 來禁用 `inpoutx64` 驅動程式（將 HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Services\\inpoutx64 的 Start 值設定為 \"4\"）。然而，微軟警告此操作可能導致周邊設備的 RGB 功能失常。建議用戶在進行修改前備份 Registry。\n\n微軟持續調查 RGB 組件與觸發遊戲之間的關係，並鼓勵玩家透過 Feedback Hub 提交報告。",
+    tags: ["Windows 11", "inpoutx64.sys", "RGB 照明", "驅動程式衝突", "系統穩定性"],
+    title_en: "Windows 11 Update Causes Game Crashes: Microsoft Releases Temporary Fix, Recommends Disabling inpoutx64 Driver",
+    summary_en: "Microsoft has released a temporary solution addressing game stability issues observed after Windows 11 24H2 and 25H2 updates in August 2026. User reports indicate that running games such as ARC Raiders and MARVEL Tōkon: Fighting Souls can cause system crashes, failure to launch, or unexpected restarts, accompanied by an \"EXCEPTION_ACCESS_VIOLATION\" error.\n\nInvestigations suggest that the issue is related to RGB lighting peripheral device drivers or components installed on affected Windows systems, specifically pointing to the `inpoutx64.sys` driver. Developer Embark Studios has also confirmed this.\n\nMicrosoft advises users to disable the `inpoutx64` driver by modifying the Windows Registry (setting the Start value of HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Services\\inpoutx64 to \"4\"). However, Microsoft warns that this action may cause RGB peripheral functionality to malfunction. Users are advised to back up the Registry before making any changes.\n\nMicrosoft continues to investigate the relationship between RGB components and game triggering, and encourages players to submit reports via the Feedback Hub.",
+    tags_en: ["Windows 11", "inpoutx64.sys", "RGB Lighting", "Driver Conflict", "System Stability"],
+    sources: [
+      { name: "BleepingComputer", url: "https://bleepingcomputer.com/news/microsoft/microsoft-shares-temporary-fix-for-windows-11-gaming-issues", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260824-073",
+    trackers: ["security"],
+    category: "漏洞與威脅情報",
+    title: "微軟推出 Teams 新政策，讓管理員可自動阻擋外部機器人加入會議",
+    summary: "為加強企業會議的安全性，Microsoft 發布了一項新的 Teams 會議保護策略。此更新允許系統管理員設定，能自動阻止所有被識別的外部機器人（external bots）加入 Teams 會議。這比先前在六月推出的政策更進一步，原先只需將偵測到的機器人標記並要求主辦方批准，現在可以完全自動阻擋，無需任何手動確認。\n此功能旨在防止第三方機器人或被威脅行為者控制的惡意應用程式加入會議。由於攻擊者常利用 Teams 進行存取和橫向移動，甚至冒充 IT 或幫助台人員實施社交工程詐騙，因此這項保護機制能大幅降低組織風險。管理員可透過 Teams 管理中心中的「管理機器人」設定啟用此政策，並可針對特定使用者或群組分配。\n該功能預計在八月底進行分批推出，並將於九月下旬在全球範圍內提供一般可用性。",
+    tags: ["Microsoft Teams", "機器人保護", "Teams 管理員中心", "社交工程", "企業安全"],
+    title_en: "Microsoft Launches New Teams Policy Allowing Administrators to Automatically Block External Bots from Joining Meetings",
+    summary_en: "To enhance the security of corporate meetings, Microsoft has released a new Teams meeting protection policy. This update allows system administrators to set a rule that automatically blocks all identified external bots from joining Teams meetings. This is an advancement over the policy introduced in June, which previously only required detected bots to be flagged and approved by the meeting organizer. The new policy provides automatic blocking without any manual confirmation.\n\nThis feature aims to prevent third-party bots or malicious applications controlled by threat actors from joining meetings. Since attackers frequently use Teams for access and lateral movement, and even impersonate IT or help desk personnel to execute social engineering scams, this protective mechanism significantly reduces organizational risk. Administrators can enable this policy via the 'Manage Bots' settings in the Teams admin center and can assign it to specific users or groups.\n\nThe feature is scheduled for phased rollout by the end of August and will be generally available globally by late September.",
+    tags_en: ["Microsoft Teams", "Bot Protection", "Teams Admin Center", "Social Engineering", "Enterprise Security"],
+    sources: [
+      { name: "BleepingComputer", url: "https://bleepingcomputer.com/news/security/microsoft-teams-now-lets-admins-block-external-bots-from-meetings", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260824-074",
+    trackers: ["security"],
+    category: "漏洞與威脅情報",
+    title: "駭客鎖定 miniOrange SAML SSO 外掛，利用兩項認證繞過漏洞進行管理員登入",
+    summary: "miniOrange 的 SAML 2.0 單點登入 (SSO) 外掛為 WordPress 網站提供企業身份平台（如 Microsoft Entra ID、Okta 等）的登入功能。然而，該外掛存在兩項關鍵認證繞過漏洞：CVE-2026-61979 和 CVE-2026-15981。攻擊者可利用 CVE-2026-61979 選擇 HMAC-SHA1 簽章演算法，導致外掛誤將身份提供者 (IdP) 的 RSA 公鑰視為共享密鑰，從而偽造可被接受的簽名。接著，CVE-2026-15981 使外掛將 OpenSSL 驗證錯誤（-1）視為成功結果，允許格式不良的簽名通過驗證。\n\n安全公司 Patchstack 指出，儘管這些漏洞已於七月公開修復，但廠商僅在公告中涵蓋了免費版本，導致許多運行付費版本的網站未收到警示。攻擊者已將兩項漏洞鏈接起來，成功從 Standard 版 16.1.9 版本獲取管理員會話 Cookie。目前有跡象顯示持續的利用嘗試和掃描活動正在進行中，PoC 程式碼也已公開。\n\n網站擁有者必須手動升級到修補版本（例如 Free, single site – 5.4.5；Premium/Enterprise/All-Inclusive, multisite – 20.2.8 等），因為付費版本的管理員儀表板不會顯示更新警告。",
+    tags: ["miniOrange SAML SSO", "WordPress", "CVE-2026-61979", "CVE-2026-15981", "SAML 2.0", "認證繞過"],
+    title_en: "Hackers Target miniOrange SAML SSO Plugin with Authentication Bypass Vulnerability for Admin Login",
+    summary_en: "The miniOrange SAML 2.0 Single Sign-On (SSO) plugin provides WordPress sites with enterprise identity platform login functionality (such as Microsoft Entra ID, Okta, etc.). However, the plugin contains two critical authentication bypass vulnerabilities: CVE-2026-61979 and CVE-2026-15981. Attackers can exploit CVE-2026-61979 by selecting the HMAC-SHA1 signature algorithm, causing the plugin to mistakenly treat the Identity Provider's (IdP) RSA public key as a shared secret, thereby allowing the forgery of acceptable signatures. Subsequently, CVE-2026-15981 causes the plugin to treat an OpenSSL verification error (-1) as a successful result, allowing malformed signatures to pass validation.\n\nSecurity company Patchstack noted that although these vulnerabilities were publicly patched in July, the vendor only included the free version in the announcement, leaving many sites running paid versions without receiving alerts. Attackers have chained the two vulnerabilities together, successfully obtaining administrator session cookies from the Standard version 16.1.9. There are current signs of ongoing exploitation attempts and scanning activity, and PoC code has also been made public.\n\nWebsite owners must manually upgrade to the patched versions (e.g., Free, single site – 5.4.5; Premium/Enterprise/All-Inclusive, multisite – 20.2.8, etc.), as the paid version admin dashboard does not display update warnings.",
+    tags_en: ["miniOrange SAML SSO", "WordPress", "CVE-2026-61979", "CVE-2026-15981", "SAML 2.0", "Authentication Bypass"],
+    sources: [
+      { name: "BleepingComputer", url: "https://bleepingcomputer.com/news/security/hackers-target-wordpress-sites-in-miniorange-auth-bypass-attacks", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260824-075",
+    trackers: ["security"],
+    category: "漏洞與威脅情報",
+    title: "ReliaQuest遭社工詐騙攻擊：駭客偽造SSO頁面竊取憑證，但安全控制成功阻止資料外洩",
+    summary: "資安公司 ReliaQuest 確認其員工曾遭受社交工程（Social Engineering）攻擊。攻擊者冒充資安團隊成員，透過電話和網路，誘騙員工進入一個「假造的 ReliaQuest 單點登入 (SSO) 頁面」，試圖竊取憑證。該釣魚網址使用了 lookalike domain reliaquest.claims。\n\n一名受害員工在詐騙手法下輸入了帳號密碼，並批准了 MFA 推播通知，讓攻擊者獲得了臨時的、僅限檢視（view-only）權限存取 ReliaQuest 的身份儀表板。然而，ReliaQuest 報告指出，由於實施了強大的設備信任控制 (device-trust controls) 等安全機制，後續嘗試存取應用程式的行為均被成功阻擋。\n\n公司隨即採取行動，終止了攻擊者的連線、撤銷了暴露的密碼，並重設了所有身份驗證 Token。調查結果顯示，未發現任何存取其他帳戶、應用或客戶資料的證據，且沒有跡象表明攻擊者在 ReliaQuest 系統中建立了持久性（persistence）。\n\n此事件凸顯了即使初始憑證被竊取，完善的縱深防禦和身份驗證控制仍能有效限制駭客的橫向移動與危害範圍。",
+    tags: ["ReliaQuest", "Social Engineering", "SSO", "Phishing", "MFA", "設備信任控制"],
+    title_en: "ReliaQuest Targeted by Social Engineering Attack: Hackers Forge SSO Page to Steal Credentials, But Security Controls Prevent Data Leakage",
+    summary_en: "Cybersecurity firm ReliaQuest confirmed that one of its employees was targeted by a social engineering attack. The attacker impersonated a member of the security team, using phone calls and online communication to trick the employee into accessing a 'fake ReliaQuest Single Sign-On (SSO) page,' attempting to steal credentials. The phishing URL utilized the lookalike domain reliaquest.claims.\n\nUnder the fraudulent scheme, an employee entered their account credentials and approved an MFA push notification, granting the attacker temporary, view-only access to the ReliaQuest identity dashboard. However, ReliaQuest reported that subsequent attempts to access applications were successfully blocked due to the implementation of robust security mechanisms, such as device-trust controls. \n\nThe company immediately took action, terminating the attacker's connection, revoking the exposed passwords, and resetting all authentication tokens. The investigation found no evidence of access to other accounts, applications, or client data, and no signs that the attacker established persistence within the ReliaQuest system.\n\nThis incident highlights that even if initial credentials are stolen, robust defense-in-depth and identity controls can effectively limit an attacker's lateral movement and scope of harm.",
+    tags_en: ["ReliaQuest", "Social Engineering", "SSO", "Phishing", "MFA", "device-trust controls"],
+    sources: [
+      { name: "BleepingComputer", url: "https://bleepingcomputer.com/news/security/reliaquest-confirms-failed-data-theft-attack-after-shinyhunters-breach", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260824-076",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "北韓駭客組織 BlueNoroff 攻擊 Rust 套件 ArrayRef，疑與 NPM 生態系供應鏈攻擊有關",
@@ -1011,7 +1067,7 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-073",
+    id: "20260824-077",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "Rust套件ArrayRef遭供應鏈攻擊：惡意版本上架後迅速移除，開發者需注意相依性風險",
@@ -1025,7 +1081,7 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-074",
+    id: "20260824-078",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "臺灣啟用全球首座 SEMI E187 實驗室，推動半導體設備資安標準化與驗證",
@@ -1039,7 +1095,7 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-075",
+    id: "20260824-079",
     trackers: ["os", "security"],
     category: "供應鏈與開源安全",
     title: "資安業者揭露 Projextor 惡意應用：利用 Electron 架構偽裝文件工具竊取資料",
@@ -1053,7 +1109,7 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-076",
+    id: "20260824-080",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "Atlassian修補超過80個漏洞：Jira、Confluence等平臺受影響，主要源於第三方套件風險",
@@ -1067,7 +1123,7 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-077",
+    id: "20260824-081",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "資安公司揭露「Ransom Busters」疑似偽裝救援組織，實為二次勒索攻擊的附屬成員",
@@ -1081,7 +1137,7 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-078",
+    id: "20260824-082",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "Anthropic升級Claude Security：Mythos 5模型強化漏洞挖掘能力，支援企業資安防禦",
@@ -1095,7 +1151,7 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-079",
+    id: "20260824-083",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "Stripe商家API金鑰外洩事件：659家商戶資料及客戶資訊遭竊，建議立即輪替密鑰",
@@ -1109,7 +1165,7 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-080",
+    id: "20260824-084",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "Broadcom Spring 框架修補 91 個漏洞：包含關鍵 RCE 與高風險安全缺陷",
@@ -1123,7 +1179,7 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-081",
+    id: "20260824-085",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "AI程式碼加速開發帶來的開源風險：企業應如何管理累積的修復債務？",
@@ -1137,7 +1193,7 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-082",
+    id: "20260824-086",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "Akamai報告揭露：企業AI使用風險升高，員工「影子AI」與個人帳號造成資安盲點",
@@ -1151,8 +1207,8 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-083",
-    trackers: ["eu_cra", "os"],
+    id: "20260824-087",
+    trackers: ["os"],
     category: "開源影響",
     title: "利用Microsoft Defender核心驅動程式BTR.sys進行攻擊：新型BYOVD技術詳解",
     summary: "安全研究機構Checkpoint Research在Black Hat USA 2026和Defcon 34上，公開了針對一種名為BYOVD（Bring Your Own Vulnerable Driver）的進階駭客技術分析報告與概念驗證（PoC）工具。該攻擊利用Windows系統自帶的「BTR.sys」驅動程式——一個用於啟動時移除（BTR）惡意軟體的必要組件，目標是從Windows 7到Windows 11 25H2等版本。駭客可以透過逆向工程分析，在不依賴外部漏洞或額外驅動程式的情況下，操縱該核心元件的加密交易流程，達到在作業系統啟動時就進行記憶體和登錄檔層級的操作。\n此攻擊的重大威脅性在於，它能繞過傳統的安全防禦機制，因為其利用的是Windows生態系統的核心要素。更甚者，由於操作過程不會留下服務安裝事件日誌，使得現有的靜態偵測系統難以捕捉。雖然執行該攻擊需要先取得系統最高權限（SeLoadDriver Privilege），但研究團隊建議的應對措施包括：強化權限管理、利用Sysmon監控特定事件ID（如Event ID 6和23）來早期偵測BTR.sys的濫用，並持續啟用Windows Defender Application Control (WDAC)及變更防護功能。",
@@ -1165,8 +1221,8 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-084",
-    trackers: ["eu_cra", "os", "security"],
+    id: "20260824-088",
+    trackers: ["os", "security"],
     category: "開源影響",
     title: "生成式AI安全風險深度解析：從數據流控制到權限管理，應對內部資料外洩與RAG系統漏洞",
     summary: "隨著ChatGPT等生成式AI已成為日常核心基礎設施，企業和公部門的應用場景極為廣泛。然而，現行缺乏足夠完善的資安體系來支持其高速發展。傳統數據安全依賴「明確邊界」，但生成式AI將內部資料（如原始碼、客戶資訊）透過Prompt輸入，實質上是跨越國境和網路邊界的無限制外傳。\n\n文章指出，核心風險已從單純的系統漏洞轉移到「整個數據流」（Input-Search-Infer-Generate-Store）的控制。主要威脅包括：1. **Prompt洩漏**：員工不慎將機密資料（如API Key、原始碼）直接輸入Prompt欄。\n2. **非結構化數據風險**：傳統DLP難以捕捉隱藏在會議記錄或報告中的語義層面敏感資訊。\n3. **RAG權限繞過**：當內部文件進入「向量資料庫」（Vector DB）時，原有的部門級別存取控制（ACL）會消失，導致一般員工能透過AI查詢到原本不應接觸的機密資料。\n4. **數據污染與完整性**：外部攻擊者可有意識地向內部系統注入錯誤或誤導資訊，影響AI的決策準確性。\n\n修補建議強調必須從技術層面建立強制控制：實施AI DLP（Prompt Security Gateway）進行即時敏感資料檢測和遮蔽；在RAG架構中，必須將**權限同步化**置於搜索精準度之上；並遵循「數據最小化原則」，確保所有AI應用都內建個人隱私保護設計（PbD）。",
@@ -1179,7 +1235,7 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-085",
+    id: "20260824-089",
     trackers: ["os"],
     category: "Android",
     title: "Pixel 11與Pixel 10深度比較：外觀微調、軟體升級及相機系統的差異分析",
@@ -1193,7 +1249,7 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-086",
+    id: "20260824-090",
     trackers: ["os"],
     category: "Android",
     title: "Pixel 11 Pro 手電筒亮度遭批評：HiLight 功能影響後，夜間照明實用性明顯下降",
@@ -1207,7 +1263,7 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-087",
+    id: "20260824-091",
     trackers: ["os"],
     category: "Android",
     title: "Pixel 11 Pro 新增「裝置協助」工具：Gemini App 提供個人化設備輔助功能",
@@ -1221,7 +1277,7 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-088",
+    id: "20260824-092",
     trackers: ["os"],
     category: "Android",
     title: "Google Clock與Pixel Magnifier更新：圖標設計同步改版，提升Android系統視覺一致性",
@@ -1235,7 +1291,7 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-089",
+    id: "20260824-093",
     trackers: ["os"],
     category: "Android",
     title: "Google 地圖流量數據故障問題重現，特別影響 Android Auto 用戶的導航體驗",
@@ -1249,7 +1305,7 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-090",
+    id: "20260824-094",
     trackers: ["os", "security"],
     category: "Android",
     title: "Google 闡述 Android Automotive OS (AAOS SDV) 的安全設計原則：強調虛擬化與隔離機制",
@@ -1263,7 +1319,7 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-091",
+    id: "20260824-095",
     trackers: ["os", "security"],
     category: "Android",
     title: "achorein expo-share-intent 存在路徑遍歷漏洞，影響 Android 文件複製功能",
@@ -1277,7 +1333,7 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-092",
+    id: "20260824-096",
     trackers: ["os", "security"],
     category: "Android",
     title: "Zscaler Client Connector 在 Android 與 ChromeOS 上存在本地可利用的緩衝區溢出漏洞 CVE-2026-59566",
@@ -1291,7 +1347,7 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-093",
+    id: "20260824-097",
     trackers: ["security"],
     category: "前瞻技術",
     title: "HITCON 2026 重點回顧：聚焦 AI 代理、PQC 與 ICS 系統安全挑戰",
@@ -1305,7 +1361,7 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-094",
+    id: "20260824-098",
     trackers: ["security"],
     category: "前瞻技術",
     title: "企業PKI面臨三重壓力：憑證效期縮短、PQC轉型與FIPS 140-3升級",
@@ -1319,7 +1375,7 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-095",
+    id: "20260824-099",
     trackers: ["security"],
     category: "前瞻技術",
     title: "雲端安全聯盟（CSA）發布PQC金鑰管理指引：企業轉型需注意效能與互通性挑戰",
@@ -1333,7 +1389,7 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-096",
+    id: "20260824-100",
     trackers: ["security"],
     category: "前瞻技術",
     title: "AI時代應用程式安全挑戰：企業應建立持續性風險評估與運行時防禦機制",
@@ -1347,7 +1403,7 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-097",
+    id: "20260824-101",
     trackers: ["security"],
     category: "前瞻技術",
     title: "Anthropic擴大 Mythos 5 存取權，透過專用介面協助資安防禦",
@@ -1361,7 +1417,7 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-098",
+    id: "20260824-102",
     trackers: ["eu_cra"],
     category: "亞太對應",
     title: "Stilleon聯盟完成針對印尼教職人員的21週深度訓練：強化國家資安教育自立能力",
@@ -1375,7 +1431,7 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-099",
+    id: "20260824-103",
     trackers: ["eu_cra"],
     category: "亞太對應",
     title: "KISA新設「後量子加密專業課程」，協助公部門與企業準備PQC轉型",
@@ -1389,7 +1445,7 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-100",
+    id: "20260824-104",
     trackers: ["os"],
     category: "重點關注",
     title: "Rivian 車載系統將整合 Waze 即時警報功能，提升駕駛安全與導航體驗",
@@ -1403,7 +1459,7 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-101",
+    id: "20260824-105",
     trackers: ["os"],
     category: "重點關注",
     title: "GrapheneOS 宣布支援摩托羅拉 Razr Fold 與 Ultra：擴大折疊機型與 Pixel 系列的隱私作業系統支持",
@@ -1417,7 +1473,7 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-102",
+    id: "20260824-106",
     trackers: ["os"],
     category: "重點關注",
     title: "Epic Games 指控 Apple 試圖封鎖關鍵數據，阻礙外部購買佣金率透明化審判",
@@ -1431,7 +1487,7 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-103",
+    id: "20260824-107",
     trackers: ["os"],
     category: "重點關注",
     title: "Apple TV 九月內容預告：聚焦新劇《Mayday》與《Slow Horses》等影視作品",
@@ -1445,7 +1501,7 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-104",
+    id: "20260824-108",
     trackers: ["os"],
     category: "重點關注",
     title: "無新聞內容，無法撰寫資安報導",
@@ -1459,7 +1515,7 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-105",
+    id: "20260824-109",
     trackers: ["os"],
     category: "重點關注",
     title: "AI 資料中心用電需求激增，推動固態變壓器技術取代傳統電力基礎設施",
@@ -1473,7 +1529,7 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-106",
+    id: "20260824-110",
     trackers: ["os"],
     category: "重點關注",
     title: "聯邦政府加強調查 General Motors 車輛煞車故障：eBoost 系統可能導致危險的制動失效",
@@ -1487,7 +1543,7 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-107",
+    id: "20260824-111",
     trackers: ["os"],
     category: "重點關注",
     title: "阿里拍賣（AliExpress）被揭露利用無聲聲音訊號進行訪客指紋識別追蹤",
@@ -1501,7 +1557,7 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-108",
+    id: "20260824-112",
     trackers: ["os"],
     category: "重點關注",
     title: "台灣起訴涉嫌協助走私高階 AI 伺服器至中國的集團，涉及 Nvidia 與 Supermicro 人員",
@@ -1515,7 +1571,7 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-109",
+    id: "20260824-113",
     trackers: ["os"],
     category: "重點關注",
     title: "儘管面臨政策阻力，美國清潔能源市場仍迎來紀錄級增長",
@@ -1529,7 +1585,7 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-110",
+    id: "20260824-114",
     trackers: ["os"],
     category: "重點關注",
     title: "WebView2 運行時將調整為兩週發布週期，提升安全修補與平台功能更新頻率",
@@ -1543,7 +1599,7 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-111",
+    id: "20260824-115",
     trackers: ["os"],
     category: "重點關注",
     title: "量子電腦威脅日益逼近：專家呼籲提前規劃後量子加密遷移",
@@ -1557,7 +1613,7 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-112",
+    id: "20260824-116",
     trackers: ["os"],
     category: "重點關注",
     title: "Emacs 編輯器發布版本 31.1，新增功能包括移除 dumper、Lisp 目錄與選單優化",
@@ -1571,7 +1627,7 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-113",
+    id: "20260824-117",
     trackers: ["os"],
     category: "重點關注",
     title: "Mozilla 宣布在 Firefox 157 中預設支援 JPEG-XL，加速網頁圖像格式轉型",
@@ -1585,7 +1641,7 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-114",
+    id: "20260824-118",
     trackers: ["os"],
     category: "重點關注",
     title: "GNU Emacs 31.1 版本發布：預設啟用終端機滑鼠控制，並新增新用戶主題與功能",
@@ -1599,7 +1655,7 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-115",
+    id: "20260824-119",
     trackers: ["os"],
     category: "重點關注",
     title: "CodeWeavers 發布 VKD3D 2.1，強化 Vulkan API 對 Direct3D 12 的支援",
@@ -1613,7 +1669,7 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-116",
+    id: "20260824-120",
     trackers: ["os"],
     category: "重點關注",
     title: "Intel 提出 DRM Fabric 提案：打造跨供應商、通用型 AI 加速器互連拓撲基礎設施",
@@ -1627,7 +1683,7 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-117",
+    id: "20260824-121",
     trackers: ["os"],
     category: "重點關注",
     title: "Linux 7.3 新增支援多項 RISC-V ISA 擴展，強化系統底層功能",
@@ -1641,7 +1697,7 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-118",
+    id: "20260824-122",
     trackers: ["os"],
     category: "重點關注",
     title: "Eigen Labs 推出 Darkbloom：利用閒置 Apple Silicon Mac 運算資源提供 AI 推論服務",
@@ -1655,7 +1711,7 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-119",
+    id: "20260824-123",
     trackers: ["os"],
     category: "重點關注",
     title: "疑似伊朗網路攻擊癱瘓英國小型發電廠，並與美國水務設施入侵事件形成連動",
@@ -1669,7 +1725,7 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-120",
+    id: "20260824-124",
     trackers: ["os"],
     category: "重點關注",
     title: "Nvidia結合Groq 3 LPU，LPX架構展現高推理效能：Gemma 4 31B 模型達 3,400 tok/s",
@@ -1683,7 +1739,7 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-121",
+    id: "20260824-125",
     trackers: ["os"],
     category: "重點關注",
     title: "中國要求特斯拉等車廠召回車輛：隱藏式門把設計引發安全疑慮",
@@ -1697,7 +1753,7 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-122",
+    id: "20260824-126",
     trackers: ["os"],
     category: "重點關注",
     title: "Oracle Exadata Database@AWS服務上線：分析其優勢、成本結構與潛在陷阱",
@@ -1711,7 +1767,7 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-123",
+    id: "20260824-127",
     trackers: ["os"],
     category: "重點關注",
     title: "ReliaQuest遭駭客ShinyHunters攻擊，公司證實身份資訊外洩但稱防護機制成功阻止系統存取",
@@ -1725,7 +1781,7 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-124",
+    id: "20260824-128",
     trackers: ["os"],
     category: "重點關注",
     title: "前微軟工程師發布跨平台進階 Task Manager，挑戰原生作業系統監控工具",
@@ -1739,7 +1795,7 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-125",
+    id: "20260824-129",
     trackers: ["os"],
     category: "重點關注",
     title: "開發者揭露：Alibaba被指利用WebAudio和多點藍牙音訊進行瀏覽器指紋識別追蹤",
@@ -1753,7 +1809,7 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-126",
+    id: "20260824-130",
     trackers: ["os"],
     category: "重點關注",
     title: "美國資料中心用水量暴增：AI 需求推升水資源壓力",
@@ -1767,7 +1823,7 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-127",
+    id: "20260824-131",
     trackers: ["os"],
     category: "重點關注",
     title: "投資巨頭 Apollo 遭「社工攻擊」外洩個人資料，包含 SSN 等敏感資訊",
@@ -1781,7 +1837,7 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-128",
+    id: "20260824-132",
     trackers: ["os"],
     category: "重點關注",
     title: "AI 晶片趨勢轉向客製化硬體，Cerebras 新一代架構提升效能與模組化",
@@ -1795,7 +1851,7 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-129",
+    id: "20260824-133",
     trackers: ["os"],
     category: "重點關注",
     title: "Canonical 與英國大學合作，啟動 AI 專案將大型 C 程式碼庫轉譯為安全 Rust",
@@ -1809,7 +1865,7 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-130",
+    id: "20260824-134",
     trackers: ["os"],
     category: "重點關注",
     title: "中國太空中華網宣布取消「嫦娥七號」月球任務，原定探測南極冰層",
@@ -1823,7 +1879,7 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-131",
+    id: "20260824-135",
     trackers: ["os"],
     category: "重點關注",
     title: "微軟洩漏「Aion」系統：跨越 Windows 11 的下一代 Agent OS 概念",
@@ -1837,7 +1893,7 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-132",
+    id: "20260824-136",
     trackers: ["eu_cra"],
     category: "產業動態",
     title: "美國國會要求調查 CISA 大幅裁員對國家關鍵基礎設施安全帶來的風險",
@@ -1851,8 +1907,8 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-133",
-    trackers: ["eu_cra", "security"],
+    id: "20260824-137",
+    trackers: ["security"],
     category: "產業動態",
     title: "警惕！新型惡意程式鎖定車用頭部單元(AVN)韌體，竊取設備資訊並建立網路殭屍群",
     summary: "安全公司 Kaspersky 揭露一宗針對汽車頭部單元（AVN）韌體的全新惡意軟體感染案例。該惡意程式透過利用正常系統應用「TWCore」（com.tw.core）的更新通道，植入名為「JarService」的 Dropper，成功規避偵測。\n\n此類攻擊將汽車電子設備作為目標，竊取包括螢幕解析度、設備型號、Wi-Fi資訊和 MAC 位址等詳細硬體識別資訊。更嚴重的是，攻擊者還在感染的車輛設備上安裝了「zhima」反向代理模組，將其用作住宅級代理殭屍網路（proxy botnet）。\n\n惡意軟體會在背景隱藏，每 90 分鐘與 C2 伺服器通訊，並執行包括不必要的廣告展示、未經授權的點擊詐騙和下載額外模組等九種遠端控制指令。專家警告，即使在法律執法機構清理殭屍網路後，針對電子設備平台的威脅仍不斷演進，強調了車聯網安全防護措施的迫切性。",
@@ -1865,7 +1921,7 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-134",
+    id: "20260824-138",
     trackers: ["eu_cra"],
     category: "產業動態",
     title: "中國駭客結合 DeepSeek 與 Hermes Agent 進行自動化攻擊，成功竊取資安日誌與密鑰",
@@ -1879,8 +1935,8 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-135",
-    trackers: ["eu_cra", "os", "security"],
+    id: "20260824-139",
+    trackers: ["os", "security"],
     category: "產業動態",
     title: "警惕假安全通知：惡意App利用偽裝閱讀器竊取設備資訊並遠端控制",
     summary: "누리랩의 MINOSS IGNITE 센터（NuriLab）偵測並分析了一起釣魚攻擊，該攻擊冒充國民健康保險公團（국민건강보험공단），誘導用戶安裝惡意Android應用程式（APK）。攻擊者製作了模仿國民健康保險公團安全公告頁面的假網站，並透過要求使用者為了閱覽安全文件而額外安裝一個檢視器App的方式來誘騙惡意應用程式的安裝。此惡意應用程式是一個偽裝成正常PDF閱讀器的投遞程式（Dropper），在執行時使用動態DEX載入技術（Dynamic DEX Loading）追加下載隱藏代碼。透過此方式，它能與C2伺服器進行通訊，並收集包括設備唯一識別號碼（IMEI）、國際行動用戶識別號碼（IMSI）、電話號碼等敏感的裝置資訊；此外，還能夠執行遠端指令，並藉由濫用Android無障礙權限來監控螢幕和擷取輸入資料。特別值得注意的是，此攻擊被設計成僅在特定條件下——例如三星設備、韓文環境以及ARM CPU等——才啟用，展現了規避分析環境的高階特徵。NuriLab警告稱，這類釣魚攻擊已從單純的個人資訊竊取進化至遠端控制階段，並強調建立專業的威脅情報追蹤與應對體系的重要性。",
@@ -1893,8 +1949,8 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-136",
-    trackers: ["eu_cra", "security"],
+    id: "20260824-140",
+    trackers: ["security"],
     category: "產業動態",
     title: "大型投資機構 Apollo Global Management 遭雲端入侵，敏感個人資料及社會安全碼外洩",
     summary: "美國全球大型替代投資管理公司 Apollo Global Management 正式宣布其雲端平台發生資安事件。駭客利用社工手法於當地時間 7 月 6 日至 10 日期間非法入侵系統。本次資料外洩的內容包括姓名、出生日期、住址、聯絡方式，以及極為關鍵的社會安全碼（SSN）等核心身份識別資訊。資安專家警告，這些組合數據可能導致嚴重的身份盜用犯罪，例如申請新貸款或開立帳戶。特別是結合地址和工作資訊進行的高級化魚叉式網路釣魚訊息，極有可能進一步竊取受害者的多因素驗證（MFA）代碼。Apollo 方面表示，截至目前尚未確認資料在暗網散播或被用於實際詐騙的情形。公司已向司法當局報案並委託外部數位鑑識機構進行調查，同時為受害者提供兩年免費信用監控服務。業界指出，此事件凸顯了身份安全流程的漏洞，強調導入具備魚叉式防禦能力的 MFA 措施刻不容緩。",
@@ -1907,7 +1963,7 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-137",
+    id: "20260824-141",
     trackers: ["eu_cra"],
     category: "產業動態",
     title: "卡斯柏氣（Kaspersky）發布「Partnerverse」數位平台，強化全球合作生態系",
@@ -1921,7 +1977,7 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-138",
+    id: "20260824-142",
     trackers: ["eu_cra"],
     category: "產業動態",
     title: "Hansak，透過安全解決方案產品線多元化成功實現第二季轉虧為盈",
@@ -1935,7 +1991,7 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-139",
+    id: "20260824-143",
     trackers: ["eu_cra"],
     category: "產業動態",
     title: "KT加速IT現代化：推動「Next IT」戰略，打造AI原生平台與雲端基礎設施",
@@ -1949,7 +2005,7 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-140",
+    id: "20260824-144",
     trackers: ["eu_cra"],
     category: "產業動態",
     title: "엔키화이트햇，在秘魯大學為當地專家提供實戰駭客訓練平台「OFFen CAMP」",
@@ -1963,7 +2019,7 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-141",
+    id: "20260824-145",
     trackers: ["eu_cra"],
     category: "產業動態",
     title: "쿠도커뮤니케이션展示：在仁川港國家重要設施的防空與整合管制系統",
@@ -1977,7 +2033,7 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-142",
+    id: "20260824-146",
     trackers: ["eu_cra"],
     category: "產業動態",
     title: "SK쉴더斯與엘림넷簽署合作備忘錄，強化醫療機構個人資料及資安服務",
@@ -1991,8 +2047,8 @@ window.TRACKER_DAYS["2026-08-24"] = [
     ]
   },
   {
-    id: "20260824-143",
-    trackers: ["eu_cra", "security"],
+    id: "20260824-147",
+    trackers: ["security"],
     category: "產業動態",
     title: "LG유플러스與HackerOne合作，啟動全球Bug Bounty計畫強化資安防護",
     summary: "為應對AI高度發展帶來的跨國邊界安全威脅，LG유플러스宣布與全球最大的Bug Bounty平台HackerOne建立合作夥伴關係，正式啟動全球漏洞賞金計畫。此計畫旨在透過全球白帽駭客社群，主動發掘國內資安驗證體系難以發現的潛在漏洞。本次活動涵蓋LG유플러스的行動、網際網路及企業服務等所有業務領域。Bug Bounty制度是提供獎勵給在公司或IT基礎設施中發現安全漏洞的白帽駭客。透過模擬真實攻擊環境，企業能及早發掘並修補漏洞，建立更強化的安全防護體系。LG유플러스此前已與KISA共同營運國內計畫；此次引入HackerOne後，將結合全球頂尖白帽駭客資源，目標是擴大資安視野，找出管理上的盲點和未被發現的潛在風險，以符合國際標準。",

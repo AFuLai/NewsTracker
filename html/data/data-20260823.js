@@ -255,6 +255,20 @@ window.TRACKER_DAYS["2026-08-23"] = [
   },
   {
     id: "20260823-019",
+    trackers: ["os", "security"],
+    category: "漏洞與威脅情報",
+    title: "惡意軟體 ToxicPanda 進化，利用 VPN 與 ADB 權限竊取資料並繞過系統防護",
+    summary: "安全公司 Zimperium 分析發現，名為 ToxicPanda 的 Android 惡意軟體已升級至 2.0 版本。此版本擴大了攻擊範圍，支援 349 個應用程式和 167 個遠端指令，目標涵蓋銀行、金融及加密貨幣等領域。\n\n該惡意軟體利用請求 VPN 服務權限來建立本地介面，從而攔截網路流量，特別是針對 Google Play 和 Google Play Services 的通訊。此外，它還會要求 Accessibility Service 權限，並自動濫用 Android Debug Bridge (ADB) 來取得 Shell 層級的存取權。\n\n透過這些高權限操作，ToxicPanda 能夠繞過標準的 Android 執行時同意提示，實施持久性機制（如『autoBoot』指令），並竊取設備 PIN、解鎖圖案和密碼。攻擊者甚至能使用假系統更新畫面來隱藏惡意活動。\n\n修補建議方面，用戶應提高警覺，留意來自未知來源的應用程式權限請求，特別是 VPN 或 Accessibility Service 相關的權限；同時，安全廠商需持續監測和修補 Android OS 在高權限操作（如 ADB）上的漏洞。",
+    tags: ["ToxicPanda", "Android Malware", "VPN Permissions", "ADB", "Accessibility Service", "Zimperium"],
+    title_en: "Malware ToxicPanda Evolves, Stealing Data and Bypassing Defenses Using VPN and ADB Permissions",
+    summary_en: "Analysis by security firm Zimperium reveals that the Android malware named ToxicPanda has upgraded to version 2.0. This version expands the attack surface, supporting 349 applications and 167 remote commands, targeting sectors including banking, finance, and cryptocurrency.\n\nThe malware utilizes the request for VPN service permissions to establish a local interface, thereby intercepting network traffic, particularly communications related to Google Play and Google Play Services. Furthermore, it requests Accessibility Service permissions and automatically abuses the Android Debug Bridge (ADB) to gain shell-level access.\n\nThrough these high-privilege operations, ToxicPanda can bypass standard Android runtime consent prompts, implement persistence mechanisms (such as the 'autoBoot' command), and steal device PINs, unlock patterns, and passwords. Attackers can even use fake system update screens to conceal malicious activities.\n\nIn terms of remediation, users are advised to remain vigilant and pay attention to application permission requests from unknown sources, especially those related to VPN or Accessibility Services; simultaneously, security vendors must continuously monitor and patch vulnerabilities in the Android OS concerning high-privilege operations (such as ADB).",
+    tags_en: ["ToxicPanda", "Android Malware", "VPN Permissions", "ADB", "Accessibility Service", "Zimperium"],
+    sources: [
+      { name: "BleepingComputer", url: "https://bleepingcomputer.com/news/security/toxicpanda-android-malware-uses-vpn-permissions-to-block-google-play", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260823-020",
     trackers: ["os"],
     category: "Android",
     title: "三星傳回歸「相機條」設計：Galaxy S27 Ultra預計採用全新外觀",
@@ -268,7 +282,7 @@ window.TRACKER_DAYS["2026-08-23"] = [
     ]
   },
   {
-    id: "20260823-020",
+    id: "20260823-021",
     trackers: ["os"],
     category: "重點關注",
     title: "Google 傳出 Pixel Watch Ultra 概念，預期將參考 Fitbit Air 的設計與功能",
@@ -282,7 +296,7 @@ window.TRACKER_DAYS["2026-08-23"] = [
     ]
   },
   {
-    id: "20260823-021",
+    id: "20260823-022",
     trackers: ["os"],
     category: "重點關注",
     title: "無資安新聞內容：悼念 Steve French",
@@ -296,7 +310,7 @@ window.TRACKER_DAYS["2026-08-23"] = [
     ]
   },
   {
-    id: "20260823-022",
+    id: "20260823-023",
     trackers: ["os"],
     category: "重點關注",
     title: "ReactOS整合 Job Objects支援，邁向運行現代Windows應用程式的重要里程碑",
@@ -310,7 +324,7 @@ window.TRACKER_DAYS["2026-08-23"] = [
     ]
   },
   {
-    id: "20260823-023",
+    id: "20260823-024",
     trackers: ["os"],
     category: "重點關注",
     title: "AMD透過調整GCC編譯器中的分支誤預測成本，為Zen 5與Zen 4處理器帶來效能提升",
@@ -324,7 +338,7 @@ window.TRACKER_DAYS["2026-08-23"] = [
     ]
   },
   {
-    id: "20260823-024",
+    id: "20260823-025",
     trackers: ["os"],
     category: "重點關注",
     title: "Cursor 推出 Origin，改用物件儲存解決大規模 Git 版本控制的擴展性瓶頸",
@@ -338,7 +352,7 @@ window.TRACKER_DAYS["2026-08-23"] = [
     ]
   },
   {
-    id: "20260823-025",
+    id: "20260823-026",
     trackers: ["os"],
     category: "重點關注",
     title: "回顧歷史：揭秘早期版 Windows 娛樂套件與 Windows 95 的收藏品軼事",
@@ -352,7 +366,7 @@ window.TRACKER_DAYS["2026-08-23"] = [
     ]
   },
   {
-    id: "20260823-026",
+    id: "20260823-027",
     trackers: ["eu_cra"],
     category: "產業動態",
     title: "Wiz深度解析韓企雲端AI安全趨勢：強調Agentless掃描與可視性提升",
@@ -366,7 +380,7 @@ window.TRACKER_DAYS["2026-08-23"] = [
     ]
   },
   {
-    id: "20260823-027",
+    id: "20260823-028",
     trackers: ["eu_cra"],
     category: "產業動態",
     title: "前NSA國長폴 나카소네成立「Nakasone Group」，將國家級資安戰略推向私人市場",
@@ -380,7 +394,7 @@ window.TRACKER_DAYS["2026-08-23"] = [
     ]
   },
   {
-    id: "20260823-028",
+    id: "20260823-029",
     trackers: ["eu_cra"],
     category: "產業動態",
     title: "疑似伊朗背景的網路攻擊導致英國發電廠停機，國家基礎設施面臨威脅",
@@ -394,7 +408,7 @@ window.TRACKER_DAYS["2026-08-23"] = [
     ]
   },
   {
-    id: "20260823-029",
+    id: "20260823-030",
     trackers: ["eu_cra"],
     category: "產業動態",
     title: "全球物理安全巨頭 Genetec 闡述 AI 與混合 SaaS 戰略，推動大型企業數位轉型",
