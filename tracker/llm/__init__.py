@@ -33,6 +33,12 @@ GEMINI_MODEL = os.environ.get("TRACKER_GEMINI_MODEL", "Flash")
 # falls back to Ollama quickly instead of stalling the run; Flash answers in ~10-30s.
 GEMINI_TIMEOUT = float(os.environ.get("TRACKER_GEMINI_TIMEOUT", "45"))
 
+# WP9: local llama.cpp generation server (OpenAI-compatible, 8083). The rollout
+# is a deployment switch (TRACKER_LLM_BACKEND), not a code flag day: the default
+# backend is unchanged until WP10 is accepted. Bind is localhost, no auth — the
+# server must not leave the box (research 20260828-llamacpp-server.md §5).
+LLAMACPP_URL = os.environ.get("TRACKER_LLAMACPP_URL", "http://127.0.0.1:8083")
+
 # Per-process backend telemetry; the orchestrator reads this for the run report.
 #   schema_miss    — WP1: the model returned a value outside the enum the schema
 #                    pinned and _coerce_category had to rescue it. Under a
@@ -46,8 +52,15 @@ GEMINI_TIMEOUT = float(os.environ.get("TRACKER_GEMINI_TIMEOUT", "45"))
 #                    ollama endpoint and was retried on the next one
 #                    (tracker/ollama_hosts.py). Non-zero means a host went
 #                    away mid-run, which is survivable but worth seeing.
+#   llamacpp_ok       — WP9: a generation request was served by the local
+#                    llama.cpp server (8083). llamacpp_fallback — that server
+#                    was unreachable at the connection layer and the request
+#                    fell open to the ollama endpoint chain; non-zero means the
+#                    local generation instance went away mid-run, survivable but
+#                    worth seeing, exactly like endpoint_failover for ollama.
 STATS = {"gemini_ok": 0, "gemini_fallback": 0, "schema_miss": 0,
-         "parse_fallback": 0, "endpoint_failover": 0}
+         "parse_fallback": 0, "endpoint_failover": 0,
+         "llamacpp_ok": 0, "llamacpp_fallback": 0}
 
 # WP2 put these layers behind a thread pool. `STATS[k] += 1` is a read-modify-
 # write and drops increments under contention, which matters precisely because
@@ -136,6 +149,50 @@ def _call_gemini(prompt: str, *, timeout: float = 120.0, format_json: bool = Fal
                       model=GEMINI_MODEL, start_marker=_GEM_START, end_marker=_GEM_END)
 
 
+def _call_llamacpp(prompt: str, *, timeout: float = 120.0,
+                   system: str | None = None, format_json: bool = False,
+                   schema: dict[str, Any] | None = None) -> str:
+    """POST to the local llama-server /v1/chat/completions (WP8, port 8083).
+
+    A schema becomes an OpenAI `response_format: {"type":"json_schema",...}`,
+    which the server compiles into a decoding grammar exactly as ollama turns
+    `format` into one — so schema_miss stays structurally impossible on this
+    path too. On a *connection-level* failure the call falls open to the ollama
+    endpoint chain, mirroring the gemini→ollama path: fail-open is the whole
+    philosophy, and a generation server that is down must not stop a run. A
+    5xx or read timeout is this prompt rather than this host (as in
+    `_post_ollama`) and is left to propagate to the caller's degraded path."""
+    messages: list[dict[str, str]] = []
+    if system:
+        messages.append({"role": "system", "content": system})
+    messages.append({"role": "user", "content": prompt})
+    payload: dict[str, Any] = {
+        "messages": messages,
+        "temperature": 0.2,
+        "stream": False,
+    }
+    if schema is not None:
+        payload["response_format"] = {
+            "type": "json_schema",
+            "json_schema": {"name": "reply", "schema": schema},
+        }
+    elif format_json:
+        payload["response_format"] = {"type": "json_object"}
+    try:
+        r = httpx.post(f"{LLAMACPP_URL}/v1/chat/completions", json=payload,
+                       timeout=timeout)
+        r.raise_for_status()
+        out = r.json()["choices"][0]["message"]["content"]
+        bump("llamacpp_ok")
+        return out
+    except (httpx.ConnectError, httpx.ConnectTimeout, httpx.ReadError,
+            httpx.RemoteProtocolError) as exc:
+        bump("llamacpp_fallback")
+        _log.warning("llama.cpp gen server failed (%s) — falling back to ollama", exc)
+        return _call_ollama(prompt, timeout=timeout, system=system,
+                            format_json=format_json, schema=schema)
+
+
 def call(prompt: str, *, model: str = OLLAMA_MODEL, timeout: float = 120.0,
          system: str | None = None, format_json: bool = False,
          backend: str = "ollama", schema: dict[str, Any] | None = None) -> str:
@@ -156,12 +213,24 @@ def call(prompt: str, *, model: str = OLLAMA_MODEL, timeout: float = 120.0,
             bump("gemini_fallback")
             _log.warning("Gemini failed (%s) — falling back to Ollama", exc)
             # fall through to Ollama with the original (unmarked) prompt
+    if backend == "llamacpp":
+        return _call_llamacpp(prompt, timeout=timeout, system=system,
+                              format_json=format_json, schema=schema)
     return _call_ollama(prompt, model=model, timeout=timeout,
                         system=system, format_json=format_json, schema=schema)
 
 
 def resolve_default_backend() -> str:
-    """`gemini` if a debug Chrome is reachable, else `ollama`."""
+    """The backend a caller's `auto` resolves to.
+
+    An explicit `TRACKER_LLM_BACKEND` is the WP9 deployment switch and wins;
+    absent it the behaviour is unchanged — `gemini` if a debug Chrome is
+    reachable, else `ollama`. The default is deliberately left at that pair
+    until WP10 is accepted: turning on llamacpp is a deployment act, not a
+    code flag day."""
+    env = os.environ.get("TRACKER_LLM_BACKEND", "").strip().lower()
+    if env in ("llamacpp", "ollama", "gemini"):
+        return env
     try:
         from . import gemini
         return "gemini" if gemini.available() else "ollama"

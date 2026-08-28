@@ -131,6 +131,10 @@ class RunReport:
     summarize_backend: str = "ollama"
     translate_backend: str = "ollama"
     gemini_fallback: int = 0
+    #: WP9 — a llama.cpp generation request fell open to the ollama chain
+    #: because the local server (8083) was unreachable. Rendered next to
+    #: gemini_fallback so a "lla/lla" run that quietly ran on ollama is visible.
+    llamacpp_fallback: int = 0
     #: WP3 — per-phase wall clock, keyed by phase name. The pre-v3 report
     #: carried only the total, so "translate got slower" stayed invisible until
     #: someone re-read the DEBUG log by hand; every Phase 0/1/2 acceptance
@@ -241,6 +245,7 @@ class RunReport:
                 f"{f' zh-fix:{self.lang_repaired}' if self.lang_repaired else ''} | "
                 f"llm {self.summarize_backend[:3]}/{self.translate_backend[:3]}"
                 f"{f' fb{self.gemini_fallback}' if self.gemini_fallback else ''}"
+                f"{f' lfb{self.llamacpp_fallback}' if self.llamacpp_fallback else ''}"
                 f" x{self.llm_concurrency} | "
                 f"schema_miss {self.schema_miss} pfb {self.parse_fallback} | "
                 f"cross +{self.cross_added}/-{self.cross_removed}"
@@ -1263,7 +1268,7 @@ def _finalize(store, rep, t0, log, stats0=None):
         # session runs several pipelines in one process, so an absolute read
         # would charge this run with the previous one's misses.
         for name in ("gemini_fallback", "schema_miss", "parse_fallback",
-                     "endpoint_failover"):
+                     "endpoint_failover", "llamacpp_fallback"):
             setattr(rep, name, llm.STATS.get(name, 0) - stats0.get(name, 0))
     stats = asdict(rep)
     store.finish_run(rep.run_id, stats_json=json.dumps(stats, ensure_ascii=False),

@@ -30,10 +30,27 @@ def test_ollama_backend_does_not_touch_gemini(monkeypatch):
 
 
 def test_resolve_default_backend(monkeypatch):
+    monkeypatch.delenv("TRACKER_LLM_BACKEND", raising=False)
     monkeypatch.setattr(gemini, "available", lambda: True)
     assert llm.resolve_default_backend() == "gemini"
     monkeypatch.setattr(gemini, "available", lambda: False)
     assert llm.resolve_default_backend() == "ollama"
+
+
+def test_llamacpp_backend_routes_and_skips_ollama(monkeypatch):
+    monkeypatch.setattr(llm, "_call_llamacpp", lambda *a, **k: "LLAMACPP-OUT")
+    monkeypatch.setattr(llm, "_call_ollama",
+                        lambda *a, **k: (_ for _ in ()).throw(AssertionError("ollama called")))
+    assert llm.call("hi", backend="llamacpp") == "LLAMACPP-OUT"
+
+
+def test_env_switch_selects_llamacpp(monkeypatch):
+    """TRACKER_LLM_BACKEND is the WP9 deployment switch and wins over the
+    Chrome probe; absent it, resolution is unchanged."""
+    monkeypatch.setenv("TRACKER_LLM_BACKEND", "llamacpp")
+    monkeypatch.setattr(gemini, "available",
+                        lambda: (_ for _ in ()).throw(AssertionError("probed despite env")))
+    assert llm.resolve_default_backend() == "llamacpp"
 
 
 def test_gemini_prompt_wraps_markers(monkeypatch):

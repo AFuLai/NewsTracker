@@ -83,8 +83,8 @@
 - `call()` 對外簽名**只增不改**；六層與 orchestrator 不動——它們只認 `call()`。
 - 測試：`test_llm_backend.py` 擴充＋新 `test_llamacpp_adapter.py`（httpx mock：正常、schema 傳遞、
   連線失敗 fallback、STATS 計數）。
-- 驗收：`- [ ] WP9.1 pytest 全綠`
-  `- [ ] WP9.2 TRACKER_LLM_BACKEND=llamacpp 完整 run ×1：schema_miss=0、pfb=0、rev_fail=0`
+- 驗收：`- [x] WP9.1 pytest 全綠`（loop#1：473 passed，見 wp-progress）
+  `- [ ] WP9.2 TRACKER_LLM_BACKEND=llamacpp 完整 run ×1：schema_miss=0、pfb=0、rev_fail=0`（待 WP8 部署 8083）
 
 ### WP10 GBNF 字元鎖＋效能定調
 
