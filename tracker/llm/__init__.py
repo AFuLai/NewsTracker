@@ -39,9 +39,10 @@ GEMINI_TIMEOUT = float(os.environ.get("TRACKER_GEMINI_TIMEOUT", "45"))
 # server must not leave the box (research 20260828-llamacpp-server.md §5).
 LLAMACPP_URL = os.environ.get("TRACKER_LLAMACPP_URL", "http://127.0.0.1:8083")
 # n_predict cap for the /completion path. The json_schema grammar terminates a
-# JSON object on its own; this is only a runaway guard, sized well above the
-# few-hundred-token title+summary+tags replies these layers produce.
-LLAMACPP_MAX_TOKENS = int(os.environ.get("TRACKER_LLAMACPP_MAX_TOKENS", "2048"))
+# JSON object on its own; this is only a runaway guard. Kept well above the
+# few-hundred-token title+summary+tags replies but small enough to leave room
+# for a ~6000-token CJK article body inside the 8192-token slot (R-004).
+LLAMACPP_MAX_TOKENS = int(os.environ.get("TRACKER_LLAMACPP_MAX_TOKENS", "1024"))
 
 # Per-process backend telemetry; the orchestrator reads this for the run report.
 #   schema_miss    — WP1: the model returned a value outside the enum the schema

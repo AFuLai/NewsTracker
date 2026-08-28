@@ -10,6 +10,13 @@ Rule: llamacpp 生成一律走 `/completion` + `json_schema`（或 grammar），
 Promotion: 已加測試 ops/llama-server/sanity.py（gen 檢查斷言 json_schema 輸出為合法 JSON）；PLAN 修訂 R-003；WP9 adapter 待改（WP9.2 前）。
 Expires-when: 換掉此模型/模板，或改用一個不含思考通道的 template。
 
+## L-003 | 2026-08-28 | loop 4
+Symptom: llama-server /completion 對真實 summarize prompt 回 400「request (N tokens) exceeds context size (2048)」，短測試卻正常。
+Root cause: `-c 8192 -np 4` 把 ctx 平均分給 4 slot＝每 slot 2048；但 body[:6000] 字（CJK ~1 token/字）就 ~6000 token。per-slot ctx 才是每次請求的真實上限，不是 -c 總值。
+Rule: llama-server 多 slot 時，per-slot ctx（= -c / -np）必須 ≥ 管線單次請求需求（本專案 ≈8192，對齊 ollama num_ctx）。設 -c 時先乘上 -np。
+Promotion: 已進 PLAN 修訂 R-004；MANIFEST flags 更新；sanity gen 檢查用短 prompt 未涵蓋此坑——WP10 若加長 prompt 的 gen sanity 可升格為測試。
+Expires-when: 改變 -np/-c 或模型 context 策略時。
+
 ## L-002 | 2026-08-28 | loop 2
 Symptom: `wsl -e bash -lc` 內含 `pkill -f "llama-b10665/llama-server"` 的指令回 exit 15（SIGTERM），伺服器沒被正確重啟。
 Root cause: `pkill -f` 比對整條 command line，而該 pattern 字串本身就在自己的 command line 裡 → 殺到自己這個 shell。

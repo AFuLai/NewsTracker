@@ -18,10 +18,15 @@ Environment=LD_LIBRARY_PATH=/opt/llama.cpp/llama-b10665
 # so steady VRAM is ~2.2 GB, not the full 5 GB — this is expected, not the old
 # ollama 42/43 shortfall. -fa on + q8_0 KV halves the KV cache. --cache-reuse
 # is omitted: unsupported with a quantized-KV flash-attention context.
+# -c 16384 -np 2 => 8192 tokens PER SLOT: the summarize/translate layers send
+# article bodies up to 6000 chars (CJK ~1 token/char, so ~6000 tokens) and need
+# the same per-request context ollama gives them (num_ctx 8192). The PLAN draft's
+# -c 8192 -np 4 gave only 2048/slot and 400'd on real bodies (R-004). WP10 may
+# revisit -np for throughput once VRAM headroom under load is measured.
 # 127.0.0.1 only — this endpoint has no auth and must not leave the box.
 ExecStart=/opt/llama.cpp/llama-b10665/llama-server \
   --model /opt/llama.cpp/models/google_gemma-4-E4B-it-Q4_K_M.gguf \
-  -ngl 99 -fa on -ctk q8_0 -ctv q8_0 -c 8192 -np 4 --jinja \
+  -ngl 99 -fa on -ctk q8_0 -ctv q8_0 -c 16384 -np 2 --jinja \
   --host 127.0.0.1 --port 8083
 Restart=always
 RestartSec=5

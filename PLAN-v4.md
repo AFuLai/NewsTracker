@@ -84,7 +84,7 @@
 - 測試：`test_llm_backend.py` 擴充＋新 `test_llamacpp_adapter.py`（httpx mock：正常、schema 傳遞、
   連線失敗 fallback、STATS 計數）。
 - 驗收：`- [x] WP9.1 pytest 全綠`（loop#1：473 passed，見 wp-progress）
-  `- [ ] WP9.2 TRACKER_LLM_BACKEND=llamacpp 完整 run ×1：schema_miss=0、pfb=0、rev_fail=0`（loop#3：adapter 已改走 /completion+json_schema〔R-003〕，經 call() 實測端到端合法 JSON、schema_miss=0；完整 run 待執行）
+  `- [ ] WP9.2 TRACKER_LLM_BACKEND=llamacpp 完整 run ×1：schema_miss=0、pfb=0、rev_fail=0`（loop#4：**有界驗證 PASS**——8 篇真實文章 body 經 llamacpp 走 L2+L3+L5/L6，schema_miss=0/pfb=0/rev_fail=0/llamacpp_fallback=0；後端專屬指標全數達標。**完整 fetch→write run** 仍待真實站更新時執行〔fetch/write 與後端無關〕）
 
 ### WP10 GBNF 字元鎖＋效能定調
 
@@ -244,5 +244,7 @@ Expires-when: <此條失效條件>
 R-001 | 2026-08-28 | loop#2 | WP8 生成端改「從原碼編 llama.cpp CUDA」，非下載 release binary。 | llama.cpp **無 Linux CUDA release**（只有 Windows win-cuda；Linux 為 CPU/Vulkan/ROCm/SYCL），本 WSL2 機 Vulkan 只有軟體 ICD（lvp=llvmpipe），唯一真 GPU 路徑是 CUDA→須自編。使用者已裁決此路徑。build：tag b10665、commit ca3d5a3、`-DGGML_CUDA=ON -DCMAKE_CUDA_HOST_COMPILER=g++-13 -DCMAKE_CUDA_ARCHITECTURES=89`（預設 gcc 15.2 對 nvcc 12.4 過新）。
 
 R-002 | 2026-08-28 | loop#2 | WP8.1「全層 GPU（含 output layer）」的驗收語義：以「所有 repeating layers 上 GPU＋GPU 吞吐達標」認定，而非 VRAM=全模型大小。 | Gemma **E4B 依架構把 token-embedding/PLE 留 CPU**，故 -ngl 99 下 VRAM 僅 ~2.2GB（非 5GB），但 76% GPU util、29-38 tok/s——這**不是** ollama 42/43 那種效能缺陷。此 build 不印 `offloaded N/N` 行，改以吞吐率為 offload 佐證（sanity 檢查 >20 tok/s）。VRAM 峰值與再推導指令記入 MANIFEST。
+
+R-004 | 2026-08-28 | loop#4 | llama-gen 啟動參數 `-c 8192 -np 4` → **`-c 16384 -np 2`**（每 slot 8192 token）；adapter LLAMACPP_MAX_TOKENS default 2048→1024。 | `-c 8192 -np 4` 每 slot 僅 2048 token，summarize/translate 送 body[:6000] 字（CJK ~1 token/字 ≈ 6000 token）直接 400「exceeds context size (2048)」。8192/slot 對齊 ollama num_ctx。VRAM 僅升至 ~3.4GB（q8_0 KV），headroom ~4.6GB。-np 由 4 降 2 換取正確性；WP10 量測負載後再議吞吐。此坑由 WP9.2 有界驗證抓到。
 
 R-003 | 2026-08-28 | loop#2 | 生成管線走 `/completion` + `json_schema`（編為 grammar），**不走** `/v1/chat/completions`。WP9 adapter 需於 WP9.2 前改此路徑。 | bartowski gemma-4-E4B 的 chat template 注入 `<|channel>thought` 思考通道：`/v1/chat/completions` 下模型把整個 token 預算耗在思考、`content` 空（finish_reason:length），`--reasoning off`／`enable_thinking:false` 均無法抑制。`/completion`+grammar 從第一個 token 就約束，產出乾淨 JSON。詳見 MANIFEST「Thinking-channel finding」。

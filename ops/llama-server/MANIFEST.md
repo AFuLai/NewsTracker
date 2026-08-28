@@ -102,9 +102,14 @@ Re-derive: `sha256sum /opt/llama.cpp/models/google_gemma-4-E4B-it-Q4_K_M.gguf`
 (HF LFS oid = sha256; verified before and after download).
 
 **Flags** (systemd `llama-gen.service`, port 8083, `127.0.0.1` only):
-`-ngl 99 -fa on -ctk q8_0 -ctv q8_0 -c 8192 -np 4 --jinja`. `--cache-reuse`
-from the PLAN draft is dropped — "cache_reuse is not supported by this context"
-with a quantized-KV flash-attention context.
+`-ngl 99 -fa on -ctk q8_0 -ctv q8_0 -c 16384 -np 2 --jinja`. Two changes from
+the PLAN draft: `--cache-reuse` is dropped ("cache_reuse is not supported by
+this context" with a quantized-KV flash-attention context); and `-c 8192 -np 4`
+became **`-c 16384 -np 2`** so each of the 2 slots gets 8192 tokens (R-004) —
+the draft's 4 slots gave only 2048/slot and 400'd on real article bodies, which
+run to 6000 chars (CJK ~1 token/char). 8192/slot matches ollama's `num_ctx`.
+WP10 may revisit `-np` for throughput once VRAM headroom under concurrent load
+is measured (steady VRAM at -c 16384 is ~3.4 GB total, ~4.6 GB free).
 
 **WP8.1 — GPU offload (VRAM).** `-ngl 99` offloads every repeating layer.
 Gemma E4B keeps its token-embedding / PLE tensors on CPU **by architecture**, so
