@@ -1,0 +1,30 @@
+[Unit]
+# gemma-4-E4B Q4_K_M generation server for WP8/WP9 (llamacpp backend).
+# Built from source with CUDA (b10665) — the release ubuntu-x64 tarball is
+# CPU-only and llama.cpp ships no Linux CUDA binary, so the b10423 embed/rerank
+# build cannot serve GPU generation. Details: ops/llama-server/MANIFEST.md.
+Description=llama-server gemma-4-E4B Q4_K_M generation (tracker WP8), CUDA
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=exec
+User=afu
+Group=afu
+# The CUDA build's own libs (libggml-cuda.so etc.) live beside the binary.
+Environment=LD_LIBRARY_PATH=/opt/llama.cpp/llama-b10665
+# -ngl 99 offloads every repeating layer to the GPU (~38 tok/s on the RTX 2000
+# Ada). Gemma E4B keeps its token-embedding/PLE tensors on CPU by architecture,
+# so steady VRAM is ~2.2 GB, not the full 5 GB — this is expected, not the old
+# ollama 42/43 shortfall. -fa on + q8_0 KV halves the KV cache. --cache-reuse
+# is omitted: unsupported with a quantized-KV flash-attention context.
+# 127.0.0.1 only — this endpoint has no auth and must not leave the box.
+ExecStart=/opt/llama.cpp/llama-b10665/llama-server \
+  --model /opt/llama.cpp/models/google_gemma-4-E4B-it-Q4_K_M.gguf \
+  -ngl 99 -fa on -ctk q8_0 -ctv q8_0 -c 8192 -np 4 --jinja \
+  --host 127.0.0.1 --port 8083
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

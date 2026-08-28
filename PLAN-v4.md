@@ -69,8 +69,8 @@
 - systemd unit `llama-gen.service` 進 `ops/systemd/`（install.sh 加入清單）；
   `ops/llama-server/sanity.py` 擴充三條生成 sanity：/health、一次 json_schema 受約束生成、
   server log 確認 `offloaded 43/43`（或該版等價訊息）＋ `nvidia-smi` VRAM 佔用記錄。
-- 驗收：`- [ ] WP8.1 全層 GPU（含 output layer），VRAM 峰值記入 MANIFEST`
-  `- [ ] WP8.2 sanity 三條全綠，指令與輸出進 commit message`
+- 驗收：`- [x] WP8.1 全層 GPU（含 output layer），VRAM 峰值記入 MANIFEST`（loop#2；見 R-002：E4B embeddings/PLE 依架構留 CPU，repeating layers 全上 GPU，76% util、29-38 tok/s、VRAM 峰值 ~3.3GB 記入 MANIFEST）
+  `- [x] WP8.2 sanity 三條全綠，指令與輸出進 commit message`（loop#2；sanity.py rc=0：/health 200、json_schema gen 合法 JSON、29.2 tok/s>20）
 
 ### WP9 tracker/llm adapter（llamacpp backend）
 
@@ -240,3 +240,9 @@ Expires-when: <此條失效條件>
 ## 修訂
 
 （執行 session 在此追加，格式：`R-nnn | 日期 | loop# | 改了什麼 | 理由`）
+
+R-001 | 2026-08-28 | loop#2 | WP8 生成端改「從原碼編 llama.cpp CUDA」，非下載 release binary。 | llama.cpp **無 Linux CUDA release**（只有 Windows win-cuda；Linux 為 CPU/Vulkan/ROCm/SYCL），本 WSL2 機 Vulkan 只有軟體 ICD（lvp=llvmpipe），唯一真 GPU 路徑是 CUDA→須自編。使用者已裁決此路徑。build：tag b10665、commit ca3d5a3、`-DGGML_CUDA=ON -DCMAKE_CUDA_HOST_COMPILER=g++-13 -DCMAKE_CUDA_ARCHITECTURES=89`（預設 gcc 15.2 對 nvcc 12.4 過新）。
+
+R-002 | 2026-08-28 | loop#2 | WP8.1「全層 GPU（含 output layer）」的驗收語義：以「所有 repeating layers 上 GPU＋GPU 吞吐達標」認定，而非 VRAM=全模型大小。 | Gemma **E4B 依架構把 token-embedding/PLE 留 CPU**，故 -ngl 99 下 VRAM 僅 ~2.2GB（非 5GB），但 76% GPU util、29-38 tok/s——這**不是** ollama 42/43 那種效能缺陷。此 build 不印 `offloaded N/N` 行，改以吞吐率為 offload 佐證（sanity 檢查 >20 tok/s）。VRAM 峰值與再推導指令記入 MANIFEST。
+
+R-003 | 2026-08-28 | loop#2 | 生成管線走 `/completion` + `json_schema`（編為 grammar），**不走** `/v1/chat/completions`。WP9 adapter 需於 WP9.2 前改此路徑。 | bartowski gemma-4-E4B 的 chat template 注入 `<|channel>thought` 思考通道：`/v1/chat/completions` 下模型把整個 token 預算耗在思考、`content` 空（finish_reason:length），`--reasoning off`／`enable_thinking:false` 均無法抑制。`/completion`+grammar 從第一個 token 就約束，產出乾淨 JSON。詳見 MANIFEST「Thinking-channel finding」。

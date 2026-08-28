@@ -74,6 +74,62 @@ Embeddings: dim 1024. cos(EN "CRA harmonised standards", ZH "網路韌性法案�
 Cross-lingual retrieval works, which is required — roughly half this tracker's
 sources are CJK.
 
+## Generation server (WP8, CUDA — port 8083)
+
+Added for PLAN-v4 WP8: a *third* `llama-server` serving gemma-4-E4B generation
+on the GPU, so the pipeline no longer depends on a borrowed remote ollama.
+
+**Why a source build.** llama.cpp ships **no Linux CUDA binary** (only Windows
+gets `win-cuda`); the Linux release tarballs are CPU / Vulkan / ROCm / SYCL.
+On this WSL2 box Vulkan exposes only software ICDs (`lvp`=llvmpipe), so the only
+real GPU path is CUDA, which had to be compiled from source. The b10423
+embed/rerank build stays **untouched** (G6: its `MODEL_TAG` binds the CRA
+calibration to that build).
+
+| item | value |
+|---|---|
+| llama.cpp source | git tag `b10665`, commit `ca3d5a3e10d53f7ea672cb9b6178faca3e2807bc` |
+| clone | `git clone --depth 1 --branch b10665 https://github.com/ggml-org/llama.cpp` |
+| build | `cmake -B build -DGGML_CUDA=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_CUDA_HOST_COMPILER=g++-13 -DCMAKE_CUDA_ARCHITECTURES=89 -DLLAMA_CURL=OFF` |
+| toolchain | CUDA 12.4.131 (nvcc), host gcc-13.4 (default gcc 15.2 is too new for nvcc 12.4), driver 552.22 |
+| install path | `/opt/llama.cpp/llama-b10665/` (binary + `libggml-cuda.so` etc.) |
+
+| model | file | sha256 | source |
+|---|---|---|---|
+| generation | `google_gemma-4-E4B-it-Q4_K_M.gguf` (5,405,170,144 B / 5.41 GB) | `d35a3aa7a6d47de237fd488bb6f7f3efd62908d828f85a63da0ee93acdbefe9f` | `huggingface.co/bartowski/google_gemma-4-E4B-it-GGUF` |
+
+Re-derive: `sha256sum /opt/llama.cpp/models/google_gemma-4-E4B-it-Q4_K_M.gguf`
+(HF LFS oid = sha256; verified before and after download).
+
+**Flags** (systemd `llama-gen.service`, port 8083, `127.0.0.1` only):
+`-ngl 99 -fa on -ctk q8_0 -ctv q8_0 -c 8192 -np 4 --jinja`. `--cache-reuse`
+from the PLAN draft is dropped — "cache_reuse is not supported by this context"
+with a quantized-KV flash-attention context.
+
+**WP8.1 — GPU offload (VRAM).** `-ngl 99` offloads every repeating layer.
+Gemma E4B keeps its token-embedding / PLE tensors on CPU **by architecture**, so
+steady VRAM is ~2.2 GB (3.3 GB total incl. the ~1.1 GB Windows-host baseline),
+not the full 5 GB — this is expected and is *not* the old ollama 42/43 shortfall.
+Measured 76% GPU utilisation during decode; ~4.6 GB VRAM headroom remains.
+Re-derive: `nvidia-smi --query-gpu=memory.used,utilization.gpu --format=csv` while
+generating. This build prints **no** `offloaded N/N` line, so throughput is the
+offload proxy (below).
+
+**WP8.2 — sanity (2026-08-28).** `ops/llama-server/sanity.py` extended with 3
+generation checks, all green: `/health`→200; a `json_schema`-constrained
+generation returns valid JSON (`title`+`summary`); eval throughput **29–38 tok/s**
+(prompt eval ~85–125 tok/s) — well above the >20 GPU threshold (a CPU-bound E4B
+is single digits).
+
+**Thinking-channel finding (feeds WP9 revision / WP10).** This GGUF's chat
+template injects a `<|channel>thought` reasoning phase; on `/v1/chat/completions`
+the model burns the whole token budget thinking and `content` stays empty
+(`finish_reason:length`), and `--reasoning off` / `enable_thinking:false` do not
+suppress it. The pipeline therefore drives generation through **`/completion` +
+`json_schema`** (compiled to a grammar that constrains from the first token),
+which yields clean JSON with no thinking. WP9's adapter currently posts to
+`/v1/chat/completions` and must be revised to this path before WP9.2.
+
 ## Operating
 
 ```bash

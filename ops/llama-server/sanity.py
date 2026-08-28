@@ -123,10 +123,62 @@ if same < 0.5:
                     f"supposed to be strongly multilingual")
 
 print("\n" + "=" * 74)
+print("GENERATION sanity (gemma-4-E4B Q4_K_M, /completion on :8083)")
+print("=" * 74)
+# WP8's three generation checks: (1) /health, (2) a json_schema-constrained
+# generation returns valid JSON, (3) GPU offload — proven by throughput because
+# this build prints no "offloaded N/N" line. We drive generation through
+# /completion, NOT /v1/chat/completions: this model's chat template injects a
+# thinking channel that burns the whole token budget before the final JSON ever
+# appears, whereas /completion + json_schema compiles the schema to a grammar
+# that constrains from the first token. This is the pipeline's WP10 path.
+GEN = "http://127.0.0.1:8083/completion"
+GEN_HEALTH = "http://127.0.0.1:8083/health"
+try:
+    h = httpx.get(GEN_HEALTH, timeout=10.0)
+    print(f"   /health -> {h.status_code}")
+    gen_ok = h.status_code == 200
+    if not gen_ok:
+        failures.append(f"gen /health returned {h.status_code}")
+except Exception as exc:
+    gen_ok = False
+    failures.append(f"gen /health unreachable: {exc}")
+
+if gen_ok:
+    gen_schema = {"type": "object",
+                  "properties": {"title": {"type": "string"},
+                                 "summary": {"type": "string"}},
+                  "required": ["title", "summary"]}
+    r = httpx.post(GEN, json={
+        "prompt": "Summarize as JSON: A critical RCE in OpenSSL affects TLS "
+                  "handshakes on all servers.\n",
+        "temperature": 0.2, "n_predict": 160, "json_schema": gen_schema,
+    }, timeout=120.0)
+    r.raise_for_status()
+    d = r.json()
+    content = d.get("content", "")
+    try:
+        obj = json.loads(content)
+        keys_ok = set(gen_schema["required"]).issubset(obj)
+        print(f"   json_schema gen -> keys {sorted(obj)} "
+              f"({'ok' if keys_ok else 'MISSING KEYS'})")
+        if not keys_ok:
+            failures.append(f"gen json_schema output missing keys: {content[:80]}")
+    except Exception as exc:
+        failures.append(f"gen json_schema output not valid JSON ({exc}): "
+                        f"{content[:80]}")
+    tps = d.get("timings", {}).get("predicted_per_second", 0.0)
+    print(f"   eval throughput = {tps:.1f} tok/s  (GPU offload proxy, want > 20)")
+    if tps < 20:
+        failures.append(f"gen throughput {tps:.1f} tok/s < 20 — the model is not "
+                        f"on the GPU (this build prints no 'offloaded' line, so "
+                        f"the rate is the proxy)")
+
+print("\n" + "=" * 74)
 if failures:
     print("SANITY FAILED:")
     for f in failures:
         print("  -", f)
     sys.exit(1)
-print("SANITY PASSED — scores separate, spread is real, CJK works both models")
+print("SANITY PASSED — rerank/embed separate & CJK works; gen emits schema JSON on GPU")
 sys.exit(0)

@@ -9,7 +9,7 @@
 set -euo pipefail
 
 SRC=$(cd "$(dirname "$0")" && pwd)
-UNITS="ollama.service llama-embed.service llama-rerank.service"
+UNITS="ollama.service llama-embed.service llama-rerank.service llama-gen.service"
 
 if [ "$(id -u)" -ne 0 ]; then
   echo "needs root: sudo bash $0" >&2
@@ -22,6 +22,7 @@ fi
 echo "stopping any hand-started instances..."
 pkill -x ollama 2>/dev/null || true
 pkill -f "llama.cpp/llama-b10423/llama-server" 2>/dev/null || true
+pkill -f "llama.cpp/llama-b10665/llama-server" 2>/dev/null || true
 sleep 2
 
 for u in $UNITS; do
@@ -51,4 +52,5 @@ check() {   # $1=port $2=path $3=label
 check 11434 /api/tags ollama       ollama.service
 check 8081  /health   embed        llama-embed.service
 check 8082  /health   rerank       llama-rerank.service
+check 8083  /health   gen          llama-gen.service
 exit $rc
