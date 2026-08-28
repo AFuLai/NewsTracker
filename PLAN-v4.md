@@ -84,7 +84,7 @@
 - 測試：`test_llm_backend.py` 擴充＋新 `test_llamacpp_adapter.py`（httpx mock：正常、schema 傳遞、
   連線失敗 fallback、STATS 計數）。
 - 驗收：`- [x] WP9.1 pytest 全綠`（loop#1：473 passed，見 wp-progress）
-  `- [ ] WP9.2 TRACKER_LLM_BACKEND=llamacpp 完整 run ×1：schema_miss=0、pfb=0、rev_fail=0`（待 WP8 部署 8083）
+  `- [ ] WP9.2 TRACKER_LLM_BACKEND=llamacpp 完整 run ×1：schema_miss=0、pfb=0、rev_fail=0`（loop#3：adapter 已改走 /completion+json_schema〔R-003〕，經 call() 實測端到端合法 JSON、schema_miss=0；完整 run 待執行）
 
 ### WP10 GBNF 字元鎖＋效能定調
 

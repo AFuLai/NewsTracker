@@ -1,9 +1,13 @@
 """WP9 — the local llama.cpp generation backend (_call_llamacpp).
 
-All HTTP is mocked: these assert the request shape (OpenAI chat/completions,
-json_schema response_format, temperature) and the fail-open contract (a
-connection-level failure falls through to the ollama chain; a read timeout or
-5xx does not, matching _post_ollama's "this prompt, not this host")."""
+All HTTP is mocked: these assert the request shape (llama-server /completion,
+gemma turn markers, json_schema compiled to a grammar) and the fail-open
+contract (a connection-level failure falls through to the ollama chain; a read
+timeout or 5xx does not, matching _post_ollama's "this prompt, not this host").
+
+The adapter uses /completion, NOT /v1/chat/completions: this model's chat
+template injects a thinking channel that never yields the constrained JSON
+(PLAN-v4 R-003)."""
 import httpx
 import pytest
 
@@ -21,67 +25,68 @@ class _Resp:
         return self._payload
 
 
-def _ok_payload(content="OUT"):
-    return {"choices": [{"message": {"content": content}}]}
+def _ok(content="OUT"):
+    return {"content": content}
 
 
-def test_llamacpp_success_hits_chat_completions(monkeypatch):
+def test_llamacpp_success_hits_completion(monkeypatch):
     seen = {}
 
     def fake_post(url, json=None, timeout=None):
         seen["url"] = url
         seen["json"] = json
-        return _Resp(_ok_payload('{"ok": 1}'))
+        return _Resp(_ok('{"ok": 1}'))
 
     monkeypatch.setattr(llm.httpx, "post", fake_post)
     before = llm.STATS["llamacpp_ok"]
     out = llm.call("hi", backend="llamacpp")
     assert out == '{"ok": 1}'
-    assert seen["url"].endswith("/v1/chat/completions")
+    assert seen["url"].endswith("/completion")
     assert seen["json"]["temperature"] == 0.2
-    assert seen["json"]["messages"] == [{"role": "user", "content": "hi"}]
+    # gemma turn markers wrap the prompt (no chat template on /completion)
+    assert "<start_of_turn>user\nhi<end_of_turn>" in seen["json"]["prompt"]
+    assert seen["json"]["prompt"].endswith("<start_of_turn>model\n")
     assert llm.STATS["llamacpp_ok"] == before + 1
 
 
-def test_llamacpp_passes_schema_as_response_format(monkeypatch):
+def test_llamacpp_passes_schema_as_json_schema(monkeypatch):
     seen = {}
     schema = {"type": "object", "properties": {"x": {"type": "string"}},
               "required": ["x"]}
 
     def fake_post(url, json=None, timeout=None):
         seen["json"] = json
-        return _Resp(_ok_payload('{"x": "y"}'))
+        return _Resp(_ok('{"x": "y"}'))
 
     monkeypatch.setattr(llm.httpx, "post", fake_post)
     llm.call("hi", backend="llamacpp", schema=schema)
-    rf = seen["json"]["response_format"]
-    assert rf["type"] == "json_schema"
-    assert rf["json_schema"]["schema"] == schema
+    assert seen["json"]["json_schema"] == schema
 
 
-def test_llamacpp_format_json_without_schema(monkeypatch):
+def test_llamacpp_no_schema_sends_no_grammar(monkeypatch):
     seen = {}
 
     def fake_post(url, json=None, timeout=None):
         seen["json"] = json
-        return _Resp(_ok_payload("{}"))
+        return _Resp(_ok("plain"))
 
     monkeypatch.setattr(llm.httpx, "post", fake_post)
-    llm.call("hi", backend="llamacpp", format_json=True)
-    assert seen["json"]["response_format"] == {"type": "json_object"}
+    out = llm.call("hi", backend="llamacpp", format_json=True)
+    assert out == "plain"
+    assert "json_schema" not in seen["json"]
 
 
-def test_llamacpp_prepends_system_message(monkeypatch):
+def test_llamacpp_prepends_system_into_prompt(monkeypatch):
     seen = {}
 
     def fake_post(url, json=None, timeout=None):
         seen["json"] = json
-        return _Resp(_ok_payload("OK"))
+        return _Resp(_ok("OK"))
 
     monkeypatch.setattr(llm.httpx, "post", fake_post)
     llm.call("hi", backend="llamacpp", system="be terse")
-    assert seen["json"]["messages"][0] == {"role": "system", "content": "be terse"}
-    assert seen["json"]["messages"][1] == {"role": "user", "content": "hi"}
+    p = seen["json"]["prompt"]
+    assert "be terse" in p and p.index("be terse") < p.index("hi")
 
 
 def test_llamacpp_connection_failure_falls_back_to_ollama(monkeypatch):

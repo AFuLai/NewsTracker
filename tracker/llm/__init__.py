@@ -38,6 +38,10 @@ GEMINI_TIMEOUT = float(os.environ.get("TRACKER_GEMINI_TIMEOUT", "45"))
 # backend is unchanged until WP10 is accepted. Bind is localhost, no auth — the
 # server must not leave the box (research 20260828-llamacpp-server.md §5).
 LLAMACPP_URL = os.environ.get("TRACKER_LLAMACPP_URL", "http://127.0.0.1:8083")
+# n_predict cap for the /completion path. The json_schema grammar terminates a
+# JSON object on its own; this is only a runaway guard, sized well above the
+# few-hundred-token title+summary+tags replies these layers produce.
+LLAMACPP_MAX_TOKENS = int(os.environ.get("TRACKER_LLAMACPP_MAX_TOKENS", "2048"))
 
 # Per-process backend telemetry; the orchestrator reads this for the run report.
 #   schema_miss    — WP1: the model returned a value outside the enum the schema
@@ -152,37 +156,35 @@ def _call_gemini(prompt: str, *, timeout: float = 120.0, format_json: bool = Fal
 def _call_llamacpp(prompt: str, *, timeout: float = 120.0,
                    system: str | None = None, format_json: bool = False,
                    schema: dict[str, Any] | None = None) -> str:
-    """POST to the local llama-server /v1/chat/completions (WP8, port 8083).
+    """POST to the local llama-server `/completion` (WP8, port 8083).
 
-    A schema becomes an OpenAI `response_format: {"type":"json_schema",...}`,
-    which the server compiles into a decoding grammar exactly as ollama turns
-    `format` into one — so schema_miss stays structurally impossible on this
-    path too. On a *connection-level* failure the call falls open to the ollama
-    endpoint chain, mirroring the gemini→ollama path: fail-open is the whole
-    philosophy, and a generation server that is down must not stop a run. A
-    5xx or read timeout is this prompt rather than this host (as in
-    `_post_ollama`) and is left to propagate to the caller's degraded path."""
-    messages: list[dict[str, str]] = []
-    if system:
-        messages.append({"role": "system", "content": system})
-    messages.append({"role": "user", "content": prompt})
+    Deliberately NOT `/v1/chat/completions`: this model's chat template injects
+    a `<|channel>thought` phase that burns the whole token budget before the
+    constrained JSON is ever emitted (MANIFEST "Thinking-channel finding",
+    PLAN-v4 R-003). `/completion` applies no template, so we wrap the prompt in
+    gemma's turn markers ourselves and pass the schema as `json_schema`, which
+    the server compiles to a grammar that constrains from the first token —
+    schema_miss stays structurally impossible on this path too.
+
+    On a *connection-level* failure the call falls open to the ollama endpoint
+    chain, mirroring the gemini→ollama path: fail-open is the whole philosophy,
+    and a generation server that is down must not stop a run. A 5xx or read
+    timeout is this prompt rather than this host (as in `_post_ollama`) and is
+    left to propagate to the caller's degraded path."""
+    user = f"{system}\n\n{prompt}" if system else prompt
+    text = f"<start_of_turn>user\n{user}<end_of_turn>\n<start_of_turn>model\n"
     payload: dict[str, Any] = {
-        "messages": messages,
+        "prompt": text,
         "temperature": 0.2,
-        "stream": False,
+        "n_predict": LLAMACPP_MAX_TOKENS,
+        "cache_prompt": True,
     }
     if schema is not None:
-        payload["response_format"] = {
-            "type": "json_schema",
-            "json_schema": {"name": "reply", "schema": schema},
-        }
-    elif format_json:
-        payload["response_format"] = {"type": "json_object"}
+        payload["json_schema"] = schema
     try:
-        r = httpx.post(f"{LLAMACPP_URL}/v1/chat/completions", json=payload,
-                       timeout=timeout)
+        r = httpx.post(f"{LLAMACPP_URL}/completion", json=payload, timeout=timeout)
         r.raise_for_status()
-        out = r.json()["choices"][0]["message"]["content"]
+        out = r.json().get("content", "")
         bump("llamacpp_ok")
         return out
     except (httpx.ConnectError, httpx.ConnectTimeout, httpx.ReadError,
