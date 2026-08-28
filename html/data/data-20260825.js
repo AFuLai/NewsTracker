@@ -1238,7 +1238,7 @@ window.TRACKER_DAYS["2026-08-25"] = [
   },
   {
     id: "20260825-089",
-    trackers: ["eu_cra", "os"],
+    trackers: ["os"],
     category: "開源影響",
     title: "Zimperium揭露：進化版金融惡意程式ToxicPanda 2.0擴散，利用ADB及系統權限攻擊Android設備",
     summary: "資安公司Zimperium發布報告指出，名為「ToxicPanda 2.0」的安卓金融惡意程式變種已大幅進化，並在全球範圍內擴散。該惡意軟體將目標金融與加密貨幣應用程式數量增加至349個，遠程控制指令也擴展到167個，鎖定全球多國用戶。\n\nToxicPanda 2.0的攻擊手法極為複雜：它首先要求設備內建虛擬私人網路(VPN)權限建立專用通訊網，隨後強制切斷與Google Play及Play Services的連線。此舉能從網路層面癱瘓如Play Protect等保護機制、安全更新和防毒檢測功能。\n\n接著，它竊取「可及性服務」(Accessibility Service)權限以取得系統控制權。特別值得注意的是，ToxicPanda 2.0會自動啟用Android 11的無線ADB (Wireless ADB) 功能，並攔截6位配對碼，從而獲得設備內部的Shell最高權限。攻擊者利用此權限繞過用戶的授權彈出視窗，自行授予所需權限並強制解除後台限制。\n\n此外，它還濫用「透明疊層」(Transparency Overlay)技術竊取螢幕觸控輸入，並啟動了針對140多個應用程式的PIN密碼盜取模組。為確保持久性，該惡意軟體執行'autoBoot'指令修改設備電源優化設定，防止後台強制關閉。",
@@ -1742,6 +1742,20 @@ window.TRACKER_DAYS["2026-08-25"] = [
   },
   {
     id: "20260825-125",
+    trackers: ["security"],
+    category: "供應鏈與開源安全",
+    title: "Red Hat硬化容器映像檔支援AWS Inspector和ECR掃描，強化軟體供應鏈安全",
+    summary: "為應對傳統容器基礎映像檔內不必要的套件和工具導致的漏洞警報過載，Red Hat推出了「Red Hat Hardened Images」目錄。這些映像檔僅包含應用程式運行所需的必要檔案，旨在從源頭減少攻擊面，推動組織邁向零CVE（zero-CVE）策略。為強化混合雲的深度防禦，Red Hat已將硬化映像檔的支援整合至AWS InspectorScan API和Amazon ECR Basic scanning。使用者可以在CI/CD管線中利用InspectorScan API，透過接收SBOM（軟體物料清單）並結合NVD和CVSS評分，在映像檔進入registry前進行早期掃描。同時，ECR Basic scanning則提供對已儲存映像檔的持續漏洞偵測。Red Hat Hardened Images提供多種用途的變體，包括用於生產環境的「Default」（無Shell/套件管理器）、用於建構階段的「Builder」以及針對受監管環境的「FIPS」變體，讓開發者和資安工程師都能在確保合規性的同時，提高開發效率。",
+    tags: ["Red Hat", "AWS InspectorScan API", "Amazon ECR Basic scanning", "Red Hat Hardened Images", "SBOM", "容器安全", "CVE"],
+    title_en: "Red Hat Hardened Container Images Support AWS Inspector and ECR Scanning, Strengthening Software Supply Chain Security",
+    summary_en: "To address the issue of vulnerability alert overload caused by unnecessary packages and tools in traditional container base images, Red Hat introduced the \"Red Hat Hardened Images\" directory. These images contain only the necessary files required for application execution, aiming to reduce the attack surface at the source and help organizations adopt a zero-CVE strategy. To strengthen deep defense in hybrid cloud environments, Red Hat has integrated hardened image support into the AWS Inspector Scan API and Amazon ECR Basic scanning. Users can utilize the Inspector Scan API within CI/CD pipelines to perform early scanning by receiving an SBOM (Software Bill of Materials) and combining it with NVD and CVSS scoring, before the image enters the registry. Concurrently, ECR Basic scanning provides continuous vulnerability detection for already stored images. Red Hat Hardened Images offers various use-case variants, including the \"Default\" (no Shell/package manager) for production environments, the \"Builder\" for build stages, and the \"FIPS\" variant for regulated environments, allowing developers and security engineers to enhance development efficiency while ensuring compliance.",
+    tags_en: ["Red Hat", "AWS InspectorScan API", "Amazon ECR Basic scanning", "Red Hat Hardened Images", "SBOM", "Container Security", "CVE"],
+    sources: [
+      { name: "Red Hat Security Blog", url: "https://redhat.com/en/blog/streamlining-container-security-red-hat-hardened-images-now-supported-aws-inspectorscan-api-and-ecr-basic-scanning", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260825-126",
     trackers: ["os"],
     category: "重點關注",
     title: "Google 系統更新詳情：Android 生態系持續強化開發者工具與跨裝置連動功能",
@@ -1755,7 +1769,7 @@ window.TRACKER_DAYS["2026-08-25"] = [
     ]
   },
   {
-    id: "20260825-126",
+    id: "20260825-127",
     trackers: ["os"],
     category: "重點關注",
     title: "彭博社報導：Apple 可能於九月發表 AirPods 5，預計推出標準與降噪兩款型號",
@@ -1769,7 +1783,7 @@ window.TRACKER_DAYS["2026-08-25"] = [
     ]
   },
   {
-    id: "20260825-127",
+    id: "20260825-128",
     trackers: ["os"],
     category: "重點關注",
     title: "IBM宣布新晶片，具備原生同時執行 Arm 與 IBM Z 指令的能力",
@@ -1783,7 +1797,7 @@ window.TRACKER_DAYS["2026-08-25"] = [
     ]
   },
   {
-    id: "20260825-128",
+    id: "20260825-129",
     trackers: ["os"],
     category: "重點關注",
     title: "研究揭露：Microsoft Paint 與 Photos 應用程式的 AI 圖像水印，可透過 GUID 與使用者 ID 連結追蹤",
@@ -1797,7 +1811,7 @@ window.TRACKER_DAYS["2026-08-25"] = [
     ]
   },
   {
-    id: "20260825-129",
+    id: "20260825-130",
     trackers: ["os"],
     category: "重點關注",
     title: "微軟CEO警告企業不可過度依賴單一AI模型，強調知識主權與「代工思考」風險",
@@ -1811,7 +1825,7 @@ window.TRACKER_DAYS["2026-08-25"] = [
     ]
   },
   {
-    id: "20260825-130",
+    id: "20260825-131",
     trackers: ["security"],
     category: "前瞻技術",
     title: "研究揭露：利用隱藏指令操縱 AI 郵件摘要生成誤導資訊",
@@ -1825,7 +1839,7 @@ window.TRACKER_DAYS["2026-08-25"] = [
     ]
   },
   {
-    id: "20260825-131",
+    id: "20260825-132",
     trackers: ["security"],
     category: "前瞻技術",
     title: "Elastic SOC 提升 AI 偵測準確性：透過整合歷史案例與風險資料優化 Agentic 工作流",
@@ -1839,7 +1853,7 @@ window.TRACKER_DAYS["2026-08-25"] = [
     ]
   },
   {
-    id: "20260825-132",
+    id: "20260825-133",
     trackers: ["security"],
     category: "前瞻技術",
     title: "OWASP公布2026年LLM應用十大安全風險：過度代理授權升至第三，強調AI系統操作的風險",
@@ -1853,7 +1867,7 @@ window.TRACKER_DAYS["2026-08-25"] = [
     ]
   },
   {
-    id: "20260825-133",
+    id: "20260825-134",
     trackers: ["os", "security"],
     category: "前瞻技術",
     title: "OpenAI與Anthropic AI資安評估事故引發警訊：基礎設施控制不足是核心風險",
@@ -1867,7 +1881,7 @@ window.TRACKER_DAYS["2026-08-25"] = [
     ]
   },
   {
-    id: "20260825-134",
+    id: "20260825-135",
     trackers: ["security"],
     category: "前瞻技術",
     title: "資安修補窗口正在縮小：企業應從「漏洞發現」轉向「網路控制平面」進行風險管理",
@@ -1881,7 +1895,7 @@ window.TRACKER_DAYS["2026-08-25"] = [
     ]
   },
   {
-    id: "20260825-135",
+    id: "20260825-136",
     trackers: ["os", "security"],
     category: "前瞻技術",
     title: "Linux Foundation主導制定TRACE標準，為AI代理程式提供硬體級可驗證的運行證明",
@@ -1895,7 +1909,7 @@ window.TRACKER_DAYS["2026-08-25"] = [
     ]
   },
   {
-    id: "20260825-136",
+    id: "20260825-137",
     trackers: ["security"],
     category: "前瞻技術",
     title: "AI安全公司 Alice 完成 1.4 億美元募資，強化對生成式模型漏洞與惡意攻擊的防禦能力",
@@ -1909,7 +1923,7 @@ window.TRACKER_DAYS["2026-08-25"] = [
     ]
   },
   {
-    id: "20260825-137",
+    id: "20260825-138",
     trackers: ["security"],
     category: "前瞻技術",
     title: "WhatsApp 更新帳號安全功能：支援多重 Passkey 與強化兩步驟驗證，提升用戶防護力",
@@ -1923,7 +1937,7 @@ window.TRACKER_DAYS["2026-08-25"] = [
     ]
   },
   {
-    id: "20260825-138",
+    id: "20260825-139",
     trackers: ["security"],
     category: "前瞻技術",
     title: "SecurityWeek與MTSI推出實作型課程：深入理解網路物理系統的攻擊手法",
@@ -1937,7 +1951,7 @@ window.TRACKER_DAYS["2026-08-25"] = [
     ]
   },
   {
-    id: "20260825-139",
+    id: "20260825-140",
     trackers: ["security"],
     category: "前瞻技術",
     title: "WhatsApp 升級帳號安全機制：支援多重 Passkey 與強化密碼驗證",
@@ -1951,7 +1965,7 @@ window.TRACKER_DAYS["2026-08-25"] = [
     ]
   },
   {
-    id: "20260825-140",
+    id: "20260825-141",
     trackers: ["security"],
     category: "前瞻技術",
     title: "面對 Frontier AI 威脅，資安漏洞管理與修補流程需升級至暴露管理層級",
@@ -1965,7 +1979,7 @@ window.TRACKER_DAYS["2026-08-25"] = [
     ]
   },
   {
-    id: "20260825-141",
+    id: "20260825-142",
     trackers: ["security"],
     category: "前瞻技術",
     title: "Mandiant服務介紹：提供全面的資安事件應變、風險評估與防禦強化方案",
@@ -1979,7 +1993,7 @@ window.TRACKER_DAYS["2026-08-25"] = [
     ]
   },
   {
-    id: "20260825-142",
+    id: "20260825-143",
     trackers: ["security"],
     category: "前瞻技術",
     title: "Mandiant服務介紹：提供全面的資安事件應對、風險評估與戰略防禦建議",
@@ -1993,7 +2007,7 @@ window.TRACKER_DAYS["2026-08-25"] = [
     ]
   },
   {
-    id: "20260825-143",
+    id: "20260825-144",
     trackers: ["security"],
     category: "前瞻技術",
     title: "Mandiant服務介紹：提供全面的資安事件應對、風險評估與防禦能力升級方案",
@@ -2007,7 +2021,7 @@ window.TRACKER_DAYS["2026-08-25"] = [
     ]
   },
   {
-    id: "20260825-144",
+    id: "20260825-145",
     trackers: ["eu_cra", "security"],
     category: "前瞻技術",
     title: "Mandiant服務介紹：提供全面的資安事件應變、風險評估與戰略防禦建議",
@@ -2021,7 +2035,7 @@ window.TRACKER_DAYS["2026-08-25"] = [
     ]
   },
   {
-    id: "20260825-145",
+    id: "20260825-146",
     trackers: ["security"],
     category: "前瞻技術",
     title: "Mandiant提供全面的資安服務，協助企業提升韌性與風險管理",
@@ -2035,7 +2049,7 @@ window.TRACKER_DAYS["2026-08-25"] = [
     ]
   },
   {
-    id: "20260825-146",
+    id: "20260825-147",
     trackers: ["security"],
     category: "前瞻技術",
     title: "Mandiant提供全面的資安服務，協助企業從事件應對到風險管理",
@@ -2049,7 +2063,7 @@ window.TRACKER_DAYS["2026-08-25"] = [
     ]
   },
   {
-    id: "20260825-147",
+    id: "20260825-148",
     trackers: ["os"],
     category: "重點關注",
     title: "Pebblebee推出LÔC8：專為自行車與高爾夫球桿設計的隱形追蹤器",
@@ -2063,7 +2077,7 @@ window.TRACKER_DAYS["2026-08-25"] = [
     ]
   },
   {
-    id: "20260825-148",
+    id: "20260825-149",
     trackers: ["os"],
     category: "重點關注",
     title: "Google Home 語音指令功能異常：Gemini 整合導致無法將商品新增至 Google Keep 清單",
@@ -2077,7 +2091,7 @@ window.TRACKER_DAYS["2026-08-25"] = [
     ]
   },
   {
-    id: "20260825-149",
+    id: "20260825-150",
     trackers: ["os"],
     category: "重點關注",
     title: "WhatsApp升級兩步驟驗證：從六位數PIN碼改為複雜字母數字密碼",
@@ -2091,7 +2105,7 @@ window.TRACKER_DAYS["2026-08-25"] = [
     ]
   },
   {
-    id: "20260825-150",
+    id: "20260825-151",
     trackers: ["os"],
     category: "重點關注",
     title: "高通預覽下一代 Snapdragon 旗艦晶片，搭載 Oryon CPU 達到 5 GHz",
@@ -2105,7 +2119,7 @@ window.TRACKER_DAYS["2026-08-25"] = [
     ]
   },
   {
-    id: "20260825-151",
+    id: "20260825-152",
     trackers: ["os", "security"],
     category: "重點關注",
     title: "無資安新聞內容：文章為科技雜談與生活資訊彙整，不具備可作為安全事件報導的本質。",
@@ -2119,7 +2133,7 @@ window.TRACKER_DAYS["2026-08-25"] = [
     ]
   },
   {
-    id: "20260825-152",
+    id: "20260825-153",
     trackers: ["os"],
     category: "重點關注",
     title: "Apple 發布 Mac mini M6 新廣告幕後花絮，展示創意與製作過程",
@@ -2133,7 +2147,7 @@ window.TRACKER_DAYS["2026-08-25"] = [
     ]
   },
   {
-    id: "20260825-153",
+    id: "20260825-154",
     trackers: ["os"],
     category: "重點關注",
     title: "Apple 更新 Mac mini 與 Mac Studio，首次支援 Wi-Fi 7 全功能",
@@ -2147,7 +2161,7 @@ window.TRACKER_DAYS["2026-08-25"] = [
     ]
   },
   {
-    id: "20260825-154",
+    id: "20260825-155",
     trackers: ["os"],
     category: "重點關注",
     title: "OpenAI推出ChatGPT Admin Plugin，讓管理員可直接在聊天介面內處理用戶權限與使用分析",
@@ -2161,7 +2175,7 @@ window.TRACKER_DAYS["2026-08-25"] = [
     ]
   },
   {
-    id: "20260825-155",
+    id: "20260825-156",
     trackers: ["os"],
     category: "重點關注",
     title: "WhatsApp升級帳號安全功能：支援多個Passkey與字母數字密碼，強化防盜機制",
@@ -2175,7 +2189,7 @@ window.TRACKER_DAYS["2026-08-25"] = [
     ]
   },
   {
-    id: "20260825-156",
+    id: "20260825-157",
     trackers: ["os"],
     category: "重點關注",
     title: "Anthropic 更新 Claude 功能：統一 Cowork 與 Chat 的記憶體功能，提升用戶體驗",
@@ -2189,7 +2203,7 @@ window.TRACKER_DAYS["2026-08-25"] = [
     ]
   },
   {
-    id: "20260825-157",
+    id: "20260825-158",
     trackers: ["os"],
     category: "重點關注",
     title: "Apple 推出「50 種輔助功能」指南，協助年長用戶更輕鬆使用設備",
@@ -2203,7 +2217,7 @@ window.TRACKER_DAYS["2026-08-25"] = [
     ]
   },
   {
-    id: "20260825-158",
+    id: "20260825-159",
     trackers: ["os"],
     category: "重點關注",
     title: "OpenAI CEO Sam Altman：人工智慧仍待「iPhone時刻」，需從Apple學到關鍵教訓",
@@ -2217,7 +2231,7 @@ window.TRACKER_DAYS["2026-08-25"] = [
     ]
   },
   {
-    id: "20260825-159",
+    id: "20260825-160",
     trackers: ["os"],
     category: "重點關注",
     title: "DuckDuckGo調查揭露：用戶向AI聊天機器人分享個人資訊的程度與隱私盲點",
@@ -2231,7 +2245,7 @@ window.TRACKER_DAYS["2026-08-25"] = [
     ]
   },
   {
-    id: "20260825-160",
+    id: "20260825-161",
     trackers: ["os"],
     category: "重點關注",
     title: "化學研究探討如何維持螢光顏料的發光效果，以保存藝術品色彩",
@@ -2245,7 +2259,7 @@ window.TRACKER_DAYS["2026-08-25"] = [
     ]
   },
   {
-    id: "20260825-161",
+    id: "20260825-162",
     trackers: ["os"],
     category: "重點關注",
     title: "微軟宣布 Windows on Arm 生態系統擴大，NVIDIA RTX Spark 強化 ARM 架構筆電市場",
@@ -2259,7 +2273,7 @@ window.TRACKER_DAYS["2026-08-25"] = [
     ]
   },
   {
-    id: "20260825-162",
+    id: "20260825-163",
     trackers: ["os"],
     category: "重點關注",
     title: "LLVM/Clang 23.1 發布：支援 AMD Zen 6、NVIDIA Rigel 及部分 C++26 功能，提升編譯器能力",
@@ -2273,7 +2287,7 @@ window.TRACKER_DAYS["2026-08-25"] = [
     ]
   },
   {
-    id: "20260825-163",
+    id: "20260825-164",
     trackers: ["os"],
     category: "重點關注",
     title: "AI/LLM引發的「報告洪流」：Red Hat工程師警告開源專案面臨服務阻斷攻擊",
@@ -2287,7 +2301,7 @@ window.TRACKER_DAYS["2026-08-25"] = [
     ]
   },
   {
-    id: "20260825-164",
+    id: "20260825-165",
     trackers: ["os"],
     category: "重點關注",
     title: "Intel Diamond Rapids Xeon 7 CPU深度解析：採用多晶片架構與先進封裝技術，提升HPC性能",
@@ -2301,7 +2315,7 @@ window.TRACKER_DAYS["2026-08-25"] = [
     ]
   },
   {
-    id: "20260825-165",
+    id: "20260825-166",
     trackers: ["os"],
     category: "重點關注",
     title: "Oracle仍面臨攻擊風險：即使應用所有補丁，系統也可能受害",
@@ -2315,7 +2329,7 @@ window.TRACKER_DAYS["2026-08-25"] = [
     ]
   },
   {
-    id: "20260825-166",
+    id: "20260825-167",
     trackers: ["os"],
     category: "重點關注",
     title: "OpenAI 即將推出的 Jalapeño 晶片規格曝光：具備強大推論能力",
@@ -2329,7 +2343,7 @@ window.TRACKER_DAYS["2026-08-25"] = [
     ]
   },
   {
-    id: "20260825-167",
+    id: "20260825-168",
     trackers: ["os"],
     category: "重點關注",
     title: "Sifive 推動開發伺服器採用 RISC-V 架構，加速資料中心運算轉型",
@@ -2343,7 +2357,7 @@ window.TRACKER_DAYS["2026-08-25"] = [
     ]
   },
   {
-    id: "20260825-168",
+    id: "20260825-169",
     trackers: ["os", "security"],
     category: "重點關注",
     title: "CISA宣布對完美十分漏洞（Perfect 10）的修補期限，要求在三天內完成緊急修補",
@@ -2357,7 +2371,7 @@ window.TRACKER_DAYS["2026-08-25"] = [
     ]
   },
   {
-    id: "20260825-169",
+    id: "20260825-170",
     trackers: ["os"],
     category: "重點關注",
     title: "SpaceX宣布計畫於明年將Vera Rubin NVL72機架式系統送入軌道",
@@ -2371,7 +2385,21 @@ window.TRACKER_DAYS["2026-08-25"] = [
     ]
   },
   {
-    id: "20260825-170",
+    id: "20260825-171",
+    trackers: ["security"],
+    category: "前瞻技術",
+    title: "Red Hat揭露OpenStack量子加密風險：硬編碼演算法與TLS協議限制阻礙PQC遷移",
+    summary: "OpenStack作為服務於政府、金融、電信等高安全機密組織的雲端基礎設施，其核心信任模型高度依賴加密學。然而，隨著量子電腦（CRQC）的發展，OpenStack所依賴的RSA、ECDSA、ECDH等主流加密演算法將面臨Shor's algorithm的威脅，形成「Q-day」的量子風險。Red Hat進行了系統性分析，在OpenStack生態系統的90個以上儲存庫中，發現了572個量子脆弱的加密使用案例。主要的系統性問題包括：1. **硬編碼的非對稱金鑰生成**：如Barbican和Keystone，仍強制使用RSA或ECDSA，缺乏切換到PQC演算法的配置選項。2. **TLS協議障礙**：部分元件（如oslo.messaging的RabbitMQ驅動）仍使用過時的協議配置，阻止了PQC所需的TLS 1.3協商。3. **憑證驗證繞過**：在多個組件中發現了禁用憑證驗證的配置（如InsecureSkipVerify），削弱了過渡期的防禦能力。這些問題使得OpenStack無法充分利用OpenSSL 3.5等平台升級提供的PQC保護。Red Hat呼籲開發者必須進行應用層級的修復，確保加密流程的彈性（Crypto-agility）。",
+    tags: ["OpenStack", "PQC", "量子加密", "Shor's algorithm", "TLS 1.3", "Red Hat", "加密敏捷性"],
+    title_en: "Red Hat Reveals OpenStack Quantum Encryption Risks: Hardcoded Algorithms and TLS Protocol Limitations Hinder PQC Transition",
+    summary_en: "As a cloud infrastructure serving high-security organizations such as government, finance, and telecommunications, OpenStack's core trust model heavily relies on cryptography. However, with the development of quantum computers (CRQC), mainstream cryptographic algorithms used by OpenStack, such as RSA, ECDSA, and ECDH, face the threat of Shor's algorithm, posing a 'Q-day' quantum risk. Red Hat conducted a systematic analysis and found 572 quantum-vulnerable cryptographic usage cases across more than 90 repositories in the OpenStack ecosystem. The main systemic issues include: 1. **Hardcoded Asymmetric Key Generation**: Components like Barbican and Keystone still mandate the use of RSA or ECDSA, lacking configuration options to switch to PQC algorithms. 2. **TLS Protocol Obstacles**: Certain components (such as the RabbitMQ driver in oslo.messaging) still use outdated protocol configurations, preventing the TLS 1.3 negotiation required for PQC. 3. **Certificate Validation Bypass**: Multiple components were found with configurations that disable certificate validation (e.g., InsecureSkipVerify), weakening defensive capabilities during the transition period. These issues prevent OpenStack from fully utilizing PQC protection provided by platform upgrades like OpenSSL 3.5. Red Hat urges developers to implement application-level fixes to ensure crypto-agility in cryptographic processes.",
+    tags_en: ["OpenStack", "PQC", "Quantum Cryptography", "Shor's algorithm", "TLS 1.3", "Red Hat", "Crypto-agility"],
+    sources: [
+      { name: "Red Hat Security Blog", url: "https://redhat.com/en/blog/preparing-openstack-post-quantum-era-systematic-approach-crypto-agility", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260825-172",
     trackers: ["eu_cra"],
     category: "產業動態",
     title: "美國國防部 CMMC 認證體系下，防衛產業鏈面臨「信任斷層」困境",
@@ -2385,7 +2413,7 @@ window.TRACKER_DAYS["2026-08-25"] = [
     ]
   },
   {
-    id: "20260825-171",
+    id: "20260825-173",
     trackers: ["eu_cra"],
     category: "產業動態",
     title: "파수 AI導入私有區塊鏈技術，強化動行彩券數據完整性與追蹤透明度",
@@ -2399,7 +2427,7 @@ window.TRACKER_DAYS["2026-08-25"] = [
     ]
   },
   {
-    id: "20260825-172",
+    id: "20260825-174",
     trackers: ["os", "security"],
     category: "產業動態",
     title: "報告指出中型企業成為勒索軟體攻擊新目標：供應鏈核心的資安漏洞亟待修補",
@@ -2413,7 +2441,7 @@ window.TRACKER_DAYS["2026-08-25"] = [
     ]
   },
   {
-    id: "20260825-173",
+    id: "20260825-175",
     trackers: ["eu_cra"],
     category: "產業動態",
     title: "콴델라（Quandela）推出量子隨機數生成器「Entropy」，強化韓國國防、金融等領域的加密安全基礎",
@@ -2427,7 +2455,7 @@ window.TRACKER_DAYS["2026-08-25"] = [
     ]
   },
   {
-    id: "20260825-174",
+    id: "20260825-176",
     trackers: ["os", "security"],
     category: "產業動態",
     title: "中國駭客組織 UAT-10147 結合 AI 技術，對 Windows 與 Linux 伺服器發動跨平台攻擊",
@@ -2441,7 +2469,7 @@ window.TRACKER_DAYS["2026-08-25"] = [
     ]
   },
   {
-    id: "20260825-175",
+    id: "20260825-177",
     trackers: ["eu_cra"],
     category: "產業動態",
     title: "Softcamp-DSTI 簽署合作協議，共同推動基於零信任的文檔安全解決方案",
@@ -2455,7 +2483,7 @@ window.TRACKER_DAYS["2026-08-25"] = [
     ]
   },
   {
-    id: "20260825-176",
+    id: "20260825-178",
     trackers: ["eu_cra"],
     category: "產業動態",
     title: "S-1 (에스원), AI與IoT結合的整合解決方案，引領學校設施安全管理模式轉變",
@@ -2469,7 +2497,7 @@ window.TRACKER_DAYS["2026-08-25"] = [
     ]
   },
   {
-    id: "20260825-177",
+    id: "20260825-179",
     trackers: ["security"],
     category: "產業動態",
     title: "地蘭智交安全（지란지교시큐리티）全面導入NIST標準量子抗性加密（PQC）強化資安",
@@ -2483,7 +2511,7 @@ window.TRACKER_DAYS["2026-08-25"] = [
     ]
   },
   {
-    id: "20260825-178",
+    id: "20260825-180",
     trackers: ["eu_cra", "security"],
     category: "產業動態",
     title: "警惕「메두사」型勒索軟體：從預防轉向提升企業網路韌性",
@@ -2497,7 +2525,7 @@ window.TRACKER_DAYS["2026-08-25"] = [
     ]
   },
   {
-    id: "20260825-179",
+    id: "20260825-181",
     trackers: ["eu_cra"],
     category: "產業動態",
     title: "Fortinet提出AI安全閘道(FortiAIGate)，強化Security Fabric應對LLM與生成式AI的新威脅",
@@ -2511,7 +2539,7 @@ window.TRACKER_DAYS["2026-08-25"] = [
     ]
   },
   {
-    id: "20260825-180",
+    id: "20260825-182",
     trackers: ["eu_cra"],
     category: "產業動態",
     title: "全球安全企業 Utimaco 進入韓國市場，強調 HSM 與「加密金鑰主權」應對 AI 及量子威脅",
@@ -2525,7 +2553,7 @@ window.TRACKER_DAYS["2026-08-25"] = [
     ]
   },
   {
-    id: "20260825-181",
+    id: "20260825-183",
     trackers: ["eu_cra"],
     category: "產業動態",
     title: "金融安全院指出，金融業正趨向自發強化資安能力以應對複雜威脅",
@@ -2539,8 +2567,8 @@ window.TRACKER_DAYS["2026-08-25"] = [
     ]
   },
   {
-    id: "20260825-182",
-    trackers: ["eu_cra", "os"],
+    id: "20260825-184",
+    trackers: ["os"],
     category: "產業動態",
     title: "韓國政府啟動「松坡ICT安全群聚」建設計畫，打造國家級資訊通訊安全核心區",
     summary: "科學技術情報通信部（Ministry of Science and ICT）與韓國資產管理公社（Korea Asset Management Corporation, KAMCO）於近日在首爾舉辦了「松坡ICT安全群聚1期」的開工典禮，正式啟動建設。此計畫旨在將中央電波管理所所在的區域打造為一個集結電波、資訊保護相關機構、民間辦公設施和商業設施的複合式ICT安全核心區（Meca）。\n本專案分為三個階段進行：1期建設計劃包含新建中央電波管理所大樓及電波測試設施（電波Playground），預計投入609億韓元，總建築面積約13,560㎡，目標於2029年上半年完工。未來2期將建設公共辦公設施，匯集如韓國網際網路振興院等相關機構；3期則規劃一般辦公、商業及住宅設施。\n政府方表示，此舉是讓管理國家電波資源的歷史基地重新蛻變為대한민국 ICT安全的核心樞紐。成功建成後，預計能大幅提升國家的ICT安全能力，並成為數位產業的新成長引擎。",
@@ -2553,7 +2581,7 @@ window.TRACKER_DAYS["2026-08-25"] = [
     ]
   },
   {
-    id: "20260825-183",
+    id: "20260825-185",
     trackers: ["eu_cra"],
     category: "研討活動",
     title: "AIM Intelligence舉辦「AI風險大會首爾2026」，聚焦企業如何管理AI營運責任與法律風險",
@@ -2567,7 +2595,7 @@ window.TRACKER_DAYS["2026-08-25"] = [
     ]
   },
   {
-    id: "20260825-184",
+    id: "20260825-186",
     trackers: ["eu_cra"],
     category: "研討活動",
     title: "專家警告AI潛在失控風險：呼籲建立「憲法式零信任」與認知安全架構",
@@ -2581,7 +2609,7 @@ window.TRACKER_DAYS["2026-08-25"] = [
     ]
   },
   {
-    id: "20260825-185",
+    id: "20260825-187",
     trackers: ["eu_cra"],
     category: "研討活動",
     title: "國內企業與駭客社群在DEF CON 34展示AI主題競賽，深化全球資安技術交流",
@@ -2595,7 +2623,7 @@ window.TRACKER_DAYS["2026-08-25"] = [
     ]
   },
   {
-    id: "20260825-186",
+    id: "20260825-188",
     trackers: ["eu_cra"],
     category: "研討活動",
     title: "라온시큐어（RaonSecure）舉辦「2026 SecureUp & Hackathon」，提出基於 Agentic AI 的安全與 Web3 信任結構",

@@ -493,6 +493,62 @@ window.TRACKER_DAYS["2026-08-22"] = [
   },
   {
     id: "20260822-036",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心發現 tipc 模組 Use-After-Free 漏洞：非同步清理導致記憶體釋放競爭",
+    summary: "本漏洞存在於 Linux 核心的 tipc 網路模組中，具體發生在 `tipc_node_link_down()` 函數。該函數在取得節點鎖（n->lock）之前，會先非同步地快取（cache）連結指標 `le->link`。當另一個執行緒（CPU B）透過 `delete=true` 參數呼叫 `kfree(l)` 釋放該連結時，如果另一個執行緒（CPU A）在未取得鎖的情況下讀取了這個快取指標，然後在後續的程式碼路徑（如 `tipc_link_is_establishing()` 或 `tipc_link_reset()`）中解引用（dereference）它，就會導致 Use-After-Free (UAF) 漏洞。由於連結是使用普通的 `kfree()` 釋放，而非 `kfree_rcu()`，且 UDP 承載器禁用（disable_media()）只排程了非同步的清理工作，使得正在進行的 CPU A 任務會解引用已被釋放的記憶體。此漏洞的修補建議是將對 `le->link` 的讀取操作移動到取得 `tipc_node_write_lock()` 內部，確保其與刪除路徑的 `kfree()` 操作序列化（serialized），從而避免競爭條件。",
+    tags: ["Linux 核心", "tipc", "Use-After-Free", "kfree", "網路模組", "CVE-2026-74609"],
+    title_en: "Linux Kernel discovers tipc module Use-After-Free vulnerability: Asynchronous cleanup causes memory release race",
+    summary_en: "This vulnerability exists in the tipc network module within the Linux kernel, specifically occurring in the `tipc_node_link_down()` function. This function asynchronously caches the link pointer `le->link` before acquiring the node lock (n->lock). If another thread (CPU B) calls `kfree(l)` to release this link using the `delete=true` parameter, and another thread (CPU A) reads this cached pointer without acquiring the lock, and subsequently dereferences it in later code paths (such as `tipc_link_is_establishing()` or `tipc_link_reset()`), it results in a Use-After-Free (UAF) vulnerability. Because the link is released using a standard `kfree()` rather than `kfree_rcu()`, and the UDP carrier disablement (`disable_media()`) only schedules asynchronous cleanup, the ongoing CPU A task will dereference already freed memory. The suggested patch is to move the read operation on `le->link` inside the acquisition of `tipc_node_write_lock()`, ensuring that it is serialized with the `kfree()` operation in the deletion path, thereby avoiding a race condition.",
+    tags_en: ["Linux Kernel", "tipc", "Use-After-Free", "kfree", "network module", "CVE-2026-74609"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-74609", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260822-037",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心修補：TLS 1.3 零拷貝路徑的訊息迭代器恢復漏洞 (CVE-2026-74611)",
+    summary: "本漏洞存在於 Linux 核心的 TLS 處理機制中，特別是在啟用 TLS 1.3 零拷貝（zero-copy）優化路徑時。當 `tls_decrypt_sg()` 函式為優化路徑進行資料映射時，如果解密記錄並非未填充的應用資料，系統會嘗試回退（retry）到核心 skb。然而，此過程會導致訊息迭代器（msg->msg_iter）被推進，但後續的資料複製操作（copy from the skb）卻會在呼叫方 `iovecs` 的較晚位置再次寫入解密位元組，而 `recvmsg()` 函式只回報了重試後的長度。攻擊者可以利用 TLS 協定對端，在接收端啟用 `TLS_RX_EXPECT_NO_PAD` 選項後觸發此問題。修補建議是回退迭代器，使其在嘗試零拷貝映射前，能正確地根據重試消耗的位元組數進行調整。此外，核心已新增 selftest 來驗證 `recvmsg()` 不會覆寫超出返回長度的 `iovecs` 範圍。",
+    tags: ["Linux 核心", "TLS 1.3", "CVE-2026-74611", "零拷貝", "recvmsg", "網路協定"],
+    title_en: "Linux Kernel Patch: Message Iterator Recovery Vulnerability in TLS 1.3 Zero-Copy Path (CVE-2026-74611)",
+    summary_en: "This vulnerability resides in the TLS handling mechanism of the Linux kernel, specifically when the TLS 1.3 zero-copy optimization path is enabled. When the `tls_decrypt_sg()` function performs data mapping for the optimized path, if the decrypted record is not unpadded application data, the system attempts to retry against the core skb. However, this process advances the message iterator (`msg->msg_iter`), but the subsequent data copy operation (copy from the skb) writes the decrypted bytes again at a later position in the caller's `iovecs`, while `recvmsg()` only reports the length after the retry. An attacker can exploit this by using a TLS protocol peer that enables the `TLS_RX_EXPECT_NO_PAD` option on the receiving end. The suggested fix is to roll back the iterator, ensuring it correctly adjusts based on the bytes consumed during the retry attempt before attempting the zero-copy mapping. Furthermore, the kernel has added a selftest to verify that `recvmsg()` does not overwrite the `iovecs` range beyond the reported length.",
+    tags_en: ["Linux Kernel", "TLS 1.3", "CVE-2026-74611", "Zero-Copy", "recvmsg", "Networking Protocol"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-74611", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260822-038",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心 veth 介面修復 skb 長度計算錯誤，防止 XDP 程式導致資料截斷與記憶體讀取異常",
+    summary: "本漏洞修復針對 Linux 核心中的 veth 虛擬乙太網路介面，主要問題出在 XDP 程式調整分片區域時，veth_xdp_rcv_skb() 函數未能同步更新 skb 的長度資訊。當 XDP 程式調整分片區域後，skb->data_len 被更新，但 skb->len 卻保留了舊的分片貢獻，導致 skb_headlen() 大於實際線性區域。\n\n實務上，這會導致在 UDP 接收路徑中，資料會超出實際線性尾部被複製到使用者空間，包含受影響的 skb 的 nr_frags、xdp_frags_size 等資訊，並造成實際封包資料被錯位和截斷。此外，bpf_xdp_pull_data() 函數在資料結束點前進時，如果 skb 仍非線性，舊代碼會觸發 SKB_LINEAR_ASSERT()。\n\n修復措施要求在替換舊的 data_len 前減去舊的 data_len，並在之後加上新的 data_len，確保 skb->len 和 skb->data_len 保持同步。同時，建議使用 skb_set_tail_pointer() 並明確更新 skb->len，取代 __skb_put()，因為前者不要求 skb 必須是線性結構。修復後，在 veth 介面上的 UDP 測試中，所有測試運行均能正確處理資料載荷，解決了資料損壞和崩潰的風險。",
+    tags: ["Linux 核心", "veth", "XDP", "skb", "bpf", "CVE-2026-74612"],
+    title_en: "Linux Kernel veth Interface Fixes skb Length Calculation Error, Preventing XDP Programs from Causing Data Truncation and Memory Read Anomalies",
+    summary_en: "This vulnerability fix targets the veth virtual Ethernet interface within the Linux kernel. The core issue arises when XDP programs adjust the fragmentation region, and the veth_xdp_rcv_skb() function fails to synchronously update the skb's length information. After an XDP program adjusts the fragmentation region, skb->data_len is updated, but skb->len retains the old fragmentation contribution, causing skb_headlen() to exceed the actual linear region.\n\nPractically, this leads to data being copied to user space in the UDP reception path, exceeding the actual linear tail, including information such as the affected skb's nr_frags and xdp_frags_size, resulting in the actual packet data being misaligned and truncated. Furthermore, when the bpf_xdp_pull_data() function advances before the data end point, if the skb is not linear, the old code would trigger SKB_LINEAR_ASSERT().\n\nThe remediation requires subtracting the old data_len before replacing the old data_len, and then adding the new data_len, ensuring that skb->len and skb->data_len remain synchronized. Additionally, it is recommended to use skb_set_tail_pointer() and explicitly update skb->len, replacing __skb_put(), because the former does not require the skb to be a linear structure. After the fix, all UDP tests run on the veth interface correctly handle the data payload, resolving the risk of data corruption and crashes.",
+    tags_en: ["Linux Kernel", "veth", "XDP", "skb", "bpf", "CVE-2026-74612"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-74612", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260822-039",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心 vsock/virtio 漏洞：teardown 後 RX 佇列仍可能被意外填充",
+    summary: "本文描述了一個發生在 Linux 核心 `vsock/virtio` 驅動程式中的記憶體使用後錯誤（use-after-free）漏洞。該漏洞的根本原因在於，即使在執行設備關閉（teardown）流程時，原本設計用於補充接收佇列（RX queue）的邏輯，仍可能在虛擬佇列（virtqueues）已被刪除之後，意外地為佇列添加緩衝區。這導致了 `BUG: KASAN: slab-use-after-free` 警告，並可能引發核心崩潰（Kernel panic）。漏洞的影響範圍涉及使用 `vsock` 和 `virtio` 介面的系統，特別是在設備電源管理（device_suspend）或資源釋放的過程中。修補建議是修改相關的退出邏輯，確保當 `rx_run` 狀態為空時，應直接跳轉到不進行佇列補充的退出流程，避免使用已釋放的資源。使用者應升級到包含修補程式的 Linux 核心版本以修復此問題。",
+    tags: ["Linux 核心", "vsock", "virtio", "KASAN", "use-after-free", "Kernel panic"],
+    title_en: "Linux Kernel vsock/virtio Vulnerability: RX Queue May Be Unexpectedly Populated After Teardown",
+    summary_en: "This article describes a use-after-free vulnerability found in the Linux kernel's `vsock/virtio` driver. The root cause is that the logic designed to replenish the receive queue (RX queue), even during the device teardown process, may unexpectedly add buffers to the queue after the virtual queues (virtqueues) have been deleted. This results in a `BUG: KASAN: slab-use-after-free` warning and could potentially trigger a kernel panic. The vulnerability affects systems utilizing `vsock` and `virtio` interfaces, particularly during device power management (device_suspend) or resource release. The suggested fix is to modify the relevant exit logic to ensure that when the `rx_run` state is empty, the process skips directly to the exit routine without performing queue replenishment, thereby avoiding the use of already released resources. Users should upgrade to a Linux kernel version containing the patch to resolve this issue.",
+    tags_en: ["Linux Kernel", "vsock", "virtio", "KASAN", "use-after-free", "Kernel panic"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-74613", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260822-040",
     trackers: ["security"],
     category: "法規與標準",
     title: "TikTok 支付 4 億美元和解金，解決美國違反兒童隱私法案指控",
@@ -506,7 +562,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-037",
+    id: "20260822-041",
     trackers: ["os"],
     category: "Windows",
     title: "微軟推出「Outlook Classic」主題，協助用戶平穩過渡至 New Outlook",
@@ -520,7 +576,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-038",
+    id: "20260822-042",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Perl Punk::OAuth2::Server 存在 CVE-2026-75866 漏洞，允許未經授權的範圍（Scope）獲取存取令牌",
@@ -534,7 +590,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-039",
+    id: "20260822-043",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "CVE-2026-75870：Perl Punk 函式庫版本低於 0.18，因預設 HMAC 金鑰空值導致會話 Cookie 可偽造",
@@ -548,7 +604,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-040",
+    id: "20260822-044",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "CHIRP應用程式Kenwood ITM驅動程式存在評估注入漏洞，可透過惡意無線電檔案執行任意代碼",
@@ -562,7 +618,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-041",
+    id: "20260822-045",
     trackers: ["os", "security"],
     category: "漏洞與威脅情報",
     title: "Emacs 核心功能 TRAMP 存在零點擊本地命令執行漏洞，安全社群關注修復時程",
@@ -576,7 +632,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-042",
+    id: "20260822-046",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Perl 模組 Tie::Hash::Regex 發佈 CVE-2026-77781：舊版在處理無效查找鍵時會拋出異常",
@@ -590,7 +646,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-043",
+    id: "20260822-047",
     trackers: ["os", "security"],
     category: "漏洞與威脅情報",
     title: "Linux核心Open vSwitch資料路徑漏洞 (CVE-2026-64531)：允許未授權使用者執行Root程式碼",
@@ -604,7 +660,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-044",
+    id: "20260822-048",
     trackers: ["os"],
     category: "Apple",
     title: "蘋果傳推出首款觸控螢幕MacBook Pro，搭載Tandem OLED與Dynamic Island",
@@ -618,7 +674,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-045",
+    id: "20260822-049",
     trackers: ["os"],
     category: "Android",
     title: "Google 推出 Android Pulse App：用於系統資源異常偵測的診斷工具",
@@ -632,7 +688,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-046",
+    id: "20260822-050",
     trackers: ["os"],
     category: "Android",
     title: "Google Pixel 11 系列推出新相機處理功能，提升用戶對照片外觀的控制權",
@@ -646,7 +702,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-047",
+    id: "20260822-051",
     trackers: ["os"],
     category: "重點關注",
     title: "Apple iPhone 18 Pro 系列與首款折疊機預計於 2026 年九月發表，重點關注新產品線規劃",
@@ -660,7 +716,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-048",
+    id: "20260822-052",
     trackers: ["os"],
     category: "重點關注",
     title: "IT領導者期待AI管理Mac設備，但新報告顯示許多企業尚未準備就緒",
@@ -674,7 +730,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-049",
+    id: "20260822-053",
     trackers: ["os"],
     category: "重點關注",
     title: "美國政府擬撤銷「無路區規則」威脅，可能擾亂阿拉斯加等地的野生動物與水資源生態",
@@ -688,7 +744,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-050",
+    id: "20260822-054",
     trackers: ["os"],
     category: "重點關注",
     title: "開源 Etnaviv 驅動程式支援 YOLOX 物件偵測模型，提升 Vivante NPU 的 AI 運算能力",
@@ -702,7 +758,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-051",
+    id: "20260822-055",
     trackers: ["os"],
     category: "重點關注",
     title: "AI 代理人（Agents）成為新型攻擊面：專家警告企業必須進行主動紅隊演練防禦威脅",
@@ -716,7 +772,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-052",
+    id: "20260822-056",
     trackers: ["os", "security"],
     category: "重點關注",
     title: "AI生成程式碼的「雜質」浪潮：專家警告缺乏紀律的應用開發風險",
@@ -730,8 +786,8 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-053",
-    trackers: ["eu_cra", "security"],
+    id: "20260822-057",
+    trackers: ["security"],
     category: "產業動態",
     title: "Bitdefender揭露「SilkParasite」：針對中亞政府機構的複雜網路間諜活動分析",
     summary: "資安公司Bitdefender公開了大規模網路間諜行動「SilkParasite」，該攻擊目標鎖定中央亞洲地區的主要政府機構。攻擊者使用了包含DriveSilkRAT和GoginRAT在內的七個惡意程式家族，並疑似利用過去由中國相關駭客組織使用的BLOODALCHEMY和SpiceRAT等工具。\n\n此次攻擊的特點是結合了AI開發工具與專業軟體設計，快速大量生產多種語言的客製化惡意工具。攻擊流程首先透過偽裝成當地政府部門的Spear-phishing郵件進行初步滲透。當受害者開啟附件時，惡性巨集會執行，並巧妙地檢查目標是否運行Kaspersky等本地防毒軟體後方可繼續。\n\n核心入侵路徑是利用DLL Sideloading技術，透過導入正常的數位簽名程式來執行惡意DLL。此外，攻擊者還將Google Drive、HTTP Cookie和ETag Header等正常網路傳輸規範偽裝成命令與控制（C2）通訊通道進行濫用。所有惡意程式均採用插件模組化結構，可根據現場環境實時擴展功能。專家指出，傳統基於惡意檔案模式的防毒偵測已面臨極限，建議應導入能綜合追蹤程序異常運作和非正常網路流量行為的行為分析安全體系。",
@@ -744,7 +800,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-054",
+    id: "20260822-058",
     trackers: ["eu_cra"],
     category: "產業動態",
     title: "企業PQC轉型面臨挑戰：缺乏總負責人與實戰驗證，HNDL威脅迫使加速",
@@ -758,8 +814,8 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-055",
-    trackers: ["eu_cra", "security"],
+    id: "20260822-059",
+    trackers: ["security"],
     category: "產業動態",
     title: "加拿大兒童醫院發生資料外洩：員工個人資訊遭竊，警惕醫療產業供應鏈風險",
     summary: "加拿大最大的兒科專業機構 The Hospital for Sick Children（俗稱 SickKids）近日宣布發生資料外洩事件，導致前、現任員工的個人資訊遭到盜取。該院方已正式發布聲明，強調此次入侵並未影響到其診治或臨床系統，亦未波及病患的醫療資訊。\n為應對此安全事件，醫院決定向潛在受害者個別通知，並提供兩年免費信用監控服務。\n值得注意的是，SickKids曾在 2022 年聖誕假期前夕遭受過一次大規模勒索軟體攻擊，導致藥品和影像診斷系統停擺數週。近期美國醫療機構也接連爆出資安事件，例如 Baylor Genetics 的臨床檢測結果、健康保險資訊及社會安全號碼（SSN）外洩；以及 EHR 專業公司 CareCloud 因網路入侵，造成高達 370 萬人的個人資料流失。\n專家警告，駭客威脅已從醫院的內部網路擴散至第三方外部供應鏈，使得整個醫療保健產業面臨系統性的資安風險。",
