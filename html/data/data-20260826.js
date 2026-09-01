@@ -270,6 +270,426 @@ window.TRACKER_DAYS["2026-08-26"] = [
   {
     id: "20260826-020",
     trackers: ["os", "security"],
+    category: "Linux",
+    title: "OpenZFS 核心漏洞：未授權的本地使用者可透過命名空間提升權限執行管理操作",
+    summary: "本漏洞存在於 Linux 核心的 OpenZFS 實作中。攻擊者若為本地未授權使用者，只要能開啟 /dev/zfs，且核心允許未授權的 user namespace 建立，即可利用 OpenZFS 的 ioctl 授權檢查缺陷。該缺陷導致 OpenZFS 接受僅在使用者自定義、未特權命名空間中持有的能力，等同於真實主機的最高權限。這使得未授權的本地使用者能夠執行本應需要 root 權限的敏感操作，包括但不限於執行 pool 管理操作（如建立、匯入、銷毀）、存取 pool 事件日誌（zpool events）以及執行故障注入（zinject）。攻擊無需事先取得目標 pool 或其底層設備的存取權限。修補建議為更新到修復此 ioctl 授權檢查缺陷的 OpenZFS 版本。由於原文未提供 CVSS 分數或具體版本號，建議使用者應密切關注 OpenZFS 相關的 Linux 核心安全公告。",
+    tags: ["OpenZFS", "Linux 核心", "ioctl", "命名空間", "權限提升", "CVE-2026-79619"],
+    title_en: "OpenZFS Core Vulnerability: Unauthorized Local User Can Elevate Privileges to Execute Management Operations via Namespaces",
+    summary_en: "This vulnerability exists in the OpenZFS implementation within the Linux kernel. An attacker, who is an unauthorized local user, can exploit a flaw in OpenZFS's ioctl permission checks if they can open /dev/zfs and the kernel allows the creation of unauthorized user namespaces. This flaw allows OpenZFS to accept capabilities held only within a user-defined, unprivileged namespace as if they were the highest privileges on the actual host. This enables an unauthorized local user to perform sensitive operations that should require root privileges, including but not limited to executing pool management operations (such as creating, importing, or destroying pools), accessing pool event logs (zpool events), and performing fault injection (zinject). The attack does not require prior access to the target pool or its underlying device. The recommended mitigation is to update to an OpenZFS version that fixes this ioctl permission checking flaw. Since the original text did not provide a CVSS score or specific version number, users are advised to closely monitor OpenZFS-related Linux kernel security announcements.",
+    tags_en: ["OpenZFS", "Linux Kernel", "ioctl", "Namespace", "Privilege Escalation", "CVE-2026-79619"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-79619", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260826-021",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心修復 firewire: ohci 驅動程式的 NULL 指標解引用漏洞",
+    summary: "本漏洞存在於 Linux 核心的 firewire: ohci 驅動程式中，屬於 NULL 指標解引用（NULL pointer dereference）類型。當 PCI 探測（pci_probe()）過程提早失敗時，例如 `pcim_enable_device()` 或 MMIO 映射失敗，系統會觸發 `devres cleanup` 機制，進而呼叫 `release_ohci()`。此函數會無條件地呼叫 `ar_context_release()` 來清理異步接收上下文。然而，如果 `ar_context_init()` 尚未被呼叫，`ctx->ohci` 仍為 NULL，導致 `ar_context_release()` 在檢查上下文是否初始化之前，就立即解引用了 `ctx->ohci` 指標，進而造成系統崩潰（Oops: general protection fault）。修復方法是將獲取 dev 指標的語句，移動到檢查 `!ctx->buffer` 之後。如果 `ctx->buffer` 為 NULL，則表示上下文尚未成功初始化，此時無需釋放任何資源，從而安全地避免了對未初始化 `ctx->ohci` 指標的解引用。此修復屬於核心層面的穩定性修補，建議系統管理員應更新至修復此漏洞的 Linux 核心版本。",
+    tags: ["Linux 核心", "firewire", "ohci", "NULL 指標解引用", "PCI 驅動程式", "Linux 核心修補"],
+    title_en: "Linux Kernel Fix for firewire: ohci Driver NULL Pointer Dereference Vulnerability",
+    summary_en: "This vulnerability resides in the Linux kernel's firewire: ohci driver and is a NULL pointer dereference issue. When the PCI probing process (pci_probe()) fails prematurely—for instance, due to failure in `pcim_enable_device()` or MMIO mapping—the system triggers the `devres cleanup` mechanism, which subsequently calls `release_ohci()`. This function unconditionally calls `ar_context_release()` to clean up asynchronous receive contexts. However, if `ar_context_init()` has not yet been called, `ctx->ohci` remains NULL, causing `ar_context_release()` to immediately dereference the `ctx->ohci` pointer before checking if the context was initialized, leading to a system crash (Oops: general protection fault). The fix involves moving the statement that retrieves the dev pointer to after the check for `!ctx->buffer`. If `ctx->buffer` is NULL, it indicates that the context has not been successfully initialized, and therefore no resources need to be released, thus safely preventing the dereference of the uninitialized `ctx->ohci` pointer. This patch is a core-level stability fix, and system administrators are advised to update to the Linux kernel version that addresses this vulnerability.",
+    tags_en: ["Linux Kernel", "firewire", "ohci", "NULL Pointer Dereference", "PCI Driver", "Linux Kernel Patch"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-74734", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260826-022",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心修復 l2tp 相關的參考計數洩漏漏洞，防止資源未釋放",
+    summary: "本修補針對 Linux 核心中的 l2tp 相關元件，解決了一個隧道（tunnel）和會話（session）的參考計數（refcount）洩漏漏洞。該漏洞發生在 `pppol2tp_proc_open()` 和 `l2tp_dfs_seq_open()` 函數中。當使用者空間在未讀取到檔案結束（EOF）的情況下，關閉 `/proc/net/pppol2tp` 或 `/sys/kernel/debug/l2tp/tunnels` 等檔案時，如果 `seq_file` 私有資料中儲存了 `pd->tunnel` 或 `pd->session` 的參考，這些參考將不會被正確釋放（un-dropped）。修補內容是在 `pppol2tp_proc_release()` 和 `l2tp_dfs_seq_release()` 函數中，增加邏輯，確保在關閉檔案時，會釋放所有剩餘的 `pd->tunnel` 和 `pd->session` 參考，從而防止資源洩漏。建議系統管理員應更新至修補後的 Linux 核心版本以消除此類資源洩漏風險。",
+    tags: ["Linux 核心", "l2tp", "參考計數洩漏", "資源管理", "CVE-2026-74735"],
+    title_en: "Linux Kernel Fixes l2tp Reference Count Leak Vulnerability, Preventing Resource Leakage",
+    summary_en: "This patch addresses an l2tp-related component in the Linux kernel, resolving a reference count leak vulnerability affecting tunnels and sessions. The vulnerability occurs within the `pppol2tp_proc_open()` and `l2tp_dfs_seq_open()` functions. When user space closes files such as `/proc/net/pppol2tp` or `/sys/kernel/debug/l2tp/tunnels` without reading to EOF, if the `seq_file` private data stores references to `pd->tunnel` or `pd->session`, these references may not be correctly un-dropped. The fix introduces logic in `pppol2tp_proc_release()` and `l2tp_dfs_seq_release()` to ensure that all remaining `pd->tunnel` and `pd->session` references are released upon file closure, thereby preventing resource leakage. System administrators are advised to update to the patched Linux kernel version to eliminate this type of resource leakage risk.",
+    tags_en: ["Linux Kernel", "l2tp", "Reference Count Leak", "Resource Management", "CVE-2026-74735"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-74735", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260826-023",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心修補：修復 cls_bpf 程式在設備綁定時的邏輯漏洞",
+    summary: "本漏洞存在於 Linux 核心的網路排程（net/sched: cls_bpf）元件中。當透過 `cls_bpf_prog_from_efd()` 取得一個透過 `bpf_prog_get_type_dev()` 綁定到特定設備的 BPF 程式時，核心未能驗證該設備綁定（offloaded）的網路設備是否與分類器（classifier）正在附加的 TC 網路設備相匹配。這使得攻擊者可以將為設備 A 載入的程式，透過 `cls_bpf` 和 `skip_sw` 附加到設備 B 上；隨後刪除設備 A，會導致該程式的卸載狀態被破壞，但它仍附加在設備 B 上，從而觸發了 `netdevsim WARN`，若設定 `panic_on_warn=1`，將導致系統崩潰（panic）。修補措施是在 `net/core/dev.c` 中模擬 XDP 附加路徑，當設備綁定程式的綁定設備與目標設備不匹配時，拒絕附加並返回 `-EINVAL`。",
+    tags: ["Linux 核心", "cls_bpf", "BPF", "netdevsim", "CVE-2026-74736", "網路排程"],
+    title_en: "Linux Kernel Patch: Fixes Logic Vulnerability in cls_bpf Program During Device Binding",
+    summary_en: "This vulnerability exists in the networking scheduler (net/sched: cls_bpf) component of the Linux kernel. When an attacker retrieves a BPF program that is bound to a specific device using `cls_bpf_prog_from_efd()` and `bpf_prog_get_type_dev()`, the kernel fails to validate whether the network device that the program was offloaded to matches the TC network device to which the classifier is being attached. This allows an attacker to attach a program loaded for Device A, via `cls_bpf` and `skip_sw`, to Device B. Subsequently deleting Device A corrupts the program's offload state, but the program remains attached to Device B, triggering a `netdevsim WARN`. If `panic_on_warn` is set to 1, this leads to a system crash (panic). The fix is implemented in `net/core/dev.c` to simulate the XDP attachment path. If the binding device of the program does not match the target device, the attachment is rejected and returns `-EINVAL`.",
+    tags_en: ["Linux Kernel", "cls_bpf", "BPF", "netdevsim", "CVE-2026-74736", "Networking Scheduler"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-74736", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260826-024",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心修復：am65-cpsw-nuss 網卡驅動程式的 port_id 提取邏輯錯誤",
+    summary: "本漏洞涉及 Linux 核心的網路乙太網路子系統，具體影響 am65-cpsw-nuss 網卡驅動程式。問題出在封包接收路徑（packet reception path）中，用於從 RX DMA Descriptor 的 metadata 提取 MAC Port ID 的邏輯。原始程式碼使用 cppi5_desc_get_tags_ids() 函式，將 16-bit Source Tag 填入 'port_id' 變數。然而，MAC Port ID 僅由 16-bit Source Tag 的低 8 位元代表，而高 8 位元為硬體保留且包含任意值。由於現有邏輯沒有正確處理這一點，導致後續驅動程式程式碼可能會因為使用無效的 port_id，進而存取到超出界限的記憶體（out-of-bound memory），造成間歇性的核心崩潰（kernel crash）。修復措施是修正 port_id 的提取邏輯，確保僅使用 Source Tag 的低 8 位元作為 MAC Port ID。",
+    tags: ["Linux 核心", "am65-cpsw-nuss", "net: ethernet", "port_id", "CVE-2026-74737"],
+    title_en: "Linux Kernel Fix: Logic Error in port_id Extraction for am65-cpsw-nuss Network Card Driver",
+    summary_en: "This vulnerability affects the Linux kernel's network Ethernet subsystem, specifically impacting the am65-cpsw-nuss network card driver. The issue resides in the packet reception path, concerning the logic used to extract the MAC Port ID from the RX DMA Descriptor's metadata. The original code uses the cppi5_desc_get_tags_ids() function, which populates the 'port_id' variable with the 16-bit Source Tag. However, the MAC Port ID is represented only by the lower 8 bits of the 16-bit Source Tag, while the upper 8 bits are reserved for hardware and contain arbitrary values. Because the existing logic fails to correctly handle this, subsequent driver code may attempt to use an invalid port_id, leading to out-of-bound memory access and causing intermittent kernel crashes. The fix involves correcting the port_id extraction logic to ensure that only the lower 8 bits of the Source Tag are used as the MAC Port ID.",
+    tags_en: ["Linux Kernel", "am65-cpsw-nuss", "net: ethernet", "port_id", "CVE-2026-74737"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-74737", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260826-025",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心 regmap 漏洞修復：sdw-mbq 驅動程式在未設定回呼時可能執行空指針操作",
+    summary: "本漏洞存在於 Linux 核心的 regmap 框架，特別影響 sdw-mbq 驅動程式。當系統在處理某些設備時，如果未為 `readable_reg` 回呼設定，`regmap_sdw_mbq_poll_busy()` 函數仍會嘗試呼叫它。根據提交 ca1b11b36d82 的變更，該輪詢（poll）機制現在會在遇到任何 -ENODATA 錯誤時執行，而不僅限於標記為可延遲（deferrable）的控制項。如果設備回傳 `COMMAND_IGNORED`，可能會導致核心嘗試呼叫一個空函數指標（NULL function pointer），從而引發潛在的空指針解引用（NULL function pointer dereference）問題。修復建議是讓 regmap 框架像處理其他情況一樣，將缺少回呼視為一個需要執行輪詢的正常流程，以避免空指針操作。",
+    tags: ["Linux 核心", "regmap", "sdw-mbq", "空指針", "CVE-2026-74738"],
+    title_en: "Linux Kernel regmap Vulnerability Fix: sdw-mbq Driver May Perform Null Pointer Operation When Callback is Unset",
+    summary_en: "This vulnerability exists in the Linux kernel's regmap framework, specifically affecting the sdw-mbq driver. When the system processes certain devices and the `readable_reg` callback is not set, the `regmap_sdw_mbq_poll_busy()` function still attempts to call it. According to the change in commit ca1b11b36d82, this polling mechanism now executes upon encountering any -ENODATA error, and not only for controls marked as deferrable. If the device returns `COMMAND_IGNORED`, it could cause the kernel to attempt calling a null function pointer, leading to a potential NULL function pointer dereference issue. The suggested fix is to allow the regmap framework to treat the absence of a callback as a normal process requiring polling, similar to how it handles other scenarios, thereby preventing the null pointer operation.",
+    tags_en: ["Linux Kernel", "regmap", "sdw-mbq", "Null Pointer", "CVE-2026-74738"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-74738", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260826-026",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心修復 net/sched: cls_u32 漏洞，防止 u32_bind_class() 錯誤讀取 hash 表格",
+    summary: "本漏洞存在於 Linux 核心的網路排程（net/sched）元件中，具體影響 `cls_u32` 相關功能。問題出在 `u32_walk()` 透過 walker callback 枚舉 `struct tc_u_hnode` 和 `struct tc_u_knode` 時，`u32_bind_class()` 會不加條件地將傳入的 `fh` 類型轉換為 `tc_u_knode`，並存取 `&n->res`。當實際的 `fh` 卻是 `tc_u_hnode`，而該結構體缺乏 `tcf_result` 成員時，就會導致 `tc_cls_bind_class()` 執行到一個 slab-out-of-bounds read，從而造成記憶體讀取錯誤。開發者建議透過加入 `TC_U32_KEY(handle)` 檢查機制，來跳過對 hash 表格的處理，以修復此類安全問題。此修復屬於核心元件層面的安全強化，建議所有使用 Linux 核心的系統應更新至修復版本，以避免潛在的記憶體安全漏洞。",
+    tags: ["Linux 核心", "net/sched", "cls_u32", "u32_bind_class", "記憶體安全", "Linux 核心更新"],
+    title_en: "Linux Kernel Fixes net/sched: cls_u32 Vulnerability to Prevent u32_bind_class() Hash Table Out-of-Bounds Read",
+    summary_en: "This vulnerability resides in the network scheduling (net/sched) component of the Linux kernel, specifically affecting `cls_u32` related functionality. The issue occurs when `u32_walk()` enumerates `struct tc_u_hnode` and `struct tc_u_knode` via a walker callback. In this process, `u32_bind_class()` unconditionally casts the input `fh` type to `tc_u_knode` and accesses `&n->res`. If the actual `fh` is `tc_u_hnode`, and that structure lacks the `tcf_result` member, it leads to `tc_cls_bind_class()` executing a slab-out-of-bounds read, causing a memory read error. Developers recommend adding a `TC_U32_KEY(handle)` check mechanism to skip processing the hash table, thereby fixing this security issue. Since this fix involves core component-level security enhancement, all systems using the Linux kernel are advised to update to the patched version to avoid potential memory safety vulnerabilities.",
+    tags_en: ["Linux Kernel", "net/sched", "cls_u32", "u32_bind_class", "Memory Safety", "Linux Kernel Update"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-74739", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260826-027",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心修復 net/sched 漏洞：防止 TOCTOU NULL 解引用競態條件",
+    summary: "本修補針對 Linux 核心中的 net/sched 模組，解決了一個 TOCTOU（Time-of-Check to Time-of-Use）相關的 NULL 解引用競態條件。當執行 tcf_action_exec() 處理 TC_ACT_GOTO_CHAIN 時，程式碼會先檢查 rcu_access_pointer(a->goto_chain)，然後呼叫 tcf_action_goto_chain_exec() 進行第二次獨立的 rcu_dereference_bh(a->goto_chain) 讀取，並立即解引用 chain->filter_chain。如果在此兩次讀取之間，另一個執行緒（例如執行 gact 替換路徑的 tcf_action_set_ctrlact()）清除了 a->goto_chain，第二次讀取將返回 NULL，導致 tcf_action_goto_chain_exec() 嘗試解引用 NULL 指標，從而引發崩潰或安全問題。修復方法是將原本的「檢查/使用」分離操作，改為在 tcf_action_exec() 中執行單一的 rcu_dereference_bh() 讀取 a->goto_chain，檢查其是否為 NULL，並將結果的 chain 指標傳遞給 tcf_action_goto_chain_exec()，確保檢查和使用在同一原子操作範圍內。",
+    tags: ["Linux 核心", "net/sched", "TOCTOU", "NULL 解引用", "tcf_action_exec"],
+    title_en: "Linux Kernel Fixes net/sched Vulnerability: Preventing TOCTOU NULL Dereference Race Condition",
+    summary_en: "This patch addresses a TOCTOU (Time-of-Check to Time-of-Use) related NULL dereference race condition in the Linux kernel's net/sched module. When executing tcf_action_exec() to process TC_ACT_GOTO_CHAIN, the code first checks rcu_access_pointer(a->goto_chain), and then calls tcf_action_goto_chain_exec() for a second, independent rcu_dereference_bh(a->goto_chain) read, immediately dereferencing chain->filter_chain. If another thread clears a->goto_chain between these two reads (for example, tcf_action_set_ctrlact() which replaces the path using gact), the second read will return NULL, causing tcf_action_goto_chain_exec() to attempt dereferencing a NULL pointer, leading to a crash or security issue. The fix modifies the original 'check/use' separation operation to perform a single rcu_dereference_bh() read of a->goto_chain within tcf_action_exec(), checking if it is NULL, and passing the resulting chain pointer to tcf_action_goto_chain_exec(), thereby ensuring that the check and use occur within the same atomic operation scope.",
+    tags_en: ["Linux Kernel", "net/sched", "TOCTOU", "NULL Dereference", "tcf_action_exec"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-74740", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260826-028",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心修補：ngbe 驅動程式在非 MSI-X 模式下修復 NULL 指標解引用漏洞",
+    summary: "本修補針對 Linux 核心中的 net: ngbe 驅動程式，解決了在非 MSI-X 模式（如傳統 INTx 或單一 MSI）下，處理中斷時可能發生的 NULL 指標解引用漏洞。當系統處於非 MSI-X 模式時，`wx->msix_entry` 可能未被正確分配或初始化。若呼叫 NGBE_INTR_MISC(wx)，將會解引用 `wx->msix_entry->entry`，導致系統崩潰。此問題源於先前修復 IRQ vector 時，當虛擬功能（VFs）數量為 7 時引入。修補建議透過明確檢查 `pdev->msix_enabled` 來確定正確的向量索引，並為非 MSI-X 備用模式設定中斷遮罩為 BIT(0)，以確保在 MSI/INTx 模式下，雜項（miscellaneous）和佇列中斷共享向量 0 的正確性。",
+    tags: ["Linux 核心", "ngbe", "NULL 指標解引用", "MSI-X", "Linux 驅動程式"],
+    title_en: "Linux Kernel Patch: Fixes NULL Pointer Dereference Vulnerability in ngbe Driver under Non-MSI-X Mode",
+    summary_en: "This patch addresses a NULL pointer dereference vulnerability in the net: ngbe driver within the Linux kernel. The vulnerability occurs when handling interrupts in non-MSI-X modes (such as traditional INTx or single MSI). When the system operates in non-MSI-X mode, `wx->msix_entry` might not be correctly allocated or initialized. Calling NGBE_INTR_MISC(wx) could then dereference `wx->msix_entry->entry`, leading to a system crash. This issue originated from a previous fix to the IRQ vector when the number of Virtual Functions (VFs) was 7. The patch suggests explicitly checking `pdev->msix_enabled` to determine the correct vector index and setting the interrupt mask to BIT(0) for the non-MSI-X fallback mode, ensuring the correctness of miscellaneous and queue interrupts sharing vector 0 in MSI/INTx modes.",
+    tags_en: ["Linux Kernel", "ngbe", "NULL Pointer Dereference", "MSI-X", "Linux Driver"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-74741", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260826-029",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心 veth 虛擬網卡漏洞：GRO/NAPI 模式下，多佇列環境可能導致網卡佇列永久停止",
+    summary: "本漏洞存在於 Linux 核心的 veth 虛擬網卡驅動程式中。當系統在啟用 GRO（Generic Receive Offload）模式，且未附加 XDP 程式的情況下，在多佇列（multi-queue）環境中，veth 網卡在發送資料時可能會發生佇列索引錯誤。由於 veth_poll() 函式錯誤地從 `rq->xdp_rxq.queue_index` 取得對端 TX 佇列的索引，而此欄位僅在啟用 XDP 範圍時初始化。在純粹的 GRO/NAPI 傳輸路徑中，此欄位會保持預設值 0。這導致所有 NAPI 實例都錯誤地嘗試喚醒對端佇列 0，即使實際資料阻塞在佇列 1 或更高索引的佇列。當某個佇列因緩衝區滿載而停止時，系統無法正確喚醒它，導致網卡佇列永久處於停止狀態，造成網路服務中斷。開發者建議應修改索引推導邏輯，使其直接從 `priv->rq` 中獲取佇列位置，以確保無論是否啟用 XDP，都能正確判斷佇列索引。",
+    tags: ["Linux 核心", "veth", "GRO", "NAPI", "CVE-2026-74742", "網路堆疊"],
+    title_en: "Linux Kernel veth Virtual Network Card Vulnerability: Potential Permanent Network Card Queue Stoppage in Multi-Queue Environments under GRO/NAPI Mode",
+    summary_en: "This vulnerability resides in the veth virtual network card driver within the Linux kernel. When the system is running in GRO (Generic Receive Offload) mode without attached XDP programs, a queue index error may occur on the veth network card during data transmission in a multi-queue environment. This is because the veth_poll() function incorrectly retrieves the index of the peer TX queue from `rq->xdp_rxq.queue_index`, a field that is only initialized when XDP is enabled. In a pure GRO/NAPI data path, this field retains its default value of 0. This causes all NAPI instances to incorrectly attempt to wake up peer queue 0, even if the actual data is blocked in queue 1 or higher indices. When a queue stops due to buffer overflow, the system fails to correctly wake it up, leading to the network card queue remaining permanently stopped and causing network service disruption. Developers recommend modifying the index derivation logic to directly retrieve the queue position from `priv->rq`, ensuring that the queue index can be accurately determined regardless of whether XDP is enabled.",
+    tags_en: ["Linux Kernel", "veth", "GRO", "NAPI", "CVE-2026-74742", "Network Stack"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-74742", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260826-030",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心修復 macvlan 設備漏洞：確保正確繼承封包頭尾空間資訊",
+    summary: "本更新針對 Linux 核心中的 macvlan 設備功能，修復了一個關於封包頭尾空間（headroom/tailroom）計算的漏洞。當 macvlan 設備初始化時，它會從底層設備（lowerdev）繼承 `hard_header_len`，但卻將 `needed_headroom` 和 `needed_tailroom` 設定為 0。這導致當底層設備需要額外的頭部或尾部空間（例如用於 macsec、ipsec、wireguard 隧道或帶有接收頭部空間的 veth）時，上層計算封包頭尾空間會失敗，無法預留足夠的空間。\n\n實務影響包括：導致資源重新分配開銷、`skb` 頭部空間不足（underflows），甚至在執行 `dev_hard_header()` 或 `macvlan_hard_header()` 附加頭部資料，或底層設備附加尾部空間時，可能引發 KASAN slab-use-after-free 崩潰。\n\n修復方案要求在 `macvlan_init()` 中從底層設備繼承 `needed_headroom` 和 `needed_tailroom`，並在接收到 `NETDEV_FEAT_CHANGE` 事件時，透過 `macvlan_device_event()` 將這些空間更新傳播給所有附屬的 macvlan 設備，確保系統封包處理的穩定性。",
+    tags: ["Linux 核心", "macvlan", "needed_headroom", "needed_tailroom", "KASAN", "Linux 網路堆疊"],
+    title_en: "Linux Kernel Fixes macvlan Device Vulnerability: Ensuring Correct Inheritance of Packet Header/Trailer Space Information",
+    summary_en: "This update addresses a vulnerability in the Linux kernel's macvlan device functionality related to the calculation of packet headroom and tailroom. When a macvlan device initializes, it inherits `hard_header_len` from the lower device, but incorrectly sets `needed_headroom` and `needed_tailroom` to 0. This causes the upper layer to fail when calculating packet headroom and tailroom—for instance, when the lower device requires additional header or trailer space (such as for macsec, ipsec, wireguard tunnels, or veth with receive headroom). \n\nPractical impacts include: resource reallocation overhead, `skb` header space underflows, and potential KASAN slab-use-after-free crashes when attaching header data via `dev_hard_header()` or `macvlan_hard_header()`, or when the lower device attaches trailer space.\n\nThe fix requires inheriting `needed_headroom` and `needed_tailroom` in `macvlan_init()` from the lower device, and subsequently propagating these space updates to all associated macvlan devices via `macvlan_device_event()` upon receiving the `NETDEV_FEAT_CHANGE` event, thereby ensuring the stability of system packet processing.",
+    tags_en: ["Linux Kernel", "macvlan", "needed_headroom", "needed_tailroom", "KASAN", "Linux Network Stack"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-74743", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260826-031",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心修補：ipvlan 設備未正確繼承網路封包空間，可能導致記憶體溢出或崩潰",
+    summary: "本漏洞存在於 Linux 核心的 `ipvlan` 模組。當 `ipvlan` 設備初始化時，它會從底層的 `phy_dev` 繼承 `hard_header_len`，但卻忽略了 `needed_headroom` 和 `needed_tailroom` 這兩個關鍵的封包空間參數。當底層設備（如支援 macsec、ipsec、wireguard、隧道或帶有接收空間的 veth）需要額外的標頭或尾部空間時，上層的封包處理機制無法正確預留足夠的空間。這可能導致資源重新分配開銷過大、`skb` 空間不足（headroom underflows），甚至在執行 `dev_hard_header()` 或 `ipvlan_hard_header()` 準備標頭資料，或底層設備附加尾部空間時，引發 KASAN 報告的 slab-use-after-free 崩潰。修補建議是：在 `ipvlan_init()` 函數中，必須從 `phy_dev` 正確繼承 `needed_headroom` 和 `needed_tailroom`；並且在接收到 `NETDEV_FEAT_CHANGE` 事件時，必須在 `ipvlan_device_event()` 中將這些空間參數的更新傳播給所有附加的 `ipvlans`。",
+    tags: ["Linux 核心", "ipvlan", "needed_headroom", "needed_tailroom", "skb", "KASAN"],
+    title_en: "Linux Kernel Patch: ipvlan Device Incorrectly Inherits Network Packet Space, Potentially Causing Memory Overflow or Crash",
+    summary_en: "This vulnerability resides in the Linux kernel's `ipvlan` module. When an `ipvlan` device initializes, it inherits `hard_header_len` from the underlying `phy_dev` but ignores two critical packet space parameters: `needed_headroom` and `needed_tailroom`. When the underlying device (such as one supporting macsec, ipsec, wireguard, tunneling, or veth with receive space) requires additional header or tail space, the upper-layer packet processing mechanism fails to correctly reserve sufficient space. This can lead to excessive resource reallocation overhead, `skb` space underflows (headroom underflows), or even trigger a slab-use-after-free crash, as reported by KASAN, during the execution of `dev_hard_header()` or `ipvlan_hard_header()` when preparing header data, or when the underlying device appends tail space. The suggested fix is that `ipvlan_init()` must correctly inherit both `needed_headroom` and `needed_tailroom` from `phy_dev`; furthermore, when receiving the `NETDEV_FEAT_CHANGE` event, these space parameters must be propagated to all attached `ipvlans` within `ipvlan_device_event()`.",
+    tags_en: ["Linux Kernel", "ipvlan", "needed_headroom", "needed_tailroom", "skb", "KASAN"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-74744", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260826-032",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心修補：bnxt 網卡驅動程式修復 IRQ 相關死鎖問題",
+    summary: "本修補針對 Linux 核心中的 bnxt 網卡驅動程式，解決了在取消 IRQ affinity notifier 時可能發生的死鎖（deadlock）問題。問題出在 unregistering IRQ affinity notifiers 會同步等待回呼函式執行，而 bnxt 驅動程式在 notifier 內部會取得 netdev instance lock 來重啟佇列，並在同一鎖定下取消工作，導致了潛在的死鎖狀況。修復方案是將佇列重啟的動作移至非同步服務任務（async service task）中執行，因為佇列重啟並非極度時間敏感的操作。此外，文章指出在 `bnxt_request_irq()` 函式中，註冊 notifier、affinity 和初始 TPH 程式的順序需要反轉，以避免在使用者觸發更新時發生競態條件（racy）問題。修補旨在提高核心穩定性，確保網卡驅動程式在處理 IRQ 相關生命週期事件時的可靠性。",
+    tags: ["Linux 核心", "bnxt", "IRQ", "死鎖", "netdev", "驅動程式"],
+    title_en: "Linux Kernel Patch: bnxt Network Card Driver Fixes IRQ-Related Deadlock Issue",
+    summary_en: "This patch targets the bnxt network card driver within the Linux kernel, resolving a potential deadlock issue that can occur when canceling IRQ affinity notifiers. The problem stemmed from the fact that unregistering IRQ affinity notifiers synchronously waits for callback function execution. The bnxt driver, internally, acquires the netdev instance lock to re-queue and cancel work under this same lock, leading to a potential deadlock. The fix moves the re-queueing operation to an asynchronous service task, as re-queueing is not an extremely time-sensitive operation. Furthermore, the article notes that the order of registering the notifier, affinity, and initial TPH program within the `bnxt_request_irq()` function needs to be reversed to prevent race conditions when the user triggers an update. The patch aims to enhance kernel stability and ensure the reliability of the network card driver when handling IRQ-related lifecycle events.",
+    tags_en: ["Linux Kernel", "bnxt", "IRQ", "Deadlock", "netdev", "driver"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-74745", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260826-033",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心 netfilter 漏洞修復：修復 flowtable 處理 GC 可見元組順序問題",
+    summary: "本漏洞位於 Linux 核心的 netfilter 模組，具體影響 flowtable 的處理機制。問題出在 `nf_flow_table_iterate()` 函式僅將原始方向的元組節點視為擁有條目，導致在 `flow_offload_add()` 插入回覆節點時，如果先發布原始節點，垃圾回收機制（GC）可能會觀察並釋放一個正在安裝的流（flow）。這可能導致 KASAN 觸發 slab-use-after-free 的讀寫報告，影響 `flowtable/rhashtable` 路徑（例如 `rht_deferred_worker`, `jhash`, `flow_offload_del`, `flow_offload_lookup` 等）。修復建議是改變發布節點的順序：應先發布回覆節點，最後再發布原始節點，以確保 GC 不會觀察到部分安裝的流狀態。建議系統更新到修復此問題的 Linux 核心版本。",
+    tags: ["Linux 核心", "netfilter", "flowtable", "CVE-2026-74746", "KASAN", "use-after-free"],
+    title_en: "Linux Kernel netfilter Vulnerability Fix: Resolving GC Visibility of Tuple Order in Flowtable Processing",
+    summary_en: "This vulnerability resides in the Linux kernel's netfilter module, specifically affecting the flowtable processing mechanism. The issue stems from the `nf_flow_table_iterate()` function only treating the original direction tuple node as having an entry. This can cause the garbage collection (GC) mechanism to observe and potentially release a flow that is currently being installed when a reply node is inserted via `flow_offload_add()`, provided the original node is published first. This may lead to KASAN triggering a slab-use-after-free read/write report, affecting the `flowtable/rhashtable` path (e.g., `rht_deferred_worker`, `jhash`, `flow_offload_del`, `flow_offload_lookup`, etc.). The suggested fix is to change the order of node publication: the reply node should be published first, and the original node published last, ensuring that the GC does not observe a partially installed flow state. Users are advised to update their systems to the Linux kernel version that addresses this issue.",
+    tags_en: ["Linux Kernel", "netfilter", "flowtable", "CVE-2026-74746", "KASAN", "use-after-free"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-74746", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260826-034",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心修補 ipvs 模組：防止 IP 標頭重驗證導致的越界存取漏洞",
+    summary: "本修補針對 Linux 核心中的 ipvs 模組，解決了一個潛在的越界存取（out-of-bounds access）漏洞。該漏洞發生在處理 IP 標頭（IP header）時，特別是在從 skb frags 讀取嵌入式標頭後，未能正確重新驗證 IP 標頭長度（ihl）欄位。當本地進程（local process）可以修改 ihl 欄位，導致在執行 ip_send_check(cih) 呼叫時，看到比實際更大的值時，就會產生問題。修補措施要求在 ihl 欄位被修改後，增加檢查機制，若發現異常變動，應直接丟棄該封包，從而防止攻擊者利用此缺陷執行越界存取。此類核心修補對於維護 Linux 系統的網路堆疊安全至關重要，建議系統管理員應即時更新至修補後的 Linux 核心版本。",
+    tags: ["Linux 核心", "ipvs", "越界存取", "IP 標頭", "CVE-2026-74747"],
+    title_en: "Linux Kernel Patch for ipvs Module: Prevents Out-of-Bounds Access Due to IP Header Revalidation",
+    summary_en: "This patch addresses a potential out-of-bounds access vulnerability in the Linux kernel's ipvs module. The vulnerability occurs when processing IP headers, specifically after reading embedded headers from skb frags, due to improper revalidation of the IP header length (ihl) field. A problem arises when a local process can modify the ihl field, causing the system to see a value larger than the actual length during the ip_send_check(cih) call. The fix introduces a check mechanism after the ihl field is modified; if an abnormality is detected, the packet should be immediately dropped, thereby preventing an attacker from exploiting this flaw to perform out-of-bounds access. Such kernel patches are crucial for maintaining the security of the Linux system's network stack, and system administrators are advised to update to the patched Linux kernel version immediately.",
+    tags_en: ["Linux Kernel", "ipvs", "Out-of-Bounds Access", "IP Header", "CVE-2026-74747"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-74747", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260826-035",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心 netfilter/ipset 修正：修復 list:set GC 與 swap 之間的參考計數競態條件",
+    summary: "本漏洞位於 Linux 核心的 netfilter/ipset 模組中，涉及 list:set 的垃圾回收 (GC) 機制與 ip_set_swap() 函數之間的參考計數 (refcount) 競態條件。當一個過期的 list:set 成員呼叫 list_set_del() -> ip_set_put_byindex() 時，如果同時有 IPSET_CMD_SWAP 操作在執行，由於 nfnl 互斥鎖無法同步 swap 操作，導致呼叫者嘗試遞減一個已經移動到其他索引的 set 的參考計數，進而觸發 BUG_ON(set->ref == 0) 錯誤，最終可能導致 Kernel panic。修補建議是將索引解析和參考計數的遞減操作，統一在 ip_set_ref_lock 內執行，確保參考計數始終與索引綁定，而非依賴於可能已過時的 set 指標。此修補旨在提高核心穩定性，防止在處理網路過濾規則時發生系統崩潰。",
+    tags: ["Linux 核心", "netfilter", "ipset", "list:set", "refcount", "CVE-2026-74748"],
+    title_en: "Linux Kernel netfilter/ipset Fix: Resolving Reference Count Race Condition Between list:set GC and Swap",
+    summary_en: "This vulnerability resides in the Linux kernel's netfilter/ipset module, involving a reference count race condition between the list:set garbage collection (GC) mechanism and the ip_set_swap() function. When an expired list:set member calls list_set_del() -> ip_set_put_byindex(), and an IPSET_CMD_SWAP operation is executing concurrently, the nfnl mutex lock fails to synchronize the swap operation. This causes the caller to attempt decrementing the reference count of a set that has already been moved to a different index, triggering a BUG_ON(set->ref == 0) error, which may ultimately lead to a Kernel panic. The proposed fix is to unify the index resolution and reference count decrement operations within ip_set_ref_lock, ensuring that the reference count is always bound to the index, rather than relying on potentially stale set pointers. This patch aims to enhance kernel stability and prevent system crashes when processing network filtering rules.",
+    tags_en: ["Linux Kernel", "netfilter", "ipset", "list:set", "refcount", "CVE-2026-74748"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-74748", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260826-036",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心修復 rseq 漏洞：防止在時間切片擴展時發生硬鎖死",
+    summary: "本漏洞存在於 Linux 核心的 rseq 機制中，主要影響在處理時間切片擴展（time slice extension）時的穩定性。當 `__exit_to_user_mode_loop()` 函式在啟用中斷（interrupts enabled）的狀態下呼叫 `rseq_grant_timeslice_extension()` 時，如果擴展被授予，它會進一步呼叫 `hrtimer_rearm_deferred_tif()`。此過程會觸發 `__hrtimer_rearm_deferred()`，該函式預期在禁用中斷的狀態下執行，因為它使用了 `hrtimer_cpu_base::lock` 搭配 `raw_spin_lock()`。這種不一致的鎖定狀態（inconsistent lock state）可能導致「活鎖」（livelock）的風險，並可能造成系統硬鎖死（hard lockup）。修復措施是在 `rseq_grant_timeslice_extension()` 內部，在呼叫 `hrtimer_rearm_deferred_tif()` 周圍禁用中斷，以確保鎖定操作的原子性與正確性，從而提升系統的穩定性。",
+    tags: ["Linux 核心", "rseq", "hrtimer", "硬鎖死", "核心漏洞"],
+    title_en: "Linux Kernel Fixes rseq Vulnerability: Prevents Hard Lockup During Time Slice Extension",
+    summary_en: "This vulnerability exists in the Linux kernel's rseq mechanism and primarily affects stability when handling time slice extension. When the `__exit_to_user_mode_loop()` function calls `rseq_grant_timeslice_extension()` while interrupts are enabled, if the extension is granted, it further calls `hrtimer_rearm_deferred_tif()`. This process triggers `__hrtimer_rearm_deferred()`, which is expected to execute in a state where interrupts are disabled, as it uses `hrtimer_cpu_base::lock` combined with `raw_spin_lock()`. This inconsistent lock state may lead to a risk of",
+    tags_en: ["Linux Kernel", "rseq", "hrtimer", "hard lockup", "kernel vulnerability"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-74749", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260826-037",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心修補：解決 ovpn 鍵槽加密釋放時的競態條件與安全性問題",
+    summary: "本修補針對 Linux 核心中的 ovpn 相關功能，解決了在釋放加密鍵槽（key slot）時可能發生的競態條件和安全性問題。原有的鍵槽釋放路徑透過 RCU 回呼來釋放 AEAD 轉換（AEAD transforms），但此過程不適用於所有加密實作，因為 `crypto_free_aead` 函式在執行時可能會進入睡眠狀態（例如當進行異步或硬體實作的清理工作時）。為了解決此問題，修補建議使用 `queue_rcu_work` 來處理鍵槽釋放。這樣做可以在保持 RCU 讀取器所需的猶豫期（grace period）的同時，將實際的加密清理工作移到工作佇列（workqueue）上下文執行，此處允許進入睡眠。一旦 RCU 工作回呼執行，先前存在的 RCU 讀取器已經消失，且 `kref put` 已證明沒有轉換使用者存在，因此工作者可以安全地釋放 AEAD 轉換並釋放鍵槽。此外，修補還修正了先前補丁在模組退出時會耗盡 ovpn 工作佇列的問題，確保了鍵槽清理工作能夠在模組退出後持續執行。",
+    tags: ["Linux 核心", "ovpn", "kref", "RCU", "加密", "workqueue"],
+    title_en: "Linux Kernel Patch: Addressing Race Condition and Security Issue During ovpn Key Slot Deallocation",
+    summary_en: "This patch addresses ovpn-related functionality within the Linux kernel, resolving a race condition and security issue that can occur during the deallocation of a cryptographic key slot. The original key slot release path used RCU callbacks to free AEAD transforms, but this process was unsuitable for all cryptographic implementations because the `crypto_free_aead` function might enter a sleeping state during execution (for instance, when performing asynchronous or hardware cleanup). To resolve this, the patch recommends using `queue_rcu_work` to handle key slot deallocation. This approach allows the actual cryptographic cleanup work to be moved to a workqueue context—where sleeping is permitted—while maintaining the grace period required by RCU readers. Once the RCU work callback executes, any previously existing RCU readers have vanished, and `kref put` has proven that no user transforms remain, allowing the worker to safely free the AEAD transforms and the key slot. Furthermore, the patch corrects an issue where previous patches would exhaust the ovpn workqueue upon module exit, ensuring that key slot cleanup work continues to execute even after the module has unloaded.",
+    tags_en: ["Linux Kernel", "ovpn", "kref", "RCU", "Cryptography", "workqueue"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-74750", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260826-038",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "riscv Linux 核心修復 ZBB 最佳化 strnlen 函數的邊界檢查漏洞",
+    summary: "本次修復針對 Linux 核心中的一個 riscv 架構相關的漏洞，涉及 ZBB 最佳化版本的 strnlen 函數。該漏洞的根本問題出在字串長度計算的迴圈在檢查對齊邊界之前，會預先載入（load）超出有效字節範圍的單字。當輸入字串的結束位置（s + count）恰好落在頁面邊界，且下一頁未映射時，會導致系統發生錯誤（fault）。修復措施是改變計算對齊邊界的方式，改從最後一個有效字節（s + count - 1）計算，而不是從 s + count 計算。此外，還增加了一個迴圈前的保護機制（pre-loop guard），以確保在所有有效字節僅佔據第一個單字的情況下，計算結果的準確性。這些修復確保了字串長度計算在邊界條件下的穩定性和正確性，提升了系統的可靠性。",
+    tags: ["Linux 核心", "riscv", "strnlen", "邊界檢查", "ZBB"],
+    title_en: "riscv Linux Kernel Fix Addresses Boundary Check Vulnerability in ZBB Optimized strnlen Function",
+    summary_en: "This fix addresses a vulnerability in the Linux kernel related to the riscv architecture, specifically within the ZBB optimized version of the strnlen function. The root cause of the vulnerability lies in the loop used for string length calculation, which pre-loads words exceeding the valid byte range before checking alignment boundaries. When the end position of the input string (s + count) falls exactly on a page boundary, and the next page is unmapped, it can cause a system fault. The remediation involves changing how the alignment boundary is calculated, shifting the calculation from s + count to s + count - 1, using the last valid byte. Additionally, a pre-loop guard has been added to ensure the accuracy of the calculation result when all valid bytes occupy only the first word. These fixes ensure the stability and correctness of string length calculation under boundary conditions, thereby enhancing system reliability.",
+    tags_en: ["Linux Kernel", "riscv", "strnlen", "Boundary Check", "ZBB"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-74751", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260826-039",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心 sctp 漏洞修復：防止未經驗證的 Cookie 參數導致的越界讀寫與權限提升",
+    summary: "本漏洞存在於 Linux 核心的 SCTP 協定實作中，涉及 cookie 驗證機制。當 cookie 驗證被禁用時，`COOKIE_ECHO` 會直接從對端控制的 cookie 位元組恢復固定大小的 AUTH 欄位。攻擊者可以偽造 RANDOM 長度、HMAC 清單或 CHUNKS 清單，使其包含未經本地陣列驗證的長度或識別符。具體而言，偽造的 RANDOM 長度可能導致在建構金鑰向量時發生越界讀取（out-of-bounds reads）。此外，偽造的 HMAC 識別符還可能導致向零長度 AUTH chunk 寫入 32 位元組，為本地權限提升（local privilege escalation）鏈提供了基礎。修復措施要求在將 cookie 參數（包括 RANDOM、HMACS 和 CHUNKS）複製到關聯（association）之前，必須在 cookie 信任邊界處進行驗證。應拒絕無效類型、格式錯誤的長度、不受支援的 HMAC 識別符，以及缺乏 SHA1 或禁止的 chunk ID。此修復旨在強化 SCTP 協定在處理 cookie 參數時的安全性。",
+    tags: ["Linux 核心", "SCTP", "CVE-2026-74752", "越界讀寫", "本地權限提升"],
+    title_en: "Linux Kernel SCTP Vulnerability Fix: Preventing Out-of-Bounds Read/Write and Privilege Escalation via Unvalidated Cookie Parameters",
+    summary_en: "This vulnerability exists in the SCTP protocol implementation within the Linux kernel, specifically concerning the cookie validation mechanism. When cookie validation is disabled, `COOKIE_ECHO` directly restores a fixed-size AUTH field from peer-controlled cookie bytes. An attacker can forge the RANDOM length, HMAC list, or CHUNKS list to include lengths or identifiers that are not validated against local arrays. Specifically, a forged RANDOM length may cause an out-of-bounds read when constructing the key vector. Furthermore, a forged HMAC identifier can lead to writing 32 bytes to a zero-length AUTH chunk, providing a foundation for local privilege escalation. The fix requires validation at the cookie trust boundary before any cookie parameters (including RANDOM, HMACs, and CHUNKS) are copied to the association. Invalid types, incorrectly formatted lengths, unsupported HMAC identifiers, and missing SHA1 or forbidden chunk IDs must be rejected. This patch aims to enhance the security of the SCTP protocol when handling cookie parameters.",
+    tags_en: ["Linux Kernel", "SCTP", "CVE-2026-74752", "Out-of-Bounds Read/Write", "Local Privilege Escalation"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-74752", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260826-040",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心漏洞修補：perf 模組在處理退出狀態事件時的群組領導者驗證缺陷",
+    summary: "本漏洞存在於 Linux 核心的 perf 模組中，涉及 `perf_event_remove_on_exec()` 函數在設定 remove-on-exec 事件為 EXIT 狀態後，未能完全斷開其群組關係。由於早期驗證機制僅排除 REVOKED 和 DEAD 事件，攻擊者可以利用此缺陷將新的「兄弟」事件連結到這個已脫離群組的領導者。當領導者被關閉時，`perf_group_detach()` 函數會因為 PERF_ATTACH_GROUP 位元已清除而跳過這個新的兄弟事件。最終，該兄弟事件會保留一個指向已釋放事件的 group_leader 指標，可能導致記憶體操作錯誤或資訊洩露。修補措施要求在執行 `perf_group_detach()` 時，必須在持有共享上下文互斥鎖（shared context mutex）的狀態下進行檢查，以防止目標任務在驗證和群組附加之間脫離領導者，從而確保群組領導者在 EXIT 狀態時被正確拒絕。此修補旨在提高 Linux 核心在處理性能監控事件時的安全性。",
+    tags: ["Linux 核心", "perf 模組", "CVE-2026-74753", "記憶體安全", "Linux 核心"],
+    title_en: "Linux Kernel Vulnerability Patch: Group Leader Validation Flaw in perf Module During Exit Status Event Handling",
+    summary_en: "This vulnerability resides in the perf module of the Linux kernel, specifically within the `perf_event_remove_on_exec()` function. When setting the remove-on-exec event to the EXIT status, the function fails to completely sever its group relationship. Because the early validation mechanism only excludes REVOKED and DEAD events, an attacker can exploit this flaw to link a new 'sibling' event to this leader, which has already detached from the group. When the leader is closed, the `perf_group_detach()` function skips this new sibling event because the PERF_ATTACH_GROUP bit has been cleared. Consequently, the sibling event retains a `group_leader` pointer pointing to a released event, potentially leading to memory corruption or information leakage. The patch requires that when executing `perf_group_detach()`, a check must be performed while holding the shared context mutex to prevent the target task from detaching from the leader between validation and group attachment, thereby ensuring the group leader is correctly rejected in the EXIT status. This patch aims to enhance the security of the Linux kernel when handling performance monitoring events.",
+    tags_en: ["Linux Kernel", "perf module", "CVE-2026-74753", "Memory Safety", "Linux Kernel"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-74753", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260826-041",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心修復 scsi: core 漏洞，解決 PM 觸發的競態條件導致的資源釋放錯誤",
+    summary: "本漏洞存在於 Linux 核心的 SCSI 相關元件中，具體為 `scsi: core: pair EH runtime PM get and put` 的問題。該問題源於在錯誤處理流程（EH path）中，`shost->eh_noresume` 狀態在執行過程中可能被修改，導致一個單一的錯誤處理迭代（EH iteration）在進入時跳過自動恢復（autoresume）的資源獲取，但在退出時仍會執行資源釋放（runtime PM put）。這種不匹配的資源操作會導致一個未配對的 runtime PM 釋放，進而觸發 runtime PM 使用計數器（usage count）的下溢（underflow），可能造成系統不穩定或安全問題。修復方法是將 `eh_noresume` 變數改為標準的 bool 類型，並使用 `READ_ONCE()` 和 `WRITE_ONCE()` 確保在每次 EH 迭代中，先擷取一次狀態快照，並使用該快照來決定資源獲取和釋放的行為，從而消除競態條件。",
+    tags: ["Linux 核心", "scsi", "runtime PM", "競態條件", "CVE-2026-74754"],
+    title_en: "Linux Kernel Fix for scsi: core Vulnerability, Resolving Resource Release Error Caused by Race Condition Triggered by PM",
+    summary_en: "This vulnerability exists in the SCSI-related component of the Linux kernel, specifically in `scsi: core: pair EH runtime PM get and put`. The issue stems from the possibility that the `shost->eh_noresume` state can be modified during the error handling process (EH path). This causes a single error handling iteration (EH iteration) to skip resource acquisition of autoreresume upon entry, but still perform resource release (runtime PM put) upon exit. This mismatch in resource operations leads to an unpaired runtime PM release, which in turn triggers an underflow of the runtime PM usage counter, potentially causing system instability or security issues. The fix involves changing the `eh_noresume` variable to a standard bool type and using `READ_ONCE()` and `WRITE_ONCE()` to ensure that a state snapshot is taken at the beginning of every EH iteration, and this snapshot is used to determine the resource acquisition and release behavior, thereby eliminating the race condition.",
+    tags_en: ["Linux Kernel", "scsi", "runtime PM", "Race Condition", "CVE-2026-74754"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-74754", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260826-042",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心修復 ovpn 相關漏洞：防止在完成加密回呼清理前釋放對等點參考",
+    summary: "本漏洞存在於 Linux 核心的 OpenVPN (ovpn) 相關功能中，涉及加密完成回呼 (Crypto completion callbacks) 的清理時序問題。當加密回呼持有 key-slot 和 peer 參考時，如果過早釋放對等點 (peer) 參考，可能導致 netdev 未正確註銷或模組移除流程無法順利進行。具體來說，如果 `ovpn_crypto_key_slot_put` 在 `ovpn_peer_put` 之後執行，且在 `ovpn_cleanup_rcu_barrier` 已經運行之後，可能會安排一個依賴模組文本的 RCU 回呼。此外，在傳輸 (TX) 錯誤路徑中，`ovpn_peer_put` 之後釋放剩餘的 skb，導致回呼清理發生在對等點/netdev 生命週期窗口之外。修復建議是：必須先釋放 key slot 並釋放任何剩餘的 skb，然後再將對等點參考作為最後的回呼動作釋放。",
+    tags: ["Linux 核心", "OpenVPN", "ovpn", "netdev", "RCU", "CVE-2026-80519"],
+    title_en: "Linux Kernel Fix Addresses ovpn Vulnerability: Prevents Peer Reference Release Before Crypto Callback Cleanup",
+    summary_en: "This vulnerability resides in the OpenVPN (ovpn) functionality within the Linux kernel, involving a timing issue during the cleanup of crypto completion callbacks. If the crypto callback holds peer and key-slot references, prematurely releasing the peer reference could lead to incorrect netdev unregistration or failure during module removal. Specifically, if `ovpn_crypto_key_slot_put` executes after `ovpn_peer_put`, and after `ovpn_cleanup_rcu_barrier` has run, it might schedule an RCU callback dependent on module text. Furthermore, in the transmit (TX) error path, releasing remaining skb after `ovpn_peer_put` causes the callback cleanup to occur outside the peer/netdev lifecycle window. The suggested fix is: the key slot and any remaining skb must be released first, and only then should the peer reference be released as the final callback action.",
+    tags_en: ["Linux Kernel", "OpenVPN", "ovpn", "netdev", "RCU", "CVE-2026-80519"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-80519", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260826-043",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "OpenVPN 核心修復 NULL 解引用漏洞：處理缺失金鑰時的安全性提升",
+    summary: "本漏洞存在於 OpenVPN 的核心功能中，涉及 `ovpn_crypto_kill_key` 函數。當該函數假設兩個加密槽位（crypto slots）都已填入金鑰，並在檢查之前解引用每個槽位時，如果實際的對等方（peer）只安裝了一個金鑰，或嘗試移除一個不存在的金鑰時，可能會導致 NULL 解引用（NULL dereference）的漏洞。此問題可能允許攻擊者在特定條件下利用不當的狀態假設來執行攻擊。開發者已修復此問題，修復的重點是確保在持有加密狀態鎖（crypto state lock）時，先讀取每個槽位一次，檢查是否為 NULL，然後再檢查 `key_id`，並僅替換實際匹配的槽位，從而避免了對缺失金鑰的錯誤解引用。建議使用已修補的 OpenVPN 版本以確保連線的穩定性和安全性。",
+    tags: ["OpenVPN", "NULL dereference", "Linux 核心", "加密金鑰", "CVE-2026-80520"],
+    title_en: "OpenVPN Core Fixes NULL Dereference Vulnerability: Security Improvement When Handling Missing Keys",
+    summary_en: "This vulnerability exists in the core functionality of OpenVPN, involving the `ovpn_crypto_kill_key` function. When this function assumes that both crypto slots are populated with keys and dereferences each slot before checking, if the actual peer only has one key installed, or if it attempts to remove a non-existent key, it may lead to a NULL dereference vulnerability. This issue could potentially allow an attacker to exploit improper state assumptions under specific conditions. Developers have fixed this issue, focusing on ensuring that while holding the crypto state lock, the function first reads each slot to check if it is NULL, and only then checks the `key_id`, replacing only the slot that actually matches, thereby avoiding incorrect dereferencing of missing keys. It is recommended to use the patched OpenVPN version to ensure connection stability and security.",
+    tags_en: ["OpenVPN", "NULL dereference", "Linux Kernel", "Cryptographic Key", "CVE-2026-80520"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-80520", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260826-044",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心 af_unix 漏洞：未正確解除 SCC 邊緣導致潛在記憶體管理問題",
+    summary: "本漏洞存在於 Linux 核心的 af_unix 相關元件，涉及在處理 SCC（Strongly Connected Components）邊緣時的記憶體管理缺陷。攻擊者在特定條件下，可以利用 `send()` 和 `close()` 操作的時序窗口，導致核心在執行垃圾回收（GC）時，無法正確釋放某些邊緣的相關記憶體結構。具體來說，當一個邊緣被建立但其相關的 skb（socket buffer）尚未被排隊時，如果在 GC 觸發前執行關閉操作，GC 可能錯誤地判斷邊緣為「死亡」，但由於 skb 尚未排隊，導致 B 節點無法被釋放。雖然這本身可能不會立即導致崩潰，但後續的 `unix_walk_scc_fast()` 呼叫會加劇問題，使得核心在執行邊緣解除（unlink scc_entry）時，未能及時釋放節點。修補建議是修改 `unix_del_edge()` 函數，確保在釋放節點之前，必須先解除其 SCC 邊緣的相關記錄，以確保記憶體資源的正確釋放。",
+    tags: ["Linux 核心", "af_unix", "SCC", "記憶體管理", "CVE-2026-80521"],
+    title_en: "Linux Kernel af_unix Vulnerability: Improper SCC Edge Cleanup Leads to Potential Memory Management Issues",
+    summary_en: "This vulnerability resides in the Linux kernel's af_unix component and involves a memory management flaw when processing Strongly Connected Components (SCC) edges. Under specific conditions, an attacker can exploit the timing window between `send()` and `close()` operations, causing the kernel to fail to correctly release memory structures associated with certain edges during garbage collection (GC). Specifically, if an edge is created but its related skb (socket buffer) has not yet been queued, and a close operation is executed before GC is triggered, GC might incorrectly determine the edge as 'dead.' However, because the skb has not been queued, the associated B node cannot be released. While this might not immediately cause a crash, subsequent calls to `unix_walk_scc_fast()` exacerbate the issue, causing the kernel to fail to timely release the node when unlinking the edge. The suggested fix is to modify the `unix_del_edge()` function to ensure that the related record for the SCC edge is unlinked before the node is released, thereby guaranteeing the correct release of memory resources.",
+    tags_en: ["Linux Kernel", "af_unix", "SCC", "Memory Management", "CVE-2026-80521"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-80521", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260826-045",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心修復 tegra 相關漏洞：修正 tegra_gcm_do_one_req() 中的計算錯誤",
+    summary: "本修補針對 Linux 核心中的 tegra 相關元件，修正了 `tegra_gcm_do_one_req()` 函數中的計算邏輯錯誤。原問題是，如果呼叫者未呼叫 `tegra_gcm_setauthsize()`，導致 `ctx->authsize` 保持為零，當執行解密操作時，由於 `rctx->cryptlen` 的計算不正確，可能導致寫入超出 `rctx->dst_sg` 緩衝區的緩衝區溢出（write beyond）。修補建議將 `rctx->cryptlen` 的計算方式統一為與 `tegra_ccm_crypt_init()` 函數一致的邏輯。此外，修補還包含了清理工作，移除了看似未使用的 `tegra_aead_ctx->authsize` 欄位，並簡化了 `tegra_ccm_setauthsize()` 和 `tegra_gcm_setauthsize()` 函數。建議使用更新的 Linux 核心版本以修復此安全問題。",
+    tags: ["Linux 核心", "tegra", "GCM", "緩衝區溢出", "安全修補"],
+    title_en: "Linux Kernel Fixes Tegra Vulnerability: Corrects Calculation Error in tegra_gcm_do_one_req()",
+    summary_en: "This patch addresses a tegra-related component within the Linux kernel, correcting a calculation logic error in the `tegra_gcm_do_one_req()` function. The original issue was that if the caller failed to call `tegra_gcm_setauthsize()`, causing `ctx->authsize` to remain zero, the incorrect calculation of `rctx->cryptlen` during decryption could lead to a buffer overflow (write beyond) outside the `rctx->dst_sg` buffer. The patch recommends unifying the calculation of `rctx->cryptlen` to match the logic used in the `tegra_ccm_crypt_init()` function. Additionally, the patch includes cleanup work, removing the seemingly unused `tegra_aead_ctx->authsize` field, and simplifying the `tegra_ccm_setauthsize()` and `tegra_gcm_setauthsize()` functions. Users are advised to use an updated Linux kernel version to mitigate this security issue.",
+    tags_en: ["Linux Kernel", "tegra", "GCM", "Buffer Overflow", "Security Patch"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-80522", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260826-046",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心修補：修復 clk: spacemit: k3 中 HDMA 時鐘設定為關鍵的漏洞",
+    summary: "本漏洞存在於 Linux 核心的 clk: spacemit: k3 模組中。HDMA 時鐘負責 X100 RISC-V 核心的內部 TCM 存取路徑。若未將時鐘旗標設定為關鍵（critical），可能導致系統在執行向量指令存取並產生頁面錯誤（page fault）等情況時，無法正確維持時鐘狀態，進而造成整個 Linux 系統掛起（hang）。此修補旨在確保 HDMA 時鐘的狀態被正確識別為關鍵，防止其被意外關閉，從而維持系統的穩定性與功能性。建議所有使用相關硬體或核心版本的系統，應立即更新至修補後的 Linux 核心版本以避免潛在的系統掛起風險。",
+    tags: ["Linux 核心", "CVE-2026-80523", "RISC-V", "HDMA", "系統掛起"],
+    title_en: "Linux Kernel Patch: Fixes Vulnerability Where HDMA Clock Setting is Critical in clk: spacemit: k3",
+    summary_en: "This vulnerability resides in the Linux kernel's clk: spacemit: k3 module. The HDMA clock is responsible for the internal TCM access path of the X100 RISC-V core. If the clock flag is not set as critical, it may fail to maintain the clock state correctly when the system executes vector instructions or generates a page fault, potentially causing the entire Linux system to hang. This patch aims to ensure that the HDMA clock state is correctly identified as critical, preventing its accidental shutdown, thereby maintaining system stability and functionality. All systems using the relevant hardware or kernel versions are advised to immediately update to the patched Linux kernel version to mitigate the potential risk of system hang.",
+    tags_en: ["Linux Kernel", "CVE-2026-80523", "RISC-V", "HDMA", "System Hang"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-80523", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260826-047",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心修補：optee 模組修復 NULL 參考錯誤，防止記憶體壓力下的潛在漏洞",
+    summary: "本篇公告指出在 Linux 核心的 optee 模組中發現了一個潛在的 NULL 參考錯誤（null dereference）漏洞。該漏洞位於 `optee_ffa_lend_protmem` 函式中，由於缺乏對已分配指標的有效性檢查，在記憶體壓力（memory pressure）情況下可能導致程式執行異常或安全問題。此問題已被修復，修補內容為增加缺失的 NULL 檢查機制，以確保指標的有效性。建議使用已修補的 Linux 核心版本，以避免此類因指標驗證不足而產生的安全風險。由於原文未提供 CVSS 分數、受影響版本範圍或具體修補版本號，建議系統管理員應參考官方安全公告進行升級。",
+    tags: ["Linux 核心", "optee", "CVE-2026-80524", "NULL 參考", "記憶體安全"],
+    title_en: "Linux Kernel Patch: optee Module Fixes NULL Reference Error, Preventing Potential Vulnerability Under Memory Pressure",
+    summary_en: "This announcement details a potential NULL reference vulnerability discovered in the optee module within the Linux kernel. The vulnerability resides in the `optee_ffa_lend_protmem` function. Due to the lack of effective validity checks on allocated pointers, this flaw could potentially lead to program execution anomalies or security issues under memory pressure. This issue has been patched by adding the missing NULL check mechanism to ensure pointer validity. System administrators are advised to use the patched Linux kernel version to mitigate security risks arising from insufficient pointer validation. Since the original text did not provide a CVSS score, affected version range, or specific patch version number, system administrators should refer to official security advisories for upgrade guidance.",
+    tags_en: ["Linux Kernel", "optee", "CVE-2026-80524", "NULL Reference", "Memory Safety"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-80524", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260826-048",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心 ASoC 漏洞：設備在 Suspend/Resume 循環後，IPC 緩存資料過期導致 DMA 衝突與系統崩潰",
+    summary: "本漏洞存在於 Linux 核心的 ASoC (Audio Streaming Core) 驅動程式中，特別影響處理器在 Suspend/Resume 狀態切換時的設備初始化流程。當系統進入 Suspend 狀態後，相關的 widget 清單會保留，導致 `sof_pcm_hw_params` 跳過關鍵的 `sof_pcm_setup_connected_widgets` 函式，進而使負責建構 IPC 緩存資料的 `ipc_prepare` 函式無法再次執行。結果，用於傳送給韌體（firmware）的 `ipc_config_data` 緩存載荷（payload）會是過時的（stale），其中包含舊的 DMA 頻道分配資訊。當系統嘗試使用這些過時的資料進行 DMA 傳輸時，會導致 DMA 頻道衝突（DMA channel conflicts），進而引發韌體錯誤和系統崩潰。修補建議是在 `sof_ipc4_widget_setup` 函式中，在發送 IPC 訊息之前，強制刷新 `ipc_config_data` 中的 `copier_data` 和 `dma_config_tlv` 部分，確保傳送的載荷始終反映當前的 DMA 狀態。此外，對於 DAI copiers，還需在複製資料前暫時膨脹 `gtw_cfg.config_length` 以包含 TLV 大小，並在後續步驟中恢復。",
+    tags: ["Linux 核心", "ASoC", "DMA", "Suspend/Resume", "ipc_config_data", "sof_pcm_setup_connected_widgets"],
+    title_en: "Linux Kernel ASoC Vulnerability: Stale IPC Cache Data After Suspend/Resume Cycle Causes DMA Conflict and System Crash",
+    summary_en: "This vulnerability resides in the ASoC (Audio Streaming Core) driver within the Linux kernel, specifically affecting the device initialization process when the processor switches between Suspend/Resume states. After the system enters the Suspend state, the relevant widget list is retained, causing `sof_pcm_hw_params` to skip the critical `sof_pcm_setup_connected_widgets` function. This prevents the `ipc_prepare` function, which is responsible for constructing the IPC cache data, from executing again. Consequently, the `ipc_config_data` cache payload sent to the firmware becomes stale, containing outdated DMA channel allocation information. When the system attempts to use this stale data for DMA transfer, it leads to DMA channel conflicts, triggering firmware errors and system crashes. The suggested fix is to forcibly refresh the `copier_data` and `dma_config_tlv` sections within `ipc_config_data` in the `sof_ipc4_widget_setup` function before sending the IPC message, ensuring that the transmitted payload always reflects the current DMA state. Furthermore, for DAI copiers, it is necessary to temporarily expand `gtw_cfg.config_length` to include the TLV size before copying data, and then restore it in subsequent steps.",
+    tags_en: ["Linux Kernel", "ASoC", "DMA", "Suspend/Resume", "ipc_config_data", "sof_pcm_setup_connected_widgets"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-80525", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260826-049",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心 ASoC 漏洞：tas2562 缺乏輸入驗證，可能導致緩衝區溢出",
+    summary: "本漏洞存在於 Linux 核心的 ASoC 驅動程式中，具體為 tas2562 相關功能。問題點在於 `tas2562_volume_control_put()` 函數未對來自使用者空間的控制值進行充分驗證。該函數直接使用該輸入值在一個固定大小的陣列中查找，若輸入值超出範圍，可能導致陣列索引溢出（overflow），進而將任意讀取到的值寫入設備，造成潛在的資訊洩露或系統不穩定。修補建議是為該函數增加輸入驗證機制，確保載入的值確實存在於預期的陣列範圍內，以防止惡意或錯誤的輸入導致的行為。由於原文未提供 CVSS 分數、受影響版本或修補日期，實務影響評估需依據實際使用環境進行。建議系統管理員應關注 Linux 核心的相關安全公告，並儘速更新到修補後的版本。",
+    tags: ["Linux 核心", "ASoC", "tas2562", "緩衝區溢出", "Linux 漏洞"],
+    title_en: "Linux Kernel ASoC Vulnerability: tas2562 Lacks Input Validation, Potential Buffer Overflow",
+    summary_en: "This vulnerability resides in the ASoC driver within the Linux kernel, specifically related to tas2562 functionality. The issue lies in the `tas2562_volume_control_put()` function, which fails to adequately validate control values originating from user space. This function directly uses the input value to search within a fixed-size array. If the input value exceeds the defined range, it could lead to an array index overflow, potentially allowing arbitrary read values to be written to the device, causing potential information leakage or system instability. The recommended fix is to implement input validation within this function, ensuring that loaded values are strictly within the expected array range to prevent malicious or erroneous inputs from causing issues. Since the original text did not provide a CVSS score, affected versions, or patch dates, practical impact assessment must be based on the actual usage environment. System administrators are advised to monitor relevant Linux kernel security advisories and update to patched versions promptly.",
+    tags_en: ["Linux Kernel", "ASoC", "tas2562", "Buffer Overflow", "Linux Vulnerability"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-80526", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260826-050",
+    trackers: ["os", "security"],
     category: "Windows",
     title: "揭秘傳說中的 Windows XP 盜版金鑰：非駭客破解，而是企業授權漏洞所致",
     summary: "本文回顧了 Windows XP 上一個著名的「盜版金鑰」FCKGW-RHQQ2-YXRKT-8TG6W-2B7Q8 的傳說。許多人誤以為這是一個駭客破解或繞過 Microsoft 反盜版系統的密碼，但事實上，它只是一個合法的企業批量授權金鑰（Volume License Key, VLK）。\n在 Windows XP 早期，Microsoft 推出了產品激活技術 (Product Activation)，透過生成硬體 ID 並與產品金鑰進行比對來提高防盜能力。此外，為了方便大型企業管理數千台電腦，Microsoft 設計了 Volume License Keys (VLKs)。由於 FCKGW-RHQQ2-YXRKT-8TG6W-2B7Q8 是一個合法的 VLK，它在 XP 的激活邏輯中被「白名單」化，系統會跳過正常的激活提示。\n這導致盜版者可以利用這個漏洞製作出無需正常激活的 ISO 映像檔。雖然該金鑰和相關服務多年已停用或黑名單化，但此事件揭示了早期作業系統在企業級授權與消費者產品之間存在的安全盲點。",
@@ -282,7 +702,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-021",
+    id: "20260826-051",
     trackers: ["security"],
     category: "法規與標準",
     title: "數發部推動政府AI治理：建立四步驟風險評估與分級內控，確保AI應用安全",
@@ -296,7 +716,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-022",
+    id: "20260826-052",
     trackers: ["eu_cra", "security"],
     category: "法規與標準",
     title: "愛立信透過上游協作應對 EU Cyber Resilience Act，貢獻超過 1,400 個依賴更新與 214 個安全修復",
@@ -310,7 +730,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-023",
+    id: "20260826-053",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "CVE-2026-73180：Apache Tomcat 存在未正確終止 WebSocket Session 的漏洞",
@@ -324,7 +744,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-024",
+    id: "20260826-054",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Apache Tomcat 存在 CVE-2026-68763 漏洞：HTTP/2 回傳追蹤中的資源分配洩漏導致服務拒絕",
@@ -338,7 +758,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-025",
+    id: "20260826-055",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Apache Tomcat 存在 Principal lookup 認證失敗漏洞 (CVE-2026-68569)，可能導致未經授權登入",
@@ -352,7 +772,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-026",
+    id: "20260826-056",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Apache Tomcat 存在 CVE-2026-68525 漏洞：表單認證後重定向可能繞過方法限制",
@@ -366,7 +786,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-027",
+    id: "20260826-057",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Apache Tomcat 存在 CVE-2026-66422 漏洞：Servlet 角色引用可繞過宣告式權限限制",
@@ -380,7 +800,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-028",
+    id: "20260826-058",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Apache Tomcat 存在 CVE-2026-65927 漏洞：RewriteValve 重啟機制可能繞過存取控制",
@@ -394,7 +814,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-029",
+    id: "20260826-059",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Apache Tomcat 存在 CVE-2026-65905：DIGEST 認證機制可被有限次重放攻擊",
@@ -408,7 +828,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-030",
+    id: "20260826-060",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Apache Tomcat 存在 CVE-2026-65637：HTTP/2 SNI 驗證不嚴格導致的繞過漏洞",
@@ -422,7 +842,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-031",
+    id: "20260826-061",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Apache Tomcat 存在 TOCTOU 競態條件漏洞 (CVE-2026-65183)，允許本地未授權使用者存取 Unix Domain Socket",
@@ -436,7 +856,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-032",
+    id: "20260826-062",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Apache Tomcat 存在 CVE-2026-65182：長前綴安全限制繞過漏洞，建議立即升級",
@@ -450,7 +870,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-033",
+    id: "20260826-063",
     trackers: ["eu_cra"],
     category: "合規指引",
     title: "提升個人資安意識：從日常習慣建立防範網路詐騙與資訊洩漏的實用指南",
@@ -464,7 +884,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-034",
+    id: "20260826-064",
     trackers: ["os", "security"],
     category: "漏洞與威脅情報",
     title: "CISA新增六個已知遭利用漏洞，提醒機構優先修補高風險資安漏洞",
@@ -478,7 +898,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-035",
+    id: "20260826-065",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "CISA發布漏洞審查報告：強調基礎安全缺陷與風險優先級管理",
@@ -492,7 +912,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-036",
+    id: "20260826-066",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "與黎巴嫩相關的 Dark Caracal 威脅群組升級惡意工具，新增 GoCaracal 框架進行網路間諜活動",
@@ -506,7 +926,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-037",
+    id: "20260826-067",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Huntress揭露假北韓IT員工詐騙手法：從設備異常到身份文件疑點",
@@ -520,7 +940,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-038",
+    id: "20260826-068",
     trackers: ["os", "security"],
     category: "漏洞與威脅情報",
     title: "Android惡意軟體透過車用頭顯示器更新系統感染，Botnet活動擴散至車載資訊娛樂系統",
@@ -534,7 +954,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-039",
+    id: "20260826-069",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "新型釣魚服務 NovaCookies 可竊取 Microsoft 365 認證會話，繞過 MFA 防護",
@@ -548,7 +968,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-040",
+    id: "20260826-070",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "資安公司揭露網路間諜活動 Operation QuicSilver：中國駭客鎖定緬甸政府，利用VHD虛擬磁碟散播Go後門",
@@ -562,7 +982,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-041",
+    id: "20260826-071",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "miniOrange WordPress外掛程式遭兩漏洞攻擊，未經驗證可偽造SAML授權，資安專家籲立即修補",
@@ -576,7 +996,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-042",
+    id: "20260826-072",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "微軟警告：AI 基礎設施成為高價值目標，駭客利用 LiteLLM 閘道執行憑證竊取與後門部署",
@@ -590,7 +1010,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-043",
+    id: "20260826-073",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "美國司法部宣布瓦解中國駭客組織 QTFY 的 QScan 與 QTRouter 平台，威脅關鍵基礎設施",
@@ -604,7 +1024,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-044",
+    id: "20260826-074",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "資安研究揭露 Nimbus Manticore 擴大工具集：針對中東與歐洲的 APT 威脅分析",
@@ -618,7 +1038,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-045",
+    id: "20260826-075",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "新型 AitM 釣魚工具 NovaCookies 劫持 Microsoft 365 登入，透過 Docusign 偽裝進行會話竊取",
@@ -632,7 +1052,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-046",
+    id: "20260826-076",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Kaltura HTML5 影片播放器曝兩高危未修補漏洞：遠端讀取檔案及執行程式碼",
@@ -646,7 +1066,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-047",
+    id: "20260826-077",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "OpenAI揭露俄羅斯利用ChatGPT進行影響作戰：建立虛假權威與國家主權指數",
@@ -660,7 +1080,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-048",
+    id: "20260826-078",
     trackers: ["os", "security"],
     category: "漏洞與威脅情報",
     title: "研究揭露新型 Windows 後門 SLEEPWALKER：利用 DLL 側載機制監聽網路流量",
@@ -674,7 +1094,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-049",
+    id: "20260826-079",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "CISA警告：Gitea存在CVE-2026-60004遠端代碼執行漏洞，攻擊者可透過註冊功能觸發",
@@ -688,7 +1108,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-050",
+    id: "20260826-080",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "駭客利用 AI 語音代理人，建立「假 Apple 客服」詐騙平台竊取裝置密碼",
@@ -702,7 +1122,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-051",
+    id: "20260826-081",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Vim 編輯器 32 位元版本面臨堆疊溢出風險：讀取惡意 Undo 檔案可導致記憶體寫入",
@@ -716,7 +1136,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-052",
+    id: "20260826-082",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Vim 編輯器 libvterm 存在越界存取漏洞，可能導致記憶體損壞及崩潰",
@@ -730,7 +1150,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-053",
+    id: "20260826-083",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "graphql-go/graphql 存在二次方複雜度 DoS 漏洞，可透過錯誤訊息觸發 CPU 耗盡",
@@ -744,7 +1164,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-054",
+    id: "20260826-084",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "GNU Emacs 發現零點擊本地命令執行漏洞 (CVE-2026-79992)",
@@ -758,7 +1178,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-055",
+    id: "20260826-085",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Apache APISIX 存在 LDAP 注入漏洞：CVE-2026-75020 允許身份冒充",
@@ -772,7 +1192,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-056",
+    id: "20260826-086",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Apache APISIX 存在 CVE-2026-75005 漏洞：單一請求可導致 CPU 耗盡的 DoS 攻擊",
@@ -786,7 +1206,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-057",
+    id: "20260826-087",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Apache APISIX 存在跨用戶響應污染漏洞 (CVE-2026-74848)，影響 Serverless 插件路由",
@@ -800,7 +1220,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-058",
+    id: "20260826-088",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Apache APISIX 存在 CVE-2026-63041 漏洞：attach-consumer-label 插件未正確清除標頭",
@@ -814,7 +1234,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-059",
+    id: "20260826-089",
     trackers: ["os"],
     category: "Apple",
     title: "iOS 27 重磅升級：提醒事項（Reminders）整合 Apple Intelligence，實現自然語言描述創建提醒",
@@ -828,7 +1248,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-060",
+    id: "20260826-090",
     trackers: ["os"],
     category: "Apple",
     title: "Counterpoint報告：iPhone 17系列在2026年第二季蟬聯全球暢銷手機冠軍",
@@ -842,7 +1262,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-061",
+    id: "20260826-091",
     trackers: ["os"],
     category: "Apple",
     title: "Apple提前發布Mac mini與Mac Studio，預示9月大型新品發表會將涵蓋多樣產品線",
@@ -856,7 +1276,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-062",
+    id: "20260826-092",
     trackers: ["os"],
     category: "Apple",
     title: "Apple 預告九月活動，中國地區標語暗示首次摺疊式 iPhone 產品線",
@@ -870,7 +1290,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-063",
+    id: "20260826-093",
     trackers: ["os"],
     category: "Apple",
     title: "Apple 釋出 #AppleEvent 專屬 Hashmoji，預告 9 月 9 日新品發表會",
@@ -884,7 +1304,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-064",
+    id: "20260826-094",
     trackers: ["os"],
     category: "Apple",
     title: "iPhone Ultra 傳聞顏色曝光：資安新聞編輯應謹慎看待 AI 生成的色彩資訊",
@@ -898,7 +1318,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-065",
+    id: "20260826-095",
     trackers: ["os"],
     category: "Apple",
     title: "Astropad發布Rock Paper Pencil 4.0，為Apple Pencil和iPad提供石墨筆觸體驗",
@@ -912,7 +1332,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-066",
+    id: "20260826-096",
     trackers: ["os"],
     category: "Apple",
     title: "Apple 傳聞 iPhone Ultra 將搭載三項重大升級：幾乎無摺痕螢幕、超薄設計與液態金屬<0xE9><0x89><0xB8>接",
@@ -926,7 +1346,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-067",
+    id: "20260826-097",
     trackers: ["os"],
     category: "Apple",
     title: "Apple Wallet 數位駕照功能擴展至維吉尼亞州，支援美國更多地區的數位身份驗證",
@@ -940,7 +1360,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-068",
+    id: "20260826-098",
     trackers: ["os"],
     category: "Apple",
     title: "iOS 27 Beta 揭示 Apple 正在為 Apple TV 4K 與 HomePod 整合 Apple Intelligence 功能",
@@ -954,7 +1374,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-069",
+    id: "20260826-099",
     trackers: ["os"],
     category: "Apple",
     title: "Apple 升級近期訂購的 M4 Mac mini，免費升級至 M6 或 M5 Pro 型號",
@@ -968,7 +1388,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-070",
+    id: "20260826-100",
     trackers: ["os"],
     category: "Apple",
     title: "Apple 地圖服務正式引入廣告：用戶反應與產業影響分析",
@@ -982,7 +1402,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-071",
+    id: "20260826-101",
     trackers: ["os"],
     category: "Apple",
     title: "Apple M5 Max Mac Studio 升級陷阱：GPU 與記憶體升級成本隱藏加總 $600",
@@ -996,7 +1416,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-072",
+    id: "20260826-102",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "資安業者揭露：77個可疑Firefox延伸套件中，40個惡意竊取加密貨幣錢包敏感資訊",
@@ -1010,7 +1430,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-073",
+    id: "20260826-103",
     trackers: ["os"],
     category: "Android",
     title: "Google Keep for Android 推出「筆記內搜尋」功能，提升用戶在筆記內容中的文字查找效率",
@@ -1024,7 +1444,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-074",
+    id: "20260826-104",
     trackers: ["os"],
     category: "Android",
     title: "Google Play 針對記憶體使用提出新標準：Android 17 將實施應用程式記憶體限制",
@@ -1038,7 +1458,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-075",
+    id: "20260826-105",
     trackers: ["os"],
     category: "Android",
     title: "Motorola 宣布 Android 17 更新功能，重點導入主題圖示與多樣化介面優化",
@@ -1052,7 +1472,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-076",
+    id: "20260826-106",
     trackers: ["os"],
     category: "Android",
     title: "Nothing Phone (3) 在 Amazon 進行限時促銷，大幅降價至 $499，具備高性價比的 Android 手機選擇",
@@ -1066,7 +1486,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-077",
+    id: "20260826-107",
     trackers: ["os"],
     category: "Android",
     title: "三星 Galaxy Watch 8 系列開始測試 Wear OS 7 Beta，強化健康功能並支援 Gemini 服務",
@@ -1080,7 +1500,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-078",
+    id: "20260826-108",
     trackers: ["os"],
     category: "Android",
     title: "三星 Galaxy S26 Ultra 奪冠：Q2 2026 全球最暢銷 Android 手機",
@@ -1094,7 +1514,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-079",
+    id: "20260826-109",
     trackers: ["os"],
     category: "Android",
     title: "Nothing OS 5.0 Beta 啟動，基於 Android 17 的新版系統面臨下載錯誤，公司正積極修復",
@@ -1108,7 +1528,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-080",
+    id: "20260826-110",
     trackers: ["os"],
     category: "Android",
     title: "Google 推出 Android Pulse 系統服務：用於系統資源異常偵測與診斷",
@@ -1122,7 +1542,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-081",
+    id: "20260826-111",
     trackers: ["os", "security"],
     category: "Android",
     title: "Google Play 提高 App 品質標準：導入記憶體使用與安全上線新門檻",
@@ -1136,7 +1556,21 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-082",
+    id: "20260826-112",
+    trackers: ["os", "security"],
+    category: "Android",
+    title: "Android 應用程式 Myna Point 存在不當授權漏洞，可透過自訂 URL Scheme 執行任意 JavaScript",
+    summary: "Android 應用程式 Myna Point 存在一個不當授權（Improper Authorization）的漏洞，屬於 CWE-939。攻擊者若在用戶的 Android 設備上安裝惡意應用程式，可利用 Intent 機制，透過觸發受影響應用程式的自訂 URL Scheme，進而執行任意 JavaScript 代碼。此漏洞的實務影響為，攻擊者可能在受影響應用程式的環境中執行惡意腳本，造成資料洩漏或功能劫持。修補建議是開發者應嚴格實施權限檢查，確保應用程式在處理自訂 URL Scheme 或 Intent 時，能正確驗證呼叫來源和權限，防止未經授權的外部代碼執行。",
+    tags: ["Myna Point", "Android", "CWE-939", "Intent", "不當授權", "JavaScript"],
+    title_en: "Myna Point Android Application has Improper Authorization Vulnerability, Allowing Arbitrary JavaScript Execution via Custom URL Scheme",
+    summary_en: "The Myna Point Android application contains an Improper Authorization vulnerability, classified as CWE-939. An attacker who installs a malicious application on a user's Android device can exploit the Intent mechanism. By triggering the vulnerable application's custom URL Scheme, the attacker can execute arbitrary JavaScript code. The practical impact of this vulnerability is that an attacker may execute malicious scripts within the affected application's environment, leading to data leakage or function hijacking. The recommended remediation is for developers to strictly implement permission checks, ensuring that the application correctly validates the source and permissions when handling custom URL Schemes or Intents, thereby preventing unauthorized external code execution.",
+    tags_en: ["Myna Point", "Android", "CWE-939", "Intent", "Improper Authorization", "JavaScript"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-73335", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260826-113",
     trackers: ["os"],
     category: "重點關注",
     title: "Google 實驗性導入 Flatpak 套件支援，強化 Chromium 在 Linux 上的沙盒分發能力",
@@ -1150,7 +1584,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-083",
+    id: "20260826-114",
     trackers: ["security"],
     category: "前瞻技術",
     title: "PortSwigger發布AI工具HTTP Terminator：自主發現新型HTTP請求混送攻擊",
@@ -1164,7 +1598,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-084",
+    id: "20260826-115",
     trackers: ["security"],
     category: "前瞻技術",
     title: "奈及利亞推動主權雲端，強化國家資安與數據控制權",
@@ -1178,7 +1612,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-085",
+    id: "20260826-116",
     trackers: ["security"],
     category: "前瞻技術",
     title: "研究揭露 Claude Opus 4.6 代理人可利用 IDOR 漏洞進行惡意預約與取消行為",
@@ -1192,7 +1626,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-086",
+    id: "20260826-117",
     trackers: ["eu_cra"],
     category: "亞太對應",
     title: "파이오링크為菲律賓國家網路安全中心規劃下一代SOC營運策略：強調AI與網路韌性",
@@ -1206,7 +1640,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-087",
+    id: "20260826-118",
     trackers: ["os"],
     category: "重點關注",
     title: "Google Pixel 11 Pro Fold 評測：折疊機市場競爭激烈，新機在設計與耐用性上雖有進步，但整體仍難具備革命性。",
@@ -1220,7 +1654,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-088",
+    id: "20260826-119",
     trackers: ["os"],
     category: "重點關注",
     title: "Google Gemini Live 升級：整合 Spark、Gmail 與個人記憶，實現跨應用場景的語音生產力協作",
@@ -1234,7 +1668,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-089",
+    id: "20260826-120",
     trackers: ["os"],
     category: "重點關注",
     title: "Google發布 Gemini 3.5 Transcribe：提升語音轉文字精度與多功能性",
@@ -1249,7 +1683,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-090",
+    id: "20260826-121",
     trackers: ["os"],
     category: "重點關注",
     title: "三星 Galaxy S27 系列設計洩漏：基礎版設計維持穩健，Ultra 版則大幅改變相機模組",
@@ -1263,7 +1697,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-091",
+    id: "20260826-122",
     trackers: ["os"],
     category: "重點關注",
     title: "IDC預測Apple首款折疊式iPhone上市後，第一年出貨量將超過1,000萬台",
@@ -1277,7 +1711,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-092",
+    id: "20260826-123",
     trackers: ["os", "security"],
     category: "重點關注",
     title: "Apple 2026 年 8 月 26 日活動回顧：無重大資安事件報導",
@@ -1291,7 +1725,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-093",
+    id: "20260826-124",
     trackers: ["os"],
     category: "重點關注",
     title: "OpenAI 擴大 ChatGPT 教師計畫，提供美國更多學區免費 AI 輔助學習資源",
@@ -1305,7 +1739,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-094",
+    id: "20260826-125",
     trackers: ["os"],
     category: "重點關注",
     title: "Volvo 宣布為 EX90 等車型加入 Spatial Audio 功能，透過 CarPlay 支援 Dolby Atmos 沉浸式音效",
@@ -1319,7 +1753,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-095",
+    id: "20260826-126",
     trackers: ["os"],
     category: "重點關注",
     title: "Instagram 推出 First Draft 功能，協助用戶自動生成 Reels 初稿，提升內容創作效率",
@@ -1333,7 +1767,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-096",
+    id: "20260826-127",
     trackers: ["os"],
     category: "重點關注",
     title: "調查顯示：美國消費者對未來 iPhone Ultra 的興趣度雖高，但購買意願與價格仍成最大挑戰",
@@ -1347,7 +1781,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-097",
+    id: "20260826-128",
     trackers: ["os"],
     category: "重點關注",
     title: "蘋果（Apple）持續爭取加速證據開示，以應對 OpenAI 侵犯商業機密指控",
@@ -1361,7 +1795,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-098",
+    id: "20260826-129",
     trackers: ["os"],
     category: "重點關注",
     title: "Meta 曾規劃「AI 原生」重組，考慮裁員六成，但計畫已取消",
@@ -1375,7 +1809,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-099",
+    id: "20260826-130",
     trackers: ["os"],
     category: "重點關注",
     title: "Bambu Lab 3D 列印軟體違反 AGPLv3 授權，SFC 討論替代方案",
@@ -1389,7 +1823,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-100",
+    id: "20260826-131",
     trackers: ["os"],
     category: "重點關注",
     title: "LibreOffice 26.8 版本發布：強化雙向與複雜文字支援，提升跨語言文件處理能力",
@@ -1403,7 +1837,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-101",
+    id: "20260826-132",
     trackers: ["os"],
     category: "重點關注",
     title: "BeOS精神繼承者Haiku OS發布R1 Beta 6，支援QEMU虛擬化與ARM64移植進展",
@@ -1417,7 +1851,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-102",
+    id: "20260826-133",
     trackers: ["os"],
     category: "重點關注",
     title: "AMD 提出 LLVM 新選項 -fenable-readonly-thp，在編譯與連結時啟用 iTHP 提升效能",
@@ -1431,7 +1865,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-103",
+    id: "20260826-134",
     trackers: ["os"],
     category: "重點關注",
     title: "LibreOffice 26.8 重磅發布：提升大型文件處理速度與微軟 XLSX 相容性",
@@ -1445,7 +1879,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-104",
+    id: "20260826-135",
     trackers: ["os"],
     category: "重點關注",
     title: "AMD 在 LLVM 編譯器中引入 GFX1250-STRICT GPU 目標，強化硬體支援",
@@ -1459,7 +1893,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-105",
+    id: "20260826-136",
     trackers: ["os"],
     category: "重點關注",
     title: "GCC 支援 RISC-V 平台，新增 -mcpu=native 與 -mtune=native 編譯器選項",
@@ -1473,7 +1907,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-106",
+    id: "20260826-137",
     trackers: ["os", "security"],
     category: "重點關注",
     title: "OpenAI技術報告揭露：內部AI模型如何透過SSRF漏洞攻擊Hugging Face伺服器",
@@ -1487,7 +1921,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-107",
+    id: "20260826-138",
     trackers: ["os"],
     category: "重點關注",
     title: "Meta發表MTIA 400加速器：專為LLM訓練設計，結合廣告推薦系統運算",
@@ -1501,7 +1935,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-108",
+    id: "20260826-139",
     trackers: ["os"],
     category: "重點關注",
     title: "美國公民抗議大規模監控：法律倡議組織挑戰 Flock 等廠商的 ALPR 系統權限",
@@ -1515,7 +1949,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-109",
+    id: "20260826-140",
     trackers: ["os"],
     category: "重點關注",
     title: "CISA警告：超過100個水務系統遭駭客攻擊，指出OT設備連網風險極高",
@@ -1529,7 +1963,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-110",
+    id: "20260826-141",
     trackers: ["os"],
     category: "重點關注",
     title: "GitHub Actions再次中斷：CI/CD平台可靠性持續堪憂，開發者需關注服務穩定性",
@@ -1543,7 +1977,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-111",
+    id: "20260826-142",
     trackers: ["os"],
     category: "重點關注",
     title: "Meta 提案以 $180 億和使用限制和解，要求 YouTube 與 TikTok 共同遵守青少年使用規範",
@@ -1557,7 +1991,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-112",
+    id: "20260826-143",
     trackers: ["os"],
     category: "重點關注",
     title: "記憶體成本飆升：TrendForce預測DRAM與NAND將佔雲端服務商資本支出高達六成八",
@@ -1571,7 +2005,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-113",
+    id: "20260826-144",
     trackers: ["os", "security"],
     category: "重點關注",
     title: "醫療設備製造商 Boston Scientific 遭遇全球性網路攻擊，營運系統全面中斷",
@@ -1585,7 +2019,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-114",
+    id: "20260826-145",
     trackers: ["os"],
     category: "重點關注",
     title: "Microsoft 推遲 Whiteboard 淘汰日期至 2026 年，促使用戶遷移至 OneDrive 支援的白板功能",
@@ -1599,7 +2033,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-115",
+    id: "20260826-146",
     trackers: ["os"],
     category: "重點關注",
     title: "AWS 收購 DuckLabs，強化開源 OLAP 資料庫 DuckDB 生態系",
@@ -1613,7 +2047,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-116",
+    id: "20260826-147",
     trackers: ["os"],
     category: "重點關注",
     title: "Bill Gates警告AI時代可能帶來社會「末日」，呼籲建立國際框架與稅制改革",
@@ -1627,7 +2061,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-117",
+    id: "20260826-148",
     trackers: ["os"],
     category: "重點關注",
     title: "Windows on Arm 邁向新里程碑：Microsoft 宣布支援 RTX Spark 平台，擴大應用與遊戲生態系",
@@ -1641,7 +2075,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-118",
+    id: "20260826-149",
     trackers: ["security"],
     category: "產業動態",
     title: "Group-IB將「攻擊者中心威脅情報」正式上架AWS Marketplace，協助企業從被動防禦轉向預警式安全",
@@ -1655,7 +2089,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-119",
+    id: "20260826-150",
     trackers: ["eu_cra"],
     category: "產業動態",
     title: "Cartis結合物理與網路安全平台，打造國家重要設施的無中斷邊界防護系統",
@@ -1669,7 +2103,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-120",
+    id: "20260826-151",
     trackers: ["eu_cra"],
     category: "產業動態",
     title: "SKT與Naver Cloud主導，組建大型AI基礎模型聯盟開發資安專用模型",
@@ -1683,7 +2117,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-121",
+    id: "20260826-152",
     trackers: ["eu_cra"],
     category: "產業動態",
     title: "POS系統與支付終端面臨供應鏈攻擊：駭客竊取遠端維護主密鑰進行大規模數據竊取",
@@ -1697,7 +2131,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-122",
+    id: "20260826-153",
     trackers: ["eu_cra"],
     category: "產業動態",
     title: "從技術到人本：中央大學教授探討《駭客安全》如何從神話古典視角重塑人本安全觀念",
@@ -1711,7 +2145,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-123",
+    id: "20260826-154",
     trackers: ["eu_cra"],
     category: "產業動態",
     title: "金融機構與GA合作建立情報安全協調體，強化第三方資訊防護",
@@ -1725,7 +2159,7 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-124",
+    id: "20260826-155",
     trackers: ["eu_cra"],
     category: "研討活動",
     title: "國家情報院舉辦「國際網路安全峰會韓國」（CSK 2026），聚焦AI駭客威脅與全球協作",
@@ -1739,8 +2173,8 @@ window.TRACKER_DAYS["2026-08-26"] = [
     ]
   },
   {
-    id: "20260826-125",
-    trackers: ["eu_cra", "security"],
+    id: "20260826-156",
+    trackers: ["security"],
     category: "研討活動",
     title: "OWASP 서울分享：探討AI在資安事件應對與情境化威脅情報分析的應用",
     summary: "本文介紹了在資安事件應對（IR）的實務挑戰，指出在不完整的證據和時間壓力下，決策者必須在「立即隔離」與「證據完整性」之間做出艱難取捨。演講者強調了在時間、服務連續性、人力不足和不完整日誌等「四重困境」下，靈活修正假設的重要性。\n\n為了解決傳統資安監控的「警報疲勞」和缺乏「情境（Context）」判斷，MatchGroup分享了自建的AI SOC架構。該架構的核心是「Libraryian」模組，它持續學習並彙整Playbook、日誌來源、使用者及設備等知識，並採用「人機協作（Human in the Loop）」模式，讓AI提供警報摘要和行動依據，最終由人類決策者確認。\n\n此外，MatchGroup也展示了AI威脅情報（Threat Intel）自動化系統。該系統能從外部來源（如社群媒體、安全部落格）提取入侵指標（IoC），並利用AI過濾掉誤報（False Positive）或來自CDN等公用基礎設施的指標，評估其風險度（Confidence），最終將精煉的情報與內部SIEM系統整合，實現實時偵測。這強調了資安系統必須深度結合企業內部知識庫（KB）才能做出準確判斷。",
