@@ -69,7 +69,7 @@ meta:
 
 | id | 嚴重度 | 標題 | 證據（file:line / probe） | 狀態 |
 |---|---|---|---|---|
-| F-ISOLATION-1 | **HIGH** | 測試套件寫入真實 production status.json，跑 pytest 會把 last-run 健康訊號洗成 FAIL | **根因**：`_finalize`（`orchestrator.py:1277`）寫 `PROJECT_ROOT/status.json`，PROJECT_ROOT 是模組常數（`tracker/__init__.py:18` 硬編 `/mnt/d/...`），未從 `out`/`db` 參數串接；觸發測試 = `tests/test_orchestrator.py:33 test_pipeline_aborts_when_ollama_down`（:41 自承「tolerate it」）；conftest.py 未隔離。本 session 實測：iter2 pytest 把 run#79 OK→run#1 FAIL（mtime 對得上），已由 DB run#79 還原。**CONFIRMED**。修法：_finalize 的 status 路徑改由參數決定（預設 PROJECT_ROOT，測試傳 out.parent）或測試 monkeypatch | open（已止血） |
+| F-ISOLATION-1 | **HIGH** | 測試套件寫入真實 production status.json，跑 pytest 會把 last-run 健康訊號洗成 FAIL | **根因**：`_finalize`（`orchestrator.py:1277`）寫 `PROJECT_ROOT/status.json`，PROJECT_ROOT 是模組常數（`tracker/__init__.py:18` 硬編 `/mnt/d/...`），未從 `out`/`db` 參數串接；觸發測試 = `tests/test_orchestrator.py:33 test_pipeline_aborts_when_ollama_down`（:41 自承「tolerate it」）；conftest.py 未隔離。本 session 實測：iter2 pytest 把 run#79 OK→run#1 FAIL（mtime 對得上），已由 DB run#79 還原。**CONFIRMED**。 | **✅ FIXED**：conftest 加 autouse `_isolate_project_root`（patch orchestrator+cli PROJECT_ROOT→tmp）；實測 476 pass、status.json run_id 79 前後不變 |
 | F-BUILD-1 | medium | runtime venv `/opt/venv` 未文件化、未 pin | `which python3`→僅系統 3.14（無依賴）；ops/*.sh 無 activate；無 requirements/lock；README 無 bootstrap 步驟 | open |
 | F-BUILD-2 | low | 跑在 py3.14.4（極新），pyproject 僅 `requires-python>=3.11`、無上界無 lock | `pyproject.toml` | open |
 | F-TEST-1 | low | venv 無 coverage 工具，覆蓋率不可量；`changelog.py`(subprocess+LLM)、`builtins.py`(資料) 無直接測試 | `import coverage`→ModuleNotFound；tests/ 無 changelog/builtins 引用 | open |
@@ -84,7 +84,7 @@ meta:
 | F-DATA-3 | med | 主 `Store` 無 WAL/無 busy_timeout，`cra_library.py:493` 卻設 busy_timeout=30000（不一致），並發易 "database is locked" | `dedup.py:263-264` | open |
 | F-DATA-4 | med | 站點發布（render_day→manifests→mark_written）多檔寫入＋DB commit 無交易，崩潰留半態 | `orchestrator.py:1120-1129` | open |
 | F-SEC-1 | med→**high** | source 連結 href 未限制 scheme，`javascript:`/`data:` 可執行 → XSS；**codex 追到上游** feed 抓取即未擋 scheme | `ui/index.html:2046`（escHtml 只轉義不擋 scheme，**親驗確認**）＋`fetchers/feed.py:53`（codex#3）｜**CONFIRMED、codex 收斂** | open |
-| H-SILENT-OK | **HIGH** | per-article summarize 例外只 log_error+debug+continue，**不設 rep.ok=False／不加 rep.errors** → 全部摘要失敗仍回報 ok:true 0 errors（假綠健康訊號，F-ISOLATION-1 的雙生） | `orchestrator.py:816-823`（**親驗**）；僅 preflight-down(:335) 與 phase 例外(:424) 會翻 ok。codex#5 獨立發現。**CONFIRMED**。修法：summarize error 計數並在超閾值時翻 ok/加 errors | open |
+| H-SILENT-OK | **HIGH** | per-article summarize 例外只 log_error+debug+continue，**不設 rep.ok=False／不加 rep.errors** → 全部摘要失敗仍回報 ok:true 0 errors（假綠健康訊號，F-ISOLATION-1 的雙生） | `orchestrator.py:816-823`（**親驗**）；僅 preflight-down(:335) 與 phase 例外(:424) 會翻 ok。codex#5 獨立發現。**CONFIRMED**。 | **✅ FIXED**：加 `summarize_failed` 計數＋`RunReport.note_summarize_wipeout()`（attempted>0 且 summarized==0 才翻 ok，保 fail-open）；one_line/status.json 曝 sum_fail；+3 單元測試（total/partial/empty） |
 | H-DASH | **HIGH** | 儀表板 `ThreadingHTTPServer(("0.0.0.0",port))` 綁全介面、handler 無驗證，暴露改 ollama endpoint／跑 pipeline 等狀態變更控制 → 同網段可把 prompt/內容導向攻擊者伺服器 | `web_dashboard.py:204`（**親驗**綁 0.0.0.0＋無 auth；WSL2 bridge 註解解釋但不豁免 LAN 暴露）。codex#1。**CONFIRMED** | open |
 | H-SSRF | med-high | PATH 抓取「同網域」檢查用 netloc 子字串比對，`trusted.example@127.0.0.1` 或 `example.com.evil.com` 皆過 → SSRF/抓內網 | `sources/path.py:202`（**親驗**：`domain_norm not in netloc`；netloc 含 userinfo）。codex#2。**CONFIRMED** | open |
 | F-CONC-1 | high | pipeline 無 process-level lock，排程 run 與儀表板 run 重疊 → 同列重複摘要、互蓋、SQLite 爭用、同時 render 同檔 | `orchestrator.py:286`（codex#4，結構性；與 F-DATA-3/4 同源）｜PLAUSIBLE（未見 lockfile） | open |
@@ -122,6 +122,11 @@ meta:
 - 動了：subagent 讀 dedup/cluster/cross/render/templates/ui，回 10 條。我套判斷：**#1 id 依排序位重編＝CLAUDE.md 明載的刻意設計**（非 bug，降級為「已知限制：permalink 不穩」）；#3 semantic enforce 掉文章＝目前 shadow 未啟用，真實嚴重度降；其餘照收。挑 #2（merge 不 union trackers）與 #6（href 未限 scheme）為最有價值**新**發現，待我親驗（self-attack：不盲信 subagent）。
 - 學到：subagent 找到我前幾圈沒碰的產出面向——`dedup.py` 未設 WAL/busy_timeout 但 `cra_library.py:493` 有設（不一致，F-DATA-3）；ui/index.html escHtml 不擋 `javascript:` scheme（F-SEC-1，待驗）；U+2028/2029 進 .js（低）。
 - 下一步還對嗎：是。iter7 會親驗 #2/#6 再定嚴重度，並與 codex/LLM subagent 對帳去重。
+
+### iter 9 — 2026-09-02 修補兩條假綠訊號（使用者裁示）
+- 動了：**F-ISOLATION-1** → conftest autouse `_isolate_project_root`（patch orchestrator+cli PROJECT_ROOT→tmp_path），更新 test_orchestrator 過期註解。**H-SILENT-OK** → 加 `RunReport.summarize_failed` 計數、error 分支 +1、`note_summarize_wipeout()`（total wipeout 才翻 ok，保 fail-open）、one_line 曝 sum_fail、+3 單元測試。
+- 學到：兩條都做成「測試證明」而非宣稱——status.json run_id 79 前後不變（隔離生效）、476 pass（含新 6 測）。自攻擊：flip 在 shipping path（_phase_summarize 尾）會被呼叫；skip-summarize 時 attempted=0 不誤翻。
+- 下一步：commit 修補（code+tests+journal），回報使用者其餘 HIGH 待裁示。
 
 ### iter 8 — 2026-09-02 彙整交付
 - 動了：把 20 條缺口（7 HIGH／11 MED／6 LOW）彙整成 `ops/audit/HEALTH-AUDIT-2026-09-02.md`，每條帶 file:line＋驗證狀態（CONFIRMED/PLAUSIBLE＋收斂來源）＋修法＋優先序。寫 memory `monitoring-ok-flag-false-green`。

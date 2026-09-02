@@ -116,6 +116,10 @@ class RunReport:
     summarize_attempted: int = 0
     summarized: int = 0
     review_failed: int = 0
+    #: Per-article summarize exceptions (LLM/backend errors). Fail-open keeps
+    #: these non-fatal, but they are counted so a run that summarized nothing
+    #: can flip ok rather than report a false-green status.json.
+    summarize_failed: int = 0
     translated: int = 0
     #: Summaries that came back in the article's own language (Korean,
     #: Japanese, ...) and were translated into Chinese before storing.
@@ -230,6 +234,22 @@ class RunReport:
             return f" | cra {self.cra_scored}sc ENFORCED"
         return f" | cra {self.cra_scored}sc shadow(-{self.cra_would_drop})"
 
+    def note_summarize_wipeout(self) -> None:
+        """Flip ok on a *total* summarize failure.
+
+        A run whose LLM backend is down produces zero summaries from a
+        non-empty queue. Fail-open keeps individual article errors non-fatal
+        (they only bump summarize_failed), but a total wipeout must not report
+        OK — otherwise status.json is a false green (every summary failed, yet
+        ok=true, errors=[]). A partial failure stays ok; the count is still
+        surfaced in one_line and status.json.
+        """
+        if self.summarize_attempted and self.summarized == 0:
+            self.ok = False
+            self.errors.append(
+                f"summarize produced nothing: {self.summarize_failed}/"
+                f"{self.summarize_attempted} failed")
+
     def one_line(self) -> str:
         status = "OK" if self.ok else "FAIL"
         return (f"run#{self.run_id} {status} {self.since}..{self.until} "
@@ -240,6 +260,7 @@ class RunReport:
                 f"{self._cra()} | "
                 f"sum {self.summarized}/{self.summarize_attempted} "
                 f"(oow:{self.out_of_window} rev_fail:{self.review_failed}"
+                f"{f' sum_fail:{self.summarize_failed}' if self.summarize_failed else ''}"
                 f"{f' 429:{self.rate_limited}' if self.rate_limited else ''}) | "
                 f"i18n {self.translated}"
                 f"{f' zh-fix:{self.lang_repaired}' if self.lang_repaired else ''} | "
@@ -821,6 +842,7 @@ def _phase_summarize(store, window, trackers, rep, log, limit, concurrency, rpt,
                         else:
                             store.log_error(r["source"], f"summarize: {detail}", r["url"])
                             log.debug("summarize id=%s error: %s", aid, detail)
+                            rep.summarize_failed += 1
                         continue
                     if result.get("repaired"):
                         rep.lang_repaired += 1
@@ -850,6 +872,7 @@ def _phase_summarize(store, window, trackers, rep, log, limit, concurrency, rpt,
                             if store.add_tracker(aid, oname):
                                 rep.cross_added += 1
     _record_call_times(rep, "summarize", call_s, log)
+    rep.note_summarize_wipeout()
 
     # WP6: embed the rows this run may cluster. Failure is silent by design:
     # an embedding is an optimisation for clustering, and no article should be

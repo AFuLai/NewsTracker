@@ -23,6 +23,36 @@ def test_one_line_format():
     assert line.endswith("776s")
 
 
+def test_summarize_wipeout_flips_ok():
+    # Every summary failed against a non-empty queue → must NOT report OK.
+    r = RunReport(run_id=7, since="2026-06-01", until="2026-06-02",
+                  trackers=["security"], summarize_attempted=12, summarized=0,
+                  summarize_failed=12)
+    r.note_summarize_wipeout()
+    assert r.ok is False
+    assert any("summarize produced nothing" in e for e in r.errors)
+    assert "sum_fail:12" in r.one_line()
+
+
+def test_partial_summarize_failure_stays_ok():
+    # Fail-open: some succeeded, some errored → still OK, but count is surfaced.
+    r = RunReport(run_id=8, since="2026-06-01", until="2026-06-02",
+                  trackers=["security"], summarize_attempted=12, summarized=10,
+                  summarize_failed=2)
+    r.note_summarize_wipeout()
+    assert r.ok is True
+    assert r.errors == []
+    assert "sum_fail:2" in r.one_line()
+
+
+def test_empty_queue_stays_ok():
+    # Nothing to summarize (attempted=0) is not a failure.
+    r = RunReport(run_id=9, since="2026-06-01", until="2026-06-02",
+                  trackers=["security"], summarize_attempted=0, summarized=0)
+    r.note_summarize_wipeout()
+    assert r.ok is True
+
+
 def test_eu_cra_filter_has_markers():
     assert "cra" in EU_CRA_FILTER
     assert "ENISA" in EU_CRA_FILTER
@@ -38,7 +68,9 @@ def test_pipeline_aborts_when_ollama_down(monkeypatch):
     monkeypatch.setattr(preflight, "ensure_ollama", lambda **k: False)
     tmp = Path(tempfile.mkdtemp())
     db = tmp / "t.sqlite"
-    # PROJECT_ROOT status.json write goes to the real project root; tolerate it.
+    # status.json now lands in the per-test tmp dir: conftest's autouse
+    # _isolate_project_root redirects orchestrator.PROJECT_ROOT, so this no
+    # longer touches the operator's real /mnt/d/.../status.json.
     rep = run_pipeline(since="2026-06-01", until="2026-06-02",
                        trackers=["security"], db=db, out=tmp,
                        summarize_limit=1, cleanup=False)
