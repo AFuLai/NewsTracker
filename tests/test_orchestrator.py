@@ -61,6 +61,67 @@ def test_eu_cra_filter_has_markers():
     assert any("사" in w for w in EU_CRA_FILTER)  # 사 (KR)
 
 
+def test_cross_cleanup_rerenders_demoted_days(monkeypatch, tmp_path):
+    # F-DATA-4: demoting a membership must re-render that day so the static
+    # site stops showing the article under the removed tracker.
+    import logging
+    import tracker.cross as cross
+    from tracker.dedup import Store
+    from tracker.progress import NullReporter
+
+    store = Store(tmp_path / "t.sqlite")
+    # Two trackers so one can be demoted (remove_tracker refuses to strip the
+    # article's last tracker).
+    store.upsert_candidate(url="https://x.com/a", source="X", title="T",
+                           date="2026-06-01", tracker="security,eu_cra")
+    aid = store.conn.execute("SELECT id FROM articles").fetchone()[0]
+    store.mark_status(aid, "written", date="2026-06-01")
+    # Keep security, demote eu_cra.
+    monkeypatch.setattr(cross, "belongs_to",
+                        lambda **k: k.get("other_name") != "eu_cra")
+    monkeypatch.setattr(orch, "load_tracker", lambda name: object())  # info present
+
+    calls = {}
+
+    def fake_rebuild(s, o, dates=None):
+        calls["dates"] = dates
+        return len(dates or [])
+
+    monkeypatch.setattr(orch, "rebuild_days", fake_rebuild)
+    rep = RunReport(run_id=1, since="2026-06-01", until="2026-06-02",
+                    trackers=["security"])
+    orch._phase_cross_cleanup(store, rep, logging.getLogger("t"),
+                              NullReporter(), tmp_path)
+    assert rep.cross_removed == 1
+    assert calls.get("dates") == ["2026-06-01"]
+
+
+def test_dedupe_pending_across_trackers_keeps_id_once():
+    # C-DBLSUM: a row tagged for two trackers appears in both pending lists;
+    # it must be summarized once (under the first tracker), not clobbered.
+    from tracker.orchestrator import _dedupe_pending_across_trackers
+    a, b, c = {"id": 1}, {"id": 2}, {"id": 3}
+    pbt = {"security": [a, b], "eu_cra": [b, c]}  # b (id=2) is in both
+    out = _dedupe_pending_across_trackers(pbt, ["security", "eu_cra"])
+    assert [r["id"] for r in out["security"]] == [1, 2]
+    assert [r["id"] for r in out["eu_cra"]] == [3]
+
+
+def test_preflight_skipped_for_write_only_restart(monkeypatch, tmp_path):
+    # C-PREFLIGHT: a write-only restart uses no LLM, so a stopped ollama must
+    # not abort it. ensure_ollama must not even be called.
+    import tracker.preflight as preflight
+
+    def _boom(**k):
+        raise AssertionError("ensure_ollama called for a write-only run")
+
+    monkeypatch.setattr(preflight, "ensure_ollama", _boom)
+    rep = run_pipeline(since="2026-06-01", until="2026-06-02",
+                       trackers=["security"], db=tmp_path / "t.sqlite",
+                       out=tmp_path, start_at="write", cleanup=False)
+    assert not any("ollama" in e for e in rep.errors)
+
+
 def test_pipeline_aborts_when_db_lock_held(tmp_path):
     # F-CONC-1: a second run started while another holds the DB lock aborts
     # cleanly (ok=False, run_id=-1) and journals nothing.

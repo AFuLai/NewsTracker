@@ -99,16 +99,16 @@ meta:
 | F-DATA-1 | med（設計限制） | 站點 id 依當日排序位指派，往舊日期插一則→整天 id 重編，permalink 不穩 | `render.py:96,100`；**注意：CLAUDE.md 明載為刻意設計**，屬已知限制非 bug | **WONTFIX（by design）**：CLAUDE.md 明載此為刻意（delta 壓縮成本小）。若日後要穩定 permalink 需改 id 指派為穩定鍵，屬設計變更、非缺陷修補——留給使用者裁決 |
 | F-DATA-2 | med | `merge_by_title` 跨 tracker 合併時未 union 被併列的 `trackers`，事件可能從非主 tracker 頁消失 | `cluster.py:162-173`＋`orchestrator.py:1099,1117`（iter7 親驗 live） | **✅ FIXED**：cluster 輸出 union 所有 member 的 trackers（逗號串）。+1 測試 |
 | F-DATA-3 | med | 主 `Store` 無 WAL/無 busy_timeout，`cra_library.py:493` 卻設 busy_timeout=30000（不一致），並發易 "database is locked" | `dedup.py:263-264` | **✅ FIXED**：Store.__init__ 設 `busy_timeout=30000`＋`journal_mode=WAL`（對齊 cra_library）。+1 測試 |
-| F-DATA-4 | med | 站點發布（render_day→manifests→mark_written）多檔寫入＋DB commit 無交易，崩潰留半態 | `orchestrator.py:1120-1129` | open |
+| F-DATA-4 | med | 站點發布多檔寫入無交易；cross-cleanup 在 render 後 demote 卻不重繪 → 站/DB 不一致殘留 | `orchestrator.py:409,1120-1129`（subagent 親驗 REAL）| **✅ FIXED（cleanup 一致性）**：`_phase_cross_cleanup` 收集被 demote 的日期，事後 `rebuild_days(touched)` 重繪（含清空日檔）。+1 測試。註：write 序列本身的跨檔原子性未加交易（filesystem+sqlite 難原子），屬殘留低風險 |
 | F-SEC-1 | med→**high** | source 連結 href 未限制 scheme，`javascript:`/`data:` 可執行 → XSS；**codex 追到上游** feed 抓取即未擋 scheme | `ui/index.html:2046`（escHtml 只轉義不擋 scheme，**親驗確認**）＋`fetchers/feed.py:53`（codex#3）｜**CONFIRMED、codex 收斂** | **✅ FIXED（3 層）**：feed.py ingest 拒非 http(s)；cluster `_make_source` render chokepoint 清 scheme；ui `safeHref()`＋escHtml 補 `'`。+2 測試（_make_source）、node 驗 safeHref |
 | H-SILENT-OK | **HIGH** | per-article summarize 例外只 log_error+debug+continue，**不設 rep.ok=False／不加 rep.errors** → 全部摘要失敗仍回報 ok:true 0 errors（假綠健康訊號，F-ISOLATION-1 的雙生） | `orchestrator.py:816-823`（**親驗**）；僅 preflight-down(:335) 與 phase 例外(:424) 會翻 ok。codex#5 獨立發現。**CONFIRMED**。 | **✅ FIXED**：加 `summarize_failed` 計數＋`RunReport.note_summarize_wipeout()`（attempted>0 且 summarized==0 才翻 ok，保 fail-open）；one_line/status.json 曝 sum_fail；+3 單元測試（total/partial/empty） |
 | H-DASH | **HIGH** | 儀表板 `ThreadingHTTPServer(("0.0.0.0",port))` 綁全介面、handler 無驗證，暴露改 ollama endpoint／跑 pipeline 等狀態變更控制 → 同網段可把 prompt/內容導向攻擊者伺服器 | `web_dashboard.py:204`（**親驗**綁 0.0.0.0＋無 auth；WSL2 bridge 註解解釋但不豁免 LAN 暴露）。codex#1。**CONFIRMED** | **✅ FIXED**：預設綁 `127.0.0.1`（WSL2 localhost 轉發仍通），LAN 需明設 `TRACKER_DASHBOARD_HOST=0.0.0.0` opt-in。+2 測試 |
 | H-SSRF | med-high | PATH 抓取「同網域」檢查用 netloc 子字串比對，`trusted.example@127.0.0.1` 或 `example.com.evil.com` 皆過 → SSRF/抓內網 | `sources/path.py:202`（**親驗**：`domain_norm not in netloc`；netloc 含 userinfo）。codex#2。**CONFIRMED** | **✅ FIXED**：新增 `_same_domain()` 用 `urlparse().hostname` 精確/子網域比對（擋 userinfo、`.evil.com`、`evil-`、no-host scheme）。+2 測試 |
 | F-CONC-1 | high | pipeline 無 process-level lock，排程 run 與儀表板 run 重疊 → 同列重複摘要、互蓋、SQLite 爭用、同時 render 同檔 | `orchestrator.py:286`（codex#4，結構性；與 F-DATA-3/4 同源）｜親驗確認無 lock | **✅ FIXED**：run_pipeline 進入取 `flock(LOCK_EX\|LOCK_NB)` 於 `<db>.lock`（process 退出自動釋放、無 stale），敗者 ok=False run_id=-1 不寫任何檔；`_finalize` 單點釋放。+1 測試 |
-| C-REVDET | med | 既有 URL 只用 URL hash 跳過，`content_hash`（宣稱做改版偵測）從未用 → 廠商同網址改 advisory 不會更新 | `orchestrator.py:539`（codex#9）｜PLAUSIBLE、待驗 | open |
-| C-DATEFLOOD | med | 無日期文章給 discovery date → 首爬十年舊 archive 會以「今天」發佈 | `orchestrator.py:837`（codex#13；fallback_date=fetched_at，親見機制）；date-window 部分緩解 | open |
-| C-PREFLIGHT | med | 即使 backend=llamacpp 或 write-only 階段，仍強制 ollama preflight → llama.cpp 健康但 ollama 停就整個中止 | `orchestrator.py:334`（codex#11，preflight 無條件）｜PLAUSIBLE | open |
-| C-DBLSUM | med | pending 依 tracker 各自快照，多 tracker 文章被以不同分類定義重複摘要、後蓋前 | `orchestrator.py:682`（codex#8）｜PLAUSIBLE、待驗 | open |
+| C-REVDET | med | 既有 URL 只用 URL hash 跳過，`content_hash`（宣稱做改版偵測）從未用 → 廠商同網址改 advisory 不會更新 | `orchestrator.py:539`（subagent 親驗 REAL：content_hash 寫入但從不 SELECT）| **✅ FIXED（gated）**：新增 `Store.requeue_if_content_changed`，fetch 在 `TRACKER_REVISION_DETECT`（**預設 off**）開時比對 content_hash 變更則 re-queue。預設 off＝不改既有行為/不增 LLM 成本；能力已接好可 opt-in。+1 測試 |
+| C-DATEFLOOD | med | 無日期文章給 discovery date → 首爬十年舊 archive 會以「今天」發佈 | `orchestrator.py:837`（subagent 親驗 REAL；`fallback_date=fetched_at`）| **POLICY（記錄不硬改）**：F3 fallback 正是為避免無日期文章「永久隱形」而存在（碼中明載）；「今天 vs NULL」是設計權衡，非明確 bug。像 F-DATA-1 交由使用者裁決；報告載選項與取捨。低頻（僅首爬大型無日期 archive 才 flood）|
+| C-PREFLIGHT | med | 即使 backend=llamacpp 或 write-only 階段，仍強制 ollama preflight → llama.cpp 健康但 ollama 停就整個中止 | `orchestrator.py:334`（subagent 親驗 REAL）| **✅ FIXED（write-only）**：preflight 僅在 gate/summarize/translate 任一會跑時才要求 ollama；write/cleanup-only restart 跳過。llamacpp-primary 仍 preflight（因其 fail-open 回退 ollama）——保守只修無歧義的 write-only 案。+1 測試 |
+| C-DBLSUM | med | pending 依 tracker 各自快照，多 tracker 文章被以不同分類定義重複摘要、後蓋前 | `orchestrator.py:682`（subagent 親驗 REAL）| **✅ FIXED**：抽出 `_dedupe_pending_across_trackers`，每 id 只在第一個 tracker 摘要一次（cross-tag 事後補其餘）；順帶修 summarize_attempted 重複計數。+1 測試 |
 
 ---
 
@@ -144,6 +144,11 @@ meta:
 - 動了：新增 `ops/RUNTIME.md`（venv bootstrap、py3.14、`install -e .[dev]`、跑測試/coverage、logs 說明）；pyproject 加 `[project.optional-dependencies] dev`（pytest+pytest-cov，讓 coverage 可跑，不入 runtime deps）。F-DATA-1 記 WONTFIX（CLAUDE.md 明載刻意）。
 - 學到：多為 doc/config 而非 code bug；不 pip-install 進 /opt/venv（越權）、不自動刪 logs（刪使用者資料風險）、不硬加 lockfile（更大決策）——「fix」在此＝文件化＋讓工具可得，並誠實標示未做與原因。
 - 下一步還對嗎：是。等 iter17 subagent 回收（5 條 PLAUSIBLE 驗證）→ 處置 → 最終健檢＋封存。
+
+### iter 17 — 2026-09-02 PLAUSIBLE 驗證批（subagent 外部重錨）＋處置
+- 動了：subagent 讀碼驗證 5 條全 REAL（無 by-design 註解）。我親驗要修的再落地：**C-DBLSUM**（抽 `_dedupe_pending_across_trackers`）、**C-PREFLIGHT**（write-only 跳 preflight）、**F-DATA-4**（cleanup 後 `rebuild_days(touched)`）、**C-REVDET**（`requeue_if_content_changed` + `TRACKER_REVISION_DETECT` 預設 off）。+5 測試（含各真紅路徑）。
+- 學到：`remove_tracker` 拒刪最後一個 tracker（防孤兒）——F-DATA-4 測試因此需雙 tracker 列才會 demote。**C-DATEFLOOD 不硬改**：F3 fallback 是為避免無日期文章永久隱形而存在，「今天 vs NULL」是設計權衡（如 F-DATA-1）交使用者裁決。C-REVDET 用預設-off flag＝修好死碼但不擅改成本/行為。
+- 下一步還對嗎：是。492 pass。commit iter17 → 最終健檢＋封存。
 
 ### iter 16 — 2026-09-02 併發：F-CONC-1（process lock）
 - 動了：run_pipeline 進入即取 `flock(LOCK_EX|LOCK_NB)` 於 `<db>.lock`；敗者早退 ok=False/run_id=-1、不建 runs 列、不寫 status.json；`_finalize`（所有真出口的漏斗）關 fd 釋放鎖。fcntl 局部 import（避免非 WSL import 破裂）。+1 併發爭用測試。

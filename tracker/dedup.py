@@ -378,6 +378,26 @@ class Store:
         self.conn.commit()
         return True
 
+    def requeue_if_content_changed(self, url_hash: str, new_content_hash: str) -> bool:
+        """Re-queue an existing article whose content changed (C-REVDET).
+
+        The article table stores `content_hash` for republish detection, but the
+        fetch path skips any known URL by `url_hash` alone, so that column was
+        never consulted. When revision detection is enabled, this compares the
+        stored hash against the freshly-fetched one and, if it differs, resets
+        the row to 'pending' (and clears the stale summary) so the revised item
+        is re-summarised. Returns True when it re-queued the row.
+        """
+        row = self.conn.execute(
+            "SELECT content_hash FROM articles WHERE url_hash = ?", (url_hash,)).fetchone()
+        if row is None or not new_content_hash or row["content_hash"] == new_content_hash:
+            return False
+        self.conn.execute(
+            "UPDATE articles SET status='pending', content_hash=?, summary_en=NULL "
+            "WHERE url_hash = ?", (new_content_hash, url_hash))
+        self.conn.commit()
+        return True
+
     def list_pending(self, limit: int = 100, *, tracker: str | None = None) -> list[sqlite3.Row]:
         if tracker:
             return list(self.conn.execute(

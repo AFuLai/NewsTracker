@@ -371,13 +371,23 @@ def run_pipeline(*, since: str, until: str, trackers: list[str],
     rpt.enter("preflight", "checking ollama")
     from . import preflight as preflight_mod
     from .preflight import ensure_ollama
-    if not ensure_ollama():
+    # C-PREFLIGHT: only require ollama when a phase that talks to it will run.
+    # A write-only or cleanup-only restart (start_at past gate/summarize/
+    # translate) needs no LLM, so aborting it because ollama is stopped just
+    # blocks harmless work. (The generation backend still preflights ollama even
+    # under llama.cpp, because llama.cpp fails open to the ollama chain.)
+    _needs_ollama = any(_do(p) for p in ("gate", "summarize", "translate"))
+    if _needs_ollama and not ensure_ollama():
         rep.ok = False
         rep.errors.append("ollama down (auto-start failed)")
         log.error("ollama not reachable and auto-start failed")
         rpt.result("preflight", "ollama unreachable", failed=True)
         _finalize(store, rep, t0, log, stats0)
         return rep
+    if not _needs_ollama:
+        rpt.result("preflight", "skipped (no LLM phase in this run)")
+        log.info("preflight: no LLM phase runs (start_at=%s) — skipping ollama",
+                 start_at)
     # WP2: say which of the two cases we are in, because they have different
     # throughput. We only control OLLAMA_NUM_PARALLEL for a daemon we started;
     # otherwise the LLM pool may be queueing behind a 1-slot daemon and the
@@ -451,7 +461,7 @@ def run_pipeline(*, since: str, until: str, trackers: list[str],
         if cleanup and _do("cleanup"):
             _ck()
             with _timed("cleanup"):
-                _phase_cross_cleanup(store, rep, log, rpt)
+                _phase_cross_cleanup(store, rep, log, rpt, out)
                 # After the reverse cleanup, so a tag this adds is not demoted
                 # by the very same run.
                 _phase_cross_tag(store, rep, log)
@@ -487,6 +497,12 @@ def _phase_fetch(store, window, trackers, rep, log, concurrency, rpt, browser_ba
     all_hashes = store.all_url_hashes()       # one batch SELECT, then in-memory
     pending_new: list[dict] = []
     seen_this_run: set[str] = set()
+    # C-REVDET: off by default. When on, a known URL whose content_hash changed
+    # is re-queued (re-summarised) instead of skipped. Opt-in because it costs
+    # extra LLM work and republishes the item; wires up the previously-dead
+    # content_hash column that dedup.py documents for republish detection.
+    revision_detect = os.environ.get("TRACKER_REVISION_DETECT", "").strip().lower() \
+        in ("1", "true", "yes", "on", "enforce")
     for tname in trackers:
         info = load_tracker(tname)
         keys = [k.text for k in info.keys]
@@ -578,6 +594,11 @@ def _phase_fetch(store, window, trackers, rep, log, concurrency, rpt, browser_ba
                 from .dedup import url_hash
                 h = url_hash(c.url)
                 if h in all_hashes or h in seen_this_run:
+                    if (revision_detect and h in all_hashes
+                            and h not in seen_this_run and c.content_hash
+                            and store.requeue_if_content_changed(h, c.content_hash)):
+                        seen_this_run.add(h)
+                        log.info("re-queued changed content (C-REVDET): %s", c.url)
                     continue
                 seen_this_run.add(h)
                 pending_new.append({
@@ -710,6 +731,29 @@ def _record_call_times(rep, phase: str, durations: list[float], log) -> None:
 
 # ── Phase 3: SUMMARIZE (+ L3 review hook + cross-detect) ─────────────────────
 
+def _dedupe_pending_across_trackers(pending_by_tracker, trackers):
+    """Each article id is summarized once (C-DBLSUM).
+
+    `list_pending(tracker=t)` matches the comma-joined `trackers` column, so a
+    row tagged 'security,eu_cra' is returned in BOTH per-tracker lists. Without
+    this dedup it would be summarized once per tracker — the second pass
+    overwriting the first with a different category definition, and
+    double-counting summarize_attempted. Keep each id only under the first
+    tracker (in `trackers` order) that holds it; the cross-tag phase adds the
+    other memberships afterward.
+    """
+    seen: set = set()
+    for t in trackers:
+        kept = []
+        for r in pending_by_tracker[t]:
+            if r["id"] in seen:
+                continue
+            seen.add(r["id"])
+            kept.append(r)
+        pending_by_tracker[t] = kept
+    return pending_by_tracker
+
+
 def _phase_summarize(store, window, trackers, rep, log, limit, concurrency, rpt,
                      controller=None, backend="ollama"):
     from .cross import NARROW_DOMAINS, belongs_to
@@ -720,6 +764,7 @@ def _phase_summarize(store, window, trackers, rep, log, limit, concurrency, rpt,
     other_infos_cache: dict[str, object] = {}
     rpt.enter("summarize", "fetching article bodies")
     pending_by_tracker = {t: store.list_pending(limit=limit, tracker=t) for t in trackers}
+    pending_by_tracker = _dedupe_pending_across_trackers(pending_by_tracker, trackers)
     grand_total = sum(len(v) for v in pending_by_tracker.values())
     processed = 0
     call_s: list[float] = []
@@ -1243,11 +1288,12 @@ def rebuild_days(store, out: Path, dates: list[str] | None = None) -> int:
 
 # ── Phase 5: cross-scan reverse cleanup ──────────────────────────────────────
 
-def _phase_cross_cleanup(store, rep, log, rpt):
+def _phase_cross_cleanup(store, rep, log, rpt, out=None):
     rpt.enter("cleanup", "re-checking cross-tracker memberships")
     from .cross import NARROW_DOMAINS, belongs_to
     rows = list(store.conn.execute(
         "SELECT * FROM articles WHERE status IN ('ready','written')"))
+    touched_days: set = set()
     infos = {}
     for name in SEARCHINFOS:
         try:
@@ -1271,6 +1317,17 @@ def _phase_cross_cleanup(store, rep, log, rpt):
                 continue
             if store.remove_tracker(r["id"], name):
                 rep.cross_removed += 1
+                if r["date"]:
+                    touched_days.add(r["date"])
+    # F-DATA-4: a demoted membership changes what a day's page should list, but
+    # that day was already rendered by _phase_write and is now `written`, so
+    # _ready_dates won't revisit it and the stale file would keep showing the
+    # article under a tracker the DB no longer assigns it. Re-render just the
+    # touched days so the static site matches the DB (rebuild_days re-reads
+    # current membership and drops a day file that is now empty).
+    if touched_days and out is not None:
+        n = rebuild_days(store, out, dates=sorted(touched_days))
+        log.info("cross cleanup: re-rendered %d day(s) after demotions", n)
     log.info("cross cleanup: -%d demoted", rep.cross_removed)
     rpt.result("cleanup", f"-{rep.cross_removed} demoted, +{rep.cross_added} added earlier")
 
