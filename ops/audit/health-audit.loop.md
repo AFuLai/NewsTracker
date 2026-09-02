@@ -7,7 +7,7 @@ meta:
 - slug: health-audit
 - started: 2026-09-02
 - N: 3（每 3 圈快速自檢）   M: 3（每 3 次自檢一次健檢）   健檢圈距: 9
-- status: open        # open | closed
+- status: closed      # open | closed（2026-09-02 封存：稽核＋全 findings 處置完成）
 - owner: Claude Opus 4.8 session（cwd = D:\Claude\Tool\NewsTracker；repo = WSL /opt/tracker）
 - N/M 判準：本稽核約 6–9 片有意義工作；N=3 讓歪頭在變貴前被抓、M×N=9 讓健檢時手上有真經驗。若實際每片成本落差大，於下次自檢重算並記此處。
 
@@ -31,13 +31,13 @@ meta:
 依報告建議優先序修掉所有 remaining findings，每一條都以「修前紅、修後綠」的**測試/probe 證明**收尾（非宣稱）；PLAUSIBLE 條目**先親驗**再決定修或降級；設計性條目（如 F-DATA-1 明載刻意）**記錄裁決而非硬改**。不破壞現有 476 測試。每個綠檢查點提交。
 
 成功樣貌（達成打勾，不刪改文字）：
-- [ ] 安全三條落地：H-SSRF、F-SEC-1（render＋feed 兩層）、H-DASH
-- [ ] 資料正確性：F-DATA-2（union trackers）、F-DATA-3（WAL+busy_timeout）、F-CONC-1（process lock）
-- [ ] LLM 韌性：F-LLM-2（connect timeout）、F-LLM-4（fallback 拓寬）、F-LLM-1/3（injection 硬化）、F-LLM-5（gemini timeout）
-- [ ] 產出：F-DATA-5（U+2028/2029）
-- [ ] PLAUSIBLE 逐一親驗並處置：C-REVDET、C-DATEFLOOD、C-PREFLIGHT、C-DBLSUM、F-DATA-4
-- [ ] 可重現性/雜項：F-BUILD-1/2、F-TEST-1、F-RUNTIME-1（可 doc-only）；F-DATA-1 記裁決
-- [ ] 每條都有測試/probe 佐證，全套件保持綠，變更分批 commit
+- [x] 安全三條落地：H-SSRF、F-SEC-1（render＋feed 兩層）、H-DASH
+- [x] 資料正確性：F-DATA-2（union trackers）、F-DATA-3（WAL+busy_timeout）、F-CONC-1（process lock）
+- [x] LLM 韌性：F-LLM-2（connect timeout）、F-LLM-4（fallback 拓寬）、F-LLM-1/3（injection 硬化）、F-LLM-5（gemini timeout）  ※F-LLM-4/F-LLM-5 親驗判 by-design，記錄不改
+- [x] 產出：F-DATA-5（U+2028/2029）
+- [x] PLAUSIBLE 逐一親驗並處置：C-REVDET、C-DATEFLOOD、C-PREFLIGHT、C-DBLSUM、F-DATA-4  ※4 修、C-DATEFLOOD 記政策裁決
+- [x] 可重現性/雜項：F-BUILD-1/2、F-TEST-1、F-RUNTIME-1（可 doc-only）；F-DATA-1 記裁決
+- [x] 每條都有測試/probe 佐證，全套件保持綠（492 pass），變更分批 commit（6 commits）
 
 ---
 
@@ -79,6 +79,9 @@ meta:
 - **稽核「健康訊號」時，永遠不要只信頂層 ok 布林**：先確認 per-item 失敗是否上捲到 run-level ok。本專案兩處假綠：(a) 測試污染 production status.json（F-ISOLATION-1）；(b) summarize per-item error 不翻 ok（H-SILENT-OK）。→ 健康 probe 必含「attempted vs succeeded 比率」，不只 ok/error 計數。
 - **稽核會寫 shared/production 檔案的專案前，先靜態查測試隔離**：跑其 pytest 本身可能污染 production 產物（硬編 PROJECT_ROOT＋測試自承 tolerate）。本次即因此洗掉 status.json，事後由 runs DB 還原。
 - **codex 是第二意見不是權威**（其 README 明訂）：其新 HIGH 主張一律親驗才入報告；但「三個獨立稽核者收斂於同一條」是該條為真的強證據（本次 F-DATA-2/F-ISOLATION-1/F-SEC-1 三方收斂）。
+- **修前先讀該處碼的 rationale**（修補階段升格）：動手前先看 docstring/註解。三類處置——真 bug→修＋測試；刻意（碼中明載）→WONTFIX 引證；政策取捨（成本/可見性/相容）→交使用者裁決，不擅改預設。本次救回 F-LLM-4/F-LLM-5/C-DATEFLOOD/F-DATA-1 四次錯修。
+- **會改成本/行為的修用預設-off flag 接能力**：如 C-REVDET 的 `TRACKER_REVISION_DETECT`——死碼修好、預設行為不變、使用者可 opt-in。
+- **把 fix 抽成可測 helper**：note_summarize_wipeout／_dedupe_pending_across_trackers／_same_domain——既修又給每條一個修前會紅的單元測試，免去重度整合 mock。
 
 ---
 
@@ -226,6 +229,13 @@ meta:
 ---
 
 ## HEALTH CHECKS — 每 M×N=9 圈一格
+
+### health check @iter 17（修補階段收尾）— 2026-09-02
+- 復發樣式：**「verify-before-fix」**——F-LLM-4、F-LLM-5、C-DATEFLOOD、F-DATA-1 皆親讀後判 by-design/政策，若照 codex/subagent 建議照修會破壞刻意行為。這是本階段最重要的復發教訓（已升 METHOD＋memory）。次要：多個 fix 抽成可測 helper（note_summarize_wipeout、_dedupe_pending_across_trackers、_same_domain）＝既修又留紅路徑測試。
+- 外部重錨（3 件）：(1) 最終 gate — 492 pass、全模組 import、SECRETS 0、source 無 raw 分隔符；(2) 真相來源 — production status.json 全程 `True 79` 未被污染（isolation 修補經受 16 圈驗證）；(3) 獨立視角 — iter17 用 subagent 讀碼驗證 5 條 PLAUSIBLE。三者與 journal 自述一致。
+- 演化方法：3 條升格（見 METHOD 新增）；C-REVDET 用預設-off flag 模式＝「修好死碼但不擅改成本/行為」成為標準做法。
+- 寫進 memory：`audit-fix-verify-before-fix`（feedback）。
+- 收尾判定：GOAL-2 六條成功樣貌全達成；最近健檢無**新**復發樣式（verify-before-fix 已升格處置）。→ 封存 journal（status: closed）。
 
 ### iter 7 log — 2026-09-02 codex 對帳（外部重錨）
 - 動了：codex exec 對 source-only 副本獨立稽核（15 findings, exit 0, 205k tok）＋2 個 subagent（LLM/資料）回收；我親驗 codex 6 條 novel/HIGH 中的 4 條（dashboard bind、SSRF、silent-ok、feed scheme）全 CONFIRMED，另親驗 F-DATA-2 為 live。
