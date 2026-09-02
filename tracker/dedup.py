@@ -262,6 +262,13 @@ class Store:
         db_path.parent.mkdir(parents=True, exist_ok=True)
         self.conn = sqlite3.connect(db_path)
         self.conn.row_factory = sqlite3.Row
+        # Concurrency (F-DATA-3): the pipeline writer and a reader (dashboard,
+        # cross-scan, a second CLI) can hit this DB at once. Wait for a
+        # concurrent writer instead of raising "database is locked" after
+        # sqlite's ~5s default, and use WAL so readers don't block the writer.
+        # Mirrors cra_library._conn, which already did this.
+        self.conn.execute("PRAGMA busy_timeout=30000")
+        self.conn.execute("PRAGMA journal_mode=WAL")
         self.conn.executescript(SCHEMA)
         _ensure_trackers_column(self.conn)
         _ensure_v2_columns(self.conn)

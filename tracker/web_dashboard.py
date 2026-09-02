@@ -5,13 +5,16 @@ memory; a tiny threaded HTTP server serves a self-contained HTML page that polls
 /state and renders a graphical dashboard (phase cards, progress bars, ETA, the
 current item, and a completion summary).
 
-Works from WSL2: the server binds 0.0.0.0:<port> and Windows localhost
-forwarding routes http://localhost:<port> in the user's browser to it — no X
-server needed.
+Works from WSL2: the server binds 127.0.0.1:<port> and WSL2's localhost
+forwarding routes http://localhost:<port> in the user's Windows browser to it
+— no X server needed. The bind host defaults to loopback so the control
+endpoint (which can run the pipeline and repoint the LLM endpoint) is not
+exposed to the LAN; set TRACKER_DASHBOARD_HOST=0.0.0.0 to opt into LAN access.
 """
 from __future__ import annotations
 
 import json
+import os
 import threading
 import time
 from dataclasses import asdict
@@ -201,7 +204,12 @@ def serve(reporter: WebReporter, *, port: int = DEFAULT_PORT) -> ThreadingHTTPSe
             self.end_headers()
             self.wfile.write(body)
 
-    httpd = ThreadingHTTPServer(("0.0.0.0", port), Handler)
+    # Loopback by default: the control endpoint can start the pipeline and
+    # repoint the LLM backend, so it must not be reachable from the LAN. WSL2
+    # localhost forwarding still routes the Windows browser to 127.0.0.1. A
+    # deliberate LAN deployment sets TRACKER_DASHBOARD_HOST=0.0.0.0.
+    host = os.environ.get("TRACKER_DASHBOARD_HOST", "127.0.0.1").strip() or "127.0.0.1"
+    httpd = ThreadingHTTPServer((host, port), Handler)
     t = threading.Thread(target=httpd.serve_forever, daemon=True)
     t.start()
     return httpd

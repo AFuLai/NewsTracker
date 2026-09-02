@@ -143,3 +143,22 @@ def test_control_post_without_controller_or_job_is_rejected():
     finally:
         httpd.shutdown()
 
+
+def test_serve_binds_loopback_by_default(monkeypatch):
+    # H-DASH: the control endpoint must not be LAN-exposed by default.
+    monkeypatch.delenv("TRACKER_DASHBOARD_HOST", raising=False)
+    httpd = serve(WebReporter(), port=8805)
+    try:
+        assert httpd.server_address[0] == "127.0.0.1"
+    finally:
+        httpd.shutdown()
+
+
+def test_serve_lan_bind_is_opt_in(monkeypatch):
+    monkeypatch.setenv("TRACKER_DASHBOARD_HOST", "0.0.0.0")
+    httpd = serve(WebReporter(), port=8806)
+    try:
+        assert httpd.server_address[0] == "0.0.0.0"
+    finally:
+        httpd.shutdown()
+

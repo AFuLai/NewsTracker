@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import re
 from typing import Any
+from urllib.parse import urlsplit
 
 THRESHOLD = 0.45
 #: WP6 cosine threshold for the semantic signal. 0.85 is the plan's starting
@@ -72,6 +73,12 @@ ZH_DOMAINS = ("ithome.com.tw", "informationsecurity.com.tw", "twcert.org.tw",
 def _make_source(row: dict[str, Any]) -> dict[str, str]:
     name = row.get("source") or "source"
     url = row.get("url") or ""
+    # Site-output chokepoint: every source link the page renders passes through
+    # here, so drop any non-http(s) scheme (javascript:/data:) before it can
+    # reach a rendered href — defence in depth behind the feed-ingest filter,
+    # and it also cleans URLs already stored in the DB from before that filter.
+    if url and urlsplit(url).scheme.lower() not in ("http", "https"):
+        url = ""
     lang = "ZH-TW" if any(d in url for d in ZH_DOMAINS) else "EN"
     return {"name": name, "url": url, "lang": lang}
 
@@ -161,6 +168,19 @@ def merge_by_title(rows: list[dict[str, Any]],
         members = [rows[i] for i in member_ids]
         primary = max(members, key=lambda r: len((r.get("summary") or "")))
         primary = dict(primary)
+        # Union every merged member's tracker membership into the primary
+        # (F-DATA-2). merge_by_title receives the whole day across trackers, so
+        # a security row and an eu_cra row about the same CVE can merge; keeping
+        # only the primary's `trackers` would drop the event from the other
+        # tracker's page. `trackers` is a comma-joined string.
+        merged_trackers: list[str] = []
+        for m in members:
+            for t in (m.get("trackers") or "").split(","):
+                t = t.strip()
+                if t and t not in merged_trackers:
+                    merged_trackers.append(t)
+        if merged_trackers:
+            primary["trackers"] = ",".join(merged_trackers)
         seen: set[str] = set()
         sources: list[dict[str, str]] = []
         for m in members:

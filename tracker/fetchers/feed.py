@@ -8,6 +8,7 @@ and return new etag/Last-Modified to persist.
 from __future__ import annotations
 
 from datetime import datetime, timezone
+from urllib.parse import urlsplit
 
 import feedparser
 import httpx
@@ -52,6 +53,12 @@ class FeedFetcher:
             published = _iso_date(e)
             link = getattr(e, "link", "") or ""
             if not link:
+                continue
+            # A feed entry's link is untrusted and ends up as a clickable href
+            # on the rendered site. Only http(s) may enter — reject
+            # javascript:/data:/mailto: so a hostile feed cannot plant an XSS
+            # or a bogus source link.
+            if urlsplit(link).scheme.lower() not in ("http", "https"):
                 continue
             if not window.contains(published):
                 continue

@@ -1,4 +1,29 @@
-from tracker.cluster import merge_by_title, _jaccard, _tokens
+from tracker.cluster import merge_by_title, _jaccard, _tokens, _make_source
+
+
+def test_merge_unions_tracker_membership():
+    # F-DATA-2: two rows about the same CVE from different trackers merge; the
+    # survivor must carry BOTH trackers, or the event vanishes from the
+    # non-primary tracker's page.
+    rows = [
+        {"id": 1, "title": "CVE-2026-9082 Drupal SQL Injection Exploited",
+         "summary": "x" * 60, "url": "https://a.com/1", "source": "A",
+         "trackers": "security"},
+        {"id": 2, "title": "Drupal CVE-2026-9082 與 CRA 合規影響",
+         "summary": "y" * 10, "url": "https://b.com/2", "source": "B",
+         "trackers": "eu_cra"},
+    ]
+    out = merge_by_title(rows)
+    assert len(out) == 1
+    assert set(out[0]["trackers"].split(",")) == {"security", "eu_cra"}
+
+
+def test_make_source_drops_dangerous_url_scheme():
+    # http(s) survives; javascript:/data: collapse to "" so they never reach a
+    # rendered href (F-SEC-1).
+    assert _make_source({"source": "S", "url": "https://x.com/a"})["url"] == "https://x.com/a"
+    assert _make_source({"source": "S", "url": "javascript:alert(1)"})["url"] == ""
+    assert _make_source({"source": "S", "url": "data:text/html,<script>"})["url"] == ""
 
 
 def test_tokens_pick_cjk_bigrams_and_ascii_words():

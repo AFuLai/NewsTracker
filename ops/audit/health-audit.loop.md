@@ -26,18 +26,35 @@ meta:
 
 ---
 
-## PLAN (living) — 每圈可改
+## GOAL-2 (frozen) — 🔴 修補階段（使用者 2026-09-02 裁示「fix all remaining findings as your suggested order」）
 
-- [ ] iter1：build/deps 健康——安裝、import、CLI smoke、pyproject/依賴
-- [ ] iter2：測試套件——實跑 pytest，記 pass/fail、慢測、skip、覆蓋缺口
-- [ ] iter3：pipeline 執行期健康——status.json、logs、最近 run、錯誤率、health.py
-- [ ] iter4：LLM 整合（最新最險）——llama.cpp/ollama adapter、schema、shadow-feature、fallback
-- [ ] iter5：資料/產出完整性——html/data、id 指派、changelog、dedup/cross 正確性
-- [ ] iter6：secrets/config/安全——endpoints、金鑰、.gitignore/.gitattributes、輸入處理
-- [ ] iter7：codex 獨立稽核 pass（外部重錨）＋對帳
-- [ ] iter8：彙整成稽核報告、排序、交付
+依報告建議優先序修掉所有 remaining findings，每一條都以「修前紅、修後綠」的**測試/probe 證明**收尾（非宣稱）；PLAUSIBLE 條目**先親驗**再決定修或降級；設計性條目（如 F-DATA-1 明載刻意）**記錄裁決而非硬改**。不破壞現有 476 測試。每個綠檢查點提交。
 
-（改計畫時，把被放棄的項目移到 GRAVEYARD，別直接刪。）
+成功樣貌（達成打勾，不刪改文字）：
+- [ ] 安全三條落地：H-SSRF、F-SEC-1（render＋feed 兩層）、H-DASH
+- [ ] 資料正確性：F-DATA-2（union trackers）、F-DATA-3（WAL+busy_timeout）、F-CONC-1（process lock）
+- [ ] LLM 韌性：F-LLM-2（connect timeout）、F-LLM-4（fallback 拓寬）、F-LLM-1/3（injection 硬化）、F-LLM-5（gemini timeout）
+- [ ] 產出：F-DATA-5（U+2028/2029）
+- [ ] PLAUSIBLE 逐一親驗並處置：C-REVDET、C-DATEFLOOD、C-PREFLIGHT、C-DBLSUM、F-DATA-4
+- [ ] 可重現性/雜項：F-BUILD-1/2、F-TEST-1、F-RUNTIME-1（可 doc-only）；F-DATA-1 記裁決
+- [ ] 每條都有測試/probe 佐證，全套件保持綠，變更分批 commit
+
+---
+
+## PLAN (living) — 每圈可改（修補階段；N=3）
+
+- [x] iter1–9：稽核 + 已修 F-ISOLATION-1、H-SILENT-OK（見下）
+- [ ] iter10：安全 — H-SSRF（path.py hostname 精確比對）+ F-SEC-1（render/feed scheme 白名單）
+- [ ] iter11：安全 — H-DASH（bind 127.0.0.1，選擇性 token）
+- [ ] iter12：資料 — F-DATA-2（cluster union trackers）+ F-DATA-3（WAL+busy_timeout）
+- [ ] iter13：LLM — F-LLM-2（connect timeout）+ F-LLM-4（fallback 拓寬）
+- [ ] iter14：LLM — F-LLM-1/3 injection 硬化 + F-LLM-5（gemini timeout）
+- [ ] iter15：產出 — F-DATA-5（U+2028/2029 跳脫）
+- [ ] iter16：F-CONC-1（process lock，先驗再修）
+- [ ] iter17：PLAUSIBLE 驗證批 — C-REVDET/C-DATEFLOOD/C-PREFLIGHT/C-DBLSUM/F-DATA-4
+- [ ] iter18：可重現性/雜項 — F-BUILD-1/2、F-TEST-1、F-RUNTIME-1；F-DATA-1 裁決
+
+（改計畫時，把被放棄的項目移到 GRAVEYARD，別直接刪。原稽核階段 iter1-8 計畫已完成，保留於 ITERATION LOG。）
 
 ---
 
@@ -80,13 +97,13 @@ meta:
 | F-LLM-4 | med | `_call_llamacpp` 只在連線層錯誤 fallback，ReadTimeout/5xx 直接拋 → 文章 error 而非改用 ollama | `llm/__init__.py:191-196` | open |
 | F-LLM-5 | low-med | 次要 LLM 韌性：gemini timeout 參數被忽略(:144-154)、parse fail 回傳生文(:47-50)、gemini 無法強制 schema、translate/gate 假設欄位型別 | `llm/__init__.py` / `summarize.py` / `translate.py:74`（一組低嚴重度韌性缺口） | open |
 | F-DATA-1 | med（設計限制） | 站點 id 依當日排序位指派，往舊日期插一則→整天 id 重編，permalink 不穩 | `render.py:96,100`；**注意：CLAUDE.md 明載為刻意設計**，屬已知限制非 bug | open |
-| F-DATA-2 | med | `merge_by_title` 跨 tracker 合併時未 union 被併列的 `trackers`，事件可能從非主 tracker 頁消失 | `cluster.py:162-173`＋`orchestrator.py:1099,1117`（待 iter7 親驗） | open |
-| F-DATA-3 | med | 主 `Store` 無 WAL/無 busy_timeout，`cra_library.py:493` 卻設 busy_timeout=30000（不一致），並發易 "database is locked" | `dedup.py:263-264` | open |
+| F-DATA-2 | med | `merge_by_title` 跨 tracker 合併時未 union 被併列的 `trackers`，事件可能從非主 tracker 頁消失 | `cluster.py:162-173`＋`orchestrator.py:1099,1117`（iter7 親驗 live） | **✅ FIXED**：cluster 輸出 union 所有 member 的 trackers（逗號串）。+1 測試 |
+| F-DATA-3 | med | 主 `Store` 無 WAL/無 busy_timeout，`cra_library.py:493` 卻設 busy_timeout=30000（不一致），並發易 "database is locked" | `dedup.py:263-264` | **✅ FIXED**：Store.__init__ 設 `busy_timeout=30000`＋`journal_mode=WAL`（對齊 cra_library）。+1 測試 |
 | F-DATA-4 | med | 站點發布（render_day→manifests→mark_written）多檔寫入＋DB commit 無交易，崩潰留半態 | `orchestrator.py:1120-1129` | open |
-| F-SEC-1 | med→**high** | source 連結 href 未限制 scheme，`javascript:`/`data:` 可執行 → XSS；**codex 追到上游** feed 抓取即未擋 scheme | `ui/index.html:2046`（escHtml 只轉義不擋 scheme，**親驗確認**）＋`fetchers/feed.py:53`（codex#3）｜**CONFIRMED、codex 收斂** | open |
+| F-SEC-1 | med→**high** | source 連結 href 未限制 scheme，`javascript:`/`data:` 可執行 → XSS；**codex 追到上游** feed 抓取即未擋 scheme | `ui/index.html:2046`（escHtml 只轉義不擋 scheme，**親驗確認**）＋`fetchers/feed.py:53`（codex#3）｜**CONFIRMED、codex 收斂** | **✅ FIXED（3 層）**：feed.py ingest 拒非 http(s)；cluster `_make_source` render chokepoint 清 scheme；ui `safeHref()`＋escHtml 補 `'`。+2 測試（_make_source）、node 驗 safeHref |
 | H-SILENT-OK | **HIGH** | per-article summarize 例外只 log_error+debug+continue，**不設 rep.ok=False／不加 rep.errors** → 全部摘要失敗仍回報 ok:true 0 errors（假綠健康訊號，F-ISOLATION-1 的雙生） | `orchestrator.py:816-823`（**親驗**）；僅 preflight-down(:335) 與 phase 例外(:424) 會翻 ok。codex#5 獨立發現。**CONFIRMED**。 | **✅ FIXED**：加 `summarize_failed` 計數＋`RunReport.note_summarize_wipeout()`（attempted>0 且 summarized==0 才翻 ok，保 fail-open）；one_line/status.json 曝 sum_fail；+3 單元測試（total/partial/empty） |
-| H-DASH | **HIGH** | 儀表板 `ThreadingHTTPServer(("0.0.0.0",port))` 綁全介面、handler 無驗證，暴露改 ollama endpoint／跑 pipeline 等狀態變更控制 → 同網段可把 prompt/內容導向攻擊者伺服器 | `web_dashboard.py:204`（**親驗**綁 0.0.0.0＋無 auth；WSL2 bridge 註解解釋但不豁免 LAN 暴露）。codex#1。**CONFIRMED** | open |
-| H-SSRF | med-high | PATH 抓取「同網域」檢查用 netloc 子字串比對，`trusted.example@127.0.0.1` 或 `example.com.evil.com` 皆過 → SSRF/抓內網 | `sources/path.py:202`（**親驗**：`domain_norm not in netloc`；netloc 含 userinfo）。codex#2。**CONFIRMED** | open |
+| H-DASH | **HIGH** | 儀表板 `ThreadingHTTPServer(("0.0.0.0",port))` 綁全介面、handler 無驗證，暴露改 ollama endpoint／跑 pipeline 等狀態變更控制 → 同網段可把 prompt/內容導向攻擊者伺服器 | `web_dashboard.py:204`（**親驗**綁 0.0.0.0＋無 auth；WSL2 bridge 註解解釋但不豁免 LAN 暴露）。codex#1。**CONFIRMED** | **✅ FIXED**：預設綁 `127.0.0.1`（WSL2 localhost 轉發仍通），LAN 需明設 `TRACKER_DASHBOARD_HOST=0.0.0.0` opt-in。+2 測試 |
+| H-SSRF | med-high | PATH 抓取「同網域」檢查用 netloc 子字串比對，`trusted.example@127.0.0.1` 或 `example.com.evil.com` 皆過 → SSRF/抓內網 | `sources/path.py:202`（**親驗**：`domain_norm not in netloc`；netloc 含 userinfo）。codex#2。**CONFIRMED** | **✅ FIXED**：新增 `_same_domain()` 用 `urlparse().hostname` 精確/子網域比對（擋 userinfo、`.evil.com`、`evil-`、no-host scheme）。+2 測試 |
 | F-CONC-1 | high | pipeline 無 process-level lock，排程 run 與儀表板 run 重疊 → 同列重複摘要、互蓋、SQLite 爭用、同時 render 同檔 | `orchestrator.py:286`（codex#4，結構性；與 F-DATA-3/4 同源）｜PLAUSIBLE（未見 lockfile） | open |
 | C-REVDET | med | 既有 URL 只用 URL hash 跳過，`content_hash`（宣稱做改版偵測）從未用 → 廠商同網址改 advisory 不會更新 | `orchestrator.py:539`（codex#9）｜PLAUSIBLE、待驗 | open |
 | C-DATEFLOOD | med | 無日期文章給 discovery date → 首爬十年舊 archive 會以「今天」發佈 | `orchestrator.py:837`（codex#13；fallback_date=fetched_at，親見機制）；date-window 部分緩解 | open |
@@ -122,6 +139,28 @@ meta:
 - 動了：subagent 讀 dedup/cluster/cross/render/templates/ui，回 10 條。我套判斷：**#1 id 依排序位重編＝CLAUDE.md 明載的刻意設計**（非 bug，降級為「已知限制：permalink 不穩」）；#3 semantic enforce 掉文章＝目前 shadow 未啟用，真實嚴重度降；其餘照收。挑 #2（merge 不 union trackers）與 #6（href 未限 scheme）為最有價值**新**發現，待我親驗（self-attack：不盲信 subagent）。
 - 學到：subagent 找到我前幾圈沒碰的產出面向——`dedup.py` 未設 WAL/busy_timeout 但 `cra_library.py:493` 有設（不一致，F-DATA-3）；ui/index.html escHtml 不擋 `javascript:` scheme（F-SEC-1，待驗）；U+2028/2029 進 .js（低）。
 - 下一步還對嗎：是。iter7 會親驗 #2/#6 再定嚴重度，並與 codex/LLM subagent 對帳去重。
+
+### iter 12 — 2026-09-02 資料正確性：F-DATA-2 + F-DATA-3
+- 動了：F-DATA-2 → cluster 輸出建構 union 所有 member 的 `trackers`（逗號串、去重保序）。F-DATA-3 → Store.__init__ 設 `PRAGMA busy_timeout=30000`＋`journal_mode=WAL`（對齊 cra_library._conn）。+2 測試。
+- 學到：WAL 安全（DB 在 WSL ext4、僅 WSL 存取；Windows 側只讀 status/html）；union 只納入實際被併的 member，不會過度標記。
+- 下一步還對嗎：是。達 N=3 → checkpoint@iter12。iter13 = F-LLM-2 + F-LLM-4。
+
+### checkpoint @iter 12 — 2026-09-02（修補階段第一格）
+- 防歪頭：逐字讀 GOAL-2。iter10（安全2）、iter11（dashboard）、iter12（資料2）＝**3/3 直接服務**成功樣貌前兩列。偏移 0。
+- 指標（重跑 probe）：TESTS 483 pass ✅；IMPORT_OK（含 cluster/web_dashboard/path/feed 全新動模組）；SECRETS 0；STATUS True 0 0 0（**isolation 修補後 production 訊號未被測試碰**）；TODO 1 →。
+- 演化指標：無新增；「測試通過」持續作為每條修補的紅路徑載體（每個 fix 都附一條修前會紅的測試）。
+- 自攻擊：新測試皆有真紅路徑（_same_domain 修前不存在、舊 netloc 檢查會放行 SSRF case）；WAL 不碰真 DB（測試用 tmp）；127.0.0.1 有 env 逃生口。撐得住。
+- 判定：綠 → commit（6 findings 已修：iter9 的 2 + iter10-12 的 6... 累計 8）。
+
+### iter 11 — 2026-09-02 安全：H-DASH
+- 動了：web_dashboard.serve 預設綁 `127.0.0.1`（`TRACKER_DASHBOARD_HOST` 可 opt-in LAN），更新 docstring，加 `import os`。+2 測試（loopback 預設 / 0.0.0.0 opt-in）。
+- 學到：WSL2 localhost 轉發對 127.0.0.1 仍通，故安全預設不破壞 Windows 瀏覽器存取；真要 LAN 才明設 env（知情選擇風險）。
+- 下一步還對嗎：是。iter12 = F-DATA-2 + F-DATA-3。
+
+### iter 10 — 2026-09-02 安全批：H-SSRF + F-SEC-1
+- 動了：H-SSRF → path.py 新增 `_same_domain()`（hostname 精確/子網域比對，取代 netloc 子字串），移除死變數 p。F-SEC-1 → 3 層：`feed.py` ingest 拒非 http(s)、`cluster._make_source` render chokepoint 清 scheme、`ui/index.html` `safeHref()`＋escHtml 補 `'`。+4 單元測試。
+- 學到：path.py 原本靠「javascript: 無 netloc → 子字串不中 → 跳過」意外擋住 XSS，但 SSRF（userinfo）真的會過；hostname 比對一次修好兩者。F-SEC-1 選 _make_source 當單一 chokepoint 最省（所有站點 source 連結都經它，且順帶清 DB 舊資料）。
+- 下一步還對嗎：是。479 pass、node 驗 safeHref。iter11 = H-DASH（bind 127.0.0.1）。
 
 ### iter 9 — 2026-09-02 修補兩條假綠訊號（使用者裁示）
 - 動了：**F-ISOLATION-1** → conftest autouse `_isolate_project_root`（patch orchestrator+cli PROJECT_ROOT→tmp_path），更新 test_orchestrator 過期註解。**H-SILENT-OK** → 加 `RunReport.summarize_failed` 計數、error 分支 +1、`note_summarize_wipeout()`（total wipeout 才翻 ok，保 fail-open）、one_line 曝 sum_fail、+3 單元測試。

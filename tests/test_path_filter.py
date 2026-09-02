@@ -5,7 +5,25 @@
 trafilatura extracts nothing from a how-to page.
 """
 from tracker.sources import path as path_mod
-from tracker.sources.path import _looks_like_article, fetch_listing
+from tracker.sources.path import _looks_like_article, fetch_listing, _same_domain
+
+
+def test_same_domain_matches_host_not_netloc_substring():
+    # Legit: exact host, subdomain, and www-stripped.
+    assert _same_domain("https://example.com/a", "example.com")
+    assert _same_domain("https://blog.example.com/a", "example.com")
+    assert _same_domain("https://www.example.com/a", "example.com")
+
+
+def test_same_domain_rejects_ssrf_and_lookalikes():
+    # userinfo SSRF: host is 127.0.0.1, not example.com.
+    assert not _same_domain("https://example.com@127.0.0.1:11434/x", "example.com")
+    # suffix / prefix look-alikes must not match.
+    assert not _same_domain("https://example.com.evil.com/x", "example.com")
+    assert not _same_domain("https://evil-example.com/x", "example.com")
+    # no-host schemes (javascript:/data:) are rejected.
+    assert not _same_domain("javascript:alert(1)", "example.com")
+    assert not _same_domain("data:text/html,x", "example.com")
 
 
 def test_rejects_tutorial_sections():

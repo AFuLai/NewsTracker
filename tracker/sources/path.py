@@ -156,6 +156,23 @@ def _looks_like_article(href: str) -> bool:
     return "-" in last or any(ch.isdigit() for ch in last) or last.endswith((".html", ".htm"))
 
 
+def _same_domain(candidate_url: str, domain_norm: str) -> bool:
+    """True when candidate_url's HOST is domain_norm or a subdomain of it.
+
+    Compares urlparse().hostname — which excludes any userinfo and port — not a
+    substring of netloc. `https://trusted.example@127.0.0.1/x` has netloc
+    `trusted.example@127.0.0.1`, so a substring test (`domain_norm in netloc`)
+    passed while the request actually resolves to 127.0.0.1 (SSRF). A scheme
+    with no host (javascript:, data:, mailto:) has hostname None → rejected.
+    The boundary dot in the suffix test stops `evil-example.com` and
+    `example.com.evil.com` from matching `example.com`.
+    """
+    host = (urlparse(candidate_url).hostname or "").lower().removeprefix("www.")
+    if not host or not domain_norm:
+        return False
+    return host == domain_norm or host.endswith("." + domain_norm)
+
+
 def fetch_listing(base_url: str, *, search_path: str = "",
                   keyword: str = "", domain: str = "",
                   max_results: int = 30, timeout: float = 20.0,
@@ -196,10 +213,9 @@ def fetch_listing(base_url: str, *, search_path: str = "",
             continue
         # Resolve relative URLs against the listing page.
         abs_url = urljoin(url, href)
-        p = urlparse(abs_url)
-        # Same-domain only
-        netloc = p.netloc.lower().removeprefix("www.")
-        if domain_norm not in netloc:
+        # Same-domain only — host match, not a substring of netloc (SSRF); this
+        # also drops javascript:/data:/mailto: links, which have no host.
+        if not _same_domain(abs_url, domain_norm):
             continue
         if not _looks_like_article(abs_url):
             continue
