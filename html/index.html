@@ -2043,7 +2043,7 @@ function openOverlay(a, triggerEl) {
   const ecat = effectiveCat(a, state.currentTracker);
   const catClass = 'cat-' + ecat;
   const srcHtml = (a.sources || []).map(s =>
-    '<li><a href="' + escHtml(s.url) + '" target="_blank" rel="noopener">[' + escHtml(s.lang) + '] ' + escHtml(s.name) + '</a></li>'
+    '<li><a href="' + escHtml(safeHref(s.url)) + '" target="_blank" rel="noopener">[' + escHtml(s.lang) + '] ' + escHtml(s.name) + '</a></li>'
   ).join('');
   const tagsHtml = artTags(a).map(tg => {
     if (/^CVE-\d{4}-\d{4,}$/.test(tg)) {
@@ -2169,7 +2169,14 @@ function escHtml(str) {
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+// Only http(s) may become a real href. Anything else (javascript:, data:)
+// collapses to '#', so a hostile source URL that slipped past the pipeline
+// filters still cannot execute on click. Defence in depth.
+function safeHref(u) {
+  return /^https?:\/\//i.test(String(u || '')) ? u : '#';
 }
 function toggleTheme() {
   const isDark = document.documentElement.dataset.theme !== 'light';
