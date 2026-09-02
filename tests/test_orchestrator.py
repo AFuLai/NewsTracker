@@ -61,6 +61,25 @@ def test_eu_cra_filter_has_markers():
     assert any("사" in w for w in EU_CRA_FILTER)  # 사 (KR)
 
 
+def test_pipeline_aborts_when_db_lock_held(tmp_path):
+    # F-CONC-1: a second run started while another holds the DB lock aborts
+    # cleanly (ok=False, run_id=-1) and journals nothing.
+    import fcntl
+    db = tmp_path / "t.sqlite"
+    holder = open(str(db) + ".lock", "w")
+    fcntl.flock(holder, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    try:
+        rep = run_pipeline(since="2026-06-01", until="2026-06-02",
+                           trackers=["security"], db=db, out=tmp_path,
+                           summarize_limit=1, cleanup=False)
+        assert rep.ok is False
+        assert rep.run_id == -1
+        assert any("already active" in e for e in rep.errors)
+    finally:
+        fcntl.flock(holder, fcntl.LOCK_UN)
+        holder.close()
+
+
 def test_pipeline_aborts_when_ollama_down(monkeypatch):
     # ensure_ollama fails → run_pipeline must return ok=False without crashing,
     # write a runs row, and leave no half-state.

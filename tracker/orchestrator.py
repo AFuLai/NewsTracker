@@ -308,7 +308,26 @@ def run_pipeline(*, since: str, until: str, trackers: list[str],
     log = _setup_logger(run_ts)
     t0 = time.time()
     window = DateWindow(_date.fromisoformat(since), _date.fromisoformat(until))
+    # F-CONC-1: one pipeline per DB. A second concurrent run — e.g. the daily
+    # scheduler overlapping a dashboard-started run — would race SQLite writes,
+    # status.json, and the non-atomic static output files. Take an exclusive,
+    # non-blocking flock on <db>.lock; it auto-releases when this process exits,
+    # so a crash never leaves a stale lock. A loser aborts cleanly with ok=False
+    # and writes nothing (no runs row, no status.json).
+    import fcntl
+    Path(db).parent.mkdir(parents=True, exist_ok=True)
+    run_lock = open(f"{db}.lock", "w")
+    try:
+        fcntl.flock(run_lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except OSError:
+        run_lock.close()
+        log.error("another pipeline run is already active on %s — aborting", db)
+        rep = RunReport(run_id=-1, since=since, until=until, trackers=list(trackers))
+        rep.ok = False
+        rep.errors.append("another pipeline run is already active on this db")
+        return rep
     store = Store(db)
+    store._run_lock = run_lock
     rid = store.start_run(json.dumps({"since": since, "until": until, "trackers": trackers}))
     rep = RunReport(run_id=rid, since=since, until=until, trackers=list(trackers))
     rep.summarize_backend, rep.translate_backend = summarize_backend, translate_backend
@@ -1305,3 +1324,11 @@ def _finalize(store, rep, t0, log, stats0=None):
     except Exception as exc:
         log.warning("could not write status.json: %s", exc)
     log.info("run %s finished: %s", rep.run_id, rep.one_line())
+    # Release the F-CONC-1 run lock (closing the fd drops the flock). Every real
+    # exit path funnels through _finalize, so this is the single release point.
+    lock = getattr(store, "_run_lock", None)
+    if lock is not None:
+        try:
+            lock.close()
+        except OSError:
+            pass
