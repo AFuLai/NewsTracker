@@ -12,9 +12,20 @@ from jinja2 import Environment, PackageLoader, select_autoescape
 from . import ROOT
 
 
+# Map U+2028/U+2029 to their escaped form. chr(92) is a backslash, built at
+# runtime so this source carries no literal backslash to mis-escape.
+_JS_LINE_SEPS = {0x2028: chr(92) + "u2028", 0x2029: chr(92) + "u2029"}
+
+
 def _tojson_unicode(value):
-    """tojson that preserves CJK characters (no \\uXXXX escape)."""
-    return json.dumps(value, ensure_ascii=False)
+    """tojson that keeps CJK characters literal (no ASCII-escaping).
+
+    U+2028/U+2029 (LINE/PARAGRAPH SEPARATOR) are valid in JSON but are raw line
+    terminators inside a JavaScript string literal on pre-ES2019 engines, so a
+    title/summary containing one would break the whole data-YYYYMMDD.js file
+    (F-DATA-5). Map just those two to their escaped form; CJK stays readable.
+    """
+    return json.dumps(value, ensure_ascii=False).translate(_JS_LINE_SEPS)
 
 
 _env = Environment(

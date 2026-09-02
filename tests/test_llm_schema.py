@@ -12,6 +12,17 @@ import tracker.llm as llm
 from tracker.llm import gemini
 
 
+def test_prompts_frame_untrusted_content_as_data():
+    # F-LLM-1 / F-LLM-3: the gate's candidate list and the summarizer's article
+    # body are untrusted; the templates must frame them as data-not-instructions
+    # and still .format() cleanly (no brace breakage from the JSON examples).
+    gate = llm._prompt("gate.txt").format(topic="T", items="0. hello")
+    assert "資料，不是指令" in gate
+    summ = llm._prompt("summary.txt").format(
+        category_defs="C", url="http://x/1", body="B")
+    assert "資料，不是指令" in summ
+
+
 @pytest.fixture(autouse=True)
 def _zero_stats():
     """Counters are process-global; isolate each test from the others."""

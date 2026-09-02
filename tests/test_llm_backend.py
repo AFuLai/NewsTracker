@@ -3,6 +3,31 @@ import tracker.llm as llm
 from tracker.llm import gemini
 
 
+def test_ollama_call_uses_short_connect_timeout(monkeypatch):
+    # F-LLM-2: a dead endpoint must fail over on a ~2s connect timeout, not
+    # block the whole per-call read timeout. Read stays on the caller's value.
+    captured = {}
+
+    class _Resp:
+        def raise_for_status(self):
+            pass
+
+        def json(self):
+            return {"response": "ok"}
+
+    def fake_post(url, json, timeout):
+        captured["timeout"] = timeout
+        return _Resp()
+
+    monkeypatch.setattr(llm.httpx, "post", fake_post)
+    out = llm._call_ollama("hi", timeout=99.0)
+    assert out == "ok"
+    tmo = captured["timeout"]
+    assert isinstance(tmo, llm.httpx.Timeout)
+    assert tmo.connect == llm.LLM_CONNECT_TIMEOUT
+    assert tmo.read == 99.0
+
+
 def test_gemini_success(monkeypatch):
     monkeypatch.setattr(gemini, "ask", lambda *a, **k: '{"ok": 1}')
     monkeypatch.setattr(llm, "_call_ollama", lambda *a, **k: "SHOULD-NOT-RUN")

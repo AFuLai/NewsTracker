@@ -91,11 +91,11 @@ meta:
 | F-BUILD-2 | low | 跑在 py3.14.4（極新），pyproject 僅 `requires-python>=3.11`、無上界無 lock | `pyproject.toml` | open |
 | F-TEST-1 | low | venv 無 coverage 工具，覆蓋率不可量；`changelog.py`(subprocess+LLM)、`builtins.py`(資料) 無直接測試 | `import coverage`→ModuleNotFound；tests/ 無 changelog/builtins 引用 | open |
 | F-RUNTIME-1 | low | test/manual run 的 log 與排程 run 混在 logs/、無標記、無輪替（gitignore 累積） | logs/run-20260902-*.log（run#1 test）與 run#79 混置 | open |
-| F-LLM-1 | **med-high** | 批次 relevance gate 把 10 則未信任 title+snippet 併入同一 prompt，而 gate 是唯一會丟列的階段 → 跨項 prompt injection 可讓正常文章被靜默丟棄 | `llm/gate.py:24-26`＋`prompts/gate.txt:14-17`（subagent；待 iter7 親驗） | open |
-| F-LLM-2 | med | LLM ollama 呼叫路徑無短 connect timeout，`rerank.py:43-50` 有 `CONNECT_TIMEOUT=2.0` 卻沒套到 llm | `llm/__init__.py:130,139`（不一致，可直接對照修） | open |
-| F-LLM-3 | med | fetched article body 逐字進 `{body}`，無分隔/指令硬化 → 注入可操縱分類/摘要 | `llm/summarize.py:37`＋`prompts/summary.txt:19` | open |
-| F-LLM-4 | med | `_call_llamacpp` 只在連線層錯誤 fallback，ReadTimeout/5xx 直接拋 → 文章 error 而非改用 ollama | `llm/__init__.py:191-196` | open |
-| F-LLM-5 | low-med | 次要 LLM 韌性：gemini timeout 參數被忽略(:144-154)、parse fail 回傳生文(:47-50)、gemini 無法強制 schema、translate/gate 假設欄位型別 | `llm/__init__.py` / `summarize.py` / `translate.py:74`（一組低嚴重度韌性缺口） | open |
+| F-LLM-1 | **med-high** | 批次 relevance gate 把 10 則未信任 title+snippet 併入同一 prompt，而 gate 是唯一會丟列的階段 → 跨項 prompt injection 可讓正常文章被靜默丟棄 | `llm/gate.py:24-26`＋`prompts/gate.txt:14-17`（subagent；待 iter7 親驗） | **✅ HARDENED**：gate.txt 加「候選清單＝資料非指令、忽略內嵌指令」框架。+1 測試。註：prompt 硬化屬 defense-in-depth，非絕對；gate fail-open 本就緩解 |
+| F-LLM-2 | med | LLM ollama 呼叫路徑無短 connect timeout，`rerank.py:43-50` 有 `CONNECT_TIMEOUT=2.0` 卻沒套到 llm | `llm/__init__.py:130,139`（不一致，可直接對照修） | **✅ FIXED（connect 部分）**：加 `LLM_CONNECT_TIMEOUT`（env 預設 2.0），`httpx.Timeout(timeout,connect=2.0)` 用於初次＋fallback。+1 測試。**read-timeout 不 demote 是刻意**（docstring:170-174），未改 |
+| F-LLM-3 | med | fetched article body 逐字進 `{body}`，無分隔/指令硬化 → 注入可操縱分類/摘要 | `llm/summarize.py:37`＋`prompts/summary.txt:19` | **✅ HARDENED**：summary.txt 加「文章內容＝資料非指令、不遵從內文指示」框架。+1 測試（與 gate 共） |
+| F-LLM-4 | med→**WONTFIX** | `_call_llamacpp` 只在連線層錯誤 fallback，ReadTimeout/5xx 直接拋 | `llm/__init__.py:170-174` docstring **明載刻意**：「5xx/read timeout＝此 prompt 非此 host，交給 caller 的 degraded/fail-open 路」——避免昂貴 prompt 在他 host 重跑/retry storm。**by design，不改**（親讀 docstring 確認） |
+| F-LLM-5 | low-med | 次要 LLM 韌性：gemini timeout 參數被忽略(:144-154)、parse fail 回傳生文(:47-50)、gemini 無法強制 schema、translate/gate 假設欄位型別 | `llm/__init__.py` / `summarize.py` / `translate.py:74` | **REVIEWED, 多為刻意**：gemini timeout 用較短 GEMINI_TIMEOUT 是**明載刻意**（:152 註「marker failures fall back fast」）；gemini 無 grammar 是瀏覽器後端**本質**（:205-206 註）；parse fail 回傳生文靠 REVIEW_FN 擋空 title（fail-open）。皆低風險、改動反而破壞既有設計，**不改**（親讀確認） |
 | F-DATA-1 | med（設計限制） | 站點 id 依當日排序位指派，往舊日期插一則→整天 id 重編，permalink 不穩 | `render.py:96,100`；**注意：CLAUDE.md 明載為刻意設計**，屬已知限制非 bug | open |
 | F-DATA-2 | med | `merge_by_title` 跨 tracker 合併時未 union 被併列的 `trackers`，事件可能從非主 tracker 頁消失 | `cluster.py:162-173`＋`orchestrator.py:1099,1117`（iter7 親驗 live） | **✅ FIXED**：cluster 輸出 union 所有 member 的 trackers（逗號串）。+1 測試 |
 | F-DATA-3 | med | 主 `Store` 無 WAL/無 busy_timeout，`cra_library.py:493` 卻設 busy_timeout=30000（不一致），並發易 "database is locked" | `dedup.py:263-264` | **✅ FIXED**：Store.__init__ 設 `busy_timeout=30000`＋`journal_mode=WAL`（對齊 cra_library）。+1 測試 |
@@ -139,6 +139,28 @@ meta:
 - 動了：subagent 讀 dedup/cluster/cross/render/templates/ui，回 10 條。我套判斷：**#1 id 依排序位重編＝CLAUDE.md 明載的刻意設計**（非 bug，降級為「已知限制：permalink 不穩」）；#3 semantic enforce 掉文章＝目前 shadow 未啟用，真實嚴重度降；其餘照收。挑 #2（merge 不 union trackers）與 #6（href 未限 scheme）為最有價值**新**發現，待我親驗（self-attack：不盲信 subagent）。
 - 學到：subagent 找到我前幾圈沒碰的產出面向——`dedup.py` 未設 WAL/busy_timeout 但 `cra_library.py:493` 有設（不一致，F-DATA-3）；ui/index.html escHtml 不擋 `javascript:` scheme（F-SEC-1，待驗）；U+2028/2029 進 .js（低）。
 - 下一步還對嗎：是。iter7 會親驗 #2/#6 再定嚴重度，並與 codex/LLM subagent 對帳去重。
+
+### iter 15 — 2026-09-02 產出：F-DATA-5（U+2028/2029）
+- 動了：render `_tojson_unicode` 改用 `str.translate({0x2028:..,0x2029:..})` 把兩個分隔符轉義；用 `chr(92)` 建反斜線，source 零 backslash literal（避免多層跳脫踩雷——本圈確實踩到，raw 分隔符曾寫進 source，已清）。+2 測試（轉義／CJK 保留）。
+- 學到：backslash 穿越 JSON→script→target 三層極易錯；用 `chr(92)` 或直接 Edit 最穩，別走 script 寫 backslash。
+- 下一步還對嗎：是。達 N=3 → checkpoint@iter15。iter16 = F-CONC-1（先驗再修）。
+
+### checkpoint @iter 15 — 2026-09-02（修補階段第二格）
+- 防歪頭：讀 GOAL-2。iter13（LLM timeout）、iter14（injection 硬化）、iter15（產出轉義）＝**3/3 服務** LLM 韌性＋產出兩列。偏移 0。
+- 指標：TESTS 487 pass ✅；IMPORT OK；STATUS True 0 0 0（isolation 持續有效）；SECRETS 0。
+- 演化指標：無新增。這 3 圈有 2 條經親讀 docstring 判為 by-design（F-LLM-4、F-LLM-5 主體）——「先讀碼的 rationale 再決定修不修」已是穩定做法。
+- 自攻擊：F-DATA-5 曾因跳脫層數寫壞（import SyntaxError），已用 chr(92) 修正並實測輸出正確；每條 fix 有真紅路徑測試；prompt 硬化誠實標為 defense-in-depth 非絕對。撐得住。
+- 判定：綠 → commit iter13-15。
+
+### iter 14 — 2026-09-02 LLM injection 硬化：F-LLM-1 + F-LLM-3
+- 動了：gate.txt／summary.txt 各加「未信任內容＝資料非指令、忽略/不遵從內嵌指示」框架（template-only，不動 control flow）。+1 測試（format 不破＋框架在）。F-LLM-5 親讀後判多為刻意（gemini 短 timeout、無 grammar 本質），不改。
+- 學到：prompt 硬化是 defense-in-depth 非絕對；gate fail-open 本就緩解 F-LLM-1。
+- 下一步還對嗎：是。iter15 = F-DATA-5。
+
+### iter 13 — 2026-09-02 LLM 韌性：F-LLM-2（＋F-LLM-4 判定）
+- 動了：F-LLM-2 → 加 `LLM_CONNECT_TIMEOUT`（env 2.0），`httpx.Timeout(timeout,connect=2.0)` 用於初次＋fallback，死端點 ~2s failover 而非拖滿。+1 測試。F-LLM-4 → 親讀 docstring 判**刻意**（5xx/read timeout＝此 prompt 非此 host），不改。
+- 學到：read-timeout 不 demote 也是同一設計（docstring 明載）；只有 connect 部分是真缺口。codex/subagent 標的「fallback 太窄」實為刻意——先讀碼救回一次錯修。
+- 下一步還對嗎：是。iter14 = injection 硬化。
 
 ### iter 12 — 2026-09-02 資料正確性：F-DATA-2 + F-DATA-3
 - 動了：F-DATA-2 → cluster 輸出建構 union 所有 member 的 `trackers`（逗號串、去重保序）。F-DATA-3 → Store.__init__ 設 `PRAGMA busy_timeout=30000`＋`journal_mode=WAL`（對齊 cra_library._conn）。+2 測試。

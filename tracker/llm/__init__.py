@@ -32,6 +32,12 @@ GEMINI_MODEL = os.environ.get("TRACKER_GEMINI_MODEL", "Flash")
 # Per-call Gemini response timeout (seconds). Kept short so a missing-marker reply
 # falls back to Ollama quickly instead of stalling the run; Flash answers in ~10-30s.
 GEMINI_TIMEOUT = float(os.environ.get("TRACKER_GEMINI_TIMEOUT", "45"))
+# Short connect timeout so a dead endpoint fails over in ~2s instead of blocking
+# the whole per-call `timeout` (up to 120s) on connect before demote() runs
+# (F-LLM-2). Mirrors rerank.py's CONNECT_TIMEOUT. Read stays on the caller's
+# `timeout`: a slow *read* is this prompt on a live host, not a dead host, and
+# is deliberately not a failover trigger (see _call_ollama).
+LLM_CONNECT_TIMEOUT = float(os.environ.get("TRACKER_LLM_CONNECT_TIMEOUT", "2.0"))
 
 # WP9: local llama.cpp generation server (OpenAI-compatible, 8083). The rollout
 # is a deployment switch (TRACKER_LLM_BACKEND), not a code flag day: the default
@@ -126,8 +132,9 @@ def _post_ollama(payload: dict[str, Any], timeout: float) -> str:
     # through either gets the local default, which is exactly the behaviour
     # this had before endpoints existed.
     url = hosts.selected() or hosts.LOCAL_URL
+    tmo = httpx.Timeout(timeout, connect=LLM_CONNECT_TIMEOUT)
     try:
-        r = httpx.post(f"{url}/api/generate", json=payload, timeout=timeout)
+        r = httpx.post(f"{url}/api/generate", json=payload, timeout=tmo)
         r.raise_for_status()
         return r.json().get("response", "")
     except (httpx.ConnectError, httpx.ConnectTimeout, httpx.ReadError,
@@ -136,7 +143,7 @@ def _post_ollama(payload: dict[str, Any], timeout: float) -> str:
         if nxt is None:
             raise
         bump("endpoint_failover")
-        r = httpx.post(f"{nxt}/api/generate", json=payload, timeout=timeout)
+        r = httpx.post(f"{nxt}/api/generate", json=payload, timeout=tmo)
         r.raise_for_status()
         return r.json().get("response", "")
 
