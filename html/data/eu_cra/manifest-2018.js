@@ -6,5 +6,5 @@ window.TRACKER_YEAR["eu_cra"]["2018"] = {
   monthFiles: {
     "2018-01": "manifest-201801.js"
   },
-  lastUpdated: "2026-08-04"
+  lastUpdated: "2026-09-02"
 };

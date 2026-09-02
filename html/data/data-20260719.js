@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-07-19"] = [
   {
-    id: "20260719-001",
+    id: "20260719-4734",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Debian 發布 DSA-6392：修補 OpenSSH 服務中的潛在認證繞過漏洞",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-07-19"] = [
     ]
   },
   {
-    id: "20260719-002",
+    id: "20260719-4735",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Debian 發布 DSA-6391-1：修補 OpenSSH 服務中的潛在認證繞過漏洞",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-07-19"] = [
     ]
   },
   {
-    id: "20260719-003",
+    id: "20260719-4736",
     trackers: ["os"],
     category: "Linux",
     title: "Linux 核心開發進度：Kernel 7.2-rc4 穩定更新，持續關注核心元件安全修補",
@@ -44,7 +44,7 @@ window.TRACKER_DAYS["2026-07-19"] = [
     ]
   },
   {
-    id: "20260719-004",
+    id: "20260719-4742",
     trackers: ["os"],
     category: "Linux",
     title: "聯想 Legion Y700 Gen4 平板電腦獲得 Linux 核心補丁支援，邁向主線版整合",
@@ -58,7 +58,7 @@ window.TRACKER_DAYS["2026-07-19"] = [
     ]
   },
   {
-    id: "20260719-005",
+    id: "20260719-4743",
     trackers: ["os"],
     category: "Linux",
     title: "Linux 7.3 週期：ASUS 主機板支援 HWMON 驅動，擴大感測器監控範圍",
@@ -72,7 +72,7 @@ window.TRACKER_DAYS["2026-07-19"] = [
     ]
   },
   {
-    id: "20260719-006",
+    id: "20260719-4744",
     trackers: ["os"],
     category: "Linux",
     title: "GNU Hurd Q2-2026進度報告：持續推進 AArch64 支援與使用 Rust 語言開發翻譯器",
@@ -86,7 +86,7 @@ window.TRACKER_DAYS["2026-07-19"] = [
     ]
   },
   {
-    id: "20260719-007",
+    id: "20260719-4756",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心 SELinux 權限檢查漏洞：過時快取導致部分權限檢查未被稽核",
@@ -100,7 +100,7 @@ window.TRACKER_DAYS["2026-07-19"] = [
     ]
   },
   {
-    id: "20260719-008",
+    id: "20260719-4757",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux f2fs 檔案系統修復：修正 fsck 檢查不一致性，防止 inode 區塊標記錯誤",
@@ -114,7 +114,7 @@ window.TRACKER_DAYS["2026-07-19"] = [
     ]
   },
   {
-    id: "20260719-009",
+    id: "20260719-4758",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心 UDF 格式處理漏洞：透過超大 CRC 長度繞過驗證",
@@ -128,7 +128,7 @@ window.TRACKER_DAYS["2026-07-19"] = [
     ]
   },
   {
-    id: "20260719-010",
+    id: "20260719-4759",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修補：強化 ACR Mask 驗證，修復用戶空間與硬體配置漏洞",
@@ -142,7 +142,7 @@ window.TRACKER_DAYS["2026-07-19"] = [
     ]
   },
   {
-    id: "20260719-011",
+    id: "20260719-4760",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心：RDMA/ionic 處理 node_desc sysfs 讀取時，因缺乏 NUL 終止符導致資訊洩漏漏洞 (CVE-2026-53371)",
@@ -156,7 +156,7 @@ window.TRACKER_DAYS["2026-07-19"] = [
     ]
   },
   {
-    id: "20260719-012",
+    id: "20260719-4761",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心 iommu/vt-d 漏洞：PASID 附加至嵌套域時的資料追蹤缺陷",
@@ -170,7 +170,7 @@ window.TRACKER_DAYS["2026-07-19"] = [
     ]
   },
   {
-    id: "20260719-013",
+    id: "20260719-4762",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修補：修復 mmap 鉤子在處理 VMA 卸載時的邏輯錯誤",
@@ -184,7 +184,7 @@ window.TRACKER_DAYS["2026-07-19"] = [
     ]
   },
   {
-    id: "20260719-014",
+    id: "20260719-4763",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心 AMDGPU 漏洞修復：GART 表格未初始化導致 TLB 資訊洩漏風險",
@@ -198,7 +198,7 @@ window.TRACKER_DAYS["2026-07-19"] = [
     ]
   },
   {
-    id: "20260719-015",
+    id: "20260719-4764",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心安全漏洞：amdgpu/vce 驅動程式可因部分地址修補導致寫入錯誤",
@@ -212,7 +212,7 @@ window.TRACKER_DAYS["2026-07-19"] = [
     ]
   },
   {
-    id: "20260719-016",
+    id: "20260719-4765",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心安全更新：修補 AMD kfd 驅動程式的數值邊界檢查漏洞",
@@ -226,7 +226,7 @@ window.TRACKER_DAYS["2026-07-19"] = [
     ]
   },
   {
-    id: "20260719-017",
+    id: "20260719-4766",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心 GPU 驅動程式漏洞：drm/msm 提升穩定性，修復 GPU 恢復機制",
@@ -240,7 +240,7 @@ window.TRACKER_DAYS["2026-07-19"] = [
     ]
   },
   {
-    id: "20260719-018",
+    id: "20260719-4767",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修補：修復 drm/colorop 狀態管理中的記憶體洩漏漏洞",
@@ -254,7 +254,7 @@ window.TRACKER_DAYS["2026-07-19"] = [
     ]
   },
   {
-    id: "20260719-019",
+    id: "20260719-4768",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心漏洞：i2c/ov8856 驅動程式控制處理器釋放錯誤，建議更新核心版本",
@@ -268,7 +268,7 @@ window.TRACKER_DAYS["2026-07-19"] = [
     ]
   },
   {
-    id: "20260719-020",
+    id: "20260719-4770",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心安全漏洞：virtiofs 處理子掛載卸載時可能發生 UAF 崩潰",
@@ -282,7 +282,7 @@ window.TRACKER_DAYS["2026-07-19"] = [
     ]
   },
   {
-    id: "20260719-021",
+    id: "20260719-4771",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修復 vidtv 驅動程式的空指標解引用漏洞，防止一般保護故障",
@@ -296,7 +296,7 @@ window.TRACKER_DAYS["2026-07-19"] = [
     ]
   },
   {
-    id: "20260719-022",
+    id: "20260719-4772",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux ksmbd 核心漏洞：非首次複合請求可導致遠端 NULL 指標解引用，影響服務穩定性",
@@ -310,7 +310,7 @@ window.TRACKER_DAYS["2026-07-19"] = [
     ]
   },
   {
-    id: "20260719-023",
+    id: "20260719-4773",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心：8250 序列埠驅動程式存在資源洩漏，若時鐘通知器註冊失敗，可能導致 Use-After-Free",
@@ -324,7 +324,7 @@ window.TRACKER_DAYS["2026-07-19"] = [
     ]
   },
   {
-    id: "20260719-024",
+    id: "20260719-4774",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修復：vcs_notifier() 處理競態條件導致的空指標解引用漏洞",
@@ -338,7 +338,7 @@ window.TRACKER_DAYS["2026-07-19"] = [
     ]
   },
   {
-    id: "20260719-025",
+    id: "20260719-4775",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心 iio:adc:ti-ads1298 邊界檢查漏洞 (CVE-2026-53386) 修復公告",
@@ -352,7 +352,7 @@ window.TRACKER_DAYS["2026-07-19"] = [
     ]
   },
   {
-    id: "20260719-026",
+    id: "20260719-4776",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心 iio: light: veml6075 驅動程式存在越界存取漏洞，需更新核心版本修補",
@@ -366,7 +366,7 @@ window.TRACKER_DAYS["2026-07-19"] = [
     ]
   },
   {
-    id: "20260719-027",
+    id: "20260719-4777",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心：修復 FUSE 頁面快取操作中的 Use-After-Free 漏洞",
@@ -380,7 +380,7 @@ window.TRACKER_DAYS["2026-07-19"] = [
     ]
   },
   {
-    id: "20260719-028",
+    id: "20260719-4778",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修補：修復 net/tcp-ao 模組中 del_async 路徑的 Use-After-Free 漏洞",
@@ -394,7 +394,7 @@ window.TRACKER_DAYS["2026-07-19"] = [
     ]
   },
   {
-    id: "20260719-029",
+    id: "20260719-4779",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux ksmbd 服務修復：防止透過惡意 ACE 導致堆記憶體越界讀取 (CVE-2026-53390)",
@@ -408,7 +408,7 @@ window.TRACKER_DAYS["2026-07-19"] = [
     ]
   },
   {
-    id: "20260719-030",
+    id: "20260719-4780",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心 pNFS 漏洞：零長度 r_addr 導致空指針解引用，可能讓客戶端崩潰",
@@ -422,7 +422,7 @@ window.TRACKER_DAYS["2026-07-19"] = [
     ]
   },
   {
-    id: "20260719-031",
+    id: "20260719-4781",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心 NFSv4/flexfiles 漏洞修復：防止零檔案句柄版本計數導致的記憶體讀取錯誤",
@@ -436,7 +436,7 @@ window.TRACKER_DAYS["2026-07-19"] = [
     ]
   },
   {
-    id: "20260719-032",
+    id: "20260719-4782",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux NFSd 核心漏洞：寫回錯誤處理不當，可能導致客戶端誤判資料持久性",
@@ -450,7 +450,7 @@ window.TRACKER_DAYS["2026-07-19"] = [
     ]
   },
   {
-    id: "20260719-033",
+    id: "20260719-4783",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心 NFSv4.0 漏洞：避免在重試競態條件下洩漏預分配的 openowner",
@@ -464,7 +464,7 @@ window.TRACKER_DAYS["2026-07-19"] = [
     ]
   },
   {
-    id: "20260719-034",
+    id: "20260719-5222",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux NFSd 核心修補：修復 ACL 衝突保護機制，防止資源洩漏導致 Slab 耗盡",
@@ -478,7 +478,7 @@ window.TRACKER_DAYS["2026-07-19"] = [
     ]
   },
   {
-    id: "20260719-035",
+    id: "20260719-5223",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux NFSd 核心修復：修補 ACL 處理的資訊洩漏與資源釋放漏洞",
@@ -492,7 +492,7 @@ window.TRACKER_DAYS["2026-07-19"] = [
     ]
   },
   {
-    id: "20260719-036",
+    id: "20260719-4753",
     trackers: ["os"],
     category: "Windows",
     title: "Windows 11 File Explorer 搜尋功能將大幅升速，追平 Windows Search 體驗",
@@ -506,7 +506,7 @@ window.TRACKER_DAYS["2026-07-19"] = [
     ]
   },
   {
-    id: "20260719-037",
+    id: "20260719-4754",
     trackers: ["os"],
     category: "Windows",
     title: "微軟強制在 Outlook Classic 啟用 Copilot 功能，推動用戶轉向 AI 輔助寫作體驗",
@@ -520,7 +520,7 @@ window.TRACKER_DAYS["2026-07-19"] = [
     ]
   },
   {
-    id: "20260719-038",
+    id: "20260719-4755",
     trackers: ["os"],
     category: "Windows",
     title: "微軟發布 Windows 11 KB5121767 緊急更新，修復部分 Dell PC 關機、過熱與效能問題",
@@ -534,7 +534,7 @@ window.TRACKER_DAYS["2026-07-19"] = [
     ]
   },
   {
-    id: "20260719-039",
+    id: "20260719-4704",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "關鍵 NGINX 堆緩衝區溢位漏洞 (CVE-2026-42533) 曝光，遠超 DoS 影響，建議立即升級",
@@ -548,7 +548,7 @@ window.TRACKER_DAYS["2026-07-19"] = [
     ]
   },
   {
-    id: "20260719-040",
+    id: "20260719-4705",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "俄國國家資助駭客利用 ClickFix 假 CAPTCHA 誘騙目標執行惡意 PowerShell 指令",
@@ -562,7 +562,7 @@ window.TRACKER_DAYS["2026-07-19"] = [
     ]
   },
   {
-    id: "20260719-041",
+    id: "20260719-4706",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "資安研究揭露：駭客利用 SonicWall SMA VPN 零日漏洞達成遠端任意指令執行",
@@ -576,7 +576,7 @@ window.TRACKER_DAYS["2026-07-19"] = [
     ]
   },
   {
-    id: "20260719-042",
+    id: "20260719-4709",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "駭客利用 ViPNet 更新機制攻擊俄羅斯政府機構：HelloNet 惡意活動分析",
@@ -590,7 +590,7 @@ window.TRACKER_DAYS["2026-07-19"] = [
     ]
   },
   {
-    id: "20260719-043",
+    id: "20260719-4723",
     trackers: ["os"],
     category: "Apple",
     title: "iOS 27 公開測試版發布，Apple宣稱多達 30 個功能優化，大幅提升 iPhone 性能",
@@ -604,7 +604,7 @@ window.TRACKER_DAYS["2026-07-19"] = [
     ]
   },
   {
-    id: "20260719-044",
+    id: "20260719-4725",
     trackers: ["os"],
     category: "Apple",
     title: "蘋果取消 Mac Pro 系列：內部規劃曾包含搭載 Intel 晶片的機型",
@@ -618,7 +618,7 @@ window.TRACKER_DAYS["2026-07-19"] = [
     ]
   },
   {
-    id: "20260719-045",
+    id: "20260719-4717",
     trackers: ["os"],
     category: "Android",
     title: "Android Auto 終於開始推出實時車速表功能，提升駕駛資訊顯示",
@@ -632,7 +632,7 @@ window.TRACKER_DAYS["2026-07-19"] = [
     ]
   },
   {
-    id: "20260719-046",
+    id: "20260719-4716",
     trackers: ["os"],
     category: "重點關注",
     title: "三星 Galaxy Z Fold 8 實機外洩：展示更窄、更小巧的全新外觀設計",
@@ -646,7 +646,7 @@ window.TRACKER_DAYS["2026-07-19"] = [
     ]
   },
   {
-    id: "20260719-047",
+    id: "20260719-4718",
     trackers: ["os"],
     category: "重點關注",
     title: "無法撰寫資安新聞標題：原文內容為產品促銷資訊",
@@ -660,7 +660,7 @@ window.TRACKER_DAYS["2026-07-19"] = [
     ]
   },
   {
-    id: "20260719-048",
+    id: "20260719-4719",
     trackers: ["os"],
     category: "重點關注",
     title: "無資安資訊：文章內容為個人感懷，無可歸納為資安新聞",
@@ -674,7 +674,7 @@ window.TRACKER_DAYS["2026-07-19"] = [
     ]
   },
   {
-    id: "20260719-049",
+    id: "20260719-4724",
     trackers: ["os"],
     category: "重點關注",
     title: "蘋果測試「Live Notes」AI系統：利用人工智慧記錄與轉錄Genius Bar服務對話",
@@ -688,7 +688,7 @@ window.TRACKER_DAYS["2026-07-19"] = [
     ]
   },
   {
-    id: "20260719-050",
+    id: "20260719-4726",
     trackers: ["os"],
     category: "重點關注",
     title: "Apple產品線全面漲價：從MacBook到Apple One服務，成本上漲影響用戶支出",
@@ -702,7 +702,7 @@ window.TRACKER_DAYS["2026-07-19"] = [
     ]
   },
   {
-    id: "20260719-051",
+    id: "20260719-4740",
     trackers: ["os"],
     category: "重點關注",
     title: "MPEG-4 視覺專利權利終結：巴西最後一項專利 BRPI0109962B1 今日到期",
@@ -716,7 +716,7 @@ window.TRACKER_DAYS["2026-07-19"] = [
     ]
   },
   {
-    id: "20260719-052",
+    id: "20260719-4741",
     trackers: ["os"],
     category: "重點關注",
     title: "FFmpeg 升級優化 AVX-512 指令，提升像素格式轉換速度 1.372 倍",
@@ -730,7 +730,7 @@ window.TRACKER_DAYS["2026-07-19"] = [
     ]
   },
   {
-    id: "20260719-053",
+    id: "20260719-4748",
     trackers: ["os"],
     category: "重點關注",
     title: "AI 代理與外部服務連接風險分析：擴大攻擊面與潛在安全威脅",
@@ -744,7 +744,7 @@ window.TRACKER_DAYS["2026-07-19"] = [
     ]
   },
   {
-    id: "20260719-054",
+    id: "20260719-4749",
     trackers: ["os"],
     category: "重點關注",
     title: "AI技術影響人認知：研究發現使用人工智慧會降低人們承認自己知識不足的可能性",
@@ -758,7 +758,7 @@ window.TRACKER_DAYS["2026-07-19"] = [
     ]
   },
   {
-    id: "20260719-055",
+    id: "20260719-4752",
     trackers: ["os"],
     category: "重點關注",
     title: "Windows 11 Secure Boot 2023 部署困境：多 OEM 設備面臨韌體與憑證更新的兼容性問題",

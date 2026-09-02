@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-08-29"] = [
   {
-    id: "20260829-001",
+    id: "20260829-10151",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Debian 發布安全公告：修補 OpenSSH 潛在的認證繞過漏洞",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-08-29"] = [
     ]
   },
   {
-    id: "20260829-002",
+    id: "20260829-10158",
     trackers: ["os"],
     category: "Linux",
     title: "AI爬蟲對Linux核心儲存庫造成巨大負擔：開發者呼籲關注網路爬取行為",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-08-29"] = [
     ]
   },
   {
-    id: "20260829-003",
+    id: "20260829-10186",
     trackers: ["os", "security"],
     category: "Linux",
     title: "FreeBSD 14.5-RC1 發布，修補多項核心漏洞，包含 POSIX 共享記憶體競態條件與 TTY ioctl 用後期間使用問題",
@@ -44,7 +44,7 @@ window.TRACKER_DAYS["2026-08-29"] = [
     ]
   },
   {
-    id: "20260829-004",
+    id: "20260829-10187",
     trackers: ["os"],
     category: "Linux",
     title: "非 Intel/AMD 企業實體在 Linux 核心中引入 WBINVD 指令新跳過提示",
@@ -58,7 +58,7 @@ window.TRACKER_DAYS["2026-08-29"] = [
     ]
   },
   {
-    id: "20260829-005",
+    id: "20260829-10188",
     trackers: ["os"],
     category: "Linux",
     title: "KDE Plasma 6.8 更新：提升全螢幕內容效能、優化色彩處理與修復登出時崩潰問題",
@@ -72,7 +72,7 @@ window.TRACKER_DAYS["2026-08-29"] = [
     ]
   },
   {
-    id: "20260829-006",
+    id: "20260829-10190",
     trackers: ["os"],
     category: "Linux",
     title: "F2FS 檔案系統在 Linux 7.3 中升級：實現多設備並行快閃與效能提升",
@@ -86,7 +86,7 @@ window.TRACKER_DAYS["2026-08-29"] = [
     ]
   },
   {
-    id: "20260829-007",
+    id: "20260829-10192",
     trackers: ["os"],
     category: "Linux",
     title: "加州通過 AB-1856 法案，為開源平台提供豁免，減輕對 Linux 發行版等的要求",
@@ -100,7 +100,7 @@ window.TRACKER_DAYS["2026-08-29"] = [
     ]
   },
   {
-    id: "20260829-008",
+    id: "20260829-10193",
     trackers: ["os"],
     category: "Linux",
     title: "SteamOS 3.9 Preview 重大更新：升級至 Linux 7.2 核心與 KDE Plasma 6.7.3 桌面環境",
@@ -114,7 +114,7 @@ window.TRACKER_DAYS["2026-08-29"] = [
     ]
   },
   {
-    id: "20260829-009",
+    id: "20260829-9999",
     trackers: ["security"],
     category: "法規與標準",
     title: "graphql-go/graphql 存在二次方複雜度 DoS 漏洞，單一語法錯誤即可耗盡 CPU",
@@ -128,7 +128,7 @@ window.TRACKER_DAYS["2026-08-29"] = [
     ]
   },
   {
-    id: "20260829-010",
+    id: "20260829-10241",
     trackers: ["os"],
     category: "Windows",
     title: "Windows 11 26H2 釋出預覽：僅為啟用包，功能上與 25H2 差異極小",
@@ -142,7 +142,7 @@ window.TRACKER_DAYS["2026-08-29"] = [
     ]
   },
   {
-    id: "20260829-011",
+    id: "20260829-10242",
     trackers: ["os"],
     category: "Windows",
     title: "Windows 11 KB5120998 更新引發多項顯示異常：滑鼠游標、桌布與字體問題",
@@ -156,7 +156,7 @@ window.TRACKER_DAYS["2026-08-29"] = [
     ]
   },
   {
-    id: "20260829-012",
+    id: "20260829-9930",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "TerminalFix 攻擊鏈詳解：利用偽 CAPTCHA 誘騙執行 PowerShell，建立反向隧道竊取內部網路資源",
@@ -170,7 +170,7 @@ window.TRACKER_DAYS["2026-08-29"] = [
     ]
   },
   {
-    id: "20260829-013",
+    id: "20260829-9951",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "五個關鍵 WordPress 外掛及主題曝出高危漏洞：從帳號接管到遠端代碼執行",
@@ -184,7 +184,7 @@ window.TRACKER_DAYS["2026-08-29"] = [
     ]
   },
   {
-    id: "20260829-014",
+    id: "20260829-9998",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "graphql-go/graphql 函式庫曝出二次方複雜度 DoS 漏洞，可透過查詢變數觸發資源耗盡",
@@ -198,7 +198,7 @@ window.TRACKER_DAYS["2026-08-29"] = [
     ]
   },
   {
-    id: "20260829-015",
+    id: "20260829-10000",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "graphql-go/graphql 存在輸入驗證與堆疊溢出漏洞，可透過網路遠端觸發",
@@ -212,7 +212,7 @@ window.TRACKER_DAYS["2026-08-29"] = [
     ]
   },
   {
-    id: "20260829-016",
+    id: "20260829-10001",
     trackers: ["os", "security"],
     category: "漏洞與威脅情報",
     title: "rsyslog 核心功能遇堆緩衝溢出漏洞：CVE-2026-78002 影響日誌處理服務",
@@ -226,7 +226,7 @@ window.TRACKER_DAYS["2026-08-29"] = [
     ]
   },
   {
-    id: "20260829-017",
+    id: "20260829-10105",
     trackers: ["os"],
     category: "Apple",
     title: "Meta AI 應用程式現已支援 Apple CarPlay，搶先於 Siri AI 推出車載聊天機器人體驗",
@@ -240,7 +240,7 @@ window.TRACKER_DAYS["2026-08-29"] = [
     ]
   },
   {
-    id: "20260829-018",
+    id: "20260829-10107",
     trackers: ["os"],
     category: "Apple",
     title: "Apple 預計推出第一代 AI 智慧眼鏡，整合 Siri 語音與視覺智能功能",
@@ -254,7 +254,7 @@ window.TRACKER_DAYS["2026-08-29"] = [
     ]
   },
   {
-    id: "20260829-019",
+    id: "20260829-10108",
     trackers: ["os"],
     category: "Apple",
     title: "Parallels Desktop 27 重磅升級：強化 Apple Silicon 支援與 Metal 圖形驅動",
@@ -268,8 +268,8 @@ window.TRACKER_DAYS["2026-08-29"] = [
     ]
   },
   {
-    id: "20260829-020",
-    trackers: ["eu_cra", "os"],
+    id: "20260829-10026",
+    trackers: ["os"],
     category: "開源影響",
     title: "TeamPCP核心成員在澳洲被捕：揭露史上最長供應鏈攻擊手法與多數開源工具遭入侵",
     summary: "澳洲警方逮捕了兩名涉嫌為網路犯罪集團 TeamPCP 的核心成員。該集團透過製作惡性開源軟體，對全球企業進行了大規模的供應鏈攻擊。他們利用自傳播蠕蟲 'Shai-Hulud'，從 GitHub 或 NPM 等公開程式碼儲存庫竊取開發者憑證（credentials），並將惡意程式碼隱密植入開發者常用的開源工具鏈中。此攻擊手法被稱為「循環式漏洞利用」（Cyclical Exploitation），旨在透過感染開發者網路，使受害者設備持續感染，並呈指數級擴大 피해。TeamPCP 的攻擊目標包括雲端和 AI 基礎設施，例如曾感染連接約 100 個 LLM 的開源 AI 閘道 'LightLLM'，據稱導致超過 2500 個組織的雲端服務金鑰和重要機密外洩，並侵入至少 3800 個 GitHub 程式碼儲存庫。警方正對嫌犯進行深入調查，以釐清完整的犯罪規模和參與人員。",
@@ -282,7 +282,7 @@ window.TRACKER_DAYS["2026-08-29"] = [
     ]
   },
   {
-    id: "20260829-021",
+    id: "20260829-10053",
     trackers: ["os"],
     category: "重點關注",
     title: "Google Messages持續更新功能：從自定義聊天主題到RCS回覆與照片反應支援",
@@ -296,7 +296,7 @@ window.TRACKER_DAYS["2026-08-29"] = [
     ]
   },
   {
-    id: "20260829-022",
+    id: "20260829-10055",
     trackers: ["os"],
     category: "重點關注",
     title: "Google 推出新手機遊戲 Froggy’s World，讓用戶在搜尋天氣時體驗療癒系生活模擬",
@@ -310,7 +310,7 @@ window.TRACKER_DAYS["2026-08-29"] = [
     ]
   },
   {
-    id: "20260829-023",
+    id: "20260829-10101",
     trackers: ["os"],
     category: "重點關注",
     title: "Apple Card持續升級：iOS 27新增週期性交易功能，並宣布與Booking.com、Hertz深化合作",
@@ -324,7 +324,7 @@ window.TRACKER_DAYS["2026-08-29"] = [
     ]
   },
   {
-    id: "20260829-024",
+    id: "20260829-10109",
     trackers: ["os", "security"],
     category: "重點關注",
     title: "無法生成資安新聞：原文為科技媒體播客內容，無漏洞或安全事件資訊",
@@ -338,7 +338,7 @@ window.TRACKER_DAYS["2026-08-29"] = [
     ]
   },
   {
-    id: "20260829-025",
+    id: "20260829-10144",
     trackers: ["os"],
     category: "重點關注",
     title: "個人資料權益行使調查：作者向百家公司提出資料存取請求，揭示隱私權法規的實務挑戰",
@@ -352,7 +352,7 @@ window.TRACKER_DAYS["2026-08-29"] = [
     ]
   },
   {
-    id: "20260829-026",
+    id: "20260829-10157",
     trackers: ["os"],
     category: "重點關注",
     title: "Debian 專案投票決定：正式承認生成式 AI 工具的「負責任使用」，強調貢獻者仍需負全責",
@@ -366,7 +366,7 @@ window.TRACKER_DAYS["2026-08-29"] = [
     ]
   },
   {
-    id: "20260829-027",
+    id: "20260829-10189",
     trackers: ["os"],
     category: "重點關注",
     title: "ReactOS 0.4.16 發布：新增圖形安裝器與 Server Core 版本，提升開源 Windows 兼容性",
@@ -380,7 +380,7 @@ window.TRACKER_DAYS["2026-08-29"] = [
     ]
   },
   {
-    id: "20260829-028",
+    id: "20260829-10191",
     trackers: ["os"],
     category: "重點關注",
     title: "GNOME 生態系統更新：GPU 重置恢復、Flatpak 資金挹注與新應用程式發布",
@@ -394,7 +394,7 @@ window.TRACKER_DAYS["2026-08-29"] = [
     ]
   },
   {
-    id: "20260829-029",
+    id: "20260829-10210",
     trackers: ["os"],
     category: "重點關注",
     title: "AWS 數據中心網路架構革新：探討其成本效益與未來趨勢",
@@ -408,7 +408,7 @@ window.TRACKER_DAYS["2026-08-29"] = [
     ]
   },
   {
-    id: "20260829-030",
+    id: "20260829-10211",
     trackers: ["os"],
     category: "重點關注",
     title: "防禦新創公司 Mara 募資 700 萬美元，開發可搭載背包式攔截無人機系統 Spike",
@@ -422,7 +422,7 @@ window.TRACKER_DAYS["2026-08-29"] = [
     ]
   },
   {
-    id: "20260829-031",
+    id: "20260829-10212",
     trackers: ["os"],
     category: "重點關注",
     title: "微軟Xbox與IKEA聯名推出YXSTABY系列，為遊戲玩家打造主題家具",

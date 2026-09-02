@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-02-19"] = [
   {
-    id: "20260219-001",
+    id: "20260219-1296",
     trackers: ["os", "security"],
     category: "重點關注",
     title: "OpenClaw AI 助理：透過 mDNS/DNS-SD 服務發現漏洞，可能導致連線劫持與憑證洩漏",

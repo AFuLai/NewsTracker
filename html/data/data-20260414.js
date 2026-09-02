@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-04-14"] = [
   {
-    id: "20260414-001",
+    id: "20260414-1280",
     trackers: ["os", "security"],
     category: "Windows",
     title: "微軟發布 CVE-2026-32181：Windows 權限管理缺陷導致本地服務拒絕攻擊",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-04-14"] = [
     ]
   },
   {
-    id: "20260414-002",
+    id: "20260414-118",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "微軟發布史上最大規模補丁：修復 167 個漏洞，包含 SharePoint 零日及 Windows Defender 提升權限漏洞",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-04-14"] = [
     ]
   },
   {
-    id: "20260414-003",
+    id: "20260414-132",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "資安警示：駭客利用 Obsidian 插件生態系統進行跨平台社會工程攻擊，部署 AI 輔助後門 PHANTOMPULSE",

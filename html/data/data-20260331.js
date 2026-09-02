@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-03-31"] = [
   {
-    id: "20260331-001",
+    id: "20260331-5870",
     trackers: ["eu_cra"],
     category: "研討活動",
     title: "歐盟資安技能學院擴大合作：Mastercard與Recorded Future承諾為中小企業提供實戰訓練",

@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-05-20"] = [
   {
-    id: "20260520-001",
+    id: "20260520-441",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Verizon 2026 DBIR報告：漏洞利用成主要資安入侵路徑，提醒企業加速修補與風險管理",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-05-20"] = [
     ]
   },
   {
-    id: "20260520-002",
+    id: "20260520-593",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "OpenSSF發布惡意套件資料庫，協助開發者在CI/CD流程中檢測供應鏈風險",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-05-20"] = [
     ]
   },
   {
-    id: "20260520-003",
+    id: "20260520-1136",
     trackers: ["os", "security"],
     category: "Android",
     title: "Android應用程式RoboForm Password Manager存在CVE-2026-47782：透過Intent處理缺乏URL驗證，可能導致靜默下載惡意檔案",
@@ -44,7 +44,7 @@ window.TRACKER_DAYS["2026-05-20"] = [
     ]
   },
   {
-    id: "20260520-004",
+    id: "20260520-596",
     trackers: ["security"],
     category: "前瞻技術",
     title: "Red Hat推出整合式AI安全堆疊：透過自動化紅隊測試提升LLM安全性",
@@ -58,7 +58,7 @@ window.TRACKER_DAYS["2026-05-20"] = [
     ]
   },
   {
-    id: "20260520-005",
+    id: "20260520-1135",
     trackers: ["os", "security"],
     category: "重點關注",
     title: "Google Chromecast 漏洞曝光：CVE-2026-9123 允許惡意網路流量執行任意程式碼",
@@ -72,7 +72,7 @@ window.TRACKER_DAYS["2026-05-20"] = [
     ]
   },
   {
-    id: "20260520-006",
+    id: "20260520-5821",
     trackers: ["eu_cra"],
     category: "研討活動",
     title: "歐盟團隊連續五度贏得國際網路安全挑戰賽，凸顯歐洲人才戰略深度",

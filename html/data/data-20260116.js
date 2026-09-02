@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-01-16"] = [
   {
-    id: "20260116-001",
+    id: "20260116-150",
     trackers: ["eu_cra", "security"],
     category: "研討活動",
     title: "ETSI 舉辦深度線上研討會：深入探討《網路韌性法案》（CRA）垂直標準的制定進度",

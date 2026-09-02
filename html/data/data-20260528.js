@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-05-28"] = [
   {
-    id: "20260528-001",
+    id: "20260528-494",
     trackers: ["security"],
     category: "重大事件",
     title: "嘉年華公司遭駭：員工帳號受騙外洩數百萬旅客個人資料",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-05-28"] = [
     ]
   },
   {
-    id: "20260528-002",
+    id: "20260528-35",
     trackers: ["security"],
     category: "法規與標準",
     title: "資安保險促使企業量化風險：分析其對安全防禦與勒索威脅的雙面影響",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-05-28"] = [
     ]
   },
   {
-    id: "20260528-003",
+    id: "20260528-111",
     trackers: ["eu_cra", "security"],
     category: "法規與標準",
     title: "歐盟網路韌性法案（CRA）迫近期限，呼籲開源生態系統提升合規性",
@@ -44,7 +44,7 @@ window.TRACKER_DAYS["2026-05-28"] = [
     ]
   },
   {
-    id: "20260528-004",
+    id: "20260528-1",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Gogs 關鍵 RCE 漏洞曝光：未經授權用戶可透過惡意 Pull Request 執行程式碼",
@@ -58,7 +58,7 @@ window.TRACKER_DAYS["2026-05-28"] = [
     ]
   },
   {
-    id: "20260528-005",
+    id: "20260528-2",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "駭客利用 FortiClient EMS 漏洞 CVE-2026-35616，透過偽裝更新推送資訊竊取惡意負載",
@@ -72,7 +72,7 @@ window.TRACKER_DAYS["2026-05-28"] = [
     ]
   },
   {
-    id: "20260528-006",
+    id: "20260528-3",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "微軟強推協調式漏洞揭露，回應研究人員公開多個零日漏洞攻擊的爭議",
@@ -86,7 +86,7 @@ window.TRACKER_DAYS["2026-05-28"] = [
     ]
   },
   {
-    id: "20260528-007",
+    id: "20260528-4",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "CISA將DAEMON Tools供應鏈攻擊列入KEV：惡意簽名檔繞過防禦機制",
@@ -100,7 +100,7 @@ window.TRACKER_DAYS["2026-05-28"] = [
     ]
   },
   {
-    id: "20260528-008",
+    id: "20260528-33",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "荷蘭查緝俄羅斯「彈甲託管」網路：THE.Hosting 轉移資產與活動持續，關鍵基礎設施仍面臨威脅",
@@ -114,7 +114,7 @@ window.TRACKER_DAYS["2026-05-28"] = [
     ]
   },
   {
-    id: "20260528-009",
+    id: "20260528-36",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "新型 BTMOB 遠端存取木馬（RAT）透過 MaaS 模式在巴西及拉美擴散，利用無代碼介面提升攻擊門檻",
@@ -128,7 +128,7 @@ window.TRACKER_DAYS["2026-05-28"] = [
     ]
   },
   {
-    id: "20260528-010",
+    id: "20260528-37",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "北歐CISO報告：儘管網路威脅增加，資安主管報告嚴重事件穩定，歸因於MDR與攻擊面管理改善",
@@ -142,7 +142,7 @@ window.TRACKER_DAYS["2026-05-28"] = [
     ]
   },
   {
-    id: "20260528-011",
+    id: "20260528-48",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "ABB EIBPORT 設備面臨跨站腳本漏洞：CVSS 3.1 分數為 8 的高風險安全警示",
@@ -156,7 +156,7 @@ window.TRACKER_DAYS["2026-05-28"] = [
     ]
   },
   {
-    id: "20260528-012",
+    id: "20260528-49",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Schneider Electric Ecostruxure Machine Expert HVAC 存在資訊明文儲存漏洞，可能洩露受保護原始碼",
@@ -170,7 +170,7 @@ window.TRACKER_DAYS["2026-05-28"] = [
     ]
   },
   {
-    id: "20260528-013",
+    id: "20260528-50",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "PUSR USR-W610 設備遭硬編碼密碼漏洞（CVE-2026-7786）攻擊，CVSS 9.8 警示",
@@ -184,7 +184,7 @@ window.TRACKER_DAYS["2026-05-28"] = [
     ]
   },
   {
-    id: "20260528-014",
+    id: "20260528-51",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "ABB Busch-Welcome 門體開關執行器存在遠端越權漏洞，CVSS 評分 6.8",
@@ -198,7 +198,7 @@ window.TRACKER_DAYS["2026-05-28"] = [
     ]
   },
   {
-    id: "20260528-015",
+    id: "20260528-52",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Fourth Frontier Frontier X 設備遭曝 BLE 漏洞：CVE-2026-5768 允許未經授權讀寫心率等健康數據",
@@ -212,7 +212,7 @@ window.TRACKER_DAYS["2026-05-28"] = [
     ]
   },
   {
-    id: "20260528-016",
+    id: "20260528-53",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "CP Plus 網路攝影機錄影機面臨儲存型 XSS 漏洞 (CVE-2026-6824)，資安建議修補韌體",
@@ -226,7 +226,7 @@ window.TRACKER_DAYS["2026-05-28"] = [
     ]
   },
   {
-    id: "20260528-017",
+    id: "20260528-55",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "XCharge C6 設備面臨三項重大漏洞：包含未驗證韌體更新與堆疊溢出，CVSS 分數高達 9.8",
@@ -240,7 +240,7 @@ window.TRACKER_DAYS["2026-05-28"] = [
     ]
   },
   {
-    id: "20260528-018",
+    id: "20260528-56",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "KMW CCTV 設備曝 CVE-2026-5386：可遠端未經驗證重設密碼，危及監控系統",
@@ -254,7 +254,7 @@ window.TRACKER_DAYS["2026-05-28"] = [
     ]
   },
   {
-    id: "20260528-019",
+    id: "20260528-57",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Danelec MacGregor VDR G4e 設備面臨三項漏洞，CVSS 評分最高達 8.7，建議立即更新韌體",
@@ -268,7 +268,7 @@ window.TRACKER_DAYS["2026-05-28"] = [
     ]
   },
   {
-    id: "20260528-020",
+    id: "20260528-69",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "OpenJDK 26 多項安全漏洞曝光：從資訊竊取到服務拒絕，建議立即更新修補程式",
@@ -282,7 +282,7 @@ window.TRACKER_DAYS["2026-05-28"] = [
     ]
   },
   {
-    id: "20260528-021",
+    id: "20260528-70",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "pip 函式庫面臨三項安全漏洞：包含 TLS 驗證繞過與 DoS 攻擊風險",
@@ -296,7 +296,7 @@ window.TRACKER_DAYS["2026-05-28"] = [
     ]
   },
   {
-    id: "20260528-022",
+    id: "20260528-71",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "GNU sed 編輯器存在處理符號連結時的漏洞，可能允許本地攻擊者覆寫任意檔案",
@@ -310,7 +310,7 @@ window.TRACKER_DAYS["2026-05-28"] = [
     ]
   },
   {
-    id: "20260528-023",
+    id: "20260528-72",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Ubuntu 發布 22.04、18.04、16.04、14.04 等版本，修補多個 Vim 相關套件的資安漏洞",
@@ -324,7 +324,7 @@ window.TRACKER_DAYS["2026-05-28"] = [
     ]
   },
   {
-    id: "20260528-024",
+    id: "20260528-73",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Ubuntu 警告：multipart 套件因正規表達式歧義可能導致服務拒絕攻擊",
@@ -338,7 +338,7 @@ window.TRACKER_DAYS["2026-05-28"] = [
     ]
   },
   {
-    id: "20260528-025",
+    id: "20260528-74",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "OpenJDK 25 曝出多項安全漏洞：從資訊竊取到拒絕服務，需立即更新修補程式",
@@ -352,7 +352,7 @@ window.TRACKER_DAYS["2026-05-28"] = [
     ]
   },
   {
-    id: "20260528-026",
+    id: "20260528-75",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "LibreOffice 處理 OOXML 文件加密鹽參數錯誤，可能導致服務崩潰或執行任意程式碼",
@@ -366,7 +366,7 @@ window.TRACKER_DAYS["2026-05-28"] = [
     ]
   },
   {
-    id: "20260528-027",
+    id: "20260528-76",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Apache HTTP Server 曝出多項高風險漏洞，涵蓋 SSRF、命令注入及會話劫持，多版本受影響",
@@ -380,7 +380,7 @@ window.TRACKER_DAYS["2026-05-28"] = [
     ]
   },
   {
-    id: "20260528-028",
+    id: "20260528-77",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "QtSvg 處理 SVG 圖像時存在多重漏洞，可能導致系統崩潰或執行任意程式碼",
@@ -394,7 +394,7 @@ window.TRACKER_DAYS["2026-05-28"] = [
     ]
   },
   {
-    id: "20260528-029",
+    id: "20260528-78",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "PHP 核心多個漏洞曝光：從 SQL 注入到任意代碼執行，影響範圍涵蓋多個 CVE",
@@ -408,7 +408,7 @@ window.TRACKER_DAYS["2026-05-28"] = [
     ]
   },
   {
-    id: "20260528-030",
+    id: "20260528-79",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "分析 Gentlemen 勒索軟體：揭露其自傳播機制、加密流程與雙重勒索威脅",
@@ -422,7 +422,7 @@ window.TRACKER_DAYS["2026-05-28"] = [
     ]
   },
   {
-    id: "20260528-031",
+    id: "20260528-90",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "CISA警告：cPanel外掛LiteSpeed漏洞已遭利用，聯邦機構須於5月29日前修補",
@@ -436,7 +436,7 @@ window.TRACKER_DAYS["2026-05-28"] = [
     ]
   },
   {
-    id: "20260528-032",
+    id: "20260528-91",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Veeam發布13.0.2版修補兩大漏洞：Windows代理程式與Linux備份伺服器存在權限提升及寫入任意檔案風險",
@@ -450,7 +450,7 @@ window.TRACKER_DAYS["2026-05-28"] = [
     ]
   },
   {
-    id: "20260528-033",
+    id: "20260528-92",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "高風險漏洞揭露：VS Code MCP安裝對話框可遭惡意組態注入，可能劫持開發者身分",
@@ -464,7 +464,7 @@ window.TRACKER_DAYS["2026-05-28"] = [
     ]
   },
   {
-    id: "20260528-034",
+    id: "20260528-94",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "GitHub發布GHES 3.20.3修補重大漏洞：包含兩項SSRF、Linux Dirty Frag及簽章金鑰輪換要求",
@@ -478,7 +478,7 @@ window.TRACKER_DAYS["2026-05-28"] = [
     ]
   },
   {
-    id: "20260528-035",
+    id: "20260528-95",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "PraisonAI高風險身分驗證繞過漏洞（CVE-2026-44338）曝光，駭客掃描活動顯示漏洞利用窗口極短",
@@ -492,7 +492,7 @@ window.TRACKER_DAYS["2026-05-28"] = [
     ]
   },
   {
-    id: "20260528-036",
+    id: "20260528-97",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Health-ISAC警告：Anthropic Claude Mythos模型具備高度自主漏洞利用能力，威脅醫療健康產業",
@@ -506,7 +506,7 @@ window.TRACKER_DAYS["2026-05-28"] = [
     ]
   },
   {
-    id: "20260528-037",
+    id: "20260528-98",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "權限提升漏洞 CVE-2026-48172 曝光：LiteSpeed 外掛程式遭積極利用，CISA 已列入 KEV 名單",
@@ -520,7 +520,7 @@ window.TRACKER_DAYS["2026-05-28"] = [
     ]
   },
   {
-    id: "20260528-038",
+    id: "20260528-101",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Lumen與PwC報告揭露：中國駭客組織Red Lamassu利用新型Linux/Windows惡意程式攻擊亞太電信業者",
@@ -534,7 +534,7 @@ window.TRACKER_DAYS["2026-05-28"] = [
     ]
   },
   {
-    id: "20260528-039",
+    id: "20260528-6",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "JINX-0164 駭客活動：透過社交工程與 macOS 惡意程式攻擊加密貨幣產業供應鏈",
@@ -548,7 +548,7 @@ window.TRACKER_DAYS["2026-05-28"] = [
     ]
   },
   {
-    id: "20260528-040",
+    id: "20260528-54",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "CISA警告：Nx Console擴充功能與GitHub儲存庫遭供應鏈攻擊，警惕CI/CD管線洩密",
@@ -562,7 +562,7 @@ window.TRACKER_DAYS["2026-05-28"] = [
     ]
   },
   {
-    id: "20260528-041",
+    id: "20260528-86",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "NetApp與Red Hat合作，推出OpenShift平臺備份與災難復原解決方案",
@@ -576,7 +576,7 @@ window.TRACKER_DAYS["2026-05-28"] = [
     ]
   },
   {
-    id: "20260528-042",
+    id: "20260528-87",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "資安機構聯手破壞 GlassWorm 蠕蟲：切斷多層次 C2 通訊管道，遏止軟體供應鏈攻擊",
@@ -590,7 +590,7 @@ window.TRACKER_DAYS["2026-05-28"] = [
     ]
   },
   {
-    id: "20260528-043",
+    id: "20260528-96",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "CISA警告三個供應鏈漏洞已遭利用：Daemon Tools與TanStack套件遭惡意植入",
@@ -604,7 +604,7 @@ window.TRACKER_DAYS["2026-05-28"] = [
     ]
   },
   {
-    id: "20260528-044",
+    id: "20260528-5",
     trackers: ["security"],
     category: "前瞻技術",
     title: "LayerX報告揭示企業AI風險分散性低，警示「AI超級用戶」與個人帳號使用帶來的治理盲點",
@@ -618,7 +618,7 @@ window.TRACKER_DAYS["2026-05-28"] = [
     ]
   },
   {
-    id: "20260528-045",
+    id: "20260528-34",
     trackers: ["security"],
     category: "前瞻技術",
     title: "Acronis警告：Agentic AI風險不在模型本身，而是傳統軟體與整合的漏洞",
@@ -632,7 +632,7 @@ window.TRACKER_DAYS["2026-05-28"] = [
     ]
   },
   {
-    id: "20260528-046",
+    id: "20260528-88",
     trackers: ["security"],
     category: "前瞻技術",
     title: "中華電信揭露AI資安驗證閘門：加速資安檢測，應對開發節奏極速化挑戰",
@@ -646,7 +646,7 @@ window.TRACKER_DAYS["2026-05-28"] = [
     ]
   },
   {
-    id: "20260528-047",
+    id: "20260528-89",
     trackers: ["security"],
     category: "前瞻技術",
     title: "Google Cloud推出AI資安防禦平臺：整合Gemini、Wiz等能力，應對AI加速的漏洞與攻擊趨勢",
@@ -660,7 +660,7 @@ window.TRACKER_DAYS["2026-05-28"] = [
     ]
   },
   {
-    id: "20260528-048",
+    id: "20260528-93",
     trackers: ["security"],
     category: "前瞻技術",
     title: "Anthropic推出Claude Managed Agents自管沙箱與MCP通道，強化企業級資料隔離與安全控制",
@@ -674,7 +674,7 @@ window.TRACKER_DAYS["2026-05-28"] = [
     ]
   },
   {
-    id: "20260528-049",
+    id: "20260528-99",
     trackers: ["security"],
     category: "前瞻技術",
     title: "Anthropic 強化 Claude 代理產品安全：導入環境隔離與沙箱機制，限制權限與資料外洩風險",
@@ -688,7 +688,7 @@ window.TRACKER_DAYS["2026-05-28"] = [
     ]
   },
   {
-    id: "20260528-050",
+    id: "20260528-354",
     trackers: ["security"],
     category: "前瞻技術",
     title: "Red Hat IdM 強化 Linux 身份管理：支援 AI 時代分散式系統與容器化架構",
@@ -702,7 +702,7 @@ window.TRACKER_DAYS["2026-05-28"] = [
     ]
   },
   {
-    id: "20260528-051",
+    id: "20260528-355",
     trackers: ["security"],
     category: "前瞻技術",
     title: "Red Hat RHEL 10.2 升級：預設啟用後量子加密SSH與FIPS模式支援",
@@ -716,7 +716,7 @@ window.TRACKER_DAYS["2026-05-28"] = [
     ]
   },
   {
-    id: "20260528-052",
+    id: "20260528-1145",
     trackers: ["os", "security"],
     category: "重點關注",
     title: "無法分析：提供的文章內容為NIST官方警告頁面，無具體漏洞資訊。",
@@ -730,7 +730,7 @@ window.TRACKER_DAYS["2026-05-28"] = [
     ]
   },
   {
-    id: "20260528-053",
+    id: "20260528-1148",
     trackers: ["os", "security"],
     category: "重點關注",
     title: "NVD 頁面重定向警告：提醒用戶注意官方政府網站的安全性與資訊驗證",
@@ -744,7 +744,7 @@ window.TRACKER_DAYS["2026-05-28"] = [
     ]
   },
   {
-    id: "20260528-054",
+    id: "20260528-1149",
     trackers: ["os", "security"],
     category: "重點關注",
     title: "無法生成新聞標題：原文內容為NIST網站導流頁面，無可分析的資安事件資訊。",
@@ -758,7 +758,7 @@ window.TRACKER_DAYS["2026-05-28"] = [
     ]
   },
   {
-    id: "20260528-055",
+    id: "20260528-204",
     trackers: ["eu_cra"],
     category: "產業動態",
     title: "ENISA發布歐盟網路安全現狀報告與歐盟網路安全指數（EU CSI）框架，強化歐盟整體資安成熟度評估",
@@ -772,7 +772,7 @@ window.TRACKER_DAYS["2026-05-28"] = [
     ]
   },
   {
-    id: "20260528-056",
+    id: "20260528-231",
     trackers: ["eu_cra"],
     category: "研討活動",
     title: "ETSI 宣布 2026 年資安會議：涵蓋 AI 安全、量子準備與全球法規趨勢",
@@ -786,7 +786,7 @@ window.TRACKER_DAYS["2026-05-28"] = [
     ]
   },
   {
-    id: "20260528-057",
+    id: "20260528-100",
     trackers: ["security"],
     category: "uncategorized",
     title: "Fortinet發布3500G與400G系列防火牆：強調高連線數與能效比領先",
@@ -800,7 +800,7 @@ window.TRACKER_DAYS["2026-05-28"] = [
     ]
   },
   {
-    id: "20260528-058",
+    id: "20260528-1143",
     trackers: ["security"],
     category: "uncategorized",
     title: "無法分析：提供的文章內容為 NVD 頁面重定向警告，無可提取資安新聞資訊。",
@@ -814,7 +814,7 @@ window.TRACKER_DAYS["2026-05-28"] = [
     ]
   },
   {
-    id: "20260528-059",
+    id: "20260528-1144",
     trackers: ["security"],
     category: "uncategorized",
     title: "無法生成新聞標題：原文內容為 NVD 頁面重定向警告，無可分析的資安事件資訊。",

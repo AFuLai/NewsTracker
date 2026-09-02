@@ -4,10 +4,10 @@ window.TRACKER_MONTH["os"] = window.TRACKER_MONTH["os"] || {};
 window.TRACKER_MONTH["os"]["2026-07"] = {
   dates: [
     { date: "2026-07-31", file: "../data-20260731.js", count: 76 },
-    { date: "2026-07-30", file: "../data-20260730.js", count: 96 },
+    { date: "2026-07-30", file: "../data-20260730.js", count: 98 },
     { date: "2026-07-29", file: "../data-20260729.js", count: 78 },
-    { date: "2026-07-28", file: "../data-20260728.js", count: 79 },
-    { date: "2026-07-27", file: "../data-20260727.js", count: 69 },
+    { date: "2026-07-28", file: "../data-20260728.js", count: 80 },
+    { date: "2026-07-27", file: "../data-20260727.js", count: 70 },
     { date: "2026-07-26", file: "../data-20260726.js", count: 19 },
     { date: "2026-07-25", file: "../data-20260725.js", count: 25 },
     { date: "2026-07-24", file: "../data-20260724.js", count: 98 },
@@ -35,6 +35,6 @@ window.TRACKER_MONTH["os"]["2026-07"] = {
     { date: "2026-07-02", file: "../data-20260702.js", count: 64 },
     { date: "2026-07-01", file: "../data-20260701.js", count: 86 }
   ],
-  totalArticles: 1901,
-  lastUpdated: "2026-08-05"
+  totalArticles: 1905,
+  lastUpdated: "2026-09-02"
 };

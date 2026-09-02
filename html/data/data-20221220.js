@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2022-12-20"] = [
   {
-    id: "20221220-001",
+    id: "20221220-213",
     trackers: ["eu_cra"],
     category: "研討活動",
     title: "ENISA發布歐洲網路安全技能框架（ECSF），協助企業識別專業職能與技能缺口",

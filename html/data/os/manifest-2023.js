@@ -6,5 +6,5 @@ window.TRACKER_YEAR["os"]["2023"] = {
   monthFiles: {
     "2023-10": "manifest-202310.js"
   },
-  lastUpdated: "2026-08-04"
+  lastUpdated: "2026-09-02"
 };

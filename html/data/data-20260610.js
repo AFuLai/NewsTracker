@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-06-10"] = [
   {
-    id: "20260610-001",
+    id: "20260610-969",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Debian 發布 DSA-6337-1：修補 OpenSSH 服務中的潛在資訊洩漏漏洞",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-06-10"] = [
     ]
   },
   {
-    id: "20260610-002",
+    id: "20260610-970",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Debian 發布 DSA-6336-1：修補 OpenSSH 內建的 SSH 服務的潛在資訊洩漏漏洞",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-06-10"] = [
     ]
   },
   {
-    id: "20260610-003",
+    id: "20260610-1002",
     trackers: ["os"],
     category: "Linux",
     title: "Buildroot 2026.05 版本發布：支援 Arm Neoverse 核心與 XFS 根文件系統生成",
@@ -44,7 +44,7 @@ window.TRACKER_DAYS["2026-06-10"] = [
     ]
   },
   {
-    id: "20260610-004",
+    id: "20260610-1003",
     trackers: ["os"],
     category: "Linux",
     title: "多主流 Linux 發行版發布安全更新：涵蓋 AlmaLinux, Debian, Fedora, SUSE, Ubuntu 等多個核心元件修補",
@@ -58,7 +58,7 @@ window.TRACKER_DAYS["2026-06-10"] = [
     ]
   },
   {
-    id: "20260610-005",
+    id: "20260610-512",
     trackers: ["security"],
     category: "法規與標準",
     title: "CISA發布新指令：AI威脅時代下，聯邦機構需在三日內修補最危險漏洞",
@@ -72,7 +72,7 @@ window.TRACKER_DAYS["2026-06-10"] = [
     ]
   },
   {
-    id: "20260610-006",
+    id: "20260610-513",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "ServiceNow 警示資安異常活動：確認源自資安研究，非外部威脅攻擊",
@@ -86,7 +86,7 @@ window.TRACKER_DAYS["2026-06-10"] = [
     ]
   },
   {
-    id: "20260610-007",
+    id: "20260610-515",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "研究員 Nightmare-Eclipse 釋出 Windows Defender 零日 PoC，攻擊可取得系統最高權限",
@@ -100,7 +100,7 @@ window.TRACKER_DAYS["2026-06-10"] = [
     ]
   },
   {
-    id: "20260610-008",
+    id: "20260610-521",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "資安分析揭露：勒索軟體集團 The Gentlemen 背後疑似俄羅斯人士，掌握多重數位足跡",
@@ -114,7 +114,7 @@ window.TRACKER_DAYS["2026-06-10"] = [
     ]
   },
   {
-    id: "20260610-009",
+    id: "20260610-526",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "中國資助的 JDY 殭屍網路擴張至 1,500 個設備，用於進行高精度基礎設施偵察",
@@ -128,7 +128,7 @@ window.TRACKER_DAYS["2026-06-10"] = [
     ]
   },
   {
-    id: "20260610-010",
+    id: "20260610-527",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Fortinet、Ivanti與SAP發布修補程式：修復多個高風險的命令注入與認證繞過漏洞",
@@ -142,7 +142,7 @@ window.TRACKER_DAYS["2026-06-10"] = [
     ]
   },
   {
-    id: "20260610-011",
+    id: "20260610-528",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "低代碼 AI 平台 Langflow 存在路徑穿越漏洞 CVE-2026-5027，可遠端執行程式碼",
@@ -156,7 +156,7 @@ window.TRACKER_DAYS["2026-06-10"] = [
     ]
   },
   {
-    id: "20260610-012",
+    id: "20260610-531",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "微軟釋出創紀錄 206 個漏洞修補程式：包含多個高危險性 Windows 核心與網路服務漏洞",
@@ -170,7 +170,7 @@ window.TRACKER_DAYS["2026-06-10"] = [
     ]
   },
   {
-    id: "20260610-013",
+    id: "20260610-532",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Anthropic發布Claude Fable 5與Mythos 5：強調AI模型在漏洞利用與資安偵測的雙重應用",
@@ -184,7 +184,7 @@ window.TRACKER_DAYS["2026-06-10"] = [
     ]
   },
   {
-    id: "20260610-014",
+    id: "20260610-533",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "ServiceNow 警告：未公開漏洞遭利用，可能讓未驗證使用者取得過度存取權限",
@@ -198,7 +198,7 @@ window.TRACKER_DAYS["2026-06-10"] = [
     ]
   },
   {
-    id: "20260610-015",
+    id: "20260610-534",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "PoC 爆發：研究員公開 Microsoft Defender 新型零日漏洞 RoguePlanet，成功取得 SYSTEM 權限",
@@ -212,7 +212,7 @@ window.TRACKER_DAYS["2026-06-10"] = [
     ]
   },
   {
-    id: "20260610-016",
+    id: "20260610-546",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Ubuntu 警告：libhttp-daemon-perl 處理不可信輸入時存在遠端任意指令執行漏洞",
@@ -226,7 +226,7 @@ window.TRACKER_DAYS["2026-06-10"] = [
     ]
   },
   {
-    id: "20260610-017",
+    id: "20260610-547",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Ubuntu發布USN-6455-2修復Exim回歸問題，解決CVE-2023-42117與CVE-2023-42119的資料處理漏洞",
@@ -240,7 +240,7 @@ window.TRACKER_DAYS["2026-06-10"] = [
     ]
   },
   {
-    id: "20260610-018",
+    id: "20260610-548",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "GStreamer Base Plugins 存在處理 AVI 媒體檔案的漏洞，可能導致系統崩潰或執行任意程式碼",
@@ -254,7 +254,7 @@ window.TRACKER_DAYS["2026-06-10"] = [
     ]
   },
   {
-    id: "20260610-019",
+    id: "20260610-549",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Ubuntu 提醒：libcrypt-saltedhash-perl 產生鹽值（Salt）時，使用弱隨機數生成器，可能洩漏加密保護",
@@ -268,7 +268,7 @@ window.TRACKER_DAYS["2026-06-10"] = [
     ]
   },
   {
-    id: "20260610-020",
+    id: "20260610-906",
     trackers: ["os"],
     category: "Apple",
     title: "iOS 27 整合 Siri AI，大幅升級 AirPods 功能，提供更智慧的語音助理體驗",
@@ -282,7 +282,7 @@ window.TRACKER_DAYS["2026-06-10"] = [
     ]
   },
   {
-    id: "20260610-021",
+    id: "20260610-907",
     trackers: ["os"],
     category: "Apple",
     title: "Apple 宣布 iOS 26 與 iPadOS 26 採用率數據：新機型與整體用戶群體仍有提升空間",
@@ -296,7 +296,7 @@ window.TRACKER_DAYS["2026-06-10"] = [
     ]
   },
   {
-    id: "20260610-022",
+    id: "20260610-908",
     trackers: ["os"],
     category: "Apple",
     title: "WhatsApp宣布提高最低系統要求：2026年11月30日起，將要求iOS 15.5及iPadOS 15.5以上版本",
@@ -310,7 +310,7 @@ window.TRACKER_DAYS["2026-06-10"] = [
     ]
   },
   {
-    id: "20260610-023",
+    id: "20260610-5631",
     trackers: ["eu_cra", "security"],
     category: "合規指引",
     title: "BSI說明：產品符合性評估機構（CAB）如何根據《網路韌性法案》（CRA）進行認證與通知",
@@ -324,7 +324,7 @@ window.TRACKER_DAYS["2026-06-10"] = [
     ]
   },
   {
-    id: "20260610-024",
+    id: "20260610-525",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "「迷你夏伊-胡魯德」攻擊揭示 CI/CD 流程漏洞：TanStack 透過 npm 惡意包擴散，凸顯 SLSA L3 隔離性要求",
@@ -338,7 +338,7 @@ window.TRACKER_DAYS["2026-06-10"] = [
     ]
   },
   {
-    id: "20260610-025",
+    id: "20260610-535",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "警惕 Protobuf.js 漏洞：六個 Proto6 漏洞可能導致 Node.js 遠端程式碼執行與服務中斷",
@@ -352,7 +352,7 @@ window.TRACKER_DAYS["2026-06-10"] = [
     ]
   },
   {
-    id: "20260610-026",
+    id: "20260610-757",
     trackers: ["os"],
     category: "Android",
     title: "Google發布 Android 17 QPR1 Beta 4：修復多項系統錯誤與優化使用者體驗",
@@ -366,7 +366,7 @@ window.TRACKER_DAYS["2026-06-10"] = [
     ]
   },
   {
-    id: "20260610-027",
+    id: "20260610-758",
     trackers: ["os"],
     category: "Android",
     title: "Google 發布 Android 17 QPR1 Beta 4：Pixel 系列設備更新，修復多項系統與功能錯誤",
@@ -380,7 +380,7 @@ window.TRACKER_DAYS["2026-06-10"] = [
     ]
   },
   {
-    id: "20260610-028",
+    id: "20260610-763",
     trackers: ["os"],
     category: "Android",
     title: "Chromecast with Google TV 遙控器連線不穩問題：用戶需重新配對，影響使用體驗",
@@ -394,7 +394,7 @@ window.TRACKER_DAYS["2026-06-10"] = [
     ]
   },
   {
-    id: "20260610-029",
+    id: "20260610-764",
     trackers: ["os"],
     category: "Android",
     title: "LineageOS 23.2 深度解析：搭載 Material 3 Expressive 與新功能，提升老機體驗",
@@ -408,7 +408,7 @@ window.TRACKER_DAYS["2026-06-10"] = [
     ]
   },
   {
-    id: "20260610-030",
+    id: "20260610-769",
     trackers: ["os"],
     category: "Android",
     title: "聯想 ThinkTab X11 於美國發售：一款具備 IP68 等級、支援 Android 16 的商用堅固型平板電腦",
@@ -422,7 +422,7 @@ window.TRACKER_DAYS["2026-06-10"] = [
     ]
   },
   {
-    id: "20260610-031",
+    id: "20260610-770",
     trackers: ["os"],
     category: "Android",
     title: "三星傳聞 Galaxy Watch Ultra 2 將大幅升級電池容量，預計達到 784 mAh",
@@ -436,7 +436,7 @@ window.TRACKER_DAYS["2026-06-10"] = [
     ]
   },
   {
-    id: "20260610-032",
+    id: "20260610-514",
     trackers: ["security"],
     category: "前瞻技術",
     title: "AI風險日益升高：保險業與企業需建立治理框架，應對代理式AI帶來的潛在損失",
@@ -450,7 +450,7 @@ window.TRACKER_DAYS["2026-06-10"] = [
     ]
   },
   {
-    id: "20260610-033",
+    id: "20260610-523",
     trackers: ["security"],
     category: "前瞻技術",
     title: "微軟發布 ASSERT 框架：將自然語言行為規範轉化為可執行 AI 評估系統",
@@ -464,7 +464,7 @@ window.TRACKER_DAYS["2026-06-10"] = [
     ]
   },
   {
-    id: "20260610-034",
+    id: "20260610-756",
     trackers: ["os"],
     category: "重點關注",
     title: "Surfshark推出HeyPolo：強調隱私的家庭定位分享應用程式",
@@ -478,7 +478,7 @@ window.TRACKER_DAYS["2026-06-10"] = [
     ]
   },
   {
-    id: "20260610-035",
+    id: "20260610-760",
     trackers: ["os"],
     category: "重點關注",
     title: "Gemini 應用程式遭遇部分服務中斷，影響跨平台用戶，包含網頁、Android、iOS與macOS",
@@ -492,7 +492,7 @@ window.TRACKER_DAYS["2026-06-10"] = [
     ]
   },
   {
-    id: "20260610-036",
+    id: "20260610-765",
     trackers: ["os"],
     category: "重點關注",
     title: "Google Gemini 整合 Google Business Profile，提供商家深度數據分析與內容生成能力",
@@ -506,7 +506,7 @@ window.TRACKER_DAYS["2026-06-10"] = [
     ]
   },
   {
-    id: "20260610-037",
+    id: "20260610-766",
     trackers: ["os"],
     category: "重點關注",
     title: "YouTube Music 介面更新：搜尋功能移至底部導航欄，提升單手操作便利性",
@@ -520,7 +520,7 @@ window.TRACKER_DAYS["2026-06-10"] = [
     ]
   },
   {
-    id: "20260610-038",
+    id: "20260610-768",
     trackers: ["os"],
     category: "重點關注",
     title: "Google Gemini 擴大佈局：Chrome 瀏覽器功能進一步涵蓋拉丁美洲、非洲及中東市場",
@@ -534,7 +534,7 @@ window.TRACKER_DAYS["2026-06-10"] = [
     ]
   },
   {
-    id: "20260610-039",
+    id: "20260610-771",
     trackers: ["os"],
     category: "重點關注",
     title: "Google TV Streamer 推出 2026 年更新，強化 Thread 1.4 支援，提升智慧家庭網路錨點能力",
@@ -548,7 +548,7 @@ window.TRACKER_DAYS["2026-06-10"] = [
     ]
   },
   {
-    id: "20260610-040",
+    id: "20260610-1000",
     trackers: ["os", "security"],
     category: "重點關注",
     title: "PyCharm「全行程式碼補全」插件疑似建議不安全程式碼，引發資安分類困境",
@@ -562,7 +562,7 @@ window.TRACKER_DAYS["2026-06-10"] = [
     ]
   },
   {
-    id: "20260610-041",
+    id: "20260610-1001",
     trackers: ["os"],
     category: "重點關注",
     title: "AI 代理系統（Agentic AI）在開源專案中引發爭議：自動操作導致的程式碼提交與管理混亂",
@@ -576,7 +576,7 @@ window.TRACKER_DAYS["2026-06-10"] = [
     ]
   },
   {
-    id: "20260610-042",
+    id: "20260610-505",
     trackers: ["eu_cra"],
     category: "研討活動",
     title: "G7 網路安全工作組會議回顧：聚焦後量子加密、AI 供應鏈與中小企業安全",
@@ -590,7 +590,7 @@ window.TRACKER_DAYS["2026-06-10"] = [
     ]
   },
   {
-    id: "20260610-043",
+    id: "20260610-647",
     trackers: ["security"],
     category: "uncategorized",
     title: "TP-LINK 多款產品面臨重要資訊明文傳輸的資安漏洞",

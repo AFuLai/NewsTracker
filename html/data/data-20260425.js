@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-04-25"] = [
   {
-    id: "20260425-001",
+    id: "20260425-130",
     trackers: ["security"],
     category: "前瞻技術",
     title: "Elastic InfoSec 監控 AI 代理：利用 OpenTelemetry 追蹤 Claude Code/Cowork 的操作行為",

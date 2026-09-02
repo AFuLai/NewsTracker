@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-06-18"] = [
   {
-    id: "20260618-001",
+    id: "20260618-1871",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Debian 發布 DSA-6351-1：修補 Samba 服務中的 SambaCrypt 密碼雜湊漏洞",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-06-18"] = [
     ]
   },
   {
-    id: "20260618-002",
+    id: "20260618-1885",
     trackers: ["os"],
     category: "Linux",
     title: "Linux 核心 7.2 合併窗口啟動：核心子系統變動趨勢與開發進度分析",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-06-18"] = [
     ]
   },
   {
-    id: "20260618-003",
+    id: "20260618-1887",
     trackers: ["os"],
     category: "Linux",
     title: "提升雲端虛擬區塊設備可靠性：介紹基於 RTRS 的 RMR 與 BRMR 協議",
@@ -44,7 +44,7 @@ window.TRACKER_DAYS["2026-06-18"] = [
     ]
   },
   {
-    id: "20260618-004",
+    id: "20260618-1888",
     trackers: ["os"],
     category: "Linux",
     title: "多個主流 Linux 發行版發布安全更新，涵蓋核心元件、應用程式與圖形服務",
@@ -58,7 +58,7 @@ window.TRACKER_DAYS["2026-06-18"] = [
     ]
   },
   {
-    id: "20260618-005",
+    id: "20260618-1920",
     trackers: ["os"],
     category: "Linux",
     title: "NVIDIA Vera與Ampere Altra Max效能比較：深入分析ARM Linux伺服器市場的性能差異",
@@ -72,7 +72,7 @@ window.TRACKER_DAYS["2026-06-18"] = [
     ]
   },
   {
-    id: "20260618-006",
+    id: "20260618-1967",
     trackers: ["os"],
     category: "Linux",
     title: "Canonical 為 Ubuntu 26.10 發布 Myna 語音轉文字應用程式",
@@ -86,7 +86,7 @@ window.TRACKER_DAYS["2026-06-18"] = [
     ]
   },
   {
-    id: "20260618-007",
+    id: "20260618-1660",
     trackers: ["security"],
     category: "法規與標準",
     title: "PCI DSS v4.0.1要求：支付頁面腳本完整性監控，防範 Magecart 類網頁資料竊取",
@@ -100,7 +100,7 @@ window.TRACKER_DAYS["2026-06-18"] = [
     ]
   },
   {
-    id: "20260618-008",
+    id: "20260618-1670",
     trackers: ["os", "security"],
     category: "法規與標準",
     title: "Canonical推出Golioth平台，實現從微控制器到Ubuntu Core的端到端IoT設備管理與安全",
@@ -114,7 +114,7 @@ window.TRACKER_DAYS["2026-06-18"] = [
     ]
   },
   {
-    id: "20260618-009",
+    id: "20260618-1572",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "CISA警告Fortinet設備面臨「FortiBleed」憑證外洩風險，要求立即強化資安防護",
@@ -128,7 +128,7 @@ window.TRACKER_DAYS["2026-06-18"] = [
     ]
   },
   {
-    id: "20260618-010",
+    id: "20260618-1578",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "CISA新增已知遭利用漏洞：Splunk Enterprise面臨CVE-2026-20253未經身份驗證的重大風險",
@@ -142,7 +142,7 @@ window.TRACKER_DAYS["2026-06-18"] = [
     ]
   },
   {
-    id: "20260618-011",
+    id: "20260618-1585",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "墨西哥駭客組織 MexicanMafia 進行「Operation Escaneo」活動，揭示拉丁美洲威脅格局轉變",
@@ -156,7 +156,7 @@ window.TRACKER_DAYS["2026-06-18"] = [
     ]
   },
   {
-    id: "20260618-012",
+    id: "20260618-1586",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "FIFA世界盃串流系統曝出嚴重存取控制漏洞，駭客可遠端接管直播與賽事數據",
@@ -170,7 +170,7 @@ window.TRACKER_DAYS["2026-06-18"] = [
     ]
   },
   {
-    id: "20260618-013",
+    id: "20260618-1588",
     trackers: ["os", "security"],
     category: "漏洞與威脅情報",
     title: "資安專家警告：企業應從管理漏洞積壓轉向衡量「暴露時間」，以應對日益增長的實質風險",
@@ -184,7 +184,7 @@ window.TRACKER_DAYS["2026-06-18"] = [
     ]
   },
   {
-    id: "20260618-014",
+    id: "20260618-1624",
     trackers: ["os", "security"],
     category: "漏洞與威脅情報",
     title: "Popa殭屍網路活動與廣告詐騙關聯：研究指出其與以色列公司 Alarum Technologies 的代理服務有關",
@@ -198,7 +198,7 @@ window.TRACKER_DAYS["2026-06-18"] = [
     ]
   },
   {
-    id: "20260618-015",
+    id: "20260618-1655",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "F5修補兩項NGINX關鍵漏洞：CVE-2026-42530與CVE-2026-42055，防禦遠端程式碼執行",
@@ -212,7 +212,7 @@ window.TRACKER_DAYS["2026-06-18"] = [
     ]
   },
   {
-    id: "20260618-016",
+    id: "20260618-1657",
     trackers: ["os", "security"],
     category: "漏洞與威脅情報",
     title: "AI聊天功能遭濫用傳遞惡意程式、Chrome擴充功能劫持搜尋引擎，資安威脅多點開展",
@@ -226,7 +226,7 @@ window.TRACKER_DAYS["2026-06-18"] = [
     ]
   },
   {
-    id: "20260618-017",
+    id: "20260618-1658",
     trackers: ["os", "security"],
     category: "漏洞與威脅情報",
     title: "微軟揭露「CryptoBandits」：新型Windows剪貼簿攔截惡意軟體，透過USB和Tor進行傳播",
@@ -240,7 +240,7 @@ window.TRACKER_DAYS["2026-06-18"] = [
     ]
   },
   {
-    id: "20260618-018",
+    id: "20260618-1659",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "資安研究揭露 INC 勒索軟體擴張：鎖定 Veeam 備份與邊緣設備的攻擊鏈分析",
@@ -254,7 +254,7 @@ window.TRACKER_DAYS["2026-06-18"] = [
     ]
   },
   {
-    id: "20260618-019",
+    id: "20260618-1661",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "DragonForce駭客利用Microsoft Teams TURN中繼建立後門，進行隱蔽式C2通訊",
@@ -268,7 +268,7 @@ window.TRACKER_DAYS["2026-06-18"] = [
     ]
   },
   {
-    id: "20260618-020",
+    id: "20260618-1674",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "「FortiBleed」資料外洩曝光數萬台 FortiGate VPN 憑證，資安專家籲立即更換密碼並啟用 MFA",
@@ -282,7 +282,7 @@ window.TRACKER_DAYS["2026-06-18"] = [
     ]
   },
   {
-    id: "20260618-021",
+    id: "20260618-1798",
     trackers: ["os"],
     category: "Apple",
     title: "watchOS 27 新增單指點擊手勢：提升 Apple Watch 單手操作便利性",
@@ -296,7 +296,7 @@ window.TRACKER_DAYS["2026-06-18"] = [
     ]
   },
   {
-    id: "20260618-022",
+    id: "20260618-1799",
     trackers: ["os"],
     category: "Apple",
     title: "Apple 宣布記憶體成本飆升，預計未來設備價格將上漲",
@@ -310,7 +310,7 @@ window.TRACKER_DAYS["2026-06-18"] = [
     ]
   },
   {
-    id: "20260618-023",
+    id: "20260618-1800",
     trackers: ["os"],
     category: "Apple",
     title: "市場分析：iPhone銷售逆勢增長，蘋果與華為表現亮眼，指出供應鏈穩定性成關鍵",
@@ -324,7 +324,7 @@ window.TRACKER_DAYS["2026-06-18"] = [
     ]
   },
   {
-    id: "20260618-024",
+    id: "20260618-1801",
     trackers: ["os"],
     category: "Apple",
     title: "蘋果傳聞 2027 年產品線大升級：預計推出六款 iPhone、AI 穿戴裝置與 M6 晶片設備",
@@ -338,7 +338,7 @@ window.TRACKER_DAYS["2026-06-18"] = [
     ]
   },
   {
-    id: "20260618-025",
+    id: "20260618-1804",
     trackers: ["os"],
     category: "Apple",
     title: "iOS 27 重大更新：Apple Wallet 增加實體通行證匯入功能，整合生活周邊",
@@ -352,7 +352,7 @@ window.TRACKER_DAYS["2026-06-18"] = [
     ]
   },
   {
-    id: "20260618-026",
+    id: "20260618-1806",
     trackers: ["os"],
     category: "Apple",
     title: "iPhone 18 Pro 傳聞：因搭載超大感光元件與可變光圈，相機模組凸起設計預計會更大",
@@ -366,7 +366,7 @@ window.TRACKER_DAYS["2026-06-18"] = [
     ]
   },
   {
-    id: "20260618-027",
+    id: "20260618-1807",
     trackers: ["os"],
     category: "Apple",
     title: "Apple 宣布巴西 App Store 變革：開放替代應用市場與新支付機制，強化兒童保護",
@@ -380,7 +380,7 @@ window.TRACKER_DAYS["2026-06-18"] = [
     ]
   },
   {
-    id: "20260618-028",
+    id: "20260618-1808",
     trackers: ["os"],
     category: "Apple",
     title: "Apple TV 宣布新喜劇《Brothers》，由麥修·麥康納和伍迪·哈雷森主演",
@@ -394,7 +394,7 @@ window.TRACKER_DAYS["2026-06-18"] = [
     ]
   },
   {
-    id: "20260618-029",
+    id: "20260618-1809",
     trackers: ["os"],
     category: "Apple",
     title: "Apple iOS 27 宣布強化 AI 拍照功能：新增 Reframe 與 Expand，提升照片修復與構圖彈性",
@@ -408,7 +408,7 @@ window.TRACKER_DAYS["2026-06-18"] = [
     ]
   },
   {
-    id: "20260618-030",
+    id: "20260618-1810",
     trackers: ["os"],
     category: "Apple",
     title: "蘋果因元件成本上漲，預計 iPhone 18 Pro 起售價將大幅提高至 $1,299 或 $1,399 以上",
@@ -422,7 +422,7 @@ window.TRACKER_DAYS["2026-06-18"] = [
     ]
   },
   {
-    id: "20260618-031",
+    id: "20260618-1812",
     trackers: ["os"],
     category: "Apple",
     title: "macOS 27 影響 Time Capsule 存取，專家建議蘋果應重新開發此類備份解決方案",
@@ -436,7 +436,7 @@ window.TRACKER_DAYS["2026-06-18"] = [
     ]
   },
   {
-    id: "20260618-032",
+    id: "20260618-1813",
     trackers: ["os"],
     category: "Apple",
     title: "Apple iOS 27 性能升級分析：多項微幅優化累積成整體流暢體驗",
@@ -450,7 +450,7 @@ window.TRACKER_DAYS["2026-06-18"] = [
     ]
   },
   {
-    id: "20260618-033",
+    id: "20260618-1584",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "新諾德（Novo Nordisk）遭駭：GitHub Token外洩凸顯開發管線與憑證管理風險",
@@ -464,7 +464,7 @@ window.TRACKER_DAYS["2026-06-18"] = [
     ]
   },
   {
-    id: "20260618-034",
+    id: "20260618-1587",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "第三方應用程式OAuth權杖遭濫用：Klue平台漏洞導致多個客戶Salesforce資料外洩",
@@ -478,7 +478,7 @@ window.TRACKER_DAYS["2026-06-18"] = [
     ]
   },
   {
-    id: "20260618-035",
+    id: "20260618-1629",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "國家級駭客 Sapphire Sleet 透過 npm 供應鏈攻擊，在 Mastra 生態系植入後門",
@@ -492,7 +492,7 @@ window.TRACKER_DAYS["2026-06-18"] = [
     ]
   },
   {
-    id: "20260618-036",
+    id: "20260618-1718",
     trackers: ["os"],
     category: "Android",
     title: "Google Pixel 用戶 Gmail 應用程式回覆郵件時，鍵盤無法自動彈出，影響使用體驗",
@@ -506,7 +506,7 @@ window.TRACKER_DAYS["2026-06-18"] = [
     ]
   },
   {
-    id: "20260618-037",
+    id: "20260618-1719",
     trackers: ["os"],
     category: "Android",
     title: "Google 強化 Android 開發者驗證機制：從多國逐步實施，目標阻擋惡意應用程式",
@@ -520,7 +520,7 @@ window.TRACKER_DAYS["2026-06-18"] = [
     ]
   },
   {
-    id: "20260618-038",
+    id: "20260618-1720",
     trackers: ["os"],
     category: "Android",
     title: "Google Meet 正式擴大支援 Android Auto，提供車載會議通訊功能",
@@ -534,7 +534,7 @@ window.TRACKER_DAYS["2026-06-18"] = [
     ]
   },
   {
-    id: "20260618-039",
+    id: "20260618-1722",
     trackers: ["os"],
     category: "Android",
     title: "三星Galaxy Watch系列2026年開局不利，出貨量年減28%，市場佔有率下滑",
@@ -548,7 +548,7 @@ window.TRACKER_DAYS["2026-06-18"] = [
     ]
   },
   {
-    id: "20260618-040",
+    id: "20260618-1723",
     trackers: ["os"],
     category: "Android",
     title: "Android 17 啟動 Pixel 設備：用戶回饋與性能優化重點分析",
@@ -562,7 +562,7 @@ window.TRACKER_DAYS["2026-06-18"] = [
     ]
   },
   {
-    id: "20260618-041",
+    id: "20260618-1724",
     trackers: ["os"],
     category: "Android",
     title: "Google Gemini 整合 Android Bubbles 功能，提升多工處理下的對話連續性",
@@ -576,7 +576,7 @@ window.TRACKER_DAYS["2026-06-18"] = [
     ]
   },
   {
-    id: "20260618-042",
+    id: "20260618-1839",
     trackers: ["os", "security"],
     category: "Android",
     title: "Google宣布Android開發者驗證機制：從特定市場開始，逐步全面強化生態系統安全",
@@ -590,7 +590,7 @@ window.TRACKER_DAYS["2026-06-18"] = [
     ]
   },
   {
-    id: "20260618-043",
+    id: "20260618-1589",
     trackers: ["security"],
     category: "前瞻技術",
     title: "歐盟啟動「Shield-6G」專案，整合AI、數位分身等技術強化未來6G網路安全",
@@ -604,7 +604,7 @@ window.TRACKER_DAYS["2026-06-18"] = [
     ]
   },
   {
-    id: "20260618-044",
+    id: "20260618-1628",
     trackers: ["security"],
     category: "前瞻技術",
     title: "Microsoft發布Forrester研究：統一安全平台在AI時代可為企業帶來124%的投資回報率",
@@ -618,7 +618,7 @@ window.TRACKER_DAYS["2026-06-18"] = [
     ]
   },
   {
-    id: "20260618-045",
+    id: "20260618-1656",
     trackers: ["security"],
     category: "前瞻技術",
     title: "AI 孤兒代理與常駐權限風險：企業如何追蹤離職員工留下的隱藏存取權",
@@ -632,7 +632,7 @@ window.TRACKER_DAYS["2026-06-18"] = [
     ]
   },
   {
-    id: "20260618-046",
+    id: "20260618-1714",
     trackers: ["os"],
     category: "重點關注",
     title: "Google Gemini Live 整合記憶體功能，聊天體驗可參考過往對話與個人資訊",
@@ -646,7 +646,7 @@ window.TRACKER_DAYS["2026-06-18"] = [
     ]
   },
   {
-    id: "20260618-047",
+    id: "20260618-1717",
     trackers: ["os"],
     category: "重點關注",
     title: "Google YouTube TV 更新限制舊型 Roku 設備功能，取消背景播放與未來節目列表",
@@ -660,7 +660,7 @@ window.TRACKER_DAYS["2026-06-18"] = [
     ]
   },
   {
-    id: "20260618-048",
+    id: "20260618-1725",
     trackers: ["os"],
     category: "重點關注",
     title: "Gemini 共同主導者 Noam Shazeer 宣布離開 Google，轉職加入 OpenAI",
@@ -674,7 +674,7 @@ window.TRACKER_DAYS["2026-06-18"] = [
     ]
   },
   {
-    id: "20260618-049",
+    id: "20260618-1794",
     trackers: ["os"],
     category: "重點關注",
     title: "Counterpoint 研究報告：2026年第一季 Apple Watch 出貨量激增 21%，領跑智慧手錶市場",
@@ -688,7 +688,7 @@ window.TRACKER_DAYS["2026-06-18"] = [
     ]
   },
   {
-    id: "20260618-050",
+    id: "20260618-1795",
     trackers: ["os"],
     category: "重點關注",
     title: "無法撰寫，原文內容與資安新聞無關",
@@ -702,7 +702,7 @@ window.TRACKER_DAYS["2026-06-18"] = [
     ]
   },
   {
-    id: "20260618-051",
+    id: "20260618-1803",
     trackers: ["os"],
     category: "重點關注",
     title: "Apple Beats系列耳機產品推薦與折扣資訊：包含Pill、Powerbeats Pro 2及Studio Pro",
@@ -716,7 +716,7 @@ window.TRACKER_DAYS["2026-06-18"] = [
     ]
   },
   {
-    id: "20260618-052",
+    id: "20260618-1811",
     trackers: ["os"],
     category: "重點關注",
     title: "Adobe Firefly大幅升級，在Creative Cloud應用中擴展代理式AI功能",
@@ -730,7 +730,7 @@ window.TRACKER_DAYS["2026-06-18"] = [
     ]
   },
   {
-    id: "20260618-053",
+    id: "20260618-1814",
     trackers: ["os"],
     category: "重點關注",
     title: "蘋果與英特爾宣布合作，英特爾將在美國晶圓廠為未來蘋果設備製造晶片",
@@ -744,7 +744,7 @@ window.TRACKER_DAYS["2026-06-18"] = [
     ]
   },
   {
-    id: "20260618-054",
+    id: "20260618-1859",
     trackers: ["os", "security"],
     category: "重點關注",
     title: "微軟偵測到新型自我傳播惡意軟體 Crypto Clipper，透過 USB 竊取加密貨幣憑證",
@@ -758,7 +758,7 @@ window.TRACKER_DAYS["2026-06-18"] = [
     ]
   },
   {
-    id: "20260618-055",
+    id: "20260618-1884",
     trackers: ["os"],
     category: "重點關注",
     title: "軟體自由保護協會（SFC）發布指南，指導開源軟體貢獻者使用大型語言模型（LLM）生成式 AI",
@@ -772,7 +772,7 @@ window.TRACKER_DAYS["2026-06-18"] = [
     ]
   },
   {
-    id: "20260618-056",
+    id: "20260618-1963",
     trackers: ["os"],
     category: "重點關注",
     title: "退役 Google Pixel 手機可轉化為私人雲端設備，延長硬體生命週期",
@@ -786,7 +786,7 @@ window.TRACKER_DAYS["2026-06-18"] = [
     ]
   },
   {
-    id: "20260618-057",
+    id: "20260618-1964",
     trackers: ["os"],
     category: "重點關注",
     title: "無",
@@ -800,7 +800,7 @@ window.TRACKER_DAYS["2026-06-18"] = [
     ]
   },
   {
-    id: "20260618-058",
+    id: "20260618-1965",
     trackers: ["os"],
     category: "重點關注",
     title: "Amazon推出Quick Desktop AI助理：整合多源數據建構知識圖譜，提升企業工作效率與安全洞察",
@@ -814,7 +814,7 @@ window.TRACKER_DAYS["2026-06-18"] = [
     ]
   },
   {
-    id: "20260618-059",
+    id: "20260618-1966",
     trackers: ["os"],
     category: "重點關注",
     title: "Citrix DaaS 平台規劃：旨在延遲昂貴的 PC 硬體升級週期",
@@ -828,7 +828,7 @@ window.TRACKER_DAYS["2026-06-18"] = [
     ]
   },
   {
-    id: "20260618-060",
+    id: "20260618-1968",
     trackers: ["os"],
     category: "重點關注",
     title: "無",
@@ -841,7 +841,7 @@ window.TRACKER_DAYS["2026-06-18"] = [
     ]
   },
   {
-    id: "20260618-061",
+    id: "20260618-1969",
     trackers: ["os"],
     category: "重點關注",
     title: "華為與中國電信合作，在廣東地區推動跨廠商IP網路模擬試點，為智慧網路營運奠定基礎",
@@ -855,7 +855,7 @@ window.TRACKER_DAYS["2026-06-18"] = [
     ]
   },
   {
-    id: "20260618-062",
+    id: "20260618-1686",
     trackers: ["security"],
     category: "產業動態",
     title: "Oracle Solaris 曝出三項重大漏洞：CVE-2026-46978 至 CVE-2026-35233，建議立即修補",

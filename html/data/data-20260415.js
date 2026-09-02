@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-04-15"] = [
   {
-    id: "20260415-001",
+    id: "20260415-277",
     trackers: ["eu_cra"],
     category: "研討活動",
     title: "新加坡 CSA 舉辦「老年人網路安全」工作坊：教導防範詐騙與深度偽造威脅",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-04-15"] = [
     ]
   },
   {
-    id: "20260415-002",
+    id: "20260415-172",
     trackers: ["security"],
     category: "uncategorized",
     title: "Adobe Acrobat/Reader 存在任意代碼執行漏洞：JPCERT發布修補指南，建議立即更新至最新版本",

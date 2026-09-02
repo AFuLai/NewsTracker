@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-04-07"] = [
   {
-    id: "20260407-001",
+    id: "20260407-5630",
     trackers: ["eu_cra", "security"],
     category: "法令更新",
     title: "歐盟《網路韌性法案》（CRA）確立數位產品最低資安標準，要求製造商實施「安全設計」與「SBOM」",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-04-07"] = [
     ]
   },
   {
-    id: "20260407-002",
+    id: "20260407-119",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "俄羅斯駭客利用舊型路由器DNS劫持竊取微軟帳號憑證：APT28活動分析",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-04-07"] = [
     ]
   },
   {
-    id: "20260407-003",
+    id: "20260407-160",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Medusa勒索軟體集團（Storm-1175）快速利用零日漏洞攻擊關鍵基礎設施",
@@ -44,7 +44,7 @@ window.TRACKER_DAYS["2026-04-07"] = [
     ]
   },
   {
-    id: "20260407-004",
+    id: "20260407-1415",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Dragos 報告：電網資安風險轉移，攻擊目標從控制系統轉向支援與管理系統",

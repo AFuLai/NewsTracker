@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-08-08"] = [
   {
-    id: "20260808-001",
+    id: "20260808-7018",
     trackers: ["security"],
     category: "重大事件",
     title: "Metabase 爆發 CVSS 10.0 零日漏洞遭大規模利用，Framework 與 n8n 等企業受害",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-08-08"] = [
     ]
   },
   {
-    id: "20260808-002",
+    id: "20260808-7064",
     trackers: ["security"],
     category: "重大事件",
     title: "駭客利用 TrueConf 伺服器漏洞植入木馬化用戶端安裝程式與後門",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-08-08"] = [
     ]
   },
   {
-    id: "20260808-003",
+    id: "20260808-7309",
     trackers: ["os"],
     category: "Linux",
     title: "Linux 7.3 核心將迎入 Intel 混合式 CPU 叢集負載平衡與排程改進",
@@ -44,7 +44,7 @@ window.TRACKER_DAYS["2026-08-08"] = [
     ]
   },
   {
-    id: "20260808-004",
+    id: "20260808-7310",
     trackers: ["os"],
     category: "Linux",
     title: "Polychromatic 0.9.8 發布，支援 Razer Blade 16 2023 型號，優化 Linux RGB 燈光管理",
@@ -58,7 +58,7 @@ window.TRACKER_DAYS["2026-08-08"] = [
     ]
   },
   {
-    id: "20260808-005",
+    id: "20260808-7312",
     trackers: ["os"],
     category: "Linux",
     title: "GNOME 獲得 Sovereign Tech Agency 資助，設計團隊將專注於設計與社群發展",
@@ -72,7 +72,7 @@ window.TRACKER_DAYS["2026-08-08"] = [
     ]
   },
   {
-    id: "20260808-006",
+    id: "20260808-7313",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux HWMON 子系統修復多項高風險錯誤，應對 AI 輔助工具發現的漏洞",
@@ -86,7 +86,7 @@ window.TRACKER_DAYS["2026-08-08"] = [
     ]
   },
   {
-    id: "20260808-007",
+    id: "20260808-7315",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 7.2-rc7 更新：擴充 XPad 驅動支援 Zenaim Leverless 遊戲控制器，並修復多個輸入子系統漏洞",
@@ -100,7 +100,7 @@ window.TRACKER_DAYS["2026-08-08"] = [
     ]
   },
   {
-    id: "20260808-008",
+    id: "20260808-7316",
     trackers: ["os"],
     category: "Linux",
     title: "KDE Plasma 6.8 更新：提升使用者介面體驗與修復內建遠端桌面伺服器問題",
@@ -114,7 +114,7 @@ window.TRACKER_DAYS["2026-08-08"] = [
     ]
   },
   {
-    id: "20260808-009",
+    id: "20260808-7561",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心 KVM/nVMX 漏洞：嵌套虛擬化環境下 VMCS12 頁面洩漏風險",
@@ -128,7 +128,7 @@ window.TRACKER_DAYS["2026-08-08"] = [
     ]
   },
   {
-    id: "20260808-010",
+    id: "20260808-7562",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心安全修補：Ceph 協議中的兩個不安全解碼操作導致 OOB 讀取漏洞",
@@ -142,7 +142,7 @@ window.TRACKER_DAYS["2026-08-08"] = [
     ]
   },
   {
-    id: "20260808-011",
+    id: "20260808-7382",
     trackers: ["os"],
     category: "Windows",
     title: "微軟確認 Windows 11 性能優化：提升速度、減少記憶體佔用並移除廣告內容",
@@ -156,7 +156,7 @@ window.TRACKER_DAYS["2026-08-08"] = [
     ]
   },
   {
-    id: "20260808-012",
+    id: "20260808-7017",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "PortSwigger 揭露新 CSS 跨域攻擊技術：可威脅 Gmail 與 Outlook 等 Webmail 並外洩 Token 及密碼",
@@ -170,7 +170,7 @@ window.TRACKER_DAYS["2026-08-08"] = [
     ]
   },
   {
-    id: "20260808-013",
+    id: "20260808-7019",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "N-able N-central 遭零日漏洞漏洞鏈攻擊，官方釋出 Hotfix 2 修補身份驗證繞過缺陷",
@@ -184,7 +184,7 @@ window.TRACKER_DAYS["2026-08-08"] = [
     ]
   },
   {
-    id: "20260808-014",
+    id: "20260808-7020",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "CISA將Progress Kemp LoadMaster高危指令注入漏洞CVE-2026-8037列入已遭利用漏洞目錄",
@@ -198,7 +198,7 @@ window.TRACKER_DAYS["2026-08-08"] = [
     ]
   },
   {
-    id: "20260808-015",
+    id: "20260808-7172",
     trackers: ["os"],
     category: "Apple",
     title: "Apple 釋出 iOS 27 開發者測試版，帶來高穩定性與 Siri AI 等新功能",
@@ -212,7 +212,7 @@ window.TRACKER_DAYS["2026-08-08"] = [
     ]
   },
   {
-    id: "20260808-016",
+    id: "20260808-7174",
     trackers: ["os"],
     category: "Apple",
     title: "傳聞 iPhone 18 Pro 售價將調漲，分析師建議現階段可考慮購買 iPhone 17 Pro",
@@ -226,7 +226,7 @@ window.TRACKER_DAYS["2026-08-08"] = [
     ]
   },
   {
-    id: "20260808-017",
+    id: "20260808-7175",
     trackers: ["os"],
     category: "Apple",
     title: "Apple TV 推出泰德拉索第四季宣傳廣告，結合多部平台熱門影集",
@@ -240,7 +240,7 @@ window.TRACKER_DAYS["2026-08-08"] = [
     ]
   },
   {
-    id: "20260808-018",
+    id: "20260808-7176",
     trackers: ["os"],
     category: "Apple",
     title: "Apple 傳為加速 AI 發展將跳過 M6 高階晶片，轉而專注開發 M7 晶片",
@@ -254,7 +254,7 @@ window.TRACKER_DAYS["2026-08-08"] = [
     ]
   },
   {
-    id: "20260808-019",
+    id: "20260808-7179",
     trackers: ["os"],
     category: "Apple",
     title: "WhatsApp 於 iPhone 推出專屬家長監護設定，簡化管理帳號流程",
@@ -268,7 +268,7 @@ window.TRACKER_DAYS["2026-08-08"] = [
     ]
   },
   {
-    id: "20260808-020",
+    id: "20260808-7180",
     trackers: ["os"],
     category: "Apple",
     title: "Apple 更新 Made for iPhone (MFi) 聽力輔助設備清單，支援超過 600 款設備",
@@ -282,7 +282,7 @@ window.TRACKER_DAYS["2026-08-08"] = [
     ]
   },
   {
-    id: "20260808-021",
+    id: "20260808-7181",
     trackers: ["os"],
     category: "Apple",
     title: "Apple CarPlay 連線異常頻繁中斷，專家指出可能源自無線電干擾",
@@ -296,7 +296,7 @@ window.TRACKER_DAYS["2026-08-08"] = [
     ]
   },
   {
-    id: "20260808-022",
+    id: "20260808-7090",
     trackers: ["os"],
     category: "Android",
     title: "Google Messages 多項功能更新測試與功能調整動態",
@@ -310,7 +310,7 @@ window.TRACKER_DAYS["2026-08-08"] = [
     ]
   },
   {
-    id: "20260808-023",
+    id: "20260808-7091",
     trackers: ["os"],
     category: "Android",
     title: "Google Pixel 11 Pro XL 實機照與外盒包裝於發表會前夕曝光",
@@ -324,7 +324,7 @@ window.TRACKER_DAYS["2026-08-08"] = [
     ]
   },
   {
-    id: "20260808-024",
+    id: "20260808-7092",
     trackers: ["os"],
     category: "Android",
     title: "Google Pixel 11 系列選前終極外洩：採用台積電 2nm Tensor G6 晶片與全新硬體升級",
@@ -338,7 +338,7 @@ window.TRACKER_DAYS["2026-08-08"] = [
     ]
   },
   {
-    id: "20260808-025",
+    id: "20260808-7093",
     trackers: ["os"],
     category: "Android",
     title: "Google Pixel Watch 5 爆料推出 Stephen Curry 特別版並採用 Fitbit Air 設計防潑水錶帶",
@@ -352,7 +352,7 @@ window.TRACKER_DAYS["2026-08-08"] = [
     ]
   },
   {
-    id: "20260808-026",
+    id: "20260808-7016",
     trackers: ["security"],
     category: "前瞻技術",
     title: "Atlassian Rovo AI 助手爆發提示詞注入漏洞，駭客可誘使系統外洩 Jira 與 Confluence 敏感資料",
@@ -366,7 +366,7 @@ window.TRACKER_DAYS["2026-08-08"] = [
     ]
   },
   {
-    id: "20260808-027",
+    id: "20260808-7177",
     trackers: ["os"],
     category: "重點關注",
     title: "IDC數據顯示PC市場整體下滑，Apple Mac系列仍保持出貨增長",
@@ -380,7 +380,7 @@ window.TRACKER_DAYS["2026-08-08"] = [
     ]
   },
   {
-    id: "20260808-028",
+    id: "20260808-7311",
     trackers: ["os", "security"],
     category: "重點關注",
     title: "Wine 11.15 重磅發布：修復 Wayland 顯示問題，並解決 2006 年的 MSXML3 舊漏洞",
@@ -394,7 +394,7 @@ window.TRACKER_DAYS["2026-08-08"] = [
     ]
   },
   {
-    id: "20260808-029",
+    id: "20260808-7314",
     trackers: ["os"],
     category: "重點關注",
     title: "Triton 驅動程式：透過 DDI 提升 QEMU 虛擬機的 DirectX 11 繪圖加速",

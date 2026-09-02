@@ -6,5 +6,5 @@ window.TRACKER_MONTH["eu_cra"]["2025-05"] = {
     { date: "2025-05-13", file: "../data-20250513.js", count: 2 }
   ],
   totalArticles: 2,
-  lastUpdated: "2026-08-04"
+  lastUpdated: "2026-09-02"
 };

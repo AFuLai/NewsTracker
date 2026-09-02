@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-06-14"] = [
   {
-    id: "20260614-001",
+    id: "20260614-992",
     trackers: ["os"],
     category: "Linux",
     title: "Linux 核心 7.1 版本發布：包含 ublk 零拷 I/O、NTFS 重寫與進階行程管理功能",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-06-14"] = [
     ]
   },
   {
-    id: "20260614-002",
+    id: "20260614-1019",
     trackers: ["os"],
     category: "Linux",
     title: "Linux 7.1 核心穩定版發布：新增 NTFS 驅動、優化 Intel FRED 與 Arc 顯示卡效能",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-06-14"] = [
     ]
   },
   {
-    id: "20260614-003",
+    id: "20260614-1020",
     trackers: ["os"],
     category: "Linux",
     title: "Arch Linux AUR 遭惡意程式波及：發現更複雜的混淆型惡意程式攻擊",
@@ -44,7 +44,7 @@ window.TRACKER_DAYS["2026-06-14"] = [
     ]
   },
   {
-    id: "20260614-004",
+    id: "20260614-1021",
     trackers: ["os"],
     category: "Linux",
     title: "AVX-512 優化：Linux 核心 xor_gen() 函數性能提升至 43%，有利於軟體 RAID 與檔案系統",
@@ -58,7 +58,7 @@ window.TRACKER_DAYS["2026-06-14"] = [
     ]
   },
   {
-    id: "20260614-005",
+    id: "20260614-1022",
     trackers: ["os"],
     category: "Linux",
     title: "PackageKit 推出 pkgcli：為 Linux 套件管理提供現代化、友善的命令行介面",
@@ -72,7 +72,7 @@ window.TRACKER_DAYS["2026-06-14"] = [
     ]
   },
   {
-    id: "20260614-006",
+    id: "20260614-1102",
     trackers: ["os", "security"],
     category: "Windows",
     title: "微軟發布 Windows 11/10 安全啟動更新：了解 Secure Boot 2023 憑證的自動化部署與檢查指南",
@@ -86,7 +86,7 @@ window.TRACKER_DAYS["2026-06-14"] = [
     ]
   },
   {
-    id: "20260614-007",
+    id: "20260614-1103",
     trackers: ["os"],
     category: "Windows",
     title: "Windows 11 KB5094126 更新引發啟動失敗與 BSOD：受影響設備需檢查 EFI 分區空間",
@@ -100,7 +100,7 @@ window.TRACKER_DAYS["2026-06-14"] = [
     ]
   },
   {
-    id: "20260614-008",
+    id: "20260614-838",
     trackers: ["os"],
     category: "Apple",
     title: "蘋果預告 iOS 27 新功能：Siri AI 擴充、自訂相機與 Apple Watch Ultra 介面更新",
@@ -114,7 +114,7 @@ window.TRACKER_DAYS["2026-06-14"] = [
     ]
   },
   {
-    id: "20260614-009",
+    id: "20260614-720",
     trackers: ["os"],
     category: "Android",
     title: "Google 預告下一代 Pixel 更新：加入螢幕反應與 Gemini Omni 媒體生成功能",
@@ -128,7 +128,7 @@ window.TRACKER_DAYS["2026-06-14"] = [
     ]
   },
   {
-    id: "20260614-010",
+    id: "20260614-722",
     trackers: ["os"],
     category: "Android",
     title: "三星 Galaxy Z Fold 8 Ultra 傳出規格與定價疑慮，市場關注品牌命名與產品線規劃",
@@ -142,7 +142,7 @@ window.TRACKER_DAYS["2026-06-14"] = [
     ]
   },
   {
-    id: "20260614-011",
+    id: "20260614-1565",
     trackers: ["os", "security"],
     category: "Android",
     title: "Moovit 應用程式 Android 漏洞：透過自訂 URL Scheme 進行本地未授權存取",
@@ -156,7 +156,7 @@ window.TRACKER_DAYS["2026-06-14"] = [
     ]
   },
   {
-    id: "20260614-012",
+    id: "20260614-1566",
     trackers: ["os", "security"],
     category: "Android",
     title: "Android 應用程式 Genspark AI Workspace App 2.8.4 存在本地越權漏洞，影響自訂 URL Scheme 處理",
@@ -170,7 +170,7 @@ window.TRACKER_DAYS["2026-06-14"] = [
     ]
   },
   {
-    id: "20260614-013",
+    id: "20260614-558",
     trackers: ["security"],
     category: "前瞻技術",
     title: "FBI與Google聯手瓦解大規模AI詐騙服務「Outsider Enterprise」，阻止數百萬惡意訊息傳送",
@@ -184,7 +184,7 @@ window.TRACKER_DAYS["2026-06-14"] = [
     ]
   },
   {
-    id: "20260614-014",
+    id: "20260614-721",
     trackers: ["os"],
     category: "重點關注",
     title: "Google CEO Sundar Pichai 在斯坦福畢業典禮致詞：分享科技與人生哲學",
@@ -198,7 +198,7 @@ window.TRACKER_DAYS["2026-06-14"] = [
     ]
   },
   {
-    id: "20260614-015",
+    id: "20260614-1023",
     trackers: ["os"],
     category: "重點關注",
     title: "Wine-Staging 11.11 發布：包含 289 個補丁，強化 Wayland 支援與 Direct3D 12 兼容性",
@@ -212,7 +212,7 @@ window.TRACKER_DAYS["2026-06-14"] = [
     ]
   },
   {
-    id: "20260614-016",
+    id: "20260614-1062",
     trackers: ["os"],
     category: "重點關注",
     title: "Google Cloud India 遭遇火災，服務持續受影響，修復工作仍未完成",
@@ -226,7 +226,7 @@ window.TRACKER_DAYS["2026-06-14"] = [
     ]
   },
   {
-    id: "20260614-017",
+    id: "20260614-1063",
     trackers: ["os"],
     category: "重點關注",
     title: "美國陸軍採用「Vampire」系統填補層級防禦空隙",
@@ -240,7 +240,7 @@ window.TRACKER_DAYS["2026-06-14"] = [
     ]
   },
   {
-    id: "20260614-018",
+    id: "20260614-1064",
     trackers: ["os"],
     category: "重點關注",
     title: "AI 輔助攻擊趨勢：LLMs 改變 API 攻擊面，開發者需警惕非人身份的零信任模型",
@@ -254,7 +254,7 @@ window.TRACKER_DAYS["2026-06-14"] = [
     ]
   },
   {
-    id: "20260614-019",
+    id: "20260614-1065",
     trackers: ["os"],
     category: "重點關注",
     title: "歐盟主權推動加速科技獨立，資安專家關注AI攻擊與供應鏈風險",

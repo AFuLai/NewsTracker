@@ -6,5 +6,5 @@ window.TRACKER_YEAR["security"]["2022"] = {
   monthFiles: {
     "2022-09": "manifest-202209.js"
   },
-  lastUpdated: "2026-08-04"
+  lastUpdated: "2026-09-02"
 };

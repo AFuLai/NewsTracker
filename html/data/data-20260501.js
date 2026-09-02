@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-05-01"] = [
   {
-    id: "20260501-001",
+    id: "20260501-1246",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心 FUSE 漏洞 (CVE-2026-31694)：惡意 dirent 導致頁緩存溢位",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-05-01"] = [
     ]
   },
   {
-    id: "20260501-002",
+    id: "20260501-1247",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修復 virt_wifi 設備的 Use-After-Free 漏洞，避免網路設備註銷時的記憶體操作錯誤",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-05-01"] = [
     ]
   },
   {
-    id: "20260501-003",
+    id: "20260501-1248",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修補：rxrpc 鍵解析路徑的票證長度驗證缺失，防止未授權用戶利用。",
@@ -44,7 +44,7 @@ window.TRACKER_DAYS["2026-05-01"] = [
     ]
   },
   {
-    id: "20260501-004",
+    id: "20260501-1249",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心漏洞：crypto: ccp 驅動程式在處理 CPU ID 資訊時存在緩衝區溢出與資料洩漏風險",
@@ -58,7 +58,7 @@ window.TRACKER_DAYS["2026-05-01"] = [
     ]
   },
   {
-    id: "20260501-005",
+    id: "20260501-1250",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心漏洞揭露：CCP 驅動程式在處理 PDH 憑證時可能發生緩衝區溢出與資料洩露",
@@ -72,7 +72,7 @@ window.TRACKER_DAYS["2026-05-01"] = [
     ]
   },
   {
-    id: "20260501-006",
+    id: "20260501-1251",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心漏洞：ccp 驅動程式在處理 PEK CSR 時可能導致緩衝區溢出與資料洩漏",
@@ -86,7 +86,7 @@ window.TRACKER_DAYS["2026-05-01"] = [
     ]
   },
   {
-    id: "20260501-007",
+    id: "20260501-1252",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修補 TOCTOU 競態條件：tpacket_snd() 處理 mmap 共享記憶體時的 vnet_hdr 漏洞",
@@ -100,7 +100,7 @@ window.TRACKER_DAYS["2026-05-01"] = [
     ]
   },
   {
-    id: "20260501-008",
+    id: "20260501-1253",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心 ALSA 驅動程式：caiaq 處理 USB 設備參考計數錯誤，可能導致使用已釋放的設備指標",
@@ -114,7 +114,7 @@ window.TRACKER_DAYS["2026-05-01"] = [
     ]
   },
   {
-    id: "20260501-009",
+    id: "20260501-1254",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux f2fs 文件系統修復 Use-After-Free 漏洞：修復 f2fs_compress_write_end_io() 競態條件",
@@ -128,7 +128,7 @@ window.TRACKER_DAYS["2026-05-01"] = [
     ]
   },
   {
-    id: "20260501-010",
+    id: "20260501-1255",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修復 Use-After-Free 漏洞：inode_switch_wbs_work_fn() 處理邏輯修正",
@@ -142,7 +142,7 @@ window.TRACKER_DAYS["2026-05-01"] = [
     ]
   },
   {
-    id: "20260501-011",
+    id: "20260501-1256",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心 ksmbd 漏洞 (CVE-2026-31704)：防止 POSIX/NTACL 權限列表大小溢位導致的緩衝區覆寫",
@@ -156,7 +156,7 @@ window.TRACKER_DAYS["2026-05-01"] = [
     ]
   },
   {
-    id: "20260501-012",
+    id: "20260501-1257",
     trackers: ["os", "security"],
     category: "Linux",
     title: "ksmbd 服務修復：Linux 核心 smb2_get_ea() 函數的越界寫入漏洞",
@@ -170,7 +170,7 @@ window.TRACKER_DAYS["2026-05-01"] = [
     ]
   },
   {
-    id: "20260501-013",
+    id: "20260501-1258",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux ksmbd 核心漏洞：透過偽造 NTACL 屬性觸發堆分配溢位與服務拒絕",
@@ -184,7 +184,7 @@ window.TRACKER_DAYS["2026-05-01"] = [
     ]
   },
   {
-    id: "20260501-014",
+    id: "20260501-1259",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux ksmbd 服務修復整數溢位漏洞：防止攻擊者控制的響應大小繞過訊息長度檢查",
@@ -198,7 +198,7 @@ window.TRACKER_DAYS["2026-05-01"] = [
     ]
   },
   {
-    id: "20260501-015",
+    id: "20260501-1260",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心 smb2_ioctl_query_info 存在 OOB 讀取漏洞，可能導致核心堆記憶體洩露",
@@ -212,7 +212,7 @@ window.TRACKER_DAYS["2026-05-01"] = [
     ]
   },
   {
-    id: "20260501-016",
+    id: "20260501-1261",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修補：修復 SMB 客戶端在處理 DACL 時的結構性緩衝區溢出漏洞",
@@ -226,7 +226,7 @@ window.TRACKER_DAYS["2026-05-01"] = [
     ]
   },
   {
-    id: "20260501-017",
+    id: "20260501-1262",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修補 CVE-2026-31710：修復 SMB1 UNIX 掛載的目錄分隔符錯誤",
@@ -240,7 +240,7 @@ window.TRACKER_DAYS["2026-05-01"] = [
     ]
   },
   {
-    id: "20260501-018",
+    id: "20260501-1263",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux SMB 服務修復 active_num_conn 記憶體洩漏，防止遠端攻擊者耗盡連線資源",
@@ -254,7 +254,7 @@ window.TRACKER_DAYS["2026-05-01"] = [
     ]
   },
   {
-    id: "20260501-019",
+    id: "20260501-1264",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux ksmbd 核心漏洞 (CVE-2026-31712)：透過惡意 DACL 觸發越界讀取",
@@ -268,7 +268,7 @@ window.TRACKER_DAYS["2026-05-01"] = [
     ]
   },
   {
-    id: "20260501-020",
+    id: "20260501-1265",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心 FUSE 漏洞 CVE-2026-31713：同步初始化期間服務器崩潰導致掛載掛起",
@@ -282,7 +282,7 @@ window.TRACKER_DAYS["2026-05-01"] = [
     ]
   },
   {
-    id: "20260501-021",
+    id: "20260501-1266",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux f2fs 文件系統修復記憶體洩漏：修復 f2fs_rename() 函數中的資源釋放問題",
@@ -296,7 +296,7 @@ window.TRACKER_DAYS["2026-05-01"] = [
     ]
   },
   {
-    id: "20260501-022",
+    id: "20260501-1267",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux f2fs 文件系統修補 UAF 漏洞：修復寫入完成時的空指針解引用問題",
@@ -310,7 +310,7 @@ window.TRACKER_DAYS["2026-05-01"] = [
     ]
   },
   {
-    id: "20260501-023",
+    id: "20260501-1268",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux NTFS-3 文件系統核心漏洞 (CVE-2026-31716)：Journal 重放時的記憶體溢出風險",
@@ -324,7 +324,7 @@ window.TRACKER_DAYS["2026-05-01"] = [
     ]
   },
   {
-    id: "20260501-024",
+    id: "20260501-1269",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心 ksmbd 漏洞修復：未經授權用戶可劫持持久化句柄",
@@ -338,7 +338,7 @@ window.TRACKER_DAYS["2026-05-01"] = [
     ]
   },
   {
-    id: "20260501-025",
+    id: "20260501-1270",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux ksmbd 核心修復：解決 durable scavenger 導致的 use-after-free 漏洞",
@@ -352,7 +352,7 @@ window.TRACKER_DAYS["2026-05-01"] = [
     ]
   },
   {
-    id: "20260501-026",
+    id: "20260501-1271",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修補：修復 krb5enc 異步解密時跳過雜湊驗證的漏洞",
@@ -366,7 +366,7 @@ window.TRACKER_DAYS["2026-05-01"] = [
     ]
   },
   {
-    id: "20260501-027",
+    id: "20260501-1272",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心 USB 設備漏洞 CVE-2026-31720：堆疊溢出寫入風險",
@@ -380,7 +380,7 @@ window.TRACKER_DAYS["2026-05-01"] = [
     ]
   },
   {
-    id: "20260501-028",
+    id: "20260501-1273",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修復 USB HID Gadget 漏洞：修正 `bind` 函數的資源初始化時機",
@@ -394,7 +394,7 @@ window.TRACKER_DAYS["2026-05-01"] = [
     ]
   },
   {
-    id: "20260501-029",
+    id: "20260501-1274",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修補：修復 USB Gadget 設備網路介面生命週期管理漏洞",
@@ -408,7 +408,7 @@ window.TRACKER_DAYS["2026-05-01"] = [
     ]
   },
   {
-    id: "20260501-030",
+    id: "20260501-1275",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修補：修復 USB Gadget 設備網路介面生命週期管理漏洞",

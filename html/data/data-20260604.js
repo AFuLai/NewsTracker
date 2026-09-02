@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-06-04"] = [
   {
-    id: "20260604-001",
+    id: "20260604-462",
     trackers: ["security"],
     category: "重大事件",
     title: "美國司法部發動跨國行動：聯手科技巨頭瓦解東南亞網路加密貨幣詐騙集團",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-06-04"] = [
     ]
   },
   {
-    id: "20260604-002",
+    id: "20260604-484",
     trackers: ["security"],
     category: "重大事件",
     title: "Symantec/Carbon Black揭露：駭客鎖定證交所高階主管郵件帳號，持續竊取商業機密資料",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-06-04"] = [
     ]
   },
   {
-    id: "20260604-003",
+    id: "20260604-1091",
     trackers: ["os"],
     category: "Linux",
     title: "Ubuntu Core 26 應用：利用 Snap 部署 AI 模型至 Renesas RZ/V 邊緣設備",
@@ -44,7 +44,7 @@ window.TRACKER_DAYS["2026-06-04"] = [
     ]
   },
   {
-    id: "20260604-004",
+    id: "20260604-383",
     trackers: ["security"],
     category: "法規與標準",
     title: "微軟預告 Entra ID SSPR 流程重大調整：2026年起需正式註冊驗證方法",
@@ -58,7 +58,7 @@ window.TRACKER_DAYS["2026-06-04"] = [
     ]
   },
   {
-    id: "20260604-005",
+    id: "20260604-467",
     trackers: ["security"],
     category: "法規與標準",
     title: "Bugcrowd推出歐盟資料駐留選項，應對日益複雜的資料主權與法規要求",
@@ -72,7 +72,7 @@ window.TRACKER_DAYS["2026-06-04"] = [
     ]
   },
   {
-    id: "20260604-006",
+    id: "20260604-1131",
     trackers: ["os", "security"],
     category: "Windows",
     title: "SQLite sqldiff.exe 存在命令列參數處理漏洞 (CVE-2025-71316)",
@@ -86,7 +86,7 @@ window.TRACKER_DAYS["2026-06-04"] = [
     ]
   },
   {
-    id: "20260604-007",
+    id: "20260604-321",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "巴基斯坦APT組織「SideCopy」針對阿富汗財政部進行網路間諜活動，利用Xeno RAT竊取資料",
@@ -100,7 +100,7 @@ window.TRACKER_DAYS["2026-06-04"] = [
     ]
   },
   {
-    id: "20260604-008",
+    id: "20260604-375",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "WordPress外掛Kirki曝未經身分驗證權限提升漏洞CVE-2026-8206，遭駭可接管管理員帳號",
@@ -114,7 +114,7 @@ window.TRACKER_DAYS["2026-06-04"] = [
     ]
   },
   {
-    id: "20260604-009",
+    id: "20260604-377",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "CISA警告：舊版Linux核心權限提升漏洞CVE-2022-0492持續遭利用，要求聯邦機構緊急修補",
@@ -128,7 +128,7 @@ window.TRACKER_DAYS["2026-06-04"] = [
     ]
   },
   {
-    id: "20260604-010",
+    id: "20260604-378",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "TXOne Networks發布2026年OT資安報告：歐洲工業系統老舊漏洞風險持續攀升",
@@ -142,7 +142,7 @@ window.TRACKER_DAYS["2026-06-04"] = [
     ]
   },
   {
-    id: "20260604-011",
+    id: "20260604-379",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Magento快取外掛程式曝重大漏洞 CVE-2026-45247，CISA警告已遭積極利用",
@@ -156,7 +156,7 @@ window.TRACKER_DAYS["2026-06-04"] = [
     ]
   },
   {
-    id: "20260604-012",
+    id: "20260604-380",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Google 6月Android 安全更新修補權限提升漏洞 CVE-2025-48595，CISA 確認遭積極利用",
@@ -170,7 +170,7 @@ window.TRACKER_DAYS["2026-06-04"] = [
     ]
   },
   {
-    id: "20260604-013",
+    id: "20260604-381",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "研究揭露HTTP/2 Bomb DoS攻擊：利用HPACK與流量控制窗口耗盡記憶體",
@@ -184,7 +184,7 @@ window.TRACKER_DAYS["2026-06-04"] = [
     ]
   },
   {
-    id: "20260604-014",
+    id: "20260604-454",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Cisco Unified CM 發現檔案寫入漏洞，PoC 公開，可透過 WebDialer 服務提升至 Root",
@@ -198,7 +198,7 @@ window.TRACKER_DAYS["2026-06-04"] = [
     ]
   },
   {
-    id: "20260604-015",
+    id: "20260604-457",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "思科UCM存在SSRF高風險漏洞：未經認證攻擊者可遠端寫入系統檔案",
@@ -212,7 +212,7 @@ window.TRACKER_DAYS["2026-06-04"] = [
     ]
   },
   {
-    id: "20260604-016",
+    id: "20260604-458",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "中國資安犯罪集團 TA4922 擴大攻擊範圍，以釣魚與 DLL 側載方式鎖定歐洲與亞洲企業",
@@ -226,7 +226,7 @@ window.TRACKER_DAYS["2026-06-04"] = [
     ]
   },
   {
-    id: "20260604-017",
+    id: "20260604-459",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "macOS惡意廣告活動「Operation FlutterBridge」傳播後門 FlutterShell，利用WebView架構進行動態攻擊",
@@ -240,7 +240,7 @@ window.TRACKER_DAYS["2026-06-04"] = [
     ]
   },
   {
-    id: "20260604-018",
+    id: "20260604-461",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "資安警示：駭客長期滲透全球證交所高階主管信箱，竊取市場機密資訊",
@@ -254,7 +254,7 @@ window.TRACKER_DAYS["2026-06-04"] = [
     ]
   },
   {
-    id: "20260604-019",
+    id: "20260604-465",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "中國網路犯罪集團 TA4922 擴大攻擊範圍，利用全球化釣魚郵件與多樣化惡意工具進行攻擊",
@@ -268,7 +268,7 @@ window.TRACKER_DAYS["2026-06-04"] = [
     ]
   },
   {
-    id: "20260604-020",
+    id: "20260604-468",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "NAVTOR NavBox 存在硬編碼憑證漏洞，本地攻擊者可透過 SOAP 介面取得權限",
@@ -282,7 +282,7 @@ window.TRACKER_DAYS["2026-06-04"] = [
     ]
   },
   {
-    id: "20260604-021",
+    id: "20260604-469",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "日立能源 MACH HiDraw 存在堆疊溢出漏洞：CVE-2026-7310 影響關鍵基礎設施",
@@ -296,7 +296,7 @@ window.TRACKER_DAYS["2026-06-04"] = [
     ]
   },
   {
-    id: "20260604-022",
+    id: "20260604-470",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "警告：日立能源 RTU500 韌體面臨多重漏洞，影響電力、水務等關鍵基礎設施",
@@ -310,7 +310,7 @@ window.TRACKER_DAYS["2026-06-04"] = [
     ]
   },
   {
-    id: "20260604-023",
+    id: "20260604-471",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "B&R PPT30作業系統面臨資源分配漏洞 (CVE-2025-11482)，可能導致OPC-UA服務無法使用",
@@ -324,7 +324,7 @@ window.TRACKER_DAYS["2026-06-04"] = [
     ]
   },
   {
-    id: "20260604-024",
+    id: "20260604-472",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "日立能源 (Hitachi Energy) ITT600 Explorer 產品面臨兩處漏洞，可能導致服務拒絕攻擊",
@@ -338,7 +338,7 @@ window.TRACKER_DAYS["2026-06-04"] = [
     ]
   },
   {
-    id: "20260604-025",
+    id: "20260604-473",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "AI驅動漏洞激增時代：Red Hat分析Copy Fail等漏洞，強調人工技術評估的重要性",
@@ -352,7 +352,7 @@ window.TRACKER_DAYS["2026-06-04"] = [
     ]
   },
   {
-    id: "20260604-026",
+    id: "20260604-474",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Ubuntu發布多個Linux核心安全更新：修復多項提升權限與資訊洩露的CVE漏洞",
@@ -366,7 +366,7 @@ window.TRACKER_DAYS["2026-06-04"] = [
     ]
   },
   {
-    id: "20260604-027",
+    id: "20260604-475",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Ubuntu 發布 USN-8361-2：修補 Linux 核心 FIPS 模組的網路套接字漏洞",
@@ -380,7 +380,7 @@ window.TRACKER_DAYS["2026-06-04"] = [
     ]
   },
   {
-    id: "20260604-028",
+    id: "20260604-476",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Ubuntu 提醒：Linux 核心多個漏洞曝光，包含 Copy Fail 與 Dirty Frag，本地攻擊者可提升權限或逃逸容器",
@@ -394,7 +394,7 @@ window.TRACKER_DAYS["2026-06-04"] = [
     ]
   },
   {
-    id: "20260604-029",
+    id: "20260604-477",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Linux 核心多項漏洞曝光：從加密操作到Dirty Frag，本地攻擊者可提升權限或逃逸容器",
@@ -408,7 +408,7 @@ window.TRACKER_DAYS["2026-06-04"] = [
     ]
   },
   {
-    id: "20260604-030",
+    id: "20260604-478",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Linux 核心發現 Dirty Frag 邏輯缺陷：本地攻擊者可利用提升權限或逃逸容器",
@@ -422,7 +422,7 @@ window.TRACKER_DAYS["2026-06-04"] = [
     ]
   },
   {
-    id: "20260604-031",
+    id: "20260604-479",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Ubuntu修補Linux核心Dirty Frag漏洞：本地攻擊者可提升權限或逃逸容器 (CVE-2026-43284, CVE-2026-43500)",
@@ -436,7 +436,7 @@ window.TRACKER_DAYS["2026-06-04"] = [
     ]
   },
   {
-    id: "20260604-032",
+    id: "20260604-480",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Ubuntu發布核心更新：修補多個Linux核心邏輯漏洞，包含Dirty Frag、Fragnesia及提升權限風險",
@@ -450,7 +450,7 @@ window.TRACKER_DAYS["2026-06-04"] = [
     ]
   },
   {
-    id: "20260604-033",
+    id: "20260604-481",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Nano 編輯器存在兩項漏洞：權限配置錯誤與狀態列處理缺陷，可能導致資訊洩露或服務拒絕",
@@ -464,7 +464,7 @@ window.TRACKER_DAYS["2026-06-04"] = [
     ]
   },
   {
-    id: "20260604-034",
+    id: "20260604-482",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Robocode 發現多個安全漏洞：包含路徑驗證、臨時檔案處理及整數溢位風險",
@@ -478,7 +478,7 @@ window.TRACKER_DAYS["2026-06-04"] = [
     ]
   },
   {
-    id: "20260604-035",
+    id: "20260604-487",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "McAfee揭露Minecraft惡意軟體WeedHack：低門檻攻擊模式，竊取帳密及進行網路騷擾",
@@ -492,7 +492,7 @@ window.TRACKER_DAYS["2026-06-04"] = [
     ]
   },
   {
-    id: "20260604-036",
+    id: "20260604-488",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "HTTP/2 Bomb攻擊手法曝光：研究人員串聯HPACK與Slowloris，影響主流網頁伺服器",
@@ -506,7 +506,7 @@ window.TRACKER_DAYS["2026-06-04"] = [
     ]
   },
   {
-    id: "20260604-037",
+    id: "20260604-374",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "McAfee揭露「惡意軟體租用服務」WeedHack：專攻Minecraft玩家，竊取帳密與加密貨幣資產",
@@ -520,7 +520,7 @@ window.TRACKER_DAYS["2026-06-04"] = [
     ]
   },
   {
-    id: "20260604-038",
+    id: "20260604-376",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "駭客濫用Steam社群留言區植入惡意軟體，透過WordPress網站進行C2通訊與後門建立",
@@ -534,7 +534,7 @@ window.TRACKER_DAYS["2026-06-04"] = [
     ]
   },
   {
-    id: "20260604-039",
+    id: "20260604-455",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "研究人員揭露 Anthropic Claude Code GitHub Action 漏洞：透過開源議題可劫持受影響儲存庫",
@@ -548,7 +548,7 @@ window.TRACKER_DAYS["2026-06-04"] = [
     ]
   },
   {
-    id: "20260604-040",
+    id: "20260604-460",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "駭客利用假冒開源工具網站，透過流量分發系統（TDS）傳遞 Remus Stealer 等惡意程式",
@@ -562,7 +562,7 @@ window.TRACKER_DAYS["2026-06-04"] = [
     ]
   },
   {
-    id: "20260604-041",
+    id: "20260604-464",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "Rust編寫的 IronWorm 惡意程式攻擊 NPM 供應鏈：竊取開發者憑證並擴散",
@@ -576,7 +576,7 @@ window.TRACKER_DAYS["2026-06-04"] = [
     ]
   },
   {
-    id: "20260604-042",
+    id: "20260604-485",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "Tenable揭露NPM套件操弄手法：下載量與版本歷史可能被惡意攻擊者人為推升",
@@ -590,7 +590,7 @@ window.TRACKER_DAYS["2026-06-04"] = [
     ]
   },
   {
-    id: "20260604-043",
+    id: "20260604-382",
     trackers: ["security"],
     category: "前瞻技術",
     title: "Google Workspace強化「網域外檔案警示」功能，擴大支援行動裝置與郵件通知，提升資料外洩防護",
@@ -604,7 +604,7 @@ window.TRACKER_DAYS["2026-06-04"] = [
     ]
   },
   {
-    id: "20260604-044",
+    id: "20260604-456",
     trackers: ["security"],
     category: "前瞻技術",
     title: "前沿代理式AI帶來的防禦挑戰：安全架構與資料治理成關鍵",
@@ -618,7 +618,7 @@ window.TRACKER_DAYS["2026-06-04"] = [
     ]
   },
   {
-    id: "20260604-045",
+    id: "20260604-466",
     trackers: ["security"],
     category: "前瞻技術",
     title: "Gartner警告四類關鍵威脅：深偽、供應鏈、提示注入與AI應用，企業防禦力落後",
@@ -632,7 +632,7 @@ window.TRACKER_DAYS["2026-06-04"] = [
     ]
   },
   {
-    id: "20260604-046",
+    id: "20260604-483",
     trackers: ["security"],
     category: "前瞻技術",
     title: "微軟更新 Agentic AI 失敗模式分類法 v2.0：揭示新興的供應鏈、目標劫持與視覺攻擊風險",
@@ -646,7 +646,7 @@ window.TRACKER_DAYS["2026-06-04"] = [
     ]
   },
   {
-    id: "20260604-047",
+    id: "20260604-486",
     trackers: ["security"],
     category: "前瞻技術",
     title: "信驊科技發表搭載Caliptra 2.x、支援PQC的下一代伺服器管理晶片，深化硬體信任根安全",
@@ -660,7 +660,7 @@ window.TRACKER_DAYS["2026-06-04"] = [
     ]
   },
   {
-    id: "20260604-048",
+    id: "20260604-489",
     trackers: ["security"],
     category: "前瞻技術",
     title: "Let's Encrypt規劃導入MTC，以應對Web PKI後量子身分驗證挑戰",
@@ -674,7 +674,7 @@ window.TRACKER_DAYS["2026-06-04"] = [
     ]
   },
   {
-    id: "20260604-049",
+    id: "20260604-490",
     trackers: ["security"],
     category: "前瞻技術",
     title: "趨勢科技揭露：攻擊者利用越獄Gemini AI與社群頻道進行大規模自動化詐欺與帳號入侵",
@@ -688,7 +688,7 @@ window.TRACKER_DAYS["2026-06-04"] = [
     ]
   },
   {
-    id: "20260604-050",
+    id: "20260604-451",
     trackers: ["security"],
     category: "uncategorized",
     title: "Palo Alto Networks GlobalProtect 門戶端及 Prisma Access 遭重大漏洞攻擊，可繞過驗證建立未授權 VPN 連線",

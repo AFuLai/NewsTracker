@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-05-19"] = [
   {
-    id: "20260519-001",
+    id: "20260519-1108",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心漏洞 CVE-2026-43491：qrtr 服務缺乏邊界檢查導致記憶體耗盡風險",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-05-19"] = [
     ]
   },
   {
-    id: "20260519-002",
+    id: "20260519-1109",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修復 mpi_read_raw_from_sgl() 潛在整數下溢漏洞，防止服務拒絕 (DoS)",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-05-19"] = [
     ]
   },
   {
-    id: "20260519-003",
+    id: "20260519-1110",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修補 CVE-2026-43493：修復 pcrypt 處理 MAY_BACKLOG 請求的漏洞",
@@ -44,7 +44,7 @@ window.TRACKER_DAYS["2026-05-19"] = [
     ]
   },
   {
-    id: "20260519-004",
+    id: "20260519-915",
     trackers: ["os", "security"],
     category: "Android",
     title: "Google I/O 宣布 Android CLI 穩定版與 AI Studio 整合，強化 AI Agent 驅動的開發流程",
@@ -58,7 +58,7 @@ window.TRACKER_DAYS["2026-05-19"] = [
     ]
   },
   {
-    id: "20260519-005",
+    id: "20260519-916",
     trackers: ["os", "security"],
     category: "Android",
     title: "Google AI Studio 革命性升級：實現從提示到原生 Android 應用程式的端到端開發",
@@ -72,7 +72,7 @@ window.TRACKER_DAYS["2026-05-19"] = [
     ]
   },
   {
-    id: "20260519-006",
+    id: "20260519-917",
     trackers: ["os", "security"],
     category: "Android",
     title: "Google TV 平台升級：透過 Gemini 強化內容發現，並要求開發者支援指點式遙控器輸入",
@@ -86,7 +86,7 @@ window.TRACKER_DAYS["2026-05-19"] = [
     ]
   },
   {
-    id: "20260519-007",
+    id: "20260519-918",
     trackers: ["os", "security"],
     category: "Android",
     title: "Android CLI 穩定版 1.0 發布，強化 AI Agent 開發能力，提升 Android 專案開發效率",
@@ -100,7 +100,7 @@ window.TRACKER_DAYS["2026-05-19"] = [
     ]
   },
   {
-    id: "20260519-008",
+    id: "20260519-919",
     trackers: ["os", "security"],
     category: "Android",
     title: "Google 啟動 Android XR Developer Catalyst 計劃，加速智慧眼鏡與擴增實境應用開發",
@@ -114,7 +114,7 @@ window.TRACKER_DAYS["2026-05-19"] = [
     ]
   },
   {
-    id: "20260519-009",
+    id: "20260519-920",
     trackers: ["os", "security"],
     category: "Android",
     title: "Android 17 推進適應式開發生態：強制大型螢幕支援，提升多裝置應用體驗",
@@ -128,7 +128,7 @@ window.TRACKER_DAYS["2026-05-19"] = [
     ]
   },
   {
-    id: "20260519-010",
+    id: "20260519-921",
     trackers: ["os", "security"],
     category: "Android",
     title: "Android XR SDK Developer Preview 4 發布：強化擴增實境開發，支援音訊與顯示眼鏡",
@@ -142,7 +142,7 @@ window.TRACKER_DAYS["2026-05-19"] = [
     ]
   },
   {
-    id: "20260519-011",
+    id: "20260519-923",
     trackers: ["os", "security"],
     category: "Android",
     title: "Google發布 Android Performance Analyzer (APA)，提供深度系統與繪圖性能分析工具",
@@ -156,7 +156,7 @@ window.TRACKER_DAYS["2026-05-19"] = [
     ]
   },
   {
-    id: "20260519-012",
+    id: "20260519-924",
     trackers: ["os", "security"],
     category: "Android",
     title: "Android Studio 引入 Agent Skills 提升開發效率：AI 輔助開發邁向「代理式」應用建構",
@@ -170,7 +170,7 @@ window.TRACKER_DAYS["2026-05-19"] = [
     ]
   },
   {
-    id: "20260519-013",
+    id: "20260519-925",
     trackers: ["os", "security"],
     category: "Android",
     title: "Google 宣布 Android UI 開發標準轉向 Compose First，View 組件進入維護模式",
@@ -184,7 +184,7 @@ window.TRACKER_DAYS["2026-05-19"] = [
     ]
   },
   {
-    id: "20260519-014",
+    id: "20260519-926",
     trackers: ["os", "security"],
     category: "Android",
     title: "Google 發布 Android for Cars 更新：提升車載娛樂系統的開發彈性與體驗",
@@ -198,7 +198,7 @@ window.TRACKER_DAYS["2026-05-19"] = [
     ]
   },
   {
-    id: "20260519-015",
+    id: "20260519-927",
     trackers: ["os", "security"],
     category: "Android",
     title: "Google I/O 2026 重磅發布：擴展 Android 生態系，透過 Gemini 與 Play Shorts 提升應用程式曝光與用戶互動",
@@ -212,7 +212,7 @@ window.TRACKER_DAYS["2026-05-19"] = [
     ]
   },
   {
-    id: "20260519-016",
+    id: "20260519-928",
     trackers: ["os", "security"],
     category: "Android",
     title: "Wear OS 7 重磅登場：提升電池效率、整合 Gemini AI，並推出動態 Widget 與 Live Updates",
@@ -226,7 +226,7 @@ window.TRACKER_DAYS["2026-05-19"] = [
     ]
   },
   {
-    id: "20260519-017",
+    id: "20260519-922",
     trackers: ["os", "security"],
     category: "重點關注",
     title: "Android XR開發進展：Google推出Engine Hub，支援Unreal Engine與Godot，加速跨平台開發流程",

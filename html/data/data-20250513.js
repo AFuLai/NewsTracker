@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2025-05-13"] = [
   {
-    id: "20250513-001",
+    id: "20250513-198",
     trackers: ["eu_cra"],
     category: "合規指引",
     title: "ENISA發布多項指引：涵蓋網路安全危機管理、NIS2、SME韌性及SBOM等，協助企業應對歐盟法規",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2025-05-13"] = [
     ]
   },
   {
-    id: "20250513-002",
+    id: "20250513-206",
     trackers: ["eu_cra"],
     category: "合規指引",
     title: "ENISA 發布多項指引，協助中小企業提升網路韌性與應對《網路韌性法案》",

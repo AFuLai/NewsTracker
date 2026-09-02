@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-04-30"] = [
   {
-    id: "20260430-001",
+    id: "20260430-116",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "巴西ISP遭DDoS攻擊：Huge Networks CEO私鑰外洩，駭客利用Mirai變種與CVE-2023-1389建構Botnet",

@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-07-11"] = [
   {
-    id: "20260711-001",
+    id: "20260711-3824",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Debian 發布 DSA-6387：修補 OpenSSH 服務中的密碼傳輸漏洞",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-07-11"] = [
     ]
   },
   {
-    id: "20260711-002",
+    id: "20260711-3844",
     trackers: ["os"],
     category: "Linux",
     title: "Debian 13.6 最新版本發布：包含核心安全修補、Nginx/Redis 等多個套件更新，並回溯 GeoIP 資料庫",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-07-11"] = [
     ]
   },
   {
-    id: "20260711-003",
+    id: "20260711-3845",
     trackers: ["os"],
     category: "Linux",
     title: "Linux 核心修復多顯示卡系統的 VGA 顯示回退邏輯，改善啟動時主顯示設備選擇",
@@ -44,7 +44,7 @@ window.TRACKER_DAYS["2026-07-11"] = [
     ]
   },
   {
-    id: "20260711-004",
+    id: "20260711-3847",
     trackers: ["os"],
     category: "Linux",
     title: "KDE Plasma 6.8 桌面環境更新：Spectacle 支援螢幕錄影音訊、系統監控新增 vRAM 監測",
@@ -58,7 +58,7 @@ window.TRACKER_DAYS["2026-07-11"] = [
     ]
   },
   {
-    id: "20260711-005",
+    id: "20260711-3849",
     trackers: ["os"],
     category: "Linux",
     title: "System76 Pop!_OS 24.04 推出「磨砂玻璃」桌面風格，提升使用者介面美觀度",
@@ -72,7 +72,7 @@ window.TRACKER_DAYS["2026-07-11"] = [
     ]
   },
   {
-    id: "20260711-006",
+    id: "20260711-3601",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "CISA更新KEV清單：Joomla! iCagenda與Balbooa Forms兩外掛漏洞遭積極利用，恐致遠端程式碼執行",
@@ -86,7 +86,7 @@ window.TRACKER_DAYS["2026-07-11"] = [
     ]
   },
   {
-    id: "20260711-007",
+    id: "20260711-3638",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "研究揭露中國與印度資助的網路間諜活動：巴洛奇斯坦警方系統遭植入惡意程式",
@@ -100,7 +100,7 @@ window.TRACKER_DAYS["2026-07-11"] = [
     ]
   },
   {
-    id: "20260711-008",
+    id: "20260711-3639",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Zimbra 警告：經典網頁客戶端存在嚴重儲存型 XSS 漏洞，可能導致任意程式碼執行",
@@ -114,7 +114,7 @@ window.TRACKER_DAYS["2026-07-11"] = [
     ]
   },
   {
-    id: "20260711-009",
+    id: "20260711-3676",
     trackers: ["os", "security"],
     category: "漏洞與威脅情報",
     title: "Linux 核心 LPE 漏洞 Januscape (CVE-2026-53359) 曝光，影響 KVM 虛擬化環境",
@@ -128,7 +128,7 @@ window.TRACKER_DAYS["2026-07-11"] = [
     ]
   },
   {
-    id: "20260711-010",
+    id: "20260711-3685",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "澳洲資安中心警告：全球CMS平台面臨大規模漏洞利用，多個插件與主題遭鎖定",
@@ -142,7 +142,7 @@ window.TRACKER_DAYS["2026-07-11"] = [
     ]
   },
   {
-    id: "20260711-011",
+    id: "20260711-3736",
     trackers: ["os"],
     category: "Apple",
     title: "iPadOS 27 介面更新：用戶回顧指出多工處理功能仍缺乏簡潔性",
@@ -156,7 +156,7 @@ window.TRACKER_DAYS["2026-07-11"] = [
     ]
   },
   {
-    id: "20260711-012",
+    id: "20260711-3637",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "jscrambler npm 套件遭入侵：8.14.0 版本植入資訊竊取程式，目標鎖定開發者機密",
@@ -170,7 +170,7 @@ window.TRACKER_DAYS["2026-07-11"] = [
     ]
   },
   {
-    id: "20260711-013",
+    id: "20260711-3737",
     trackers: ["os"],
     category: "重點關注",
     title: "【App推薦】Route 25：結合社交功能的全方位寶可夢集卡收藏應用程式",
@@ -184,7 +184,7 @@ window.TRACKER_DAYS["2026-07-11"] = [
     ]
   },
   {
-    id: "20260711-014",
+    id: "20260711-3740",
     trackers: ["os"],
     category: "重點關注",
     title: "M1 MacBook Air 改變蘋果筆電生命週期觀念，延長使用壽命的蘋果設備",
@@ -198,7 +198,7 @@ window.TRACKER_DAYS["2026-07-11"] = [
     ]
   },
   {
-    id: "20260711-015",
+    id: "20260711-3741",
     trackers: ["os"],
     category: "重點關注",
     title: "蘋果與英特爾潛在合作：揭秘蘋果去年免除半導體關稅的關鍵交易",
@@ -212,7 +212,7 @@ window.TRACKER_DAYS["2026-07-11"] = [
     ]
   },
   {
-    id: "20260711-016",
+    id: "20260711-3846",
     trackers: ["os"],
     category: "重點關注",
     title: "LLVM 整合 x86 LFI 目標：提升編譯器級別的程序內沙盒安全機制",
@@ -226,7 +226,7 @@ window.TRACKER_DAYS["2026-07-11"] = [
     ]
   },
   {
-    id: "20260711-017",
+    id: "20260711-3848",
     trackers: ["os"],
     category: "重點關注",
     title: "Mesa 核心更新：Panfrost 驅動程式現預設支援 Rusticl，優化 Arm Mali 繪圖硬體 OpenCL 體驗",
@@ -240,7 +240,7 @@ window.TRACKER_DAYS["2026-07-11"] = [
     ]
   },
   {
-    id: "20260711-018",
+    id: "20260711-3850",
     trackers: ["os"],
     category: "重點關注",
     title: "Wine 11.13 新版本發布：強化輸入指標支援與 X11 鍵盤掃描碼映射",
@@ -254,7 +254,7 @@ window.TRACKER_DAYS["2026-07-11"] = [
     ]
   },
   {
-    id: "20260711-019",
+    id: "20260711-3923",
     trackers: ["os"],
     category: "重點關注",
     title: "StatCounter數據修正：Windows市場佔有率未跌破60%，釐清市場數據誤傳與「未知」設備分類問題",
@@ -268,7 +268,7 @@ window.TRACKER_DAYS["2026-07-11"] = [
     ]
   },
   {
-    id: "20260711-020",
+    id: "20260711-3924",
     trackers: ["os"],
     category: "重點關注",
     title: "Microsoft Edge與Chrome比較面板引發爭議：用戶質疑微軟推廣自家瀏覽器的動機",

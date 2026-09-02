@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-05-12"] = [
   {
-    id: "20260512-001",
+    id: "20260512-447",
     trackers: ["security"],
     category: "重大事件",
     title: "BWH Hotels 遭駭客入侵，超過六個月的預訂資料外洩，影響包含姓名與聯絡資訊",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-05-12"] = [
     ]
   },
   {
-    id: "20260512-002",
+    id: "20260512-653",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "五月修補日：微軟修復 118 個漏洞，包含 Netlogon 堆緩溢出及繞過 Entra ID 的重大漏洞",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-05-12"] = [
     ]
   },
   {
-    id: "20260512-003",
+    id: "20260512-1329",
     trackers: ["os", "security"],
     category: "Android",
     title: "Fortinet FortiTokenAndroid 遭 Improper Export 漏洞攻擊：CVE-2026-44279 影響多版本",

@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2025-03-21"] = [
   {
-    id: "20250321-001",
+    id: "20250321-239",
     trackers: ["eu_cra"],
     category: "調和標準",
     title: "歐洲標準化會議探討資安法規與標準化結合，強調建立更安全的數位歐洲",

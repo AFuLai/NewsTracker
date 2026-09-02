@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-01-12"] = [
   {
-    id: "20260112-001",
+    id: "20260112-197",
     trackers: ["eu_cra"],
     category: "合規指引",
     title: "歐盟網路安全法案（CRA）：重要與關鍵產品的強制第三方符合性評估機制解析",

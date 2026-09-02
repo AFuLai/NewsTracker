@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-07-05"] = [
   {
-    id: "20260705-001",
+    id: "20260705-3137",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Debian 發布 DSA-6381-1：修補 OpenSSH 服務中的憑證驗證漏洞",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-07-05"] = [
     ]
   },
   {
-    id: "20260705-002",
+    id: "20260705-3138",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Debian 發布 DSA-6380-1：修補 OpenSSH 服務中的潛在遠端執行漏洞",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-07-05"] = [
     ]
   },
   {
-    id: "20260705-003",
+    id: "20260705-3139",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Debian 發布 DSA-6379-1：修補 OpenSSH 服務中的資訊洩漏漏洞",
@@ -44,7 +44,7 @@ window.TRACKER_DAYS["2026-07-05"] = [
     ]
   },
   {
-    id: "20260705-004",
+    id: "20260705-3140",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Debian 發布 DSA-6378-1：修補 OpenSSH 服務的潛在遠端執行漏洞",
@@ -58,7 +58,7 @@ window.TRACKER_DAYS["2026-07-05"] = [
     ]
   },
   {
-    id: "20260705-005",
+    id: "20260705-3160",
     trackers: ["os"],
     category: "Linux",
     title: "AMD為Linux 7.3提交圖形驅動程式更新：強化RDNA 3/4硬體支援與程式碼安全",
@@ -72,7 +72,7 @@ window.TRACKER_DAYS["2026-07-05"] = [
     ]
   },
   {
-    id: "20260705-006",
+    id: "20260705-3161",
     trackers: ["os"],
     category: "Linux",
     title: "Intel Nova Lake 筆電預計搭載 IPU8 影像處理單元，Linux 核心正在進行支援整合",
@@ -86,7 +86,7 @@ window.TRACKER_DAYS["2026-07-05"] = [
     ]
   },
   {
-    id: "20260705-007",
+    id: "20260705-3162",
     trackers: ["os"],
     category: "Linux",
     title: "OpenRazer 3.12.4 更新：修復與 Linux 7.2 核心兼容性問題，取代 strncpy API",
@@ -100,7 +100,7 @@ window.TRACKER_DAYS["2026-07-05"] = [
     ]
   },
   {
-    id: "20260705-008",
+    id: "20260705-3241",
     trackers: ["os"],
     category: "Windows",
     title: "微軟宣布 M365 訂閱方案漲價：AI 功能與安全強化成為主要推動成本",
@@ -114,7 +114,7 @@ window.TRACKER_DAYS["2026-07-05"] = [
     ]
   },
   {
-    id: "20260705-009",
+    id: "20260705-2942",
     trackers: ["os", "security"],
     category: "漏洞與威脅情報",
     title: "Linux核心發現Bad Epoll LPE漏洞：競態條件導致無特權提升至Root權限",
@@ -128,7 +128,7 @@ window.TRACKER_DAYS["2026-07-05"] = [
     ]
   },
   {
-    id: "20260705-010",
+    id: "20260705-3053",
     trackers: ["os"],
     category: "Apple",
     title: "分析師預測Apple摺疊機iPhone Ultra發布後供貨極度緊張，可能延遲上市",
@@ -142,7 +142,7 @@ window.TRACKER_DAYS["2026-07-05"] = [
     ]
   },
   {
-    id: "20260705-011",
+    id: "20260705-3014",
     trackers: ["os"],
     category: "重點關注",
     title: "Google 預告下一代智慧家庭顯示器概念，預計將延續 Google Home Speaker 生態系",
@@ -156,7 +156,7 @@ window.TRACKER_DAYS["2026-07-05"] = [
     ]
   },
   {
-    id: "20260705-012",
+    id: "20260705-3054",
     trackers: ["os"],
     category: "重點關注",
     title: "美國250週年紀念時間膠囊內容：預測iPhone 17 Pro Max在2276年是否仍能運作",
@@ -170,7 +170,7 @@ window.TRACKER_DAYS["2026-07-05"] = [
     ]
   },
   {
-    id: "20260705-013",
+    id: "20260705-3158",
     trackers: ["os"],
     category: "重點關注",
     title: "DXVK 3.0.1 發布：修復 Direct3D 渲染錯誤與穩定性問題，提升 Linux 遊戲兼容性",
@@ -184,7 +184,7 @@ window.TRACKER_DAYS["2026-07-05"] = [
     ]
   },
   {
-    id: "20260705-014",
+    id: "20260705-3159",
     trackers: ["os"],
     category: "重點關注",
     title: "ReactOS「開源Windows」平台成功運行《半衰期2》，邁向現代Windows系統相容性",
@@ -198,7 +198,7 @@ window.TRACKER_DAYS["2026-07-05"] = [
     ]
   },
   {
-    id: "20260705-015",
+    id: "20260705-3240",
     trackers: ["os"],
     category: "重點關注",
     title: "Link to Windows Android App 新增「移除 PC」功能，改善用戶體驗與資料清理",

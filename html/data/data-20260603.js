@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-06-03"] = [
   {
-    id: "20260603-001",
+    id: "20260603-327",
     trackers: ["security"],
     category: "重大事件",
     title: "全球證券交易所遭長期電子郵件監控：駭客利用原生Windows工具竊取高階主管信箱資料",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-06-03"] = [
     ]
   },
   {
-    id: "20260603-002",
+    id: "20260603-384",
     trackers: ["security"],
     category: "重大事件",
     title: "微軟揭露 Storm-2949 攻擊鏈：透過社交工程濫用 Azure RBAC 權限竊取雲端祕密",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-06-03"] = [
     ]
   },
   {
-    id: "20260603-003",
+    id: "20260603-386",
     trackers: ["security"],
     category: "重大事件",
     title: "微軟揭露新勒索軟體 The Gentlemen：結合自我擴散與雙重勒索的 RaaS 威脅",
@@ -44,7 +44,7 @@ window.TRACKER_DAYS["2026-06-03"] = [
     ]
   },
   {
-    id: "20260603-004",
+    id: "20260603-411",
     trackers: ["security"],
     category: "重大事件",
     title: "國際執法機構「KRATOS 2」行動：瓦解九個非法串流犯罪集團，大規模打擊盜版內容",
@@ -58,7 +58,7 @@ window.TRACKER_DAYS["2026-06-03"] = [
     ]
   },
   {
-    id: "20260603-005",
+    id: "20260603-985",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Debian 發布 DSA-6321-1：修補 OpenSSH 服務中的潛在認證繞過漏洞",
@@ -72,7 +72,7 @@ window.TRACKER_DAYS["2026-06-03"] = [
     ]
   },
   {
-    id: "20260603-006",
+    id: "20260603-1093",
     trackers: ["os"],
     category: "Linux",
     title: "AMD ROCm AI/ML 函式庫正式整合至 Ubuntu 26.04 LTS，簡化高性能運算部署",
@@ -86,7 +86,7 @@ window.TRACKER_DAYS["2026-06-03"] = [
     ]
   },
   {
-    id: "20260603-007",
+    id: "20260603-324",
     trackers: ["security"],
     category: "法規與標準",
     title: "Gartner警告：網路保險費率雖降，但排除條款擴大，警惕社會工程與國家級攻擊風險",
@@ -100,7 +100,7 @@ window.TRACKER_DAYS["2026-06-03"] = [
     ]
   },
   {
-    id: "20260603-008",
+    id: "20260603-387",
     trackers: ["os", "security"],
     category: "法規與標準",
     title: "iThome 2026 CIO/CISO調查：企業IT預算成長趨緩，AI與雲端轉型成核心焦點",
@@ -114,7 +114,7 @@ window.TRACKER_DAYS["2026-06-03"] = [
     ]
   },
   {
-    id: "20260603-009",
+    id: "20260603-394",
     trackers: ["eu_cra", "security"],
     category: "法規與標準",
     title: "ENISA發布NIS360報告：指出太空、鐵路等部門關鍵性提升，需加強資安防禦",
@@ -128,7 +128,7 @@ window.TRACKER_DAYS["2026-06-03"] = [
     ]
   },
   {
-    id: "20260603-010",
+    id: "20260603-404",
     trackers: ["eu_cra", "security"],
     category: "法規與標準",
     title: "ENISA 發布多項資安指引：涵蓋 CRA 報告、安全更新機制與 NIS2 評估",
@@ -142,7 +142,7 @@ window.TRACKER_DAYS["2026-06-03"] = [
     ]
   },
   {
-    id: "20260603-011",
+    id: "20260603-414",
     trackers: ["security"],
     category: "法規與標準",
     title: "美國財政部宣布制裁伊朗最大加密貨幣交易所 Nobitex，指控其協助恐怖活動與規避制裁",
@@ -156,7 +156,7 @@ window.TRACKER_DAYS["2026-06-03"] = [
     ]
   },
   {
-    id: "20260603-012",
+    id: "20260603-288",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "研究揭露：透過惡意通知劫持 Gemini 語音助理，可遠端控制 Android 設備",
@@ -170,7 +170,7 @@ window.TRACKER_DAYS["2026-06-03"] = [
     ]
   },
   {
-    id: "20260603-013",
+    id: "20260603-289",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "研究揭露：駭客利用 Google DoubleClick 網域進行惡意郵件釣魚，傳遞 DesckVB RAT",
@@ -184,7 +184,7 @@ window.TRACKER_DAYS["2026-06-03"] = [
     ]
   },
   {
-    id: "20260603-014",
+    id: "20260603-291",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Microsoft 365 Android應用程式存在權限漏洞：第三方App可竊取用戶授權Token",
@@ -198,7 +198,7 @@ window.TRACKER_DAYS["2026-06-03"] = [
     ]
   },
   {
-    id: "20260603-015",
+    id: "20260603-292",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "AI工具揭露Redis 7.2.0的嚴重RCE漏洞：CVE-2026-23479，利用Use-After-Free攻擊",
@@ -212,7 +212,7 @@ window.TRACKER_DAYS["2026-06-03"] = [
     ]
   },
   {
-    id: "20260603-016",
+    id: "20260603-295",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "未修補的 Windows 搜尋 URI 處理器漏洞：可透過惡意連結竊取 NTLMv2 雜湊值",
@@ -226,7 +226,7 @@ window.TRACKER_DAYS["2026-06-03"] = [
     ]
   },
   {
-    id: "20260603-017",
+    id: "20260603-296",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "新發現 HTTP/2 Bomb 漏洞：利用 HPACK 標頭壓縮機制造成多數主流網頁伺服器服務拒絕",
@@ -240,7 +240,7 @@ window.TRACKER_DAYS["2026-06-03"] = [
     ]
   },
   {
-    id: "20260603-018",
+    id: "20260603-297",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Weedhack 惡意活動鎖定 Minecraft 玩家：透過 YouTube 進行釣魚，竊取帳密與遠端控制權",
@@ -254,7 +254,7 @@ window.TRACKER_DAYS["2026-06-03"] = [
     ]
   },
   {
-    id: "20260603-019",
+    id: "20260603-322",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "駭客利用 AI 自動化 EDR 規避測試：Sophos 揭露攻擊者建立複雜紅隊實驗室",
@@ -268,7 +268,7 @@ window.TRACKER_DAYS["2026-06-03"] = [
     ]
   },
   {
-    id: "20260603-020",
+    id: "20260603-323",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "中國資安集團在拉丁美洲加劇活動：鎖定政府機構與能源產業情報",
@@ -282,7 +282,7 @@ window.TRACKER_DAYS["2026-06-03"] = [
     ]
   },
   {
-    id: "20260603-021",
+    id: "20260603-325",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "開發失誤曝露多款微軟 365 Android App 帳號，遭惡意應用程式竊取授權憑證",
@@ -296,7 +296,7 @@ window.TRACKER_DAYS["2026-06-03"] = [
     ]
   },
   {
-    id: "20260603-022",
+    id: "20260603-326",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "安全研究揭露：惡意通知可透過「假上下文對齊」欺騙 Google Gemini，執行未授權指令",
@@ -310,7 +310,7 @@ window.TRACKER_DAYS["2026-06-03"] = [
     ]
   },
   {
-    id: "20260603-023",
+    id: "20260603-346",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "CISA新增CVE-2026-45247至已知漏洞目錄，警告網站快取器存在未經信任資料反序列化風險",
@@ -324,7 +324,7 @@ window.TRACKER_DAYS["2026-06-03"] = [
     ]
   },
   {
-    id: "20260603-024",
+    id: "20260603-356",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Ubuntu修補 pip 函式庫：修復 urllib3 處理高壓縮資料時的 DoS 漏洞 (CVE-2025-66471)",
@@ -338,7 +338,7 @@ window.TRACKER_DAYS["2026-06-03"] = [
     ]
   },
   {
-    id: "20260603-025",
+    id: "20260603-357",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Ubuntu發布安全更新：修補多個MySQL漏洞，包含CVE-2026-35240等",
@@ -352,7 +352,7 @@ window.TRACKER_DAYS["2026-06-03"] = [
     ]
   },
   {
-    id: "20260603-026",
+    id: "20260603-358",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Nginx 曝出多項嚴重漏洞：從資訊洩漏到任意程式碼執行，建議立即更新修補程式",
@@ -366,7 +366,7 @@ window.TRACKER_DAYS["2026-06-03"] = [
     ]
   },
   {
-    id: "20260603-027",
+    id: "20260603-359",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "GoBGP 處理惡意 BGP UPDATE 訊息漏洞曝光：多個 CVE 導致服務拒絕風險",
@@ -380,7 +380,7 @@ window.TRACKER_DAYS["2026-06-03"] = [
     ]
   },
   {
-    id: "20260603-028",
+    id: "20260603-385",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Veeam發布13.0.2版：修復高可用性叢集OOM重置及跨平臺還原流程問題",
@@ -394,7 +394,7 @@ window.TRACKER_DAYS["2026-06-03"] = [
     ]
   },
   {
-    id: "20260603-029",
+    id: "20260603-390",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "資安公司揭露俄羅斯駭客團體 GreyVibe：利用 AI 與 LLM 進行多管道網路攻擊",
@@ -408,7 +408,7 @@ window.TRACKER_DAYS["2026-06-03"] = [
     ]
   },
   {
-    id: "20260603-030",
+    id: "20260603-392",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "資安公司揭露新興犯罪組織 DriveSurge：劫持網站發動 FakeUpdates 與 ClickFix 雙重誘餌攻擊",
@@ -422,7 +422,7 @@ window.TRACKER_DAYS["2026-06-03"] = [
     ]
   },
   {
-    id: "20260603-031",
+    id: "20260603-393",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "WithSecure揭露俄羅斯駭客組織GreyVibe：利用生成式AI與LLM攻擊烏克蘭及政府機構",
@@ -436,7 +436,7 @@ window.TRACKER_DAYS["2026-06-03"] = [
     ]
   },
   {
-    id: "20260603-032",
+    id: "20260603-395",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Google Android 6月例行更新修補重大漏洞：CVE-2025-48595 權限提升漏洞影響 Android 14/15/16",
@@ -450,7 +450,7 @@ window.TRACKER_DAYS["2026-06-03"] = [
     ]
   },
   {
-    id: "20260603-033",
+    id: "20260603-398",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Oracle宣布每月發布CSPU，修補77個漏洞，包含CVSS滿分10分的CVE-2026-46840",
@@ -464,7 +464,7 @@ window.TRACKER_DAYS["2026-06-03"] = [
     ]
   },
   {
-    id: "20260603-034",
+    id: "20260603-399",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "CISA警告：Oracle WebLogic Server的CVE-2024-21182已遭積極利用，要求聯邦機構緊急修補",
@@ -478,7 +478,7 @@ window.TRACKER_DAYS["2026-06-03"] = [
     ]
   },
   {
-    id: "20260603-035",
+    id: "20260603-400",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "微軟譴責研究員揭露零時差漏洞引發爭議：漏洞通報制度與法律行動界線模糊",
@@ -492,7 +492,7 @@ window.TRACKER_DAYS["2026-06-03"] = [
     ]
   },
   {
-    id: "20260603-036",
+    id: "20260603-401",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Palo Alto Networks警告：開源工具ROADtools遭駭客濫用，用於雲端竊取與操控Microsoft Entra ID權杖",
@@ -506,7 +506,7 @@ window.TRACKER_DAYS["2026-06-03"] = [
     ]
   },
   {
-    id: "20260603-037",
+    id: "20260603-402",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Gitea 釋出 1.26.2 修補 CVE-2026-27771：未登入者可存取私有容器映像檔",
@@ -520,7 +520,7 @@ window.TRACKER_DAYS["2026-06-03"] = [
     ]
   },
   {
-    id: "20260603-038",
+    id: "20260603-409",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "新式 HTTP/2 Bomb 攻擊：單機可耗盡網頁伺服器記憶體，影響 NGINX、Apache 等主流服務",
@@ -534,7 +534,7 @@ window.TRACKER_DAYS["2026-06-03"] = [
     ]
   },
   {
-    id: "20260603-039",
+    id: "20260603-410",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "CISA警告：駭客正利用Android和Linux核心漏洞，要求機構修補兩大高風險漏洞",
@@ -548,7 +548,7 @@ window.TRACKER_DAYS["2026-06-03"] = [
     ]
   },
   {
-    id: "20260603-040",
+    id: "20260603-412",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "研究員揭露 VS Code 零日漏洞：可透過惡意擴充套件竊取 GitHub OAuth Token",
@@ -562,7 +562,7 @@ window.TRACKER_DAYS["2026-06-03"] = [
     ]
   },
   {
-    id: "20260603-041",
+    id: "20260603-413",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "中國駭客群 TA4922 擴大攻擊範圍，在歐洲部署 Atlas RAT 等多種惡意程式",
@@ -576,7 +576,7 @@ window.TRACKER_DAYS["2026-06-03"] = [
     ]
   },
   {
-    id: "20260603-042",
+    id: "20260603-415",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "CISA警告：駭客正鎖定工業控制的燃料監測系統，建議立即隔離與強化防護",
@@ -590,7 +590,7 @@ window.TRACKER_DAYS["2026-06-03"] = [
     ]
   },
   {
-    id: "20260603-043",
+    id: "20260603-463",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "CISA將Magento外掛漏洞列入KEV：Mirasvit Cache Warmer存在可遠端執行程式碼的PHP反序列化缺陷",
@@ -604,7 +604,7 @@ window.TRACKER_DAYS["2026-06-03"] = [
     ]
   },
   {
-    id: "20260603-044",
+    id: "20260603-632",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Dragos分析：2026年第一季工業控制系統面臨持續性勒索軟體威脅",
@@ -618,7 +618,7 @@ window.TRACKER_DAYS["2026-06-03"] = [
     ]
   },
   {
-    id: "20260603-045",
+    id: "20260603-293",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "研究揭露 VS Code 透過 GitHub.dev 建立的單點擊攻擊，可竊取用戶 GitHub OAuth Token",
@@ -632,7 +632,7 @@ window.TRACKER_DAYS["2026-06-03"] = [
     ]
   },
   {
-    id: "20260603-046",
+    id: "20260603-366",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "微軟揭露 Red Hat npm 供應鏈攻擊：惡意套件利用 preinstall Hook 竊取多雲端與開發者憑證",
@@ -646,7 +646,7 @@ window.TRACKER_DAYS["2026-06-03"] = [
     ]
   },
   {
-    id: "20260603-047",
+    id: "20260603-389",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "紅帽雲端套件遭Miasma變種惡意程式入侵，恐外洩GitHub與雲端憑證",
@@ -660,7 +660,7 @@ window.TRACKER_DAYS["2026-06-03"] = [
     ]
   },
   {
-    id: "20260603-048",
+    id: "20260603-391",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "資安研究揭露：Anthropic Claude Code GitHub Actions權限繞過風險，警惕AI代理資料外洩",
@@ -674,7 +674,7 @@ window.TRACKER_DAYS["2026-06-03"] = [
     ]
   },
   {
-    id: "20260603-049",
+    id: "20260603-397",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "MITRE 將開源自動化模擬工具 Caldera 捐贈 Apache 軟體基金會，加速全球資安社群標準化發展",
@@ -688,7 +688,7 @@ window.TRACKER_DAYS["2026-06-03"] = [
     ]
   },
   {
-    id: "20260603-050",
+    id: "20260603-290",
     trackers: ["security"],
     category: "前瞻技術",
     title: "資安專家揭示網路「分割錯覺」：強調從攻擊者視角重繪網路地圖，預防橫向移動",
@@ -702,7 +702,7 @@ window.TRACKER_DAYS["2026-06-03"] = [
     ]
   },
   {
-    id: "20260603-051",
+    id: "20260603-294",
     trackers: ["security"],
     category: "前瞻技術",
     title: "企業身份管理面臨「身份暗物質」挑戰，需導入 IVIP 提升可見性與控制力",
@@ -716,7 +716,7 @@ window.TRACKER_DAYS["2026-06-03"] = [
     ]
   },
   {
-    id: "20260603-052",
+    id: "20260603-388",
     trackers: ["security"],
     category: "前瞻技術",
     title: "川普簽署AI資安行政命令：建立前沿模型自願評估機制，強化聯邦政府資安防護",
@@ -730,7 +730,7 @@ window.TRACKER_DAYS["2026-06-03"] = [
     ]
   },
   {
-    id: "20260603-053",
+    id: "20260603-396",
     trackers: ["security"],
     category: "前瞻技術",
     title: "HPE Zerto 10.9版推出 AI 助理與 Context Protocol，將生成式 AI 導入資料保護管理",
@@ -744,7 +744,7 @@ window.TRACKER_DAYS["2026-06-03"] = [
     ]
   },
   {
-    id: "20260603-054",
+    id: "20260603-403",
     trackers: ["security"],
     category: "前瞻技術",
     title: "微軟發布 Agent Governance Toolkit 擴充套件，強化 .NET AI 代理工具呼叫的治理與安全控制",
@@ -758,7 +758,7 @@ window.TRACKER_DAYS["2026-06-03"] = [
     ]
   },
   {
-    id: "20260603-055",
+    id: "20260603-1092",
     trackers: ["os"],
     category: "重點關注",
     title: "RISC-V RVA23 Profile 提升生態系統可攜性：為 Linux 應用提供 Hypervisor 與向量指令支援",
@@ -772,7 +772,7 @@ window.TRACKER_DAYS["2026-06-03"] = [
     ]
   },
   {
-    id: "20260603-056",
+    id: "20260603-449",
     trackers: ["security"],
     category: "產業動態",
     title: "Oracle 多產品群組曝出多重漏洞，資安專家提醒修補與風險評估",

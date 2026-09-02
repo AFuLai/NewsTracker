@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2025-06-12"] = [
   {
-    id: "20250612-001",
+    id: "20250612-151",
     trackers: ["eu_cra"],
     category: "調和標準",
     title: "ETSI主導制定統一歐洲標準，協助企業應對《網路韌性法案》（CRA）的強制安全要求",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2025-06-12"] = [
     ]
   },
   {
-    id: "20250612-002",
+    id: "20250612-152",
     trackers: ["eu_cra"],
     category: "調和標準",
     title: "ETSI主導制定歐盟《網路韌性法案》（CRA）標準，強化數位產品全生命週期安全要求",

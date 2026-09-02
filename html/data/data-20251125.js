@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2025-11-25"] = [
   {
-    id: "20251125-001",
+    id: "20251125-5903",
     trackers: ["eu_cra"],
     category: "研討活動",
     title: "歐盟委員會啟動產業學術網絡，透過企業承諾提升歐盟網路安全人才庫",

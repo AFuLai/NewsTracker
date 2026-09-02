@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-06-07"] = [
   {
-    id: "20260607-001",
+    id: "20260607-979",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Debian 發布 DSA-6327-1：修補 OpenSSH 服務中的潛在認證繞過漏洞",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-06-07"] = [
     ]
   },
   {
-    id: "20260607-002",
+    id: "20260607-980",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Debian 發布 DSA-6326-1：修補 OpenSSH 服務中的心臟病變漏洞",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-06-07"] = [
     ]
   },
   {
-    id: "20260607-003",
+    id: "20260607-981",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Debian 發布 DSA-6325-1：修補 OpenSSH 服務中的憑證驗證漏洞",
@@ -44,7 +44,7 @@ window.TRACKER_DAYS["2026-06-07"] = [
     ]
   },
   {
-    id: "20260607-004",
+    id: "20260607-805",
     trackers: ["os"],
     category: "Android",
     title: "Qi2 標準普及成趨勢，Android 生態系仍缺乏全面採用，Pixel 10 領先市場",
@@ -58,7 +58,7 @@ window.TRACKER_DAYS["2026-06-07"] = [
     ]
   },
   {
-    id: "20260607-005",
+    id: "20260607-806",
     trackers: ["os"],
     category: "Android",
     title: "三星 Galaxy S26 FE 洩漏：外觀設計與規格猜測，關注其發布時間與核心元件",

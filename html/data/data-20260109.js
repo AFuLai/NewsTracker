@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-01-09"] = [
   {
-    id: "20260109-001",
+    id: "20260109-1286",
     trackers: ["os", "security"],
     category: "Android",
     title: "Android UWB測試元件存在不當匯出漏洞 (CVE-2026-20972)，本地攻擊者可啟用超寬頻功能",

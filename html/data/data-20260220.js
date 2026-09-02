@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-02-20"] = [
   {
-    id: "20260220-001",
+    id: "20260220-164",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "CISA警告BeyondTrust漏洞CVE-2026-1731遭勒索軟體利用，影響遠端支援與特權存取功能",

@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-06-09"] = [
   {
-    id: "20260609-001",
+    id: "20260609-516",
     trackers: ["security"],
     category: "重大事件",
     title: "前前國資安主任警告：網路戰場已深入日常，威脅醫院、公用事業等關鍵基礎設施",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-06-09"] = [
     ]
   },
   {
-    id: "20260609-002",
+    id: "20260609-971",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Debian 發布 DSA-6335-1：修補 OpenSSH 服務中的潛在認證繞過漏洞",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-06-09"] = [
     ]
   },
   {
-    id: "20260609-003",
+    id: "20260609-972",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Debian 核心元件修補：修復 glibc 函式庫中的記憶體讀寫越界漏洞",
@@ -44,7 +44,7 @@ window.TRACKER_DAYS["2026-06-09"] = [
     ]
   },
   {
-    id: "20260609-004",
+    id: "20260609-973",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Debian 發布 DSA-6333-1：修補 OpenSSH 內建的 SSH 服務，修復潛在的認證繞過漏洞",
@@ -58,7 +58,7 @@ window.TRACKER_DAYS["2026-06-09"] = [
     ]
   },
   {
-    id: "20260609-005",
+    id: "20260609-974",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Debian 發布 DSA-6332-1：修補 OpenSSH 服務中的憑證驗證漏洞",
@@ -72,7 +72,7 @@ window.TRACKER_DAYS["2026-06-09"] = [
     ]
   },
   {
-    id: "20260609-006",
+    id: "20260609-508",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "CISA新增三項已知被利用漏洞：Arista、Google Chromium及Cisco SD-WAN受影響",
@@ -86,7 +86,7 @@ window.TRACKER_DAYS["2026-06-09"] = [
     ]
   },
   {
-    id: "20260609-007",
+    id: "20260609-509",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "西門子 KACO Blueplanet 逆變器面臨憑證竊取與SQL注入風險：需立即更新韌體",
@@ -100,7 +100,7 @@ window.TRACKER_DAYS["2026-06-09"] = [
     ]
   },
   {
-    id: "20260609-008",
+    id: "20260609-510",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "警惕！Schneider Electric EcoStruxure Panel Server 存在預設憑證風險，可能導致未授權存取",
@@ -114,7 +114,7 @@ window.TRACKER_DAYS["2026-06-09"] = [
     ]
   },
   {
-    id: "20260609-009",
+    id: "20260609-511",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Schneider Electric Modicon 交換器面臨 RADIUS 協定漏洞 CVE-2024-3596，CVSS 評分達 9 分",
@@ -128,7 +128,7 @@ window.TRACKER_DAYS["2026-06-09"] = [
     ]
   },
   {
-    id: "20260609-010",
+    id: "20260609-518",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "InfoGuard揭露「Ghost-Sender」：微軟Exchange配置缺陷允許攻擊者偽造任何電子郵件寄件人",
@@ -142,7 +142,7 @@ window.TRACKER_DAYS["2026-06-09"] = [
     ]
   },
   {
-    id: "20260609-011",
+    id: "20260609-522",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "微軟史上紀錄性 Patch Tuesday：修補近 200 個漏洞，包含 IIS、BitLocker 等多項零日漏洞",
@@ -156,7 +156,7 @@ window.TRACKER_DAYS["2026-06-09"] = [
     ]
   },
   {
-    id: "20260609-012",
+    id: "20260609-537",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Veeam Backup & Replication 存在 RCE 漏洞：CVE-2026-44963 影響舊版，建議立即升級修補",
@@ -170,7 +170,7 @@ window.TRACKER_DAYS["2026-06-09"] = [
     ]
   },
   {
-    id: "20260609-013",
+    id: "20260609-539",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "俄羅斯相關駭客群持續利用 WinRAR 漏洞 CVE-2025-8088 攻擊烏克蘭組織",
@@ -185,7 +185,7 @@ window.TRACKER_DAYS["2026-06-09"] = [
     ]
   },
   {
-    id: "20260609-014",
+    id: "20260609-541",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Google Chrome V8 零日漏洞 CVE-2026-11645：外網可執行任意程式碼的記憶體讀寫缺陷",
@@ -199,7 +199,7 @@ window.TRACKER_DAYS["2026-06-09"] = [
     ]
   },
   {
-    id: "20260609-015",
+    id: "20260609-543",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "研究揭露 FROST 攻擊：利用瀏覽器 OPFS 進行精準的本地設備指紋識別",
@@ -213,7 +213,7 @@ window.TRACKER_DAYS["2026-06-09"] = [
     ]
   },
   {
-    id: "20260609-016",
+    id: "20260609-545",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "CISA列入KEV：LiteLLM存在命令注入漏洞，可遭未經身份驗證遠端代碼執行",
@@ -227,7 +227,7 @@ window.TRACKER_DAYS["2026-06-09"] = [
     ]
   },
   {
-    id: "20260609-017",
+    id: "20260609-519",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "Miasma蠕蟲攻擊：駭客利用供應鏈漏洞癱瘓 73 個微軟 GitHub 倉庫，鎖定 AI 程式開發環境",
@@ -241,7 +241,7 @@ window.TRACKER_DAYS["2026-06-09"] = [
     ]
   },
   {
-    id: "20260609-018",
+    id: "20260609-538",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "微軟修復 GitHub 漏洞：揭露 Mini Shai-Hulud 供應鏈攻擊，多個開源套件遭植入資訊竊取器",
@@ -255,7 +255,7 @@ window.TRACKER_DAYS["2026-06-09"] = [
     ]
   },
   {
-    id: "20260609-019",
+    id: "20260609-544",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "Hades 攻擊波持續擴散：利用 PyPI 毒化 19 個 Python 套件，竊取開發者與 CI/CD 憑證",
@@ -269,7 +269,7 @@ window.TRACKER_DAYS["2026-06-09"] = [
     ]
   },
   {
-    id: "20260609-020",
+    id: "20260609-787",
     trackers: ["os"],
     category: "Android",
     title: "Google TV Streamer 2026 年更新發布：提供四月修補與性能優化",
@@ -283,7 +283,7 @@ window.TRACKER_DAYS["2026-06-09"] = [
     ]
   },
   {
-    id: "20260609-021",
+    id: "20260609-790",
     trackers: ["os"],
     category: "Android",
     title: "Google 系統更新報告：Android 平台服務與功能迭代，強化裝置管理與資安體驗",
@@ -297,7 +297,7 @@ window.TRACKER_DAYS["2026-06-09"] = [
     ]
   },
   {
-    id: "20260609-022",
+    id: "20260609-910",
     trackers: ["os", "security"],
     category: "Android",
     title: "Google I/O 重磅發布：Android CLI 穩定版 1.0，強化開發者生產力與 AI 整合",
@@ -311,7 +311,7 @@ window.TRACKER_DAYS["2026-06-09"] = [
     ]
   },
   {
-    id: "20260609-023",
+    id: "20260609-524",
     trackers: ["security"],
     category: "前瞻技術",
     title: "微軟發布 AI 活動調查手冊：提供結構化方法重構 Copilot 與 Azure AI 服務的事件調查",
@@ -325,7 +325,7 @@ window.TRACKER_DAYS["2026-06-09"] = [
     ]
   },
   {
-    id: "20260609-024",
+    id: "20260609-540",
     trackers: ["security"],
     category: "前瞻技術",
     title: "研究人員開發自複製 AI 蠕蟲：利用開源 LLM 進行動態漏洞利用與網路橫向擴散",
@@ -339,7 +339,7 @@ window.TRACKER_DAYS["2026-06-09"] = [
     ]
   },
   {
-    id: "20260609-025",
+    id: "20260609-542",
     trackers: ["security"],
     category: "前瞻技術",
     title: "資安團隊面臨的挑戰：從工具堆疊到「流程協作」的營運瓶頸風險分析",
@@ -353,7 +353,7 @@ window.TRACKER_DAYS["2026-06-09"] = [
     ]
   },
   {
-    id: "20260609-026",
+    id: "20260609-777",
     trackers: ["os"],
     category: "重點關注",
     title: "Google 宣布與 Paris Hilton 合作，展示 Android 平台結合 AI 工具的應用開發潛能",
@@ -367,7 +367,7 @@ window.TRACKER_DAYS["2026-06-09"] = [
     ]
   },
   {
-    id: "20260609-027",
+    id: "20260609-778",
     trackers: ["os"],
     category: "重點關注",
     title: "Google AI Mode與Gemini 升級，為世界盃提供互動式視覺化搜尋體驗",
@@ -381,7 +381,7 @@ window.TRACKER_DAYS["2026-06-09"] = [
     ]
   },
   {
-    id: "20260609-028",
+    id: "20260609-780",
     trackers: ["os"],
     category: "重點關注",
     title: "Google Fi 提升國際漫遊能力：支援更多國家、優化 5G 與 Wi-Fi 連接體驗",
@@ -395,7 +395,7 @@ window.TRACKER_DAYS["2026-06-09"] = [
     ]
   },
   {
-    id: "20260609-029",
+    id: "20260609-785",
     trackers: ["os"],
     category: "重點關注",
     title: "Motorola Razr Fold 深度評測：搭載 Snapdragon 8 Gen 5 與 6,000mAh 電池，具備 Android 16 系統",
@@ -409,7 +409,7 @@ window.TRACKER_DAYS["2026-06-09"] = [
     ]
   },
   {
-    id: "20260609-030",
+    id: "20260609-786",
     trackers: ["os"],
     category: "重點關注",
     title: "YouTube Shorts 測試更新：將「讚」按鈕替換為心形圖標，並可能移除「不喜歡」按鈕",
@@ -423,7 +423,7 @@ window.TRACKER_DAYS["2026-06-09"] = [
     ]
   },
   {
-    id: "20260609-031",
+    id: "20260609-789",
     trackers: ["os"],
     category: "重點關注",
     title: "OnePlus 15 支援 AirDrop over Quick Share：Android 生態系跨平台分享功能擴展",
@@ -437,7 +437,7 @@ window.TRACKER_DAYS["2026-06-09"] = [
     ]
   },
   {
-    id: "20260609-032",
+    id: "20260609-507",
     trackers: ["security"],
     category: "產業動態",
     title: "警惕 SolarWinds Serv-U 漏洞：未經身份驗證的 POST 請求可導致服務崩潰，建議立即修補",
@@ -451,7 +451,7 @@ window.TRACKER_DAYS["2026-06-09"] = [
     ]
   },
   {
-    id: "20260609-033",
+    id: "20260609-506",
     trackers: ["security"],
     category: "uncategorized",
     title: "警惕！Check Point VPN 存在嚴重認證繞過漏洞 (CVE-2026-50751)，攻擊者已積極利用",

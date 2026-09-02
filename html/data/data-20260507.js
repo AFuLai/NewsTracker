@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-05-07"] = [
   {
-    id: "20260507-001",
+    id: "20260507-1325",
     trackers: ["os", "security"],
     category: "Android",
     title: "Optoma CinemaX P2 投影機曝露 ADB 服務，遭網路攻擊可取得 Root 權限",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-05-07"] = [
     ]
   },
   {
-    id: "20260507-002",
+    id: "20260507-1326",
     trackers: ["os", "security"],
     category: "重點關注",
     title: "Optoma CinemaX P2 投影機：透過未經身份驗證的 HTTP API 實現遠端控制漏洞 (CVE-2026-30496)",

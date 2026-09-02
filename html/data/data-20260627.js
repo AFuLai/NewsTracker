@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-06-27"] = [
   {
-    id: "20260627-001",
+    id: "20260627-2397",
     trackers: ["os"],
     category: "Linux",
     title: "Linux 核心更新：發布 7.1.2、7.0.14 與 6.18.37 穩定版，包含多項重要修補",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-06-27"] = [
     ]
   },
   {
-    id: "20260627-002",
+    id: "20260627-2419",
     trackers: ["os"],
     category: "Linux",
     title: "Bytedance提議「Reserved THP」功能，旨在整合HugeTLB與THP優點，提升Linux核心大頁面記憶體管理",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-06-27"] = [
     ]
   },
   {
-    id: "20260627-003",
+    id: "20260627-2420",
     trackers: ["os"],
     category: "Linux",
     title: "Linux MD RAID5 軟體 RAID 效能優化：多核心、多磁碟陣列可提升至 17%",
@@ -44,7 +44,7 @@ window.TRACKER_DAYS["2026-06-27"] = [
     ]
   },
   {
-    id: "20260627-004",
+    id: "20260627-2421",
     trackers: ["os"],
     category: "Linux",
     title: "GNOME AI 助理 Newelle 1.4.5 更新：整合 Stable Diffusion 及雲端模型支援圖像生成與編輯功能",
@@ -58,7 +58,7 @@ window.TRACKER_DAYS["2026-06-27"] = [
     ]
   },
   {
-    id: "20260627-005",
+    id: "20260627-2422",
     trackers: ["os"],
     category: "Linux",
     title: "KDE Plasma 6.7.2 即將發布，修復 KWin 多螢幕變動刷新率的常見崩潰問題",
@@ -72,7 +72,7 @@ window.TRACKER_DAYS["2026-06-27"] = [
     ]
   },
   {
-    id: "20260627-006",
+    id: "20260627-2423",
     trackers: ["os"],
     category: "Linux",
     title: "System76 推出 COSMIC-Monitor：Rust 語言建構的全新系統監控工具，取代 GNOME System Monitor",
@@ -86,7 +86,7 @@ window.TRACKER_DAYS["2026-06-27"] = [
     ]
   },
   {
-    id: "20260627-007",
+    id: "20260627-2497",
     trackers: ["os"],
     category: "Windows",
     title: "微軟澄清「WSL 3」不存在，取代為內建 WSL Containers 於 Windows 11 推出",
@@ -100,7 +100,7 @@ window.TRACKER_DAYS["2026-06-27"] = [
     ]
   },
   {
-    id: "20260627-008",
+    id: "20260627-2498",
     trackers: ["os"],
     category: "Windows",
     title: "Windows 11 引入日曆式更新暫停與單次重啟機制，改善使用者體驗與更新管理",
@@ -114,7 +114,7 @@ window.TRACKER_DAYS["2026-06-27"] = [
     ]
   },
   {
-    id: "20260627-009",
+    id: "20260627-2499",
     trackers: ["os"],
     category: "Windows",
     title: "Windows 11「點時回溯」功能詳解：了解其運作機制、儲存空間佔用與修復流程",
@@ -128,7 +128,7 @@ window.TRACKER_DAYS["2026-06-27"] = [
     ]
   },
   {
-    id: "20260627-010",
+    id: "20260627-2100",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Google Chrome發布更新修補三項高風險漏洞：包含Mojo整數溢位與UAF缺陷",
@@ -142,7 +142,7 @@ window.TRACKER_DAYS["2026-06-27"] = [
     ]
   },
   {
-    id: "20260627-011",
+    id: "20260627-2178",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "烏克蘭資安機構揭露：俄羅斯情報服務透過簡訊詐騙竊取高層帳號密碼",
@@ -156,7 +156,7 @@ window.TRACKER_DAYS["2026-06-27"] = [
     ]
   },
   {
-    id: "20260627-012",
+    id: "20260627-2267",
     trackers: ["os"],
     category: "Apple",
     title: "新應用程式 Mirage：實現跨越 Mac、iPad、iPhone、Vision Pro 的無線桌面螢幕共享",
@@ -170,7 +170,7 @@ window.TRACKER_DAYS["2026-06-27"] = [
     ]
   },
   {
-    id: "20260627-013",
+    id: "20260627-2269",
     trackers: ["os"],
     category: "Apple",
     title: "Apple Mac與iPad價格上漲：Amazon折扣優惠仍是搶購時機",
@@ -184,7 +184,7 @@ window.TRACKER_DAYS["2026-06-27"] = [
     ]
   },
   {
-    id: "20260627-014",
+    id: "20260627-2270",
     trackers: ["os"],
     category: "Apple",
     title: "撰文者分享部署 Windows PC 的經驗，凸顯 macOS 在企業部署與整合上的優勢",
@@ -198,7 +198,7 @@ window.TRACKER_DAYS["2026-06-27"] = [
     ]
   },
   {
-    id: "20260627-015",
+    id: "20260627-2174",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "第三方供應商風險警示：教育部門面臨系統性威脅，需強化身份與漏洞管理",
@@ -212,7 +212,7 @@ window.TRACKER_DAYS["2026-06-27"] = [
     ]
   },
   {
-    id: "20260627-016",
+    id: "20260627-2179",
     trackers: ["security"],
     category: "前瞻技術",
     title: "OpenAI 推出 GPT-5.6 Sol 等新模型，強化資安能力並限時提供給政府機構",
@@ -226,7 +226,7 @@ window.TRACKER_DAYS["2026-06-27"] = [
     ]
   },
   {
-    id: "20260627-017",
+    id: "20260627-2271",
     trackers: ["os"],
     category: "重點關注",
     title: "蘋果爭取美國政府批准採購中國記憶體晶片，應對全球供應鏈與價格上漲壓力",
@@ -240,7 +240,7 @@ window.TRACKER_DAYS["2026-06-27"] = [
     ]
   },
   {
-    id: "20260627-018",
+    id: "20260627-2364",
     trackers: ["os"],
     category: "重點關注",
     title: "葡萄牙 Amble 發布 One 電動 Buggy：結合 Apple 設計美學與輕量化 L7e 級別設計",
@@ -254,7 +254,7 @@ window.TRACKER_DAYS["2026-06-27"] = [
     ]
   },
   {
-    id: "20260627-019",
+    id: "20260627-2424",
     trackers: ["os"],
     category: "重點關注",
     title: "開源影片編輯軟體 Shotcut 26.6 發布：強化 HDR 支援與 Linux Vulkan 顯示模式",
@@ -268,7 +268,7 @@ window.TRACKER_DAYS["2026-06-27"] = [
     ]
   },
   {
-    id: "20260627-020",
+    id: "20260627-2446",
     trackers: ["os", "security"],
     category: "重點關注",
     title: "AI 輔助工具潛在風險：研究警告 AI 編碼助手可能讓惡意程式碼執行系統指令",
@@ -282,7 +282,7 @@ window.TRACKER_DAYS["2026-06-27"] = [
     ]
   },
   {
-    id: "20260627-021",
+    id: "20260627-2445",
     trackers: ["os"],
     category: "uncategorized",
     title: "N/A",

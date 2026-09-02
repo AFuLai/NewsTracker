@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-05-25"] = [
   {
-    id: "20260525-001",
+    id: "20260525-32",
     trackers: ["security"],
     category: "法規與標準",
     title: "荷蘭逮捕兩名人士，指控其經營的託管服務商協助俄羅斯進行網路攻擊與影響戰",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-05-25"] = [
     ]
   },
   {
-    id: "20260525-002",
+    id: "20260525-22",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Ghost CMS 遭利用 SQL 注入漏洞 (CVE-2026-26980) 進行大規模網站污染與惡意程式碼植入",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-05-25"] = [
     ]
   },
   {
-    id: "20260525-003",
+    id: "20260525-24",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "揭露駭客組織 Lazarus 部署 RemotePE：跨平台記憶體式後門攻擊金融與加密貨幣目標",
@@ -44,7 +44,7 @@ window.TRACKER_DAYS["2026-05-25"] = [
     ]
   },
   {
-    id: "20260525-004",
+    id: "20260525-21",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "GitHub遭Poisoned擴充套件入侵，洩露3,800個儲存庫；Linux核心及Drupal等多個漏洞持續曝光",
@@ -58,7 +58,7 @@ window.TRACKER_DAYS["2026-05-25"] = [
     ]
   },
   {
-    id: "20260525-005",
+    id: "20260525-25",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "跨生態系統供應鏈攻擊「TrapDoor」：惡意套件鎖定開發者環境，竊取加密資產與雲端憑證",
@@ -72,7 +72,7 @@ window.TRACKER_DAYS["2026-05-25"] = [
     ]
   },
   {
-    id: "20260525-006",
+    id: "20260525-67",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "Red Hat Lightspeed 導入跨服務驗證，解決性能優化與安全合規衝突問題",
@@ -86,7 +86,7 @@ window.TRACKER_DAYS["2026-05-25"] = [
     ]
   },
   {
-    id: "20260525-007",
+    id: "20260525-23",
     trackers: ["security"],
     category: "前瞻技術",
     title: "AI驅動的網路偵測與回應（NDR）如何將「警報洪流」轉化為可行動的威脅情報",
@@ -100,7 +100,7 @@ window.TRACKER_DAYS["2026-05-25"] = [
     ]
   },
   {
-    id: "20260525-008",
+    id: "20260525-68",
     trackers: ["security"],
     category: "前瞻技術",
     title: "紅帽提出後量子密碼策略：強調基礎設施層面的漸進式轉型，而非單純的時限壓力",

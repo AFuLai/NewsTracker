@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-07-12"] = [
   {
-    id: "20260712-001",
+    id: "20260712-3828",
     trackers: ["os"],
     category: "Linux",
     title: "Linux 核心開發進度：Kernel 7.2-rc3 穩定更新，持續觀察核心元件變化",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-07-12"] = [
     ]
   },
   {
-    id: "20260712-002",
+    id: "20260712-3839",
     trackers: ["os"],
     category: "Linux",
     title: "Linux 7.2-rc3 預覽版發布：新增 Ultra RISC-V 支援與多 GPU 顯示偵測改善",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-07-12"] = [
     ]
   },
   {
-    id: "20260712-003",
+    id: "20260712-3840",
     trackers: ["os"],
     category: "Linux",
     title: "Linux 7.2 核心更新：預設啟用 UltraRISC RISC-V 硬體支援，擴大 RISC-V 平台適用性",
@@ -44,7 +44,7 @@ window.TRACKER_DAYS["2026-07-12"] = [
     ]
   },
   {
-    id: "20260712-004",
+    id: "20260712-3841",
     trackers: ["os"],
     category: "Linux",
     title: "Harmonic 韌體倡議 (HFI) 旨在為 RISC-V 平台提供標準化的開機與 BIOS 設定體驗",
@@ -58,7 +58,7 @@ window.TRACKER_DAYS["2026-07-12"] = [
     ]
   },
   {
-    id: "20260712-005",
+    id: "20260712-3842",
     trackers: ["os"],
     category: "Linux",
     title: "Linux 7.2-rc3 核心更新：修復 SEGA Dreamcast 驅動程式的空指針與競態條件問題",
@@ -72,7 +72,7 @@ window.TRACKER_DAYS["2026-07-12"] = [
     ]
   },
   {
-    id: "20260712-006",
+    id: "20260712-3843",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Realtek RTL8723BS WiFi 驅動程式修補：強化防禦惡意無線基地台的記憶體越界漏洞",
@@ -86,7 +86,7 @@ window.TRACKER_DAYS["2026-07-12"] = [
     ]
   },
   {
-    id: "20260712-007",
+    id: "20260712-3921",
     trackers: ["os"],
     category: "Windows",
     title: "微軟宣布多產品生命週期終結：Windows 11 24H2、Office 2021及SQL Server 2016等將於 2026 年停止支援",
@@ -100,7 +100,7 @@ window.TRACKER_DAYS["2026-07-12"] = [
     ]
   },
   {
-    id: "20260712-008",
+    id: "20260712-3922",
     trackers: ["os"],
     category: "Windows",
     title: "Windows 11 Copilot「PC Insights」功能詳解：AI可分析系統資源、硬體與儲存狀態",
@@ -114,7 +114,7 @@ window.TRACKER_DAYS["2026-07-12"] = [
     ]
   },
   {
-    id: "20260712-009",
+    id: "20260712-3683",
     trackers: ["os", "security"],
     category: "漏洞與威脅情報",
     title: "RedHook惡意軟體利用無線ADB功能，無需Root即可取得高權限Shell存取",
@@ -128,7 +128,7 @@ window.TRACKER_DAYS["2026-07-12"] = [
     ]
   },
   {
-    id: "20260712-010",
+    id: "20260712-3733",
     trackers: ["os"],
     category: "Apple",
     title: "Apple M7 Ultra 晶片預計支援 1.5TB 統一記憶體，有望追平頂級 Mac Pro 配置",
@@ -142,7 +142,7 @@ window.TRACKER_DAYS["2026-07-12"] = [
     ]
   },
   {
-    id: "20260712-011",
+    id: "20260712-3734",
     trackers: ["os"],
     category: "Apple",
     title: "蘋果傳開發新一代 Apple Pencil 配件，預計具備可更換電池系統以符合歐盟法規",
@@ -156,7 +156,7 @@ window.TRACKER_DAYS["2026-07-12"] = [
     ]
   },
   {
-    id: "20260712-012",
+    id: "20260712-3694",
     trackers: ["os"],
     category: "Android",
     title: "Pixel 11 Pro Fold 外觀洩漏：揭示「Pine」綠色與改進的相機模組設計",
@@ -170,7 +170,7 @@ window.TRACKER_DAYS["2026-07-12"] = [
     ]
   },
   {
-    id: "20260712-013",
+    id: "20260712-3695",
     trackers: ["os", "security"],
     category: "Android",
     title: "Google Pixel 11 系列預計漲價，但文章未提供資安或技術漏洞資訊",
@@ -184,7 +184,7 @@ window.TRACKER_DAYS["2026-07-12"] = [
     ]
   },
   {
-    id: "20260712-014",
+    id: "20260712-3696",
     trackers: ["os"],
     category: "Android",
     title: "Google Store 推出 Pixel 10 Pro 深度折扣，限時促銷至 $699",
@@ -198,7 +198,7 @@ window.TRACKER_DAYS["2026-07-12"] = [
     ]
   },
   {
-    id: "20260712-015",
+    id: "20260712-3940",
     trackers: ["os", "security"],
     category: "Android",
     title: "SonicCloudOrg sonic-agent 存在遠端命令注入漏洞，影響 Android WebSocket Server 組件",
@@ -212,7 +212,7 @@ window.TRACKER_DAYS["2026-07-12"] = [
     ]
   },
   {
-    id: "20260712-016",
+    id: "20260712-3735",
     trackers: ["os"],
     category: "重點關注",
     title: "Apple 學生回歸促銷活動預計本週推出，但價格上漲影響促銷誘因",
@@ -226,7 +226,7 @@ window.TRACKER_DAYS["2026-07-12"] = [
     ]
   },
   {
-    id: "20260712-017",
+    id: "20260712-3600",
     trackers: ["security"],
     category: "uncategorized",
     title: "資安機構Binarly揭露U-Boot開機載入程式六大漏洞，影響廣泛的硬體設備韌體安全",

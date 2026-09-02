@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2025-12-11"] = [
   {
-    id: "20251211-001",
+    id: "20251211-5901",
     trackers: ["eu_cra", "security"],
     category: "產業動態",
     title: "歐盟與英國舉行第三次網路對話，深化合作應對網路威脅與犯罪",

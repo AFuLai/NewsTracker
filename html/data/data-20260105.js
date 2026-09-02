@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-01-05"] = [
   {
-    id: "20260105-001",
+    id: "20260105-1216",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修復 s390/fpu 虛假陽性報告：修正 kmsan 檢測的內聯組語寫入大小判斷錯誤",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-01-05"] = [
     ]
   },
   {
-    id: "20260105-002",
+    id: "20260105-1217",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修補：修復 iavf 模組的 settime64 相關空指標解引用漏洞",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-01-05"] = [
     ]
   },
   {
-    id: "20260105-003",
+    id: "20260105-1218",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修補 CVE-2025-68753：ALSA firewire-motu 處理 DSP 事件時的緩衝區溢寫風險",
@@ -44,7 +44,7 @@ window.TRACKER_DAYS["2026-01-05"] = [
     ]
   },
   {
-    id: "20260105-004",
+    id: "20260105-1219",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修復 rtc: amlogic-a4 雙重釋放漏洞 (CVE-2025-68754)",
@@ -58,7 +58,7 @@ window.TRACKER_DAYS["2026-01-05"] = [
     ]
   },
   {
-    id: "20260105-005",
+    id: "20260105-1220",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心漏洞 CVE-2025-68755：MOST I2C 驅動程式 NULL 指標解引用風險",
@@ -72,7 +72,7 @@ window.TRACKER_DAYS["2026-01-05"] = [
     ]
   },
   {
-    id: "20260105-006",
+    id: "20260105-1221",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心 blk-mq 模組面臨死鎖風險：建議改用 RCU 機制取代鎖定機制",
@@ -86,7 +86,7 @@ window.TRACKER_DAYS["2026-01-05"] = [
     ]
   },
   {
-    id: "20260105-007",
+    id: "20260105-1222",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修補：修復 DRM vgem-fence 潛在死鎖，提升 IRQ 上下文安全性",
@@ -100,7 +100,7 @@ window.TRACKER_DAYS["2026-01-05"] = [
     ]
   },
   {
-    id: "20260105-008",
+    id: "20260105-1223",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心：LED 背光驅動程式在處理設備樹時，因 devlink 建立錯誤導致的空指針解引用漏洞修復",
@@ -114,7 +114,7 @@ window.TRACKER_DAYS["2026-01-05"] = [
     ]
   },
   {
-    id: "20260105-009",
+    id: "20260105-1224",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修復 Wi-Fi 驅動程式記憶體洩漏漏洞 (CVE-2025-68759)",
@@ -128,7 +128,7 @@ window.TRACKER_DAYS["2026-01-05"] = [
     ]
   },
   {
-    id: "20260105-010",
+    id: "20260105-1225",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心漏洞 CVE-2025-68760：iommu/amd 潛在越界讀取風險修復",
@@ -142,7 +142,7 @@ window.TRACKER_DAYS["2026-01-05"] = [
     ]
   },
   {
-    id: "20260105-011",
+    id: "20260105-1226",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修復 hfs 模組潛在 Use After Free 漏洞，提升檔案系統安全性",
@@ -156,7 +156,7 @@ window.TRACKER_DAYS["2026-01-05"] = [
     ]
   },
   {
-    id: "20260105-012",
+    id: "20260105-1227",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修補：解決 netpoll 設置失敗時的警告，避免未初始化工作佇列被取消",
@@ -170,7 +170,7 @@ window.TRACKER_DAYS["2026-01-05"] = [
     ]
   },
   {
-    id: "20260105-013",
+    id: "20260105-1228",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修補 CVE-2025-68763：StarFive 密碼庫處理錯誤，防範緩衝區溢出",
@@ -184,7 +184,7 @@ window.TRACKER_DAYS["2026-01-05"] = [
     ]
   },
   {
-    id: "20260105-014",
+    id: "20260105-1229",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修補 CVE-2025-68764：自動掛載檔案系統應繼承掛載選項旗標",
@@ -198,7 +198,7 @@ window.TRACKER_DAYS["2026-01-05"] = [
     ]
   },
   {
-    id: "20260105-015",
+    id: "20260105-1230",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修補：mt7615 驅動程式記憶體洩漏漏洞 (CVE-2025-68765)",
@@ -212,7 +212,7 @@ window.TRACKER_DAYS["2026-01-05"] = [
     ]
   },
   {
-    id: "20260105-016",
+    id: "20260105-1231",
     trackers: ["os", "security"],
     category: "uncategorized",
     title: "Linux核心漏洞 CVE-2025-68766：irqchip/mchp-eic 邊界檢查缺陷導致越界存取",

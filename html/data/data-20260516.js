@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-05-16"] = [
   {
-    id: "20260516-001",
+    id: "20260516-154",
     trackers: ["eu_cra", "security"],
     category: "調和標準",
     title: "歐盟網路韌性法案（CRA）標準化進展：ETSI與CEN-CENELEC規劃歐洲巡迴工作坊",

@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2025-09-16"] = [
   {
-    id: "20250916-001",
+    id: "20250916-210",
     trackers: ["eu_cra"],
     category: "法令更新",
     title: "NIS2 指令擴大涵蓋範圍，強化歐盟關鍵基礎設施的網路韌性要求",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2025-09-16"] = [
     ]
   },
   {
-    id: "20250916-002",
+    id: "20250916-5920",
     trackers: ["eu_cra"],
     category: "法令更新",
     title: "歐盟委員會徵集意見，計畫簡化數據、網路安全與人工智慧法規，降低企業行政負擔",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2025-09-16"] = [
     ]
   },
   {
-    id: "20250916-003",
+    id: "20250916-153",
     trackers: ["eu_cra"],
     category: "產業動態",
     title: "ETSI 委任三位專家推動《歐盟網路韌性法案》標準制定，強化關鍵產品安全",

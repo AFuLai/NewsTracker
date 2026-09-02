@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2025-10-28"] = [
   {
-    id: "20251028-001",
+    id: "20251028-5914",
     trackers: ["eu_cra"],
     category: "產業動態",
     title: "歐盟設立網路安全能力中心：啟動多項資安計畫，強化關鍵基礎設施防禦",

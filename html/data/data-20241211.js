@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2024-12-11"] = [
   {
-    id: "20241211-001",
+    id: "20241211-5645",
     trackers: ["eu_cra", "security"],
     category: "法令更新",
     title: "歐盟《網路韌性法案》（CRA）已生效：德國聯邦資安局（BSI）爭取市場監管權",

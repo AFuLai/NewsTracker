@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2025-06-24"] = [
   {
-    id: "20250624-001",
+    id: "20250624-285",
     trackers: ["security"],
     category: "合規指引",
     title: "網站安全提醒：檢查網址是否包含鎖頭圖示或 HTTPS，僅在官方安全網站分享敏感資訊",

@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-08-30"] = [
   {
-    id: "20260830-001",
+    id: "20260830-10149",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Debian 發布安全公告：修補 OpenSSH 服務中的潛在資訊洩漏漏洞",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-08-30"] = [
     ]
   },
   {
-    id: "20260830-002",
+    id: "20260830-10150",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Debian 發布安全公告：修補 OpenSSH 服務中的潛在認證繞過漏洞",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-08-30"] = [
     ]
   },
   {
-    id: "20260830-003",
+    id: "20260830-10156",
     trackers: ["os"],
     category: "Linux",
     title: "Linux 核心 7.3-rc1 發布，包含大量提交，持續追蹤核心開發進度",
@@ -44,7 +44,7 @@ window.TRACKER_DAYS["2026-08-30"] = [
     ]
   },
   {
-    id: "20260830-004",
+    id: "20260830-10177",
     trackers: ["os"],
     category: "Linux",
     title: "Linux 7.3-rc1 核心釋出：支援 AMD Zen 6、Intel Xe3P 及 Btrfs 效能提升",
@@ -58,7 +58,7 @@ window.TRACKER_DAYS["2026-08-30"] = [
     ]
   },
   {
-    id: "20260830-005",
+    id: "20260830-10179",
     trackers: ["os"],
     category: "Linux",
     title: "Linux 7.3 核心更新：大幅改善多款筆電與外接音訊設備的相容性與穩定性",
@@ -72,7 +72,7 @@ window.TRACKER_DAYS["2026-08-30"] = [
     ]
   },
   {
-    id: "20260830-006",
+    id: "20260830-10180",
     trackers: ["os"],
     category: "Linux",
     title: "AMD ROCm 運算堆棧移植至 FreeBSD：學生開發者進行核心整合與優化",
@@ -86,7 +86,7 @@ window.TRACKER_DAYS["2026-08-30"] = [
     ]
   },
   {
-    id: "20260830-007",
+    id: "20260830-10181",
     trackers: ["os"],
     category: "Linux",
     title: "Linux 7.3 核心更新：支援 AMD Zen 6、Ryzen AI Halo 及多款筆電新硬體驅動",
@@ -100,7 +100,7 @@ window.TRACKER_DAYS["2026-08-30"] = [
     ]
   },
   {
-    id: "20260830-008",
+    id: "20260830-10183",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 7.3 KVM 核心更新：修復資料結構、強化 AMD SEV-SNP 與 Intel VPID 虛擬化漏洞",
@@ -114,7 +114,7 @@ window.TRACKER_DAYS["2026-08-30"] = [
     ]
   },
   {
-    id: "20260830-009",
+    id: "20260830-10184",
     trackers: ["os"],
     category: "Linux",
     title: "Linux 7.3 更新：新增 8250_mxpcie 驅動支援 Moxa 序列埠，並移除 IPWireless 驅動",
@@ -128,7 +128,7 @@ window.TRACKER_DAYS["2026-08-30"] = [
     ]
   },
   {
-    id: "20260830-010",
+    id: "20260830-10185",
     trackers: ["os"],
     category: "Linux",
     title: "RTL8723BS 驅動程式持續主導 Linux 7.3 階段性更新，進行程式碼重構與優化",
@@ -142,7 +142,7 @@ window.TRACKER_DAYS["2026-08-30"] = [
     ]
   },
   {
-    id: "20260830-011",
+    id: "20260830-10208",
     trackers: ["os"],
     category: "Linux",
     title: "Debian 社區投票決定允許貢獻者使用生成式 AI 輔助編碼，但強調人工審核責任",
@@ -156,7 +156,7 @@ window.TRACKER_DAYS["2026-08-30"] = [
     ]
   },
   {
-    id: "20260830-012",
+    id: "20260830-10236",
     trackers: ["os"],
     category: "Windows",
     title: "Microsoft 宣布 WinUI 3 重寫 Windows Run 對話框，性能提升 8.7%，實現現代化與效能兼顧",
@@ -170,7 +170,7 @@ window.TRACKER_DAYS["2026-08-30"] = [
     ]
   },
   {
-    id: "20260830-013",
+    id: "20260830-10238",
     trackers: ["os"],
     category: "Windows",
     title: "Windows 11 改善用戶體驗：移除 OneDrive 備份促銷的「暗黑模式」，提供明確「退出備份」選項",
@@ -184,7 +184,7 @@ window.TRACKER_DAYS["2026-08-30"] = [
     ]
   },
   {
-    id: "20260830-014",
+    id: "20260830-10239",
     trackers: ["os"],
     category: "Windows",
     title: "Windows 11「文字與圖像生成」設定功能解析：澄清系統背景運行AI的誤解",
@@ -198,7 +198,7 @@ window.TRACKER_DAYS["2026-08-30"] = [
     ]
   },
   {
-    id: "20260830-015",
+    id: "20260830-10240",
     trackers: ["os"],
     category: "Windows",
     title: "Windows 11 誤報警示：系統通知誤報「關閉病毒保護」，微軟確認問題但尚未修復",
@@ -212,7 +212,7 @@ window.TRACKER_DAYS["2026-08-30"] = [
     ]
   },
   {
-    id: "20260830-016",
+    id: "20260830-9929",
     trackers: ["os", "security"],
     category: "漏洞與威脅情報",
     title: "Next.js釋出修補版本，修復兩項重大RCE漏洞：包含Windows檔案路徑與AVIF影像處理",
@@ -226,7 +226,7 @@ window.TRACKER_DAYS["2026-08-30"] = [
     ]
   },
   {
-    id: "20260830-017",
+    id: "20260830-9950",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Microsoft揭露新型惡意攻擊「TerminalFix」：利用假Cloudflare誘騙執行PowerShell指令",
@@ -240,7 +240,7 @@ window.TRACKER_DAYS["2026-08-30"] = [
     ]
   },
   {
-    id: "20260830-018",
+    id: "20260830-9993",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Apache Wicket 存在 CVE-2026-71378 漏洞：跨站請求偽造（CSRF）保護機制繞過",
@@ -254,7 +254,7 @@ window.TRACKER_DAYS["2026-08-30"] = [
     ]
   },
   {
-    id: "20260830-019",
+    id: "20260830-9994",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Apache Wicket 存在 CVE-2026-71257 漏洞：部分請求解析後，檔案上傳限制無法強制執行",
@@ -268,7 +268,7 @@ window.TRACKER_DAYS["2026-08-30"] = [
     ]
   },
   {
-    id: "20260830-020",
+    id: "20260830-9995",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Apache Wicket 存在路徑遍歷漏洞 (CVE-2026-70449)，可讀取 WEB-INF 內檔案",
@@ -282,7 +282,7 @@ window.TRACKER_DAYS["2026-08-30"] = [
     ]
   },
   {
-    id: "20260830-021",
+    id: "20260830-9996",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Apache Shiro 曝 CVE-2026-58301 漏洞：低權限用戶可透過 POST 請求劫持連線至惡意主機",
@@ -296,7 +296,7 @@ window.TRACKER_DAYS["2026-08-30"] = [
     ]
   },
   {
-    id: "20260830-022",
+    id: "20260830-9997",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Exiv2 釋出 0.28.9 版本，修復多項漏洞，包含一個中等風險的 OOB 寫入漏洞",
@@ -310,7 +310,7 @@ window.TRACKER_DAYS["2026-08-30"] = [
     ]
   },
   {
-    id: "20260830-023",
+    id: "20260830-10096",
     trackers: ["os"],
     category: "Apple",
     title: "The Weather Channel Storm Radar App 推出 CarPlay 版本，強化車載導航與天氣資訊整合",
@@ -324,7 +324,7 @@ window.TRACKER_DAYS["2026-08-30"] = [
     ]
   },
   {
-    id: "20260830-024",
+    id: "20260830-10097",
     trackers: ["os"],
     category: "Apple",
     title: "Apple 即將推出新一代 iPad mini：預計具備 OLED 螢幕與 A19/A20 Pro 晶片",
@@ -338,7 +338,7 @@ window.TRACKER_DAYS["2026-08-30"] = [
     ]
   },
   {
-    id: "20260830-025",
+    id: "20260830-10098",
     trackers: ["os"],
     category: "Apple",
     title: "蘋果傳開發「iPhone Ultra」將支援 Apple Pencil，但市場發布可能性存疑",
@@ -352,7 +352,7 @@ window.TRACKER_DAYS["2026-08-30"] = [
     ]
   },
   {
-    id: "20260830-026",
+    id: "20260830-10141",
     trackers: ["os"],
     category: "重點關注",
     title: "Steam2 服務器資料洩露：曝光 2003 至 2013 年大量未公開 PC 遊戲開發內容",
@@ -366,7 +366,7 @@ window.TRACKER_DAYS["2026-08-30"] = [
     ]
   },
   {
-    id: "20260830-027",
+    id: "20260830-10142",
     trackers: ["os"],
     category: "重點關注",
     title: "前總統川普罕見參與NASA新聞發布會，公開表揚羅曼太空望遠鏡任務",
@@ -380,7 +380,7 @@ window.TRACKER_DAYS["2026-08-30"] = [
     ]
   },
   {
-    id: "20260830-028",
+    id: "20260830-10143",
     trackers: ["os"],
     category: "重點關注",
     title: "Meta 導入機器人自動化數據中心維護，目標降低人力成本與提升效率",
@@ -394,7 +394,7 @@ window.TRACKER_DAYS["2026-08-30"] = [
     ]
   },
   {
-    id: "20260830-029",
+    id: "20260830-10178",
     trackers: ["os"],
     category: "重點關注",
     title: "開源影片編輯器 OpenShot 4.0 發布，全面升級至 Qt6 工具套件",
@@ -408,7 +408,7 @@ window.TRACKER_DAYS["2026-08-30"] = [
     ]
   },
   {
-    id: "20260830-030",
+    id: "20260830-10182",
     trackers: ["os"],
     category: "重點關注",
     title: "FFmpeg整合NVIDIA Vulkan FRUC功能，支援利用光流技術提升影片幀率",
@@ -422,7 +422,7 @@ window.TRACKER_DAYS["2026-08-30"] = [
     ]
   },
   {
-    id: "20260830-031",
+    id: "20260830-10209",
     trackers: ["os", "security"],
     category: "重點關注",
     title: "英國民眾對政府監控加密訊息持反對態度：支持隱私權與加密安全",
@@ -436,7 +436,7 @@ window.TRACKER_DAYS["2026-08-30"] = [
     ]
   },
   {
-    id: "20260830-032",
+    id: "20260830-10237",
     trackers: ["os"],
     category: "重點關注",
     title: "微軟改變 Windows 遊戲整合模式：從系統內建功能轉向應用程式商店分發",
@@ -450,8 +450,8 @@ window.TRACKER_DAYS["2026-08-30"] = [
     ]
   },
   {
-    id: "20260830-033",
-    trackers: ["eu_cra", "security"],
+    id: "20260830-10025",
+    trackers: ["security"],
     category: "產業動態",
     title: "線上時尚平台 29CM遭外部異常存取，超過15萬客戶個人資料外洩",
     summary: "線上時尚生活編輯店 29CM確認發生個人資料外洩事件。該平台是國內大型時尚平台 Musinsa 的子公司，主要服務2030年齡層的消費者。29CM透過其官方公告指出，事件發生於8月27日，源於用於查詢訂單資訊的聯動功能（API）遭遇外部異常存取。本次外洩的個人資訊項目共計159,852筆，主要包含姓名（138,841人）以及部分客戶的姓名、電子郵件地址、手機號碼和配送資訊（21,011人）。然而，29CM強調，敏感的帳號資訊，如支付資訊、帳號和密碼，並未包含在本次外洩項目中，並已得到安全保護。事件發生後，公司已立即阻斷了異常存取路徑，並主動向韓國資訊安全機構 KISA 報告。為防止二次傷害，公司已要求受影響客戶留意釣魚和Smishing詐騙，並建議所有使用與其他網站相同密碼的用戶立即修改密碼。",

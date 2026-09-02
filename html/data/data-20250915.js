@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2025-09-15"] = [
   {
-    id: "20250915-001",
+    id: "20250915-5921",
     trackers: ["eu_cra"],
     category: "研討活動",
     title: "歐盟副總裁召開網路安全對話，探討簡化合規流程與強化數位韌性",

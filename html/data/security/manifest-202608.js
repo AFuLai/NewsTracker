@@ -36,5 +36,5 @@ window.TRACKER_MONTH["security"]["2026-08"] = {
     { date: "2026-08-01", file: "../data-20260801.js", count: 5 }
   ],
   totalArticles: 1412,
-  lastUpdated: "2026-09-01"
+  lastUpdated: "2026-09-02"
 };

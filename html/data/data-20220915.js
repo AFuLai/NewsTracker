@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2022-09-15"] = [
   {
-    id: "20220915-001",
+    id: "20220915-141",
     trackers: ["eu_cra", "security"],
     category: "法令更新",
     title: "歐盟《網路韌性法案》旨在提升硬體與軟體產品的資安標準，要求製造商全生命週期管理安全。",

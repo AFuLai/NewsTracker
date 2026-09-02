@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-05-22"] = [
   {
-    id: "20260522-001",
+    id: "20260522-343",
     trackers: ["security"],
     category: "重大事件",
     title: "Verizon 2026 DBIR揭示醫療產業面臨AI強化、高度精準的社交工程攻擊",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-05-22"] = [
     ]
   },
   {
-    id: "20260522-002",
+    id: "20260522-371",
     trackers: ["security"],
     category: "法規與標準",
     title: "微軟（Microsoft）榮獲 Forrester 認可：在工作人員身份安全平台領域具備領導地位",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-05-22"] = [
     ]
   },
   {
-    id: "20260522-003",
+    id: "20260522-228",
     trackers: ["eu_cra", "security"],
     category: "合規指引",
     title: "歐盟網路韌性法案（CRA）標準化研討會：聚焦中小企業合規指引與工具",
@@ -44,7 +44,7 @@ window.TRACKER_DAYS["2026-05-22"] = [
     ]
   },
   {
-    id: "20260522-004",
+    id: "20260522-320",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "CISA承包商將AWS GovCloud金鑰及機構機密洩露於GitHub，國會質疑資安管理",
@@ -58,7 +58,7 @@ window.TRACKER_DAYS["2026-05-22"] = [
     ]
   },
   {
-    id: "20260522-005",
+    id: "20260522-344",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "中國 APT 組織 Webworm 鎖定歐洲政府機構，利用 Discord 與 Microsoft Graph API 進行 C2 通訊",
@@ -72,7 +72,7 @@ window.TRACKER_DAYS["2026-05-22"] = [
     ]
   },
   {
-    id: "20260522-006",
+    id: "20260522-351",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "CISA新增CVE-2026-9082：Drupal核心SQL注入漏洞進入已知利用漏洞清單",
@@ -86,7 +86,7 @@ window.TRACKER_DAYS["2026-05-22"] = [
     ]
   },
   {
-    id: "20260522-007",
+    id: "20260522-372",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "網路邊緣設備至內部 Linux 伺服器，再經由 Confluence 應用程式進行多階段入侵分析",
@@ -100,7 +100,7 @@ window.TRACKER_DAYS["2026-05-22"] = [
     ]
   },
   {
-    id: "20260522-008",
+    id: "20260522-408",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "分析 PHANTOMPULSE 植入物：揭露利用硬體斷點繞過 AMSI/WLDP/ETW 的多層級 C2 機制",
@@ -114,7 +114,7 @@ window.TRACKER_DAYS["2026-05-22"] = [
     ]
   },
   {
-    id: "20260522-009",
+    id: "20260522-342",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "Akamai 收購 LayerX 強化 ZTNA 產品線，將安全瀏覽器整合至零信任架構",
@@ -128,7 +128,7 @@ window.TRACKER_DAYS["2026-05-22"] = [
     ]
   },
   {
-    id: "20260522-010",
+    id: "20260522-373",
     trackers: ["security"],
     category: "前瞻技術",
     title: "醫療與人力資源產業案例：St. Luke's 與 ManpowerGroup 如何利用 Microsoft Security Copilot 建立 AI 時代的統一資安防護",
@@ -142,7 +142,7 @@ window.TRACKER_DAYS["2026-05-22"] = [
     ]
   },
   {
-    id: "20260522-011",
+    id: "20260522-229",
     trackers: ["eu_cra", "security"],
     category: "研討活動",
     title: "歐盟網路韌性法案（CRA）標準化進展：ETSI與CEN-CENELEC舉辦工作坊指導中小企業合規",
@@ -156,7 +156,7 @@ window.TRACKER_DAYS["2026-05-22"] = [
     ]
   },
   {
-    id: "20260522-012",
+    id: "20260522-448",
     trackers: ["security"],
     category: "uncategorized",
     title: "Palo Alto Networks PAN-OS 存在身份驗證繞過漏洞（CVE-2026-0265），影響啟用 CAS 的 GlobalProtect 服務",

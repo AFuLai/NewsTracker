@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2025-01-27"] = [
   {
-    id: "20250127-001",
+    id: "20250127-286",
     trackers: ["eu_cra"],
     category: "合規指引",
     title: "新加坡政府網站隱私聲明：說明資料收集、Cookie 使用與個人資料共享機制",

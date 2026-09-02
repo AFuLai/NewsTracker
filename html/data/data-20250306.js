@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2025-03-06"] = [
   {
-    id: "20250306-001",
+    id: "20250306-502",
     trackers: ["eu_cra", "security"],
     category: "調和標準",
     title: "STAN4CRA 專案公告：提供參與者申請報告員資格與資助機會",

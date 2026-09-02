@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-08-03"] = [
   {
-    id: "20260803-001",
+    id: "20260803-6654",
     trackers: ["security"],
     category: "重大事件",
     title: "號稱來自Revolut的7,500萬筆客戶資料曝光，銀行發言人：極可能是偽造資料",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-002",
+    id: "20260803-6658",
     trackers: ["security"],
     category: "重大事件",
     title: "家庭保全業者 Brinks Home IT系統遭未經授權存取，駭客組織疑似竊取超過 490 萬筆 Salesforce 資料",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-003",
+    id: "20260803-6659",
     trackers: ["security"],
     category: "重大事件",
     title: "製藥巨頭安進（Amgen）通報資料外洩：第三方雲端環境遭未授權存取，涉及專利與病患健康資訊",
@@ -44,7 +44,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-004",
+    id: "20260803-6663",
     trackers: ["security"],
     category: "重大事件",
     title: "美國牙科福利管理商 DentaQuest 遭駭，數千萬用戶敏感醫療資料外洩",
@@ -58,7 +58,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-005",
+    id: "20260803-6666",
     trackers: ["security"],
     category: "重大事件",
     title: "俄羅斯國家駭客Storm-2945攻擊旅館Wi-Fi，竊取Microsoft 365帳號與憑證",
@@ -72,7 +72,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-006",
+    id: "20260803-6670",
     trackers: ["security"],
     category: "重大事件",
     title: "亞德諾半導體（Analog Devices）遭未經授權存取，透過 SEC 揭露資安事件",
@@ -86,7 +86,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-007",
+    id: "20260803-6677",
     trackers: ["security"],
     category: "重大事件",
     title: "英國國家法律資料庫（PNLD）遭外洩：警方、政府及客戶資料曝光於暗網",
@@ -100,7 +100,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-008",
+    id: "20260803-6758",
     trackers: ["os"],
     category: "Linux",
     title: "FUSE 子系統優化討論：探討 I/O 緩衝區管理與效能提升",
@@ -114,7 +114,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-009",
+    id: "20260803-6760",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心發布：多個穩定版本更新，包含數百個修補程式以修復系統漏洞",
@@ -128,7 +128,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-010",
+    id: "20260803-6761",
     trackers: ["os"],
     category: "Linux",
     title: "NetBSD 11.0 正式發布：支援 RISC-V、增強 Linux 系統呼叫相容性與 NPF 防火牆功能",
@@ -142,7 +142,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-011",
+    id: "20260803-6762",
     trackers: ["os"],
     category: "Linux",
     title: "AlmaLinux、Debian、Fedora、Oracle等多個主流發行版發布安全更新，涵蓋核心、OpenSSH、Python等多個元件",
@@ -156,7 +156,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-012",
+    id: "20260803-6766",
     trackers: ["os"],
     category: "Linux",
     title: "Linux 核心新增 FailFS：提供極度隔離的檔案系統狀態，強化系統安全與容器隔離能力",
@@ -170,7 +170,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-013",
+    id: "20260803-6769",
     trackers: ["os"],
     category: "Linux",
     title: "GNOME Boxes 重大重構：支援 Windows 11 部署，並採用 GTK4 與 Flatpak 分發",
@@ -184,7 +184,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-014",
+    id: "20260803-6770",
     trackers: ["os"],
     category: "Linux",
     title: "NVIDIA 發布 R610 Linux 驅動程式 610.57.04，修復 X Server 崩潰及多款遊戲渲染問題",
@@ -198,7 +198,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-015",
+    id: "20260803-6771",
     trackers: ["os"],
     category: "Linux",
     title: "Linux 核心預計在 7.3 版本中移除 FreeVxFS 文件系統驅動程式",
@@ -212,7 +212,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-016",
+    id: "20260803-6772",
     trackers: ["os"],
     category: "Linux",
     title: "KDE Plasma Wayland 用戶介面更新：KGamma2 推出，提供簡易伽馬調整功能",
@@ -226,7 +226,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-017",
+    id: "20260803-6773",
     trackers: ["os"],
     category: "Linux",
     title: "GNOME Mutter 51 與 Shell 51 Beta 發布：強化 Wayland 支援、背景模糊與統一認證機制",
@@ -240,7 +240,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-018",
+    id: "20260803-6774",
     trackers: ["os"],
     category: "Linux",
     title: "KDE Linux 推出「套件相容性輔助工具」，改善 Java 與 DOS 應用程式的首次使用體驗",
@@ -254,7 +254,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-019",
+    id: "20260803-6775",
     trackers: ["os"],
     category: "Linux",
     title: "Linux 7.3 支援 MCTP-Over-USB v1.1：提升 USB 傳輸的資料封包能力",
@@ -268,7 +268,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-020",
+    id: "20260803-6776",
     trackers: ["os"],
     category: "Linux",
     title: "Linux 7.3 核心將支援 Realtek RTL8261C/D 10 Gigabit PHY，強化有線網路連線能力",
@@ -282,7 +282,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-021",
+    id: "20260803-6777",
     trackers: ["os"],
     category: "Linux",
     title: "AerynOS 發布新開發版：升級至 Linux 7.1 核心，整合 OpenZFS 與 Wayland 改善",
@@ -296,7 +296,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-022",
+    id: "20260803-6796",
     trackers: ["os"],
     category: "Linux",
     title: "回顧科技史：員工在公司辦公室意外觸發根權限（root）會話，導致舊式Unix系統受損",
@@ -310,7 +310,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-023",
+    id: "20260803-6797",
     trackers: ["os"],
     category: "Windows",
     title: "微軟宣布優化 Windows 11 記憶體佔用，目標讓 8GB RAM 也能提供流暢體驗",
@@ -324,7 +324,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-024",
+    id: "20260803-6800",
     trackers: ["os"],
     category: "Windows",
     title: "微軟澄清 Windows 11 服務「Windows Health and Optimized Experiences」非秘密監控工具，僅用於性能診斷",
@@ -338,7 +338,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-025",
+    id: "20260803-6633",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "CISA新增CVE-2026-18577至已知漏洞目錄，警告N-able N-central認證繞過風險",
@@ -353,7 +353,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-026",
+    id: "20260803-6637",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "研究人員攔截中國資方利用 Deepseek AI 代理程式進行代理劫持攻擊，揭示自主 AI 威脅模式",
@@ -367,7 +367,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-027",
+    id: "20260803-6655",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "NetApp發布ONTAP 9.19.1版，強化SnapMirror同步複製與Active Sync的AI勒索軟體防護與快照保護",
@@ -381,7 +381,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-028",
+    id: "20260803-6656",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Palo Alto Networks揭露：中國駭客結合AI代理與手動攻擊，鎖定超過400個企業組織",
@@ -395,7 +395,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-029",
+    id: "20260803-6657",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Microsoft確認俄羅斯駭客Storm-2945攻擊旅館Wi-Fi，竊取企業M365憑證",
@@ -409,7 +409,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-030",
+    id: "20260803-6660",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "中國駭客結合LLM與AI代理進行自主攻擊：Palo Alto Networks揭露AI自主滲透活動",
@@ -423,7 +423,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-031",
+    id: "20260803-6672",
     trackers: ["os", "security"],
     category: "漏洞與威脅情報",
     title: "Google Password Manager 面臨三種攻擊路徑：惡意軟體可繞過指紋和密碼登入帳戶",
@@ -437,7 +437,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-032",
+    id: "20260803-6673",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "INC勒索軟體利用SonicWall SMA 1000 VPN設備零日漏洞，攻擊目標涵蓋政府與私營企業",
@@ -451,7 +451,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-033",
+    id: "20260803-6674",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "AI模型、硬體錢包及水務系統面臨多重攻擊：從CVE-2026-66066到OT設備暴露風險",
@@ -465,7 +465,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-034",
+    id: "20260803-6676",
     trackers: ["os", "security"],
     category: "漏洞與威脅情報",
     title: "中國資安威脅行為者利用洩露的 DarkSword 漏洞套件攻擊 iOS 設備，竊取金鑰與密碼",
@@ -479,7 +479,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-035",
+    id: "20260803-6678",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "賽默飛世爾修補人識別軟體漏洞：數據檔案可被篡改，CVSS 8.2",
@@ -493,7 +493,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-036",
+    id: "20260803-6679",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "N-able N-central 遭未經認證的登入繞過攻擊，駭客可遠端取得管理權限",
@@ -507,7 +507,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-037",
+    id: "20260803-6680",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Hugging Face Diffusers 庫曝出三高危漏洞，可繞過安全機制執行任意程式碼",
@@ -521,7 +521,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-038",
+    id: "20260803-6685",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "俄羅斯駭客組織 Midnight Blizzard 鎖定飯店 Wi-Fi，利用自定義惡意程式竊取 Microsoft 365 帳號",
@@ -535,7 +535,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-039",
+    id: "20260803-6686",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "研究揭露「Pass-ta-key」三種攻擊，惡意軟體可劫持Google同步的Passkey帳號",
@@ -549,7 +549,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-040",
+    id: "20260803-6687",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "俄羅斯服務 DOUBLECUP 利用瀏覽器快取圖片進行 ClickFix 攻擊，植入 CountLoader 與 DeviceManager 惡意程式",
@@ -563,7 +563,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-041",
+    id: "20260803-6688",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "假Xeno執行器惡意安裝程式：透過Roblox玩家誘騙，植入資訊竊取與遠端存取惡意軟體",
@@ -577,7 +577,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-042",
+    id: "20260803-6724",
     trackers: ["os", "security"],
     category: "Apple",
     title: "蘋果調整漏洞獎勵計畫：限制報告數量並實施冷卻期，應對 AI 產生的安全報告激增",
@@ -591,7 +591,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-043",
+    id: "20260803-6725",
     trackers: ["os"],
     category: "Apple",
     title: "蘋果公司面臨集體訴訟：因「人物」功能涉嫌違反伊利諾尼奧生物識別法案",
@@ -605,7 +605,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-044",
+    id: "20260803-6726",
     trackers: ["os"],
     category: "Apple",
     title: "報告揭露：蘋果鼓勵員工混用個人與工作iCloud帳號，可能導致員工離職後仍能存取公司機密文件",
@@ -616,7 +616,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-045",
+    id: "20260803-6727",
     trackers: ["os"],
     category: "Apple",
     title: "Apple Upgrade 計劃要求綁定主要電信商：分析其商業與風險管理考量",
@@ -630,7 +630,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-046",
+    id: "20260803-6728",
     trackers: ["os"],
     category: "Apple",
     title: "iOS 27 照片應用程式新增「Captured by Me」功能，專門彙整用戶拍攝的媒體內容",
@@ -644,7 +644,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-047",
+    id: "20260803-6730",
     trackers: ["os"],
     category: "Apple",
     title: "Apple 傳傳接棒：John Ternus 預計於 9 月 1 日接任 CEO，並召回資深硬體工程高層",
@@ -658,7 +658,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-048",
+    id: "20260803-6731",
     trackers: ["os"],
     category: "Apple",
     title: "WhatsApp Mac 應用程式測試新功能：提供每日與每週可自訂更新頻率",
@@ -672,7 +672,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-049",
+    id: "20260803-6735",
     trackers: ["os"],
     category: "Apple",
     title: "維基百科 iOS App 更新：新增隨機文章小工具，提升用戶體驗",
@@ -686,7 +686,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-050",
+    id: "20260803-6737",
     trackers: ["os"],
     category: "Apple",
     title: "Apple 重設計配件購物體驗：線上商店與 App Store 推出多類別導覽與專家聊天功能",
@@ -700,7 +700,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-051",
+    id: "20260803-6740",
     trackers: ["os"],
     category: "Apple",
     title: "Google Health iOS App 升級：新增雙向 Apple Health 同步功能，改善 Fitbit 資料流動性",
@@ -714,7 +714,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-052",
+    id: "20260803-6744",
     trackers: ["os"],
     category: "Apple",
     title: "Apple 傳聞：今年秋季將推出折疊式 iPhone Ultra，明年 Pro 機型將回歸玻璃設計",
@@ -728,7 +728,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-053",
+    id: "20260803-6745",
     trackers: ["os"],
     category: "Apple",
     title: "iPhone 18 Pro 預計發布價格傳聞：分析 $1,399 起跳價的合理性",
@@ -742,7 +742,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-054",
+    id: "20260803-6747",
     trackers: ["os"],
     category: "Apple",
     title: "蘋果執行長蒂姆·庫克暗示：重度使用Siri AI功能可能帶來更高的成本",
@@ -756,7 +756,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-055",
+    id: "20260803-6662",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "GitHub限制NPM精細度存取權杖（GAT），強化帳號管理與套件操作的雙因素驗證要求",
@@ -770,7 +770,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-056",
+    id: "20260803-6664",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "AsyncAPI 供應鏈遭攻擊：GitHub Actions 弱點導致憑證洩漏，資安團隊緊急修復",
@@ -784,7 +784,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-057",
+    id: "20260803-6665",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "AsyncAPI 供應鏈遭攻擊：惡意套件利用未宣告掛鉤繞過掃描，建立 C2 通訊",
@@ -798,7 +798,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-058",
+    id: "20260803-6667",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "GitHub Actions配置弱點遭利用：攻擊者透過NPM供應鏈注入惡意套件",
@@ -812,7 +812,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-059",
+    id: "20260803-6668",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "CISA發布2026版SBOM最低要素指引：強化軟體供應鏈透明度與可信度",
@@ -826,7 +826,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-060",
+    id: "20260803-6669",
     trackers: ["os", "security"],
     category: "供應鏈與開源安全",
     title: "Arch Linux AUR套件庫遭供應鏈攻擊：惡意程式可竊取雲端憑證與帳密",
@@ -840,7 +840,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-061",
+    id: "20260803-6671",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "資安研究發現惡意 npm 套件攻擊：針對阿里開發者工具的跨平台遠端存取木馬",
@@ -854,7 +854,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-062",
+    id: "20260803-6702",
     trackers: ["os"],
     category: "Android",
     title: "Google 8月系統更新：Play服務與商店升級，強化用戶體驗與內容發現",
@@ -868,7 +868,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-063",
+    id: "20260803-6703",
     trackers: ["os"],
     category: "Android",
     title: "Google Android 17 QPR2 Beta 2 上線：Pixel 系列支援機種擴增與系統更新資訊",
@@ -882,7 +882,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-064",
+    id: "20260803-6704",
     trackers: ["os"],
     category: "Android",
     title: "Pixel 設備發布 Android 17 QPR2 Beta 2：最新測試版本資訊",
@@ -896,7 +896,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-065",
+    id: "20260803-6709",
     trackers: ["os"],
     category: "Android",
     title: "Google Clock 9.0 為 Android Pixel 裝置推出 Live Update 通知，提升計時器與秒錶的使用體驗",
@@ -910,7 +910,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-066",
+    id: "20260803-6710",
     trackers: ["os"],
     category: "Android",
     title: "三星Galaxy S27 Ultra傳將取消3倍望遠鏡頭，改為三鏡頭配置",
@@ -924,7 +924,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-067",
+    id: "20260803-6711",
     trackers: ["os"],
     category: "Android",
     title: "Google 預告 Pixel 11 Pro Fold，預計於 8 月 12 日開放預購",
@@ -938,7 +938,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-068",
+    id: "20260803-6804",
     trackers: ["os", "security"],
     category: "Android",
     title: "Android應用程式漏洞警示：Meesho購物App存在資料明文儲存風險，影響用戶敏感資訊",
@@ -952,7 +952,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-069",
+    id: "20260803-6805",
     trackers: ["os", "security"],
     category: "Android",
     title: "Android 應用程式 TextPlus 曝 CVE-2026-18604 漏洞：本地操作可導致元件不當匯出",
@@ -966,7 +966,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-070",
+    id: "20260803-6635",
     trackers: ["security"],
     category: "前瞻技術",
     title: "UC 研發 SAGA 工具：透過時間簽名追溯 AI 影片來源，強化深度偽造內容防禦",
@@ -980,7 +980,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-071",
+    id: "20260803-6636",
     trackers: ["os", "security"],
     category: "前瞻技術",
     title: "Anthropic Claude AI 測試洩露：模型漏洞非核心，關鍵在於系統過度授權與缺乏隔離機制",
@@ -994,7 +994,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-072",
+    id: "20260803-6661",
     trackers: ["security"],
     category: "前瞻技術",
     title: "Infoblox宣布併購Kentik，整合DNS與網路可觀測性，強化AI網路安全分析能力",
@@ -1008,7 +1008,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-073",
+    id: "20260803-6675",
     trackers: ["security"],
     category: "前瞻技術",
     title: "AI 平台與自主 SOC 的角色區分：深入理解 AI 在資安營運中的最佳應用場景",
@@ -1022,7 +1022,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-074",
+    id: "20260803-6705",
     trackers: ["os"],
     category: "重點關注",
     title: "備受好評的筆記應用 Notability 終於推出 Android 版本，提供 AI 整合與手寫筆記功能",
@@ -1036,7 +1036,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-075",
+    id: "20260803-6713",
     trackers: ["os"],
     category: "重點關注",
     title: "Google Health 5.05 更新：強化 Apple Health 數據同步與美國醫療紀錄分享功能",
@@ -1050,7 +1050,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-076",
+    id: "20260803-6741",
     trackers: ["os"],
     category: "重點關注",
     title: "蘋果收購 PlasmaSolve：強化其在先進材料與極限硬體設計的技術能力",
@@ -1064,7 +1064,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-077",
+    id: "20260803-6742",
     trackers: ["os", "security"],
     category: "重點關注",
     title: "Apple 再次對英國要求建立 iCloud 後門的指令提出法律挑戰",
@@ -1078,7 +1078,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-078",
+    id: "20260803-6746",
     trackers: ["os"],
     category: "重點關注",
     title: "DuckDuckGo發布「反監控」太陽眼鏡：強調零攝影、零數據傳輸的隱私產品",
@@ -1092,7 +1092,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-079",
+    id: "20260803-6751",
     trackers: ["os"],
     category: "重點關注",
     title: "墨西哥UNAM大學AI監考系統引發爭議：近五萬名考生需參加重考以確保入學公平性",
@@ -1106,7 +1106,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-080",
+    id: "20260803-6759",
     trackers: ["os", "security"],
     category: "重點關注",
     title: "警惕 LLM 產生的虛假 CVE：JFrog 提醒資安界注意 AI 誤導的漏洞資訊",
@@ -1120,7 +1120,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-081",
+    id: "20260803-6768",
     trackers: ["os", "security"],
     category: "重點關注",
     title: "zlib-rs 0.6.7 發布：修復 Use-After-Free 漏洞並強化 LoongArch LSX 優化",
@@ -1134,7 +1134,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-082",
+    id: "20260803-6781",
     trackers: ["os"],
     category: "重點關注",
     title: "華為、阿里等中國模型開發商推出開放權重模型，挑戰美國AI巨頭的市場主導地位",
@@ -1148,7 +1148,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-083",
+    id: "20260803-6782",
     trackers: ["os", "security"],
     category: "重點關注",
     title: "Pillar研究揭露Google AI開發套件漏洞：跨代理間的攻擊鏈威脅",
@@ -1162,7 +1162,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-084",
+    id: "20260803-6783",
     trackers: ["os", "security"],
     category: "重點關注",
     title: "AI生成虛假漏洞污染CVE資料庫：SQLite及libraw等多個CVE被證實為假情報",
@@ -1176,7 +1176,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-085",
+    id: "20260803-6784",
     trackers: ["os"],
     category: "重點關注",
     title: "微軟揭露俄羅斯SVR利用公共Wi-Fi網路進行「CaptiveCrunch」攻擊，竊取Windows與OAuth憑證",
@@ -1190,7 +1190,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-086",
+    id: "20260803-6785",
     trackers: ["os"],
     category: "重點關注",
     title: "聯發科宣布投入 50 億美元擴張 AI 資料中心晶片，目標搶佔高成長市場",
@@ -1204,7 +1204,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-087",
+    id: "20260803-6786",
     trackers: ["os", "security"],
     category: "重點關注",
     title: "英國國家法律資料庫（PNLD）遭外洩，警方資料、工作郵箱及公民資訊曝光",
@@ -1218,7 +1218,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-088",
+    id: "20260803-6787",
     trackers: ["os"],
     category: "重點關注",
     title: "NASA高層警告：將火星漫遊車工程模型用於月球任務的成本估算過高，不具可行性",
@@ -1232,7 +1232,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-089",
+    id: "20260803-6788",
     trackers: ["os"],
     category: "重點關注",
     title: "美國水系統遭駭事件升級：喬治亞與密西根州確認受襲，指向伊朗背景駭客組織",
@@ -1246,7 +1246,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-090",
+    id: "20260803-6789",
     trackers: ["os"],
     category: "重點關注",
     title: "Google Earth 導入 AI 影像生成功能遭網路檢舉後暫停，凸顯 AI 內容審核與資訊誤傳的挑戰",
@@ -1260,7 +1260,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-091",
+    id: "20260803-6791",
     trackers: ["os", "security"],
     category: "重點關注",
     title: "英國政府投資機構（UKGI）員工疏忽導致高階官員名單與工作郵箱外洩，資料已公開約 40 小時",
@@ -1274,7 +1274,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-092",
+    id: "20260803-6793",
     trackers: ["os"],
     category: "重點關注",
     title: "甲骨文限制AI生成內容貢獻於OpenJDK，強調安全與智慧財產權風險",
@@ -1288,7 +1288,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-093",
+    id: "20260803-6794",
     trackers: ["os"],
     category: "重點關注",
     title: "Claude Code 展現強大能力，加速數位考古與老舊系統的逆向工程分析",
@@ -1302,7 +1302,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-094",
+    id: "20260803-6795",
     trackers: ["os"],
     category: "重點關注",
     title: "AI成為網路攻擊雙面刃：CrowdStrike報告揭示攻擊工具與目標化趨勢",
@@ -1316,7 +1316,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-095",
+    id: "20260803-6801",
     trackers: ["os"],
     category: "重點關注",
     title: "Windows 10鎖定畫面照片成為旅遊熱點：揭秘新西蘭Wharariki海灘的傳奇起源",
@@ -1330,7 +1330,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-096",
+    id: "20260803-6802",
     trackers: ["os"],
     category: "重點關注",
     title: "深度分析：警惕網路市場佔有率數據的誤導性，AI機器人流量可能導致Linux市場份額虛高",
@@ -1344,7 +1344,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-097",
+    id: "20260803-6919",
     trackers: ["os"],
     category: "重點關注",
     title: "Google 在 Google Earth 推出 AI 影像生成後迅速撤回，因內容可能產生誤傳與政策違規",
@@ -1358,7 +1358,7 @@ window.TRACKER_DAYS["2026-08-03"] = [
     ]
   },
   {
-    id: "20260803-098",
+    id: "20260803-6701",
     trackers: ["eu_cra"],
     category: "產業動態",
     title: "Amano Korea與Bionever簽署共同開發AI基礎停車與充電整合移動平台合作備忘錄",

@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-03-10"] = [
   {
-    id: "20260310-001",
+    id: "20260310-209",
     trackers: ["eu_cra"],
     category: "調和標準",
     title: "ENISA闡述歐盟網路安全認證體系：從標準化到市場趨勢的整合路徑",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-03-10"] = [
     ]
   },
   {
-    id: "20260310-002",
+    id: "20260310-201",
     trackers: ["eu_cra"],
     category: "合規指引",
     title: "ENISA闡述網路韌性：歐盟網路韌性法案（CRA）下的產品安全認證與標準化要求",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-03-10"] = [
     ]
   },
   {
-    id: "20260310-003",
+    id: "20260310-219",
     trackers: ["eu_cra"],
     category: "產業動態",
     title: "ENISA 媒體辦公室提供資安新聞媒體聯繫管道與協助",

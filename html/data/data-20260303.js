@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-03-03"] = [
   {
-    id: "20260303-001",
+    id: "20260303-192",
     trackers: ["eu_cra", "security"],
     category: "法令更新",
     title: "歐盟強化網路安全框架：NIS2、CRA與CSA修訂案確立產品全生命週期安全義務",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-03-03"] = [
     ]
   },
   {
-    id: "20260303-002",
+    id: "20260303-194",
     trackers: ["eu_cra"],
     category: "法令更新",
     title: "歐盟 NIS2 指令擴大範圍與強化要求：涵蓋更多關鍵服務與企業，提升網路安全標準",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-03-03"] = [
     ]
   },
   {
-    id: "20260303-003",
+    id: "20260303-142",
     trackers: ["eu_cra", "security"],
     category: "合規指引",
     title: "歐盟委員會發布草案指引，協助企業理解《網路韌性法案》的合規義務與適用範圍",
@@ -44,7 +44,7 @@ window.TRACKER_DAYS["2026-03-03"] = [
     ]
   },
   {
-    id: "20260303-004",
+    id: "20260303-1305",
     trackers: ["os", "security"],
     category: "Android",
     title: "Tuya App/SDK 24.07.11 存在 JSON 數據點處理器漏洞，可能導致服務拒絕",
@@ -58,7 +58,7 @@ window.TRACKER_DAYS["2026-03-03"] = [
     ]
   },
   {
-    id: "20260303-005",
+    id: "20260303-193",
     trackers: ["eu_cra"],
     category: "產業動態",
     title: "歐盟發布新《網路安全策略》，強調提升韌性、技術主權與全球合作",
@@ -72,7 +72,7 @@ window.TRACKER_DAYS["2026-03-03"] = [
     ]
   },
   {
-    id: "20260303-006",
+    id: "20260303-217",
     trackers: ["eu_cra"],
     category: "產業動態",
     title: "ENISA 發布企業視覺識別指南，規範品牌使用與媒體素材引用規範",

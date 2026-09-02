@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-08-01"] = [
   {
-    id: "20260801-001",
+    id: "20260801-6472",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Debian 核心安全更新：修補 DSA-6409-1 相關的資訊洩漏與權限提升漏洞",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-08-01"] = [
     ]
   },
   {
-    id: "20260801-002",
+    id: "20260801-6494",
     trackers: ["os"],
     category: "Linux",
     title: "資安警訊：資深 Arch Linux 開發者 Foxboron 宣布離職，多個核心套件需尋新維護者",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-08-01"] = [
     ]
   },
   {
-    id: "20260801-003",
+    id: "20260801-6495",
     trackers: ["os"],
     category: "Linux",
     title: "Linux 7.2-rc6 修正 Western Digital SATA 驅動器問題：強制停用 LPM 解決硬碟離線故障",
@@ -44,7 +44,7 @@ window.TRACKER_DAYS["2026-08-01"] = [
     ]
   },
   {
-    id: "20260801-004",
+    id: "20260801-6496",
     trackers: ["os"],
     category: "Linux",
     title: "GNOME 專案推動 RFC 流程規範，並應對大量 AI 生成的低品質 Shell 擴充功能",
@@ -58,7 +58,7 @@ window.TRACKER_DAYS["2026-08-01"] = [
     ]
   },
   {
-    id: "20260801-005",
+    id: "20260801-6497",
     trackers: ["os"],
     category: "Linux",
     title: "KDE Plasma 6.8 顯著提升 Linux 多顯示器與 eGPU 效能，優化 KWin 影像處理",
@@ -72,7 +72,7 @@ window.TRACKER_DAYS["2026-08-01"] = [
     ]
   },
   {
-    id: "20260801-006",
+    id: "20260801-6499",
     trackers: ["os"],
     category: "Linux",
     title: "AMD發布DCN6顯示核心Linux補丁：為下一代RDNA5 GPU奠定基礎",
@@ -86,7 +86,7 @@ window.TRACKER_DAYS["2026-08-01"] = [
     ]
   },
   {
-    id: "20260801-007",
+    id: "20260801-6518",
     trackers: ["os"],
     category: "Windows",
     title: "機場指示牌顯示 Windows 啟用錯誤水印，揭示系統維護與部署的潛在問題",
@@ -100,7 +100,7 @@ window.TRACKER_DAYS["2026-08-01"] = [
     ]
   },
   {
-    id: "20260801-008",
+    id: "20260801-6561",
     trackers: ["os"],
     category: "Windows",
     title: "Windows 11 搜尋功能升級：自動學習重要資料夾並進行索引，提升檔案查找效率",
@@ -114,7 +114,7 @@ window.TRACKER_DAYS["2026-08-01"] = [
     ]
   },
   {
-    id: "20260801-009",
+    id: "20260801-6563",
     trackers: ["os"],
     category: "Windows",
     title: "Windows 11 Photos App 進行優化，移除多餘介面雜物；但新版「Photos (Preview)」仍以 WebView2 形式自動安裝",
@@ -128,7 +128,7 @@ window.TRACKER_DAYS["2026-08-01"] = [
     ]
   },
   {
-    id: "20260801-010",
+    id: "20260801-6314",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Coldcard硬體錢包韌體漏洞：攻擊者可透過弱熵值重現私鑰，造成數百萬美元資產損失",
@@ -142,7 +142,7 @@ window.TRACKER_DAYS["2026-08-01"] = [
     ]
   },
   {
-    id: "20260801-011",
+    id: "20260801-6316",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Adobe 釋出安全更新：修補 Campaign Classic 與 Adobe Bridge 多項高危漏洞，包含任意程式碼執行風險",
@@ -156,7 +156,7 @@ window.TRACKER_DAYS["2026-08-01"] = [
     ]
   },
   {
-    id: "20260801-012",
+    id: "20260801-6317",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "駭客劫持飯店Wi-Fi，透過偽瀏覽器更新推送RAT CornFlake，竊取用戶資料與MFA憑證",
@@ -170,7 +170,7 @@ window.TRACKER_DAYS["2026-08-01"] = [
     ]
   },
   {
-    id: "20260801-013",
+    id: "20260801-6389",
     trackers: ["os"],
     category: "Apple",
     title: "Apple推出全新「Apple Upgrade」租賃計畫，可能取代Apple Card月付分期付款服務",
@@ -184,7 +184,7 @@ window.TRACKER_DAYS["2026-08-01"] = [
     ]
   },
   {
-    id: "20260801-014",
+    id: "20260801-6391",
     trackers: ["os"],
     category: "Apple",
     title: "新應用程式 Overflight：iPhone、iPad 與 Apple TV 整合的空域雷達應用",
@@ -198,7 +198,7 @@ window.TRACKER_DAYS["2026-08-01"] = [
     ]
   },
   {
-    id: "20260801-015",
+    id: "20260801-6393",
     trackers: ["os"],
     category: "Apple",
     title: "Apple Mac Studio 即將升級：預計搭載 M5/M7 晶片，提升 AI 運算與記憶體支援",
@@ -212,7 +212,7 @@ window.TRACKER_DAYS["2026-08-01"] = [
     ]
   },
   {
-    id: "20260801-016",
+    id: "20260801-6394",
     trackers: ["os"],
     category: "Apple",
     title: "iOS 27重大介面變動：Siri AI接管頂部邊緣，改變通知中心（Notification Center）的呼叫手勢",
@@ -226,7 +226,7 @@ window.TRACKER_DAYS["2026-08-01"] = [
     ]
   },
   {
-    id: "20260801-017",
+    id: "20260801-6315",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "資安警示：廣告技術公司 Adform 腳本遭惡意竄改，可竊取加密貨幣錢包地址",
@@ -240,7 +240,7 @@ window.TRACKER_DAYS["2026-08-01"] = [
     ]
   },
   {
-    id: "20260801-018",
+    id: "20260801-6390",
     trackers: ["os"],
     category: "重點關注",
     title: "Apple MacBook Neo 銷售數據顯示，其正在快速取代傳統的 Windows 與 Chromebook 市場，搶佔 K-12 教育市場份額",
@@ -254,7 +254,7 @@ window.TRACKER_DAYS["2026-08-01"] = [
     ]
   },
   {
-    id: "20260801-019",
+    id: "20260801-6392",
     trackers: ["os"],
     category: "重點關注",
     title: "Apple iPhone 20 週年機型傳聞：預計採用全玻璃設計，可能取代 Pro 系列",
@@ -268,7 +268,7 @@ window.TRACKER_DAYS["2026-08-01"] = [
     ]
   },
   {
-    id: "20260801-020",
+    id: "20260801-6451",
     trackers: ["os"],
     category: "重點關注",
     title: "Reddit CEO批評Google AI Overviews：強調深度討論價值，並考慮終止與Google的授權協議",
@@ -282,7 +282,7 @@ window.TRACKER_DAYS["2026-08-01"] = [
     ]
   },
   {
-    id: "20260801-021",
+    id: "20260801-6452",
     trackers: ["os"],
     category: "重點關注",
     title: "法院下令 Waymo 停止在聖莫尼卡夜間運營自動駕駛充電站，因涉嫌造成公共滋擾",
@@ -296,7 +296,7 @@ window.TRACKER_DAYS["2026-08-01"] = [
     ]
   },
   {
-    id: "20260801-022",
+    id: "20260801-6453",
     trackers: ["os"],
     category: "重點關注",
     title: "Defcon 推出 Baochip-1x：新型開源晶片，旨在提升計算安全與透明度",
@@ -310,7 +310,7 @@ window.TRACKER_DAYS["2026-08-01"] = [
     ]
   },
   {
-    id: "20260801-023",
+    id: "20260801-6492",
     trackers: ["os"],
     category: "重點關注",
     title: "NetBSD 11.0 重磅發布：首次支援 RISC-V 64位元架構，並強化 Linux 系統呼叫相容性",
@@ -324,7 +324,7 @@ window.TRACKER_DAYS["2026-08-01"] = [
     ]
   },
   {
-    id: "20260801-024",
+    id: "20260801-6493",
     trackers: ["os"],
     category: "重點關注",
     title: "Firefox 153.0 支援 Vulkan 視訊解碼與 JPEG-XL，Pop!_OS 推出「磨砂玻璃」桌面風格",
@@ -338,7 +338,7 @@ window.TRACKER_DAYS["2026-08-01"] = [
     ]
   },
   {
-    id: "20260801-025",
+    id: "20260801-6498",
     trackers: ["os"],
     category: "重點關注",
     title: "Picolibc 1.8.12 發布：強化嵌入式環境支援，擴展多核心架構與 POSIX 功能",
@@ -352,7 +352,7 @@ window.TRACKER_DAYS["2026-08-01"] = [
     ]
   },
   {
-    id: "20260801-026",
+    id: "20260801-6519",
     trackers: ["os"],
     category: "重點關注",
     title: "Nvidia發布Vera CPU超晶片，搭載自研Olympus核心，挑戰Intel與AMD伺服器市場",
@@ -366,7 +366,7 @@ window.TRACKER_DAYS["2026-08-01"] = [
     ]
   },
   {
-    id: "20260801-027",
+    id: "20260801-6562",
     trackers: ["os"],
     category: "重點關注",
     title: "OneNote 核心功能優化：第三方插件 Onetastic 提升筆記管理效率",

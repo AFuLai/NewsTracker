@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-07-04"] = [
   {
-    id: "20260704-001",
+    id: "20260704-2975",
     trackers: ["security"],
     category: "重大事件",
     title: "美國縣政府支付百萬美元阻止資料外洩：揭示現代勒索威脅的轉變",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-07-04"] = [
     ]
   },
   {
-    id: "20260704-002",
+    id: "20260704-3141",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Debian 發布 DSA-6377-1：修補 OpenSSH 服務中的憑證驗證漏洞",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-07-04"] = [
     ]
   },
   {
-    id: "20260704-003",
+    id: "20260704-3144",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心更新：修補 IPv6 容器逃逸與 KVM Use-After-Free 漏洞",
@@ -44,7 +44,7 @@ window.TRACKER_DAYS["2026-07-04"] = [
     ]
   },
   {
-    id: "20260704-004",
+    id: "20260704-3164",
     trackers: ["os"],
     category: "Linux",
     title: "Linux DRM 核心排程器修補：改善高負載下工作提交延遲",
@@ -58,7 +58,7 @@ window.TRACKER_DAYS["2026-07-04"] = [
     ]
   },
   {
-    id: "20260704-005",
+    id: "20260704-3165",
     trackers: ["os"],
     category: "Linux",
     title: "Linux 核心更新改善 4K 60 FPS USB 影像擷取穩定性，多款設備可穩定運作",
@@ -72,7 +72,7 @@ window.TRACKER_DAYS["2026-07-04"] = [
     ]
   },
   {
-    id: "20260704-006",
+    id: "20260704-3167",
     trackers: ["os"],
     category: "Linux",
     title: "GNOME 51 與 Plasma 6.7 支援 Wayland 的 ext-background-effect-v1，實現背景模糊效果",
@@ -86,7 +86,7 @@ window.TRACKER_DAYS["2026-07-04"] = [
     ]
   },
   {
-    id: "20260704-007",
+    id: "20260704-3168",
     trackers: ["os"],
     category: "Linux",
     title: "Linux 7.3 更新：Intel Xe 驅動程式新增 Nova Lake S 顯示卡 PCI ID，並移除對 HuC 韌體的依賴",
@@ -100,7 +100,7 @@ window.TRACKER_DAYS["2026-07-04"] = [
     ]
   },
   {
-    id: "20260704-008",
+    id: "20260704-3169",
     trackers: ["os"],
     category: "Linux",
     title: "Linux 7.2-rc2 預設提升 RISC-V 64 位元 CPU 核心支援上限至 256 個",
@@ -114,7 +114,7 @@ window.TRACKER_DAYS["2026-07-04"] = [
     ]
   },
   {
-    id: "20260704-009",
+    id: "20260704-3170",
     trackers: ["os"],
     category: "Linux",
     title: "KDE Plasma 6.8 核心變動：KWin 合成器移除桌面 OpenGL 支援，改採 OpenGL ES",
@@ -128,7 +128,7 @@ window.TRACKER_DAYS["2026-07-04"] = [
     ]
   },
   {
-    id: "20260704-010",
+    id: "20260704-3171",
     trackers: ["os"],
     category: "Linux",
     title: "GNOME Mutter 提升穩定性：實現 GPU 重置後的會話恢復功能",
@@ -142,7 +142,7 @@ window.TRACKER_DAYS["2026-07-04"] = [
     ]
   },
   {
-    id: "20260704-011",
+    id: "20260704-3568",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心 KVM 漏洞：x86 架構的 Shadow Paging Use-After-Free 問題修復",
@@ -156,7 +156,7 @@ window.TRACKER_DAYS["2026-07-04"] = [
     ]
   },
   {
-    id: "20260704-012",
+    id: "20260704-3569",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心漏洞：KVM SEV-SNP 允許惡意 Guest 進行堆記憶體讀寫與資訊洩露",
@@ -170,7 +170,7 @@ window.TRACKER_DAYS["2026-07-04"] = [
     ]
   },
   {
-    id: "20260704-013",
+    id: "20260704-3570",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修補：修復 af_unix 模組中資源回收狀態判斷錯誤的競態條件漏洞",
@@ -184,7 +184,7 @@ window.TRACKER_DAYS["2026-07-04"] = [
     ]
   },
   {
-    id: "20260704-014",
+    id: "20260704-3571",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心漏洞 CVE-2026-53362：IPv6 封裝處理中的記憶體寫入越界風險",
@@ -198,7 +198,7 @@ window.TRACKER_DAYS["2026-07-04"] = [
     ]
   },
   {
-    id: "20260704-015",
+    id: "20260704-3244",
     trackers: ["os", "security"],
     category: "Windows",
     title: "重現經典：前微軟工程師打造 2.5KB 極簡版記事本，揭示現代應用程式的膨脹問題",
@@ -212,7 +212,7 @@ window.TRACKER_DAYS["2026-07-04"] = [
     ]
   },
   {
-    id: "20260704-016",
+    id: "20260704-2944",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "跨國執法行動Operation Endgame揭露：惡意程式傳遞工具Amadey的犯罪基礎設施分析",
@@ -226,7 +226,7 @@ window.TRACKER_DAYS["2026-07-04"] = [
     ]
   },
   {
-    id: "20260704-017",
+    id: "20260704-3018",
     trackers: ["os"],
     category: "Apple",
     title: "三星 Galaxy Z Fold 8 系列價格洩漏：新「Wide」機型價格維持不變，但「Ultra」版本大幅漲價",
@@ -240,7 +240,7 @@ window.TRACKER_DAYS["2026-07-04"] = [
     ]
   },
   {
-    id: "20260704-018",
+    id: "20260704-3055",
     trackers: ["os"],
     category: "Apple",
     title: "【App 開發工具】PulseKit：一鍵整合 iPhone 關鍵數據分析，提升開發者效率",
@@ -254,7 +254,7 @@ window.TRACKER_DAYS["2026-07-04"] = [
     ]
   },
   {
-    id: "20260704-019",
+    id: "20260704-3056",
     trackers: ["os"],
     category: "Apple",
     title: "Apple 企業級部署挑戰：強調穩定性與核心功能不被安全修補破壞",
@@ -268,7 +268,7 @@ window.TRACKER_DAYS["2026-07-04"] = [
     ]
   },
   {
-    id: "20260704-020",
+    id: "20260704-3057",
     trackers: ["os"],
     category: "Apple",
     title: "蘋果預計於 2027 年推出 M7 MacBook Pro：結合全新設計與觸控螢幕的入門級機型",
@@ -282,7 +282,7 @@ window.TRACKER_DAYS["2026-07-04"] = [
     ]
   },
   {
-    id: "20260704-021",
+    id: "20260704-3058",
     trackers: ["os"],
     category: "Apple",
     title: "iOS 27 Beta 2 洩漏：傳聞中的帶攝像頭 AirPods Pro 3 (代號 B790) 功能預覽",
@@ -296,7 +296,7 @@ window.TRACKER_DAYS["2026-07-04"] = [
     ]
   },
   {
-    id: "20260704-022",
+    id: "20260704-3060",
     trackers: ["os"],
     category: "Apple",
     title: "專家提醒：網頁相機遮罩（Webcam Covers）並非有效隱私保護，甚至可能損壞設備功能與螢幕",
@@ -310,7 +310,7 @@ window.TRACKER_DAYS["2026-07-04"] = [
     ]
   },
   {
-    id: "20260704-023",
+    id: "20260704-2976",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "北韓駭客「Contagious Interview」活動擴大：透過 npm、Go 等開源套件植入惡意程式碼",
@@ -324,7 +324,7 @@ window.TRACKER_DAYS["2026-07-04"] = [
     ]
   },
   {
-    id: "20260704-024",
+    id: "20260704-3016",
     trackers: ["os"],
     category: "Android",
     title: "Nothing 官方宣布 Phone (1) 終止軟體支援，完成最後一次更新",
@@ -338,7 +338,7 @@ window.TRACKER_DAYS["2026-07-04"] = [
     ]
   },
   {
-    id: "20260704-025",
+    id: "20260704-2943",
     trackers: ["security"],
     category: "前瞻技術",
     title: "AWS Graviton5 處理器與 M9g/C9g 雲端執行個體正式上線，大幅提升運算與儲存效能",
@@ -352,7 +352,7 @@ window.TRACKER_DAYS["2026-07-04"] = [
     ]
   },
   {
-    id: "20260704-026",
+    id: "20260704-3015",
     trackers: ["os"],
     category: "重點關注",
     title: "Google Gemini 升級方案詳解：AI Plus 與 AI Pro 提升用戶權限與內容處理能力",
@@ -366,7 +366,7 @@ window.TRACKER_DAYS["2026-07-04"] = [
     ]
   },
   {
-    id: "20260704-027",
+    id: "20260704-3059",
     trackers: ["os"],
     category: "重點關注",
     title: "BenQ MA270S 發表：27吋 5K 螢幕，具備 Mac 友善的亮面設計與多功能擴充性",
@@ -380,7 +380,7 @@ window.TRACKER_DAYS["2026-07-04"] = [
     ]
   },
   {
-    id: "20260704-028",
+    id: "20260704-3163",
     trackers: ["os"],
     category: "重點關注",
     title: "FEX 2607 更新：強化 ARM 平台 x86/x86_64 模擬能力，支援 SVE2 與 CUDA Thunking",
@@ -394,7 +394,7 @@ window.TRACKER_DAYS["2026-07-04"] = [
     ]
   },
   {
-    id: "20260704-029",
+    id: "20260704-3191",
     trackers: ["os", "security"],
     category: "重點關注",
     title: "研究揭露「機密運算」核心信任機制缺陷：Attested TLS 協議存在繞過風險",
@@ -408,7 +408,7 @@ window.TRACKER_DAYS["2026-07-04"] = [
     ]
   },
   {
-    id: "20260704-030",
+    id: "20260704-3242",
     trackers: ["os"],
     category: "重點關注",
     title: "微軟Teams增強會議AI控制權：提供開場者/主辦人開關切換Copilot、Facilitator等功能",

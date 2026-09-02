@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2025-04-23"] = [
   {
-    id: "20250423-001",
+    id: "20250423-238",
     trackers: ["eu_cra"],
     category: "調和標準",
     title: "ETSI 發布 AI 安全標準：TS 104 223 確立 AI 系統全生命週期基礎資安要求",

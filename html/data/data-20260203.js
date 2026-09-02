@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-02-03"] = [
   {
-    id: "20260203-001",
+    id: "20260203-443",
     trackers: ["security"],
     category: "重大事件",
     title: "駭客竊取超過 510 萬個 Panera Bread 客戶資料，透過社工攻擊繞過 SSO 系統",

@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2025-10-07"] = [
   {
-    id: "20251007-001",
+    id: "20251007-5635",
     trackers: ["eu_cra", "security"],
     category: "合規指引",
     title: "BSI升格為市場監管機構：深入解析《網路韌性法案》（CRA）對歐盟IT產品的影響",

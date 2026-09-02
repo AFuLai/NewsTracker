@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2022-04-11"] = [
   {
-    id: "20220411-001",
+    id: "20220411-279",
     trackers: ["eu_cra"],
     category: "產業動態",
     title: "新加坡資安局（CSA）發布諮詢結案報告：修訂資安服務提供商授權框架",

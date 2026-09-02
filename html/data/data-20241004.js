@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2024-10-04"] = [
   {
-    id: "20241004-001",
+    id: "20241004-440",
     trackers: ["security"],
     category: "重大事件",
     title: "Claroty報告：網路勒索軟體攻擊衝擊關鍵基礎設施，醫療、能源等產業損失高達百萬美元",

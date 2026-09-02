@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-05-18"] = [
   {
-    id: "20260518-001",
+    id: "20260518-492",
     trackers: ["security"],
     category: "重大事件",
     title: "Grafana 確認遭資料外洩：駭客透過 GitHub 存取權限竊取程式碼，但未影響客戶資料",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-05-18"] = [
     ]
   },
   {
-    id: "20260518-002",
+    id: "20260518-652",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "CISA承包商GitHub儲存AWS GovCloud金鑰與內部密碼，曝露多個高權限系統憑證",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-05-18"] = [
     ]
   },
   {
-    id: "20260518-003",
+    id: "20260518-5822",
     trackers: ["eu_cra"],
     category: "產業動態",
     title: "歐盟資安中心招募專家：參與數位歐洲與地平線計畫，強化歐盟網路安全能力",

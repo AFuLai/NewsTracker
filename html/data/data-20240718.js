@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2024-07-18"] = [
   {
-    id: "20240718-001",
+    id: "20240718-208",
     trackers: ["eu_cra"],
     category: "合規指引",
     title: "ENISA 透過意識提升活動，推動歐洲各領域實踐網路衛生與資安文化",

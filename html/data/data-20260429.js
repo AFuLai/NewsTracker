@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-04-29"] = [
   {
-    id: "20260429-001",
+    id: "20260429-129",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "CI/CD 管線濫用風險警示：新工具利用 LLM 分析檢測 GitHub Actions 等工作流變更",

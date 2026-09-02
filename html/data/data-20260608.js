@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-06-08"] = [
   {
-    id: "20260608-001",
+    id: "20260608-583",
     trackers: ["security"],
     category: "重大事件",
     title: "Silent Ransom Group (UNC3753) 透過語音詐騙與實體入侵，對美律所進行數據竊取與勒索",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-06-08"] = [
     ]
   },
   {
-    id: "20260608-002",
+    id: "20260608-615",
     trackers: ["security"],
     category: "重大事件",
     title: "Meta偵測到疑似NSO Group的魚叉式網路釣魚攻擊，並對其違反禁令提起訴訟",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-06-08"] = [
     ]
   },
   {
-    id: "20260608-003",
+    id: "20260608-975",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Debian 發布 DSA-6331-1：修補 Samba 服務中的 SambaCrypt 密碼雜湊漏洞",
@@ -44,7 +44,7 @@ window.TRACKER_DAYS["2026-06-08"] = [
     ]
   },
   {
-    id: "20260608-004",
+    id: "20260608-976",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Debian 發布 DSA-6330-1：修補 OpenSSH 服務中的潛在安全漏洞",
@@ -58,7 +58,7 @@ window.TRACKER_DAYS["2026-06-08"] = [
     ]
   },
   {
-    id: "20260608-005",
+    id: "20260608-977",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Debian 發布 DSA-6329：修補 Samba 內 Samba-client 服務的 Samba 憑證管理漏洞",
@@ -72,7 +72,7 @@ window.TRACKER_DAYS["2026-06-08"] = [
     ]
   },
   {
-    id: "20260608-006",
+    id: "20260608-978",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Debian 發布 DSA-6328-1：修補 OpenSSH 服務的潛在認證繞過漏洞",
@@ -86,7 +86,7 @@ window.TRACKER_DAYS["2026-06-08"] = [
     ]
   },
   {
-    id: "20260608-007",
+    id: "20260608-585",
     trackers: ["security"],
     category: "法規與標準",
     title: "分析：為何網路戰無法受停火協定約束？專家呼籲將《日內瓦公約》延伸至網路空間",
@@ -100,7 +100,7 @@ window.TRACKER_DAYS["2026-06-08"] = [
     ]
   },
   {
-    id: "20260608-008",
+    id: "20260608-574",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "CISA新增兩項已知遭利用漏洞：BerriAI與Check Point，警告企業應優先修補",
@@ -114,7 +114,7 @@ window.TRACKER_DAYS["2026-06-08"] = [
     ]
   },
   {
-    id: "20260608-009",
+    id: "20260608-614",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Linux 核心 CVE-2026-23111：單字符缺陷允許未授權使用者升級為 Root 並逃脫容器",
@@ -128,7 +128,7 @@ window.TRACKER_DAYS["2026-06-08"] = [
     ]
   },
   {
-    id: "20260608-010",
+    id: "20260608-616",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "警惕！Check Point VPN 關鍵漏洞 CVE-2026-50751 已遭積極利用，繞過用戶驗證",
@@ -143,7 +143,7 @@ window.TRACKER_DAYS["2026-06-08"] = [
     ]
   },
   {
-    id: "20260608-011",
+    id: "20260608-618",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Google修補Android框架高風險漏洞，CVE-2025-48595：權限提升無須互動",
@@ -157,7 +157,7 @@ window.TRACKER_DAYS["2026-06-08"] = [
     ]
   },
   {
-    id: "20260608-012",
+    id: "20260608-620",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "中國資安集團 VerdantBamboo 部署 BSD 變種後門 BRICKSTORM 攻擊企業網路",
@@ -171,7 +171,7 @@ window.TRACKER_DAYS["2026-06-08"] = [
     ]
   },
   {
-    id: "20260608-013",
+    id: "20260608-621",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "資安研究揭露 UNC3753 駭客集團：利用語音詐騙與實體入侵竊取法律與金融機構資料",
@@ -185,7 +185,7 @@ window.TRACKER_DAYS["2026-06-08"] = [
     ]
   },
   {
-    id: "20260608-014",
+    id: "20260608-5634",
     trackers: ["eu_cra"],
     category: "合規指引",
     title: "德國聯邦資訊安全辦公室（BSI）發布技術指引 TR-03183，指導製造商應對《網路韌性法案》（CRA）要求",
@@ -199,7 +199,7 @@ window.TRACKER_DAYS["2026-06-08"] = [
     ]
   },
   {
-    id: "20260608-015",
+    id: "20260608-586",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "「Hades」戰役持續攻擊 PyPI：分析 Mini Shai-Hulud 惡意程式如何利用 Python .pth 機制竊取密鑰",
@@ -213,7 +213,7 @@ window.TRACKER_DAYS["2026-06-08"] = [
     ]
   },
   {
-    id: "20260608-016",
+    id: "20260608-619",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "AI 時代下開源軟體生態系統面臨結構性危機：專家呼籲建立「最後的維護者」機制",
@@ -227,7 +227,7 @@ window.TRACKER_DAYS["2026-06-08"] = [
     ]
   },
   {
-    id: "20260608-017",
+    id: "20260608-622",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "VS Code 導入延遲更新機制，強化開發環境免受供應鏈惡意軟體攻擊",
@@ -241,7 +241,7 @@ window.TRACKER_DAYS["2026-06-08"] = [
     ]
   },
   {
-    id: "20260608-018",
+    id: "20260608-794",
     trackers: ["os"],
     category: "Android",
     title: "Adobe Acrobat PDF 閱讀器正式支援 Android Auto，透過語音朗讀功能提升車內生產力",
@@ -255,7 +255,7 @@ window.TRACKER_DAYS["2026-06-08"] = [
     ]
   },
   {
-    id: "20260608-019",
+    id: "20260608-801",
     trackers: ["os"],
     category: "Android",
     title: "Galaxy Z Fold 7 用戶反映 One UI 8.5 更新後電池續航力急劇下降",
@@ -269,7 +269,7 @@ window.TRACKER_DAYS["2026-06-08"] = [
     ]
   },
   {
-    id: "20260608-020",
+    id: "20260608-582",
     trackers: ["security"],
     category: "前瞻技術",
     title: "警惕AI內容過度使用：資安專業應重塑敘事權，避免「AI垃圾內容」侵蝕專業信譽",
@@ -283,7 +283,7 @@ window.TRACKER_DAYS["2026-06-08"] = [
     ]
   },
   {
-    id: "20260608-021",
+    id: "20260608-617",
     trackers: ["security"],
     category: "前瞻技術",
     title: "AI 強化網路釣魚攻擊潮，專家建議利用沙箱技術提升 SOC 團隊的偵測效率",
@@ -297,7 +297,7 @@ window.TRACKER_DAYS["2026-06-08"] = [
     ]
   },
   {
-    id: "20260608-022",
+    id: "20260608-793",
     trackers: ["os"],
     category: "重點關注",
     title: "Apple WWDC 2026發布Siri AI：深度整合Gemini模型，強化個人化與跨應用體驗",
@@ -311,7 +311,7 @@ window.TRACKER_DAYS["2026-06-08"] = [
     ]
   },
   {
-    id: "20260608-023",
+    id: "20260608-795",
     trackers: ["os"],
     category: "重點關注",
     title: "Google Gemini for Home 更新：提升智慧顯示器天氣預報、媒體播放與新聞互動體驗",
@@ -325,7 +325,7 @@ window.TRACKER_DAYS["2026-06-08"] = [
     ]
   },
   {
-    id: "20260608-024",
+    id: "20260608-798",
     trackers: ["os"],
     category: "重點關注",
     title: "Google 宣布 AI Plus 訂閱方案降價，提供更多儲存空間與 Gemini 應用升級功能",
@@ -339,7 +339,7 @@ window.TRACKER_DAYS["2026-06-08"] = [
     ]
   },
   {
-    id: "20260608-025",
+    id: "20260608-802",
     trackers: ["os"],
     category: "重點關注",
     title: "Google Photos「衣櫥」功能開始滾動，初期僅限付費 Android 用戶，規劃未來支援 iOS",
@@ -353,7 +353,7 @@ window.TRACKER_DAYS["2026-06-08"] = [
     ]
   },
   {
-    id: "20260608-026",
+    id: "20260608-803",
     trackers: ["os"],
     category: "重點關注",
     title: "OpenAI 重設計 ChatGPT：從聊天機器人轉向 AI 代理與編碼工具的「超級應用」",
@@ -367,7 +367,7 @@ window.TRACKER_DAYS["2026-06-08"] = [
     ]
   },
   {
-    id: "20260608-027",
+    id: "20260608-5854",
     trackers: ["eu_cra"],
     category: "產業動態",
     title: "G7 宣布提升全球數位韌性：聚焦後量子加密、AI 風險與中小企業資安保護",

@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-02-05"] = [
   {
-    id: "20260205-001",
+    id: "20260205-445",
     trackers: ["security"],
     category: "重大事件",
     title: "Substack 遭駭客洩露用戶資料：名單包含電子郵件、電話號碼與內部元數據",

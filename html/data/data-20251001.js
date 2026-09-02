@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2025-10-01"] = [
   {
-    id: "20251001-001",
+    id: "20251001-5919",
     trackers: ["eu_cra", "security"],
     category: "研討活動",
     title: "歐盟網路安全月聚焦網路釣魚威脅：強調提升公民防護意識與共同責任",

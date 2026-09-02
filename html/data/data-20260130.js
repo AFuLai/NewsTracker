@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-01-30"] = [
   {
-    id: "20260130-001",
+    id: "20260130-123",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "研究深入探討 macOS CoreAudio 類型混淆漏洞 (CVE-2024-54529) 的利用技術細節",

@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2025-03-18"] = [
   {
-    id: "20250318-001",
+    id: "20250318-148",
     trackers: ["eu_cra", "security"],
     category: "研討活動",
     title: "深入探討《網路韌性法案》（CRA）：涵蓋晶片、安全元件與歐盟標準化要求",

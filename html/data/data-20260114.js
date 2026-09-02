@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-01-14"] = [
   {
-    id: "20260114-001",
+    id: "20260114-235",
     trackers: ["eu_cra"],
     category: "調和標準",
     title: "ETSI 發布 EN 304 223 標準，建立 AI 系統全生命週期安全框架",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-01-14"] = [
     ]
   },
   {
-    id: "20260114-002",
+    id: "20260114-125",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Project Zero揭露Android生態系統0-Click攻擊面：警告AI功能擴張與驅動程式安全漏洞",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-01-14"] = [
     ]
   },
   {
-    id: "20260114-003",
+    id: "20260114-126",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "研究揭露 Pixel 9 BigWave 驅動程式存在多個 LPE 漏洞，可逃逸媒體編解碼沙盒",
@@ -44,7 +44,7 @@ window.TRACKER_DAYS["2026-01-14"] = [
     ]
   },
   {
-    id: "20260114-004",
+    id: "20260114-127",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Google 揭露 Android 訊息解碼器 0-Click 漏洞：多個 CVE 警示訊息處理風險",
@@ -58,7 +58,7 @@ window.TRACKER_DAYS["2026-01-14"] = [
     ]
   },
   {
-    id: "20260114-005",
+    id: "20260114-1287",
     trackers: ["os", "security"],
     category: "Android",
     title: "AliasVault Android 密碼管理工具存在越權取得 Passkey 回應漏洞 (CVE-2026-22694)",

@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-06-06"] = [
   {
-    id: "20260606-001",
+    id: "20260606-982",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Debian 發布 DSA-6324-1：修補 OpenSSH 服務中的潛在安全漏洞",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-06-06"] = [
     ]
   },
   {
-    id: "20260606-002",
+    id: "20260606-983",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Debian 發布 DSA-6323-1：修補 OpenSSH 服務中的潛在認證繞過漏洞",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-06-06"] = [
     ]
   },
   {
-    id: "20260606-003",
+    id: "20260606-624",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "研究揭露 Bright Data 透過 iOS SDK 將智慧電視轉為資料爬取節點，利用用戶家庭 IP 進行網路爬取",
@@ -44,7 +44,7 @@ window.TRACKER_DAYS["2026-06-06"] = [
     ]
   },
   {
-    id: "20260606-004",
+    id: "20260606-807",
     trackers: ["os"],
     category: "Android",
     title: "Google Gemini 介面更新：Android 應用程式導入 Dynamic Color 與功能優化",
@@ -58,7 +58,7 @@ window.TRACKER_DAYS["2026-06-06"] = [
     ]
   },
   {
-    id: "20260606-005",
+    id: "20260606-623",
     trackers: ["security"],
     category: "前瞻技術",
     title: "OpenAI推出ChatGPT「鎖定模式」限制工具，以降低提示注入攻擊的資料外洩風險",

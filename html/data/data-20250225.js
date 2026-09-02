@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2025-02-25"] = [
   {
-    id: "20250225-001",
+    id: "20250225-640",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Dragos 報告：OT/ICS 網路威脅升級，指出 BAUXITE、GRAPHITE 等新威脅群，並警示 FrostyGoop 等惡意軟體攻擊關鍵基礎設施",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2025-02-25"] = [
     ]
   },
   {
-    id: "20250225-002",
+    id: "20250225-3690",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Dragos發布第8屆OT/ICS資安年鑑：揭示地緣政治驅動的關鍵基礎設施威脅",

@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2025-10-17"] = [
   {
-    id: "20251017-001",
+    id: "20251017-5637",
     trackers: ["eu_cra", "security"],
     category: "合規指引",
     title: "BSI更新《技術指引 TR-03183》：提供企業應對《網路韌性法案》（CRA）的風險基礎指南",

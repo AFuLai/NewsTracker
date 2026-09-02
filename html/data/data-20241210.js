@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2024-12-10"] = [
   {
-    id: "20241210-001",
+    id: "20241210-169",
     trackers: ["eu_cra", "security"],
     category: "法令更新",
     title: "歐盟《網路韌性法案》（CRA）正式生效，要求數位產品製造商必須納入強制性資安義務",

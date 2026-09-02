@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-02-04"] = [
   {
-    id: "20260204-001",
+    id: "20260204-1291",
     trackers: ["os", "security"],
     category: "Android",
     title: "三星電話應用程式元件不當匯出，導致本地攻擊者可利用CVE-2026-20983提升權限",

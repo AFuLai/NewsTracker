@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-04-27"] = [
   {
-    id: "20260427-001",
+    id: "20260427-158",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "Red Hat宣布VEX文件重大升級：優化安全數據生態，提升漏洞資訊的精準度與可用性",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-04-27"] = [
     ]
   },
   {
-    id: "20260427-002",
+    id: "20260427-171",
     trackers: ["security"],
     category: "產業動態",
     title: "Cisco防火牆持續遭受攻擊：分析CVE-2025-20363等多重漏洞，建議立即修補並進行深度鑑識",

@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-05-14"] = [
   {
-    id: "20260514-001",
+    id: "20260514-1337",
     trackers: ["os", "security"],
     category: "Android",
     title: "Google Chrome Android 存在 Use-after-free 漏洞，可能導致沙盒逃逸，需升級至 148.0.7778.168 以上",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-05-14"] = [
     ]
   },
   {
-    id: "20260514-002",
+    id: "20260514-1338",
     trackers: ["os", "security"],
     category: "Android",
     title: "Google Chrome Android 漏洞：CVE-2026-8539 允許遠端透過網頁注入惡意腳本 (UXSS)",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-05-14"] = [
     ]
   },
   {
-    id: "20260514-003",
+    id: "20260514-1339",
     trackers: ["os", "security"],
     category: "Android",
     title: "Google Chrome Android 漏洞：GPU 堆緩衝區溢出，遠端攻擊可執行記憶體寫入",
@@ -44,7 +44,7 @@ window.TRACKER_DAYS["2026-05-14"] = [
     ]
   },
   {
-    id: "20260514-004",
+    id: "20260514-1341",
     trackers: ["os", "security"],
     category: "Android",
     title: "Google Chrome Android 漏洞揭露：CVE-2026-8566 允許遠端攻擊者繞過存取控制",
@@ -58,7 +58,7 @@ window.TRACKER_DAYS["2026-05-14"] = [
     ]
   },
   {
-    id: "20260514-005",
+    id: "20260514-1342",
     trackers: ["os", "security"],
     category: "Android",
     title: "Google Chrome Android 存在沙盒逃逸漏洞：CVE-2026-8571，需修補 GPU 政策強制性不足",
@@ -72,7 +72,7 @@ window.TRACKER_DAYS["2026-05-14"] = [
     ]
   },
   {
-    id: "20260514-006",
+    id: "20260514-1343",
     trackers: ["os", "security"],
     category: "Android",
     title: "Google Chrome Android 漏洞 CVE-2026-8572：渲染器流程被攻破後可洩漏跨來源資料",
@@ -86,7 +86,7 @@ window.TRACKER_DAYS["2026-05-14"] = [
     ]
   },
   {
-    id: "20260514-007",
+    id: "20260514-1344",
     trackers: ["os", "security"],
     category: "Android",
     title: "Google Chrome Android WebXR 漏洞 (CVE-2026-8583)：遠端攻擊者可從進程記憶體竊取敏感資訊",
@@ -100,7 +100,7 @@ window.TRACKER_DAYS["2026-05-14"] = [
     ]
   },
   {
-    id: "20260514-008",
+    id: "20260514-1283",
     trackers: ["os", "security"],
     category: "重點關注",
     title: "Fleet MDM 軟體存在身份驗證漏洞：未檢查 JWT 宣告導致任意 Azure AD 租戶可登入",
@@ -114,7 +114,7 @@ window.TRACKER_DAYS["2026-05-14"] = [
     ]
   },
   {
-    id: "20260514-009",
+    id: "20260514-1336",
     trackers: ["security"],
     category: "uncategorized",
     title: "無法生成新聞內容：提供的文章內容為 NVD 頁面重定向警告，無可分析的資安事件資訊。",

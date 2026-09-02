@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-06-13"] = [
   {
-    id: "20260613-001",
+    id: "20260613-553",
     trackers: ["security"],
     category: "重大事件",
     title: "美國政府要求 Anthropic 暫停 Claude Fable 5 模型，因國家安全擔憂與潛在繞過方法",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-06-13"] = [
     ]
   },
   {
-    id: "20260613-002",
+    id: "20260613-560",
     trackers: ["security"],
     category: "重大事件",
     title: "前IT員工持續攻擊前雇主：某學區員工因駭客行為被判入獄 造成系統癱瘓",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-06-13"] = [
     ]
   },
   {
-    id: "20260613-003",
+    id: "20260613-1025",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Fedora 45 考慮為機密運算（Confidential Compute）開發輕量化 GRUB 啟動器",
@@ -44,7 +44,7 @@ window.TRACKER_DAYS["2026-06-13"] = [
     ]
   },
   {
-    id: "20260613-004",
+    id: "20260613-1026",
     trackers: ["os"],
     category: "Linux",
     title: "Intel Thermald 2.5.12 重大更新：新增 ARM 平台支援，提升 Linux 散熱管理能力",
@@ -58,7 +58,7 @@ window.TRACKER_DAYS["2026-06-13"] = [
     ]
   },
   {
-    id: "20260613-005",
+    id: "20260613-1029",
     trackers: ["os"],
     category: "Linux",
     title: "KDE Plasma 6.7 即將發布，修復登入、休眠及顯示器配置相關的穩定性問題",
@@ -72,7 +72,7 @@ window.TRACKER_DAYS["2026-06-13"] = [
     ]
   },
   {
-    id: "20260613-006",
+    id: "20260613-1030",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Arch Linux AUR 遭遇惡意軟體攻擊：超過 1,500 個用戶貢獻套件受影響",
@@ -86,7 +86,7 @@ window.TRACKER_DAYS["2026-06-13"] = [
     ]
   },
   {
-    id: "20260613-007",
+    id: "20260613-1031",
     trackers: ["os"],
     category: "Linux",
     title: "OpenZFS 2.4.3 新版發布，強化 ZVOL 區塊複製加密檢查並修復多項 Bug",
@@ -100,7 +100,7 @@ window.TRACKER_DAYS["2026-06-13"] = [
     ]
   },
   {
-    id: "20260613-008",
+    id: "20260613-1070",
     trackers: ["os", "security"],
     category: "Windows",
     title: "Windows 系統漏洞：在倫敦無人列車系統中發現的舊版驅動程式風險",
@@ -114,7 +114,7 @@ window.TRACKER_DAYS["2026-06-13"] = [
     ]
   },
   {
-    id: "20260613-009",
+    id: "20260613-1104",
     trackers: ["os"],
     category: "Windows",
     title: "Windows 11 24H2/25H2 內建「低延遲模式」測試：確認 CPU 頻率提升不影響功耗與穩定性",
@@ -128,7 +128,7 @@ window.TRACKER_DAYS["2026-06-13"] = [
     ]
   },
   {
-    id: "20260613-010",
+    id: "20260613-552",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Splunk 關鍵漏洞 CVE-2026-20253：未經認證可執行遠端程式碼，建議立即升級",
@@ -142,7 +142,7 @@ window.TRACKER_DAYS["2026-06-13"] = [
     ]
   },
   {
-    id: "20260613-011",
+    id: "20260613-561",
     trackers: ["os", "security"],
     category: "漏洞與威脅情報",
     title: "資安研究揭露：駭客「Velvet Ant」入侵孤立網路十載，透過竄改認證系統竊取憑證",
@@ -156,7 +156,7 @@ window.TRACKER_DAYS["2026-06-13"] = [
     ]
   },
   {
-    id: "20260613-012",
+    id: "20260613-839",
     trackers: ["os"],
     category: "Apple",
     title: "Apple iOS 27 重磅更新：Siri 獨立 App 首次上線，整合 Apple Intelligence 提升個人化互動",
@@ -170,7 +170,7 @@ window.TRACKER_DAYS["2026-06-13"] = [
     ]
   },
   {
-    id: "20260613-013",
+    id: "20260613-844",
     trackers: ["os"],
     category: "Apple",
     title: "App Store 提交量激增，Apple 面臨審核壓力，開發者需注意內容價值與審核標準",
@@ -184,7 +184,7 @@ window.TRACKER_DAYS["2026-06-13"] = [
     ]
   },
   {
-    id: "20260613-014",
+    id: "20260613-846",
     trackers: ["os"],
     category: "Apple",
     title: "iOS 27 重設計 Apple Pay 結帳流程，提升用戶切換支付卡與查看資訊的便利性",
@@ -198,7 +198,7 @@ window.TRACKER_DAYS["2026-06-13"] = [
     ]
   },
   {
-    id: "20260613-015",
+    id: "20260613-723",
     trackers: ["os"],
     category: "Android",
     title: "Google Messages 推出多項新功能：支援加密 RCS、改善用戶體驗與強化安全防護",
@@ -212,7 +212,7 @@ window.TRACKER_DAYS["2026-06-13"] = [
     ]
   },
   {
-    id: "20260613-016",
+    id: "20260613-724",
     trackers: ["os"],
     category: "重點關注",
     title: "用戶分享：Fitbit Air 帶來的極簡穿戴體驗，讓作者放棄 Pixel Watch 4 的經驗分享",
@@ -226,7 +226,7 @@ window.TRACKER_DAYS["2026-06-13"] = [
     ]
   },
   {
-    id: "20260613-017",
+    id: "20260613-843",
     trackers: ["os"],
     category: "重點關注",
     title: "HeyPolo：提供比 Apple Find My 更精細、更注重隱私的定位分享應用程式",
@@ -240,7 +240,7 @@ window.TRACKER_DAYS["2026-06-13"] = [
     ]
   },
   {
-    id: "20260613-018",
+    id: "20260613-845",
     trackers: ["os"],
     category: "重點關注",
     title: "專家駁斥「生成式AI將導致SaaS終結」的預測：企業IT團隊的專業軟體仍不可取代",
@@ -254,7 +254,7 @@ window.TRACKER_DAYS["2026-06-13"] = [
     ]
   },
   {
-    id: "20260613-019",
+    id: "20260613-847",
     trackers: ["os"],
     category: "重點關注",
     title: "Anthropic 遭美國政府出口管制，緊急停用 Claude Mythos 5 與 Claude Fable 5 服務",
@@ -268,7 +268,7 @@ window.TRACKER_DAYS["2026-06-13"] = [
     ]
   },
   {
-    id: "20260613-020",
+    id: "20260613-943",
     trackers: ["os"],
     category: "重點關注",
     title: "Anthropic 響應美國商務部出口管制，緊急關閉 Mythos 5 與 Fable 5 模型",
@@ -282,7 +282,7 @@ window.TRACKER_DAYS["2026-06-13"] = [
     ]
   },
   {
-    id: "20260613-021",
+    id: "20260613-1024",
     trackers: ["os"],
     category: "重點關注",
     title: "Intel 宣布終止 BigDL 開源專案：影響跨設備 AI/LLM 應用開發",
@@ -296,7 +296,7 @@ window.TRACKER_DAYS["2026-06-13"] = [
     ]
   },
   {
-    id: "20260613-022",
+    id: "20260613-1027",
     trackers: ["os"],
     category: "重點關注",
     title: "GCC 17 支援函數多版本化 (FMV)，新增對 APX 與 AVX10.2 指令集支援",
@@ -310,7 +310,7 @@ window.TRACKER_DAYS["2026-06-13"] = [
     ]
   },
   {
-    id: "20260613-023",
+    id: "20260613-1028",
     trackers: ["os"],
     category: "重點關注",
     title: "Haiku OS 支援 AVX-512 與 GCC 16 編譯器，持續進行硬體驅動與核心優化",
@@ -324,7 +324,7 @@ window.TRACKER_DAYS["2026-06-13"] = [
     ]
   },
   {
-    id: "20260613-024",
+    id: "20260613-1067",
     trackers: ["os", "security"],
     category: "重點關注",
     title: "無重大資安事件，但業界趨勢顯示 AI 攻擊與零信任模型成為資安重點",
@@ -338,7 +338,7 @@ window.TRACKER_DAYS["2026-06-13"] = [
     ]
   },
   {
-    id: "20260613-025",
+    id: "20260613-1068",
     trackers: ["os"],
     category: "重點關注",
     title: "AWS 網路服務更新：提升網路效率與速度，為雲端應用提供更強大基礎",
@@ -352,7 +352,7 @@ window.TRACKER_DAYS["2026-06-13"] = [
     ]
   },
   {
-    id: "20260613-026",
+    id: "20260613-1069",
     trackers: ["os"],
     category: "重點關注",
     title: "NHS患者資料平台Palantir受關注：數據權限與退出機制問題",

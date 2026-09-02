@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2025-12-16"] = [
   {
-    id: "20251216-001",
+    id: "20251216-128",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Project Zero 發表新部落格，回顧歷史零日漏洞研究，持續揭露攻擊者能力與防禦機會",

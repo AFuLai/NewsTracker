@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2023-12-01"] = [
   {
-    id: "20231201-001",
+    id: "20231201-143",
     trackers: ["eu_cra", "security"],
     category: "法令更新",
     title: "歐盟網路韌性法案（CRA）重點介紹：強化產品生命週期安全與供應鏈責任",

@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-05-21"] = [
   {
-    id: "20260521-001",
+    id: "20260521-1111",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心 CVE-2026-43494：rds 訊息處理中 op_nents 清理不當導致的記憶體釋放錯誤",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-05-21"] = [
     ]
   },
   {
-    id: "20260521-002",
+    id: "20260521-1112",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修補：t7xx 模組的訊息處理函數存在越界讀取漏洞 (CVE-2026-43495)",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-05-21"] = [
     ]
   },
   {
-    id: "20260521-003",
+    id: "20260521-1113",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心：修復 net/sched red qdisc 處理流程中的潛在 Kernel Panic 漏洞",
@@ -44,7 +44,7 @@ window.TRACKER_DAYS["2026-05-21"] = [
     ]
   },
   {
-    id: "20260521-004",
+    id: "20260521-1114",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心：fbdev/udlfb 漏洞修補，防止使用後釋放（UAF）的記憶體存取",
@@ -58,7 +58,7 @@ window.TRACKER_DAYS["2026-05-21"] = [
     ]
   },
   {
-    id: "20260521-005",
+    id: "20260521-1115",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修復 CVE-2026-43498：防止 GEM 物件重傳導致的資料損壞",
@@ -72,7 +72,7 @@ window.TRACKER_DAYS["2026-05-21"] = [
     ]
   },
   {
-    id: "20260521-006",
+    id: "20260521-1116",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修復 rtmutex 漏洞：移除 wait_task 替代 current 參數，避免 UAF 與狀態混亂",
@@ -86,7 +86,7 @@ window.TRACKER_DAYS["2026-05-21"] = [
     ]
   },
   {
-    id: "20260521-007",
+    id: "20260521-1117",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修復 IPv6 處理漏洞：recompressed SRH 導致的緩衝區溢寫 (CVE-2026-43501)",
@@ -100,7 +100,7 @@ window.TRACKER_DAYS["2026-05-21"] = [
     ]
   },
   {
-    id: "20260521-008",
+    id: "20260521-1118",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修補：修復 net/rds 模組的零拷貝（zerocopy）訊息清理邏輯漏洞",
@@ -114,7 +114,7 @@ window.TRACKER_DAYS["2026-05-21"] = [
     ]
   },
   {
-    id: "20260521-009",
+    id: "20260521-651",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Kimwolf 殭屍網路營運者被捕：美國與加拿大指控其大規模發動 DDoS 攻擊",

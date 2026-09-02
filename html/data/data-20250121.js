@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2025-01-21"] = [
   {
-    id: "20250121-001",
+    id: "20250121-280",
     trackers: ["eu_cra"],
     category: "合規指引",
     title: "新加坡 CSA 提醒：強化密碼安全，建議使用長度至少 12 個字元且隨機的密碼",

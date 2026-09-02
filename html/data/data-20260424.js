@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-04-24"] = [
   {
-    id: "20260424-001",
+    id: "20260424-159",
     trackers: ["security"],
     category: "前瞻技術",
     title: "Red Hat OpenShift 推出開發者預覽版「機密叢集」，將信任邊界擴展至整個叢集基礎設施",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-04-24"] = [
     ]
   },
   {
-    id: "20260424-002",
+    id: "20260424-5864",
     trackers: ["eu_cra"],
     category: "研討活動",
     title: "歐盟資安認證週：討論強化歐盟網路韌性與《網路韌性法案》框架",

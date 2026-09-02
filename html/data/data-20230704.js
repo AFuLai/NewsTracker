@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2023-07-04"] = [
   {
-    id: "20230704-001",
+    id: "20230704-263",
     trackers: ["eu_cra", "security"],
     category: "法令更新",
     title: "歐盟《網路韌性法案》（CRA）確立數位產品安全標準，要求製造商全生命週期管理漏洞",

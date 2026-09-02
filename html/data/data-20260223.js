@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-02-23"] = [
   {
-    id: "20260223-001",
+    id: "20260223-1297",
     trackers: ["os", "security"],
     category: "Android",
     title: "AliasVault 應用程式曝露備份檔案風險：本地攻擊可竊取未加密的 API Session Token",

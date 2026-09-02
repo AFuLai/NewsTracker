@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2024-02-20"] = [
   {
-    id: "20240220-001",
+    id: "20240220-5314",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Dragos年報揭露OT資安趨勢：VOLTZITE與GANANITE等新威脅群、勒索軟體攻擊激增",

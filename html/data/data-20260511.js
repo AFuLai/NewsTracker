@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-05-11"] = [
   {
-    id: "20260511-001",
+    id: "20260511-230",
     trackers: ["eu_cra"],
     category: "調和標準",
     title: "歐盟數位身份錢包（EUDIW）標準化研討會：探討電子身份、認證與跨國數位基礎設施的未來",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-05-11"] = [
     ]
   },
   {
-    id: "20260511-002",
+    id: "20260511-1193",
     trackers: ["os", "security"],
     category: "Apple",
     title: "Apple發布iOS 26.5與iPadOS 26.5安全更新，修補多項核心元件漏洞",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-05-11"] = [
     ]
   },
   {
-    id: "20260511-003",
+    id: "20260511-1194",
     trackers: ["os", "security"],
     category: "Apple",
     title: "Apple 發布 iOS 18.7.9 與 iPadOS 18.7.9 安全更新，修補多項核心與應用層漏洞",
@@ -44,7 +44,7 @@ window.TRACKER_DAYS["2026-05-11"] = [
     ]
   },
   {
-    id: "20260511-004",
+    id: "20260511-1195",
     trackers: ["os", "security"],
     category: "Apple",
     title: "Apple 發布 iPadOS 17.7.11 安全更新，修復通知服務的資料保留與日誌記錄漏洞",
@@ -58,7 +58,7 @@ window.TRACKER_DAYS["2026-05-11"] = [
     ]
   },
   {
-    id: "20260511-005",
+    id: "20260511-1196",
     trackers: ["os", "security"],
     category: "Apple",
     title: "Apple 發布 iOS 16.7.1.6 與 iPadOS 16.7.1.6 安全更新，修補通知服務的記錄錯誤",
@@ -72,7 +72,7 @@ window.TRACKER_DAYS["2026-05-11"] = [
     ]
   },
   {
-    id: "20260511-006",
+    id: "20260511-1197",
     trackers: ["os", "security"],
     category: "Apple",
     title: "Apple 發布 iOS 15.8.8 與 iPadOS 15.8.8 安全更新，修補通知服務的日誌記錄漏洞",
@@ -86,7 +86,7 @@ window.TRACKER_DAYS["2026-05-11"] = [
     ]
   },
   {
-    id: "20260511-007",
+    id: "20260511-1198",
     trackers: ["os", "security"],
     category: "Apple",
     title: "Apple發布macOS Tahoe 26.5安全更新：修補多個核心元件與應用層漏洞，包含權限提升與記憶體相關風險",
@@ -100,7 +100,7 @@ window.TRACKER_DAYS["2026-05-11"] = [
     ]
   },
   {
-    id: "20260511-008",
+    id: "20260511-1199",
     trackers: ["os", "security"],
     category: "Apple",
     title: "Apple 發布 macOS Sequoia 15.7.7 安全更新，修補多項核心元件漏洞，包含提升沙盒與權限控制",
@@ -114,7 +114,7 @@ window.TRACKER_DAYS["2026-05-11"] = [
     ]
   },
   {
-    id: "20260511-009",
+    id: "20260511-1200",
     trackers: ["os", "security"],
     category: "Apple",
     title: "Apple 發布 macOS Sonoma 14.8.7 安全更新，修補多項核心漏洞，包含提升權限與記憶體寫入風險",
@@ -128,7 +128,7 @@ window.TRACKER_DAYS["2026-05-11"] = [
     ]
   },
   {
-    id: "20260511-010",
+    id: "20260511-1201",
     trackers: ["os", "security"],
     category: "Apple",
     title: "Apple 發布 tvOS 26.5 安全更新，修補多個核心元件與應用層漏洞，包含記憶體溢出與權限提升風險",
@@ -142,7 +142,7 @@ window.TRACKER_DAYS["2026-05-11"] = [
     ]
   },
   {
-    id: "20260511-011",
+    id: "20260511-1202",
     trackers: ["os", "security"],
     category: "Apple",
     title: "Apple 發布 watchOS 26.5 安全更新，修補多項核心與應用層漏洞，包含 Kernel、ImageIO 及 IOHIDFamily 等",
@@ -156,7 +156,7 @@ window.TRACKER_DAYS["2026-05-11"] = [
     ]
   },
   {
-    id: "20260511-012",
+    id: "20260511-1203",
     trackers: ["os", "security"],
     category: "Apple",
     title: "Apple 發布 visionOS 26.5 安全更新：修補多項核心與應用層級漏洞，包含 Kernel、ImageIO 及服務層面風險",
@@ -170,7 +170,7 @@ window.TRACKER_DAYS["2026-05-11"] = [
     ]
   },
   {
-    id: "20260511-013",
+    id: "20260511-1206",
     trackers: ["os", "security"],
     category: "Apple",
     title: "Apple 發布 iOS 18.7.7 與 iPadOS 18.7.7 安全更新，修補多個核心元件漏洞",
@@ -184,7 +184,7 @@ window.TRACKER_DAYS["2026-05-11"] = [
     ]
   },
   {
-    id: "20260511-014",
+    id: "20260511-1207",
     trackers: ["os", "security"],
     category: "Apple",
     title: "Apple 發布 iOS 26.4 與 iPadOS 26.4 安全更新，修補多項核心漏洞",
@@ -198,7 +198,7 @@ window.TRACKER_DAYS["2026-05-11"] = [
     ]
   },
   {
-    id: "20260511-015",
+    id: "20260511-1208",
     trackers: ["os", "security"],
     category: "Apple",
     title: "Apple發布macOS Tahoe 26.4安全更新：修補多個核心元件與應用程式漏洞",
@@ -212,7 +212,7 @@ window.TRACKER_DAYS["2026-05-11"] = [
     ]
   },
   {
-    id: "20260511-016",
+    id: "20260511-1209",
     trackers: ["os", "security"],
     category: "Apple",
     title: "macOS Sequoia 15.7.5 安全更新發布：修補多項核心元件與應用層漏洞",
@@ -226,7 +226,7 @@ window.TRACKER_DAYS["2026-05-11"] = [
     ]
   },
   {
-    id: "20260511-017",
+    id: "20260511-1210",
     trackers: ["os", "security"],
     category: "Apple",
     title: "macOS Sonoma 14.8.5 安全更新發布：修補多項核心元件與應用程式漏洞",
@@ -240,7 +240,7 @@ window.TRACKER_DAYS["2026-05-11"] = [
     ]
   },
   {
-    id: "20260511-018",
+    id: "20260511-1211",
     trackers: ["os", "security"],
     category: "Apple",
     title: "Apple 發布 tvOS 26.4 安全更新：修補多項核心漏洞，涵蓋 WebKit、Kernel 及授權服務",
@@ -254,7 +254,7 @@ window.TRACKER_DAYS["2026-05-11"] = [
     ]
   },
   {
-    id: "20260511-019",
+    id: "20260511-1212",
     trackers: ["os", "security"],
     category: "Apple",
     title: "Apple 發布 watchOS 26.4 安全更新，修補多項核心與應用層面漏洞，包含 Kernel、Audio 及 Keychain 相關風險",
@@ -268,7 +268,7 @@ window.TRACKER_DAYS["2026-05-11"] = [
     ]
   },
   {
-    id: "20260511-020",
+    id: "20260511-1328",
     trackers: ["os", "security"],
     category: "Android",
     title: "Meari IoT SDK 內嵌硬編碼密鑰：CVE-2026-33362 揭露多個安全關鍵密鑰",

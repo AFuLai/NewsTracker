@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-04-05"] = [
   {
-    id: "20260405-001",
+    id: "20260405-165",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "cPanel/WHM 遭未經身份驗證的遠端攻擊繞過漏洞 (CVE-2026-41940)",

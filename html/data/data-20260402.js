@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-04-02"] = [
   {
-    id: "20260402-001",
+    id: "20260402-442",
     trackers: ["security"],
     category: "重大事件",
     title: "德州Nacogdoches紀念醫院遭駭：25 萬人個人與健康資料外洩事件分析",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-04-02"] = [
     ]
   },
   {
-    id: "20260402-002",
+    id: "20260402-135",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Elastic 介紹高階規則（Higher-Order Rules）：透過關聯多重警報提升資安偵測準確性",

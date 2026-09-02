@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2025-06-26"] = [
   {
-    id: "20250626-001",
+    id: "20250626-203",
     trackers: ["eu_cra"],
     category: "研討活動",
     title: "ENISA 關注資安人才短缺與技能落差，推動建立資安技能框架以強化歐盟防禦能力",

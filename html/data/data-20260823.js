@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-08-23"] = [
   {
-    id: "20260823-001",
+    id: "20260823-9167",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心發行新版本：多個穩定版 Kernel 修補重要漏洞",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-08-23"] = [
     ]
   },
   {
-    id: "20260823-002",
+    id: "20260823-9182",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 7.3 核心新增 EFI 服務超時機制，防止有缺陷的韌體導致系統掛起",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-08-23"] = [
     ]
   },
   {
-    id: "20260823-003",
+    id: "20260823-9183",
     trackers: ["os"],
     category: "Linux",
     title: "Linux 7.3 更新：DRM 子系統大幅提升圖形驅動支援，涵蓋老舊至新一代硬體",
@@ -44,7 +44,7 @@ window.TRACKER_DAYS["2026-08-23"] = [
     ]
   },
   {
-    id: "20260823-004",
+    id: "20260823-9185",
     trackers: ["os"],
     category: "Linux",
     title: "Micron 專用檔案系統 FAMFS 為 Linux 7.3 進行準備，助力 CXL 與大容量記憶體應用",
@@ -58,7 +58,7 @@ window.TRACKER_DAYS["2026-08-23"] = [
     ]
   },
   {
-    id: "20260823-005",
+    id: "20260823-9187",
     trackers: ["os"],
     category: "Linux",
     title: "Linux 7.3 新增 AES 加密 API，預期提升核心效能並簡化程式碼",
@@ -72,7 +72,7 @@ window.TRACKER_DAYS["2026-08-23"] = [
     ]
   },
   {
-    id: "20260823-006",
+    id: "20260823-9188",
     trackers: ["os"],
     category: "Linux",
     title: "Linux 核心輸入子系統更新：修補 psmouse 用戶後使用型別錯誤，並加入多款新硬體驅動支援",
@@ -86,7 +86,7 @@ window.TRACKER_DAYS["2026-08-23"] = [
     ]
   },
   {
-    id: "20260823-007",
+    id: "20260823-9189",
     trackers: ["os"],
     category: "Linux",
     title: "資深 Linux CIFS/SMB3 維護者 Steve French 逝世，維護職責交接給 Paulo Alcantara 與 Namjae Jeon",
@@ -100,7 +100,7 @@ window.TRACKER_DAYS["2026-08-23"] = [
     ]
   },
   {
-    id: "20260823-008",
+    id: "20260823-9190",
     trackers: ["os", "security"],
     category: "Linux",
     title: "eCryptfs 為 Linux 核心修補多項漏洞，強化對惡意資料和系統通訊的防禦",
@@ -114,7 +114,7 @@ window.TRACKER_DAYS["2026-08-23"] = [
     ]
   },
   {
-    id: "20260823-009",
+    id: "20260823-9230",
     trackers: ["os"],
     category: "Linux",
     title: "Linux 所有權法律爭議接近尾聲：法院裁定 IBM 與 Red Hat 的相關主張無效",
@@ -128,7 +128,7 @@ window.TRACKER_DAYS["2026-08-23"] = [
     ]
   },
   {
-    id: "20260823-010",
+    id: "20260823-9258",
     trackers: ["os", "security"],
     category: "Windows",
     title: "Windows 11 File Explorer 新增「Preview anyway」功能，改善下載檔案預覽體驗",
@@ -142,7 +142,7 @@ window.TRACKER_DAYS["2026-08-23"] = [
     ]
   },
   {
-    id: "20260823-011",
+    id: "20260823-9261",
     trackers: ["os"],
     category: "Windows",
     title: "Windows 11 更新：現代化滑鼠指示器與 WinUI 重塑多個核心功能，提升用戶體驗",
@@ -156,7 +156,7 @@ window.TRACKER_DAYS["2026-08-23"] = [
     ]
   },
   {
-    id: "20260823-012",
+    id: "20260823-8983",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "警惕 DBD::Pg 3.21.0 版本：Perl 庫存在堆疊越界寫入漏洞 (CVE-2026-78183)",
@@ -170,7 +170,7 @@ window.TRACKER_DAYS["2026-08-23"] = [
     ]
   },
   {
-    id: "20260823-013",
+    id: "20260823-8984",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "CVE-2026-19565：Apache::AppSamurai Perl模組生成可預測的會話認證金鑰，可能導致身份驗證繞過",
@@ -184,7 +184,7 @@ window.TRACKER_DAYS["2026-08-23"] = [
     ]
   },
   {
-    id: "20260823-014",
+    id: "20260823-8985",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Kata Containers 運行時發現 CVE-2026-50540 漏洞，影響 Rust 與 Go 版本",
@@ -198,7 +198,7 @@ window.TRACKER_DAYS["2026-08-23"] = [
     ]
   },
   {
-    id: "20260823-015",
+    id: "20260823-8986",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Perl的Reverse::Proxy套件存在CVE-2026-75922，允許透過HTTP請求竊取資訊",
@@ -212,7 +212,7 @@ window.TRACKER_DAYS["2026-08-23"] = [
     ]
   },
   {
-    id: "20260823-016",
+    id: "20260823-8987",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "CVE-2026-41992：gzip 函式庫存在越界記憶體緩衝區存取漏洞，需升級至 1.15 版本",
@@ -226,7 +226,7 @@ window.TRACKER_DAYS["2026-08-23"] = [
     ]
   },
   {
-    id: "20260823-017",
+    id: "20260823-9099",
     trackers: ["os"],
     category: "Apple",
     title: "蘋果傳將推出 M6 晶片 iMac，並搭配全新顏色選項",
@@ -240,7 +240,7 @@ window.TRACKER_DAYS["2026-08-23"] = [
     ]
   },
   {
-    id: "20260823-018",
+    id: "20260823-9101",
     trackers: ["os"],
     category: "Apple",
     title: "Apple準備推出全新智慧家庭中樞、HomePod mini與Apple TV 4K，整合Siri AI功能",
@@ -254,7 +254,7 @@ window.TRACKER_DAYS["2026-08-23"] = [
     ]
   },
   {
-    id: "20260823-019",
+    id: "20260823-9339",
     trackers: ["os", "security"],
     category: "漏洞與威脅情報",
     title: "惡意軟體 ToxicPanda 進化，利用 VPN 與 ADB 權限竊取資料並繞過系統防護",
@@ -268,7 +268,7 @@ window.TRACKER_DAYS["2026-08-23"] = [
     ]
   },
   {
-    id: "20260823-020",
+    id: "20260823-9047",
     trackers: ["os"],
     category: "Android",
     title: "三星傳回歸「相機條」設計：Galaxy S27 Ultra預計採用全新外觀",
@@ -282,7 +282,7 @@ window.TRACKER_DAYS["2026-08-23"] = [
     ]
   },
   {
-    id: "20260823-021",
+    id: "20260823-9048",
     trackers: ["os"],
     category: "重點關注",
     title: "Google 傳出 Pixel Watch Ultra 概念，預期將參考 Fitbit Air 的設計與功能",
@@ -296,7 +296,7 @@ window.TRACKER_DAYS["2026-08-23"] = [
     ]
   },
   {
-    id: "20260823-022",
+    id: "20260823-9168",
     trackers: ["os"],
     category: "重點關注",
     title: "無資安新聞內容：悼念 Steve French",
@@ -310,7 +310,7 @@ window.TRACKER_DAYS["2026-08-23"] = [
     ]
   },
   {
-    id: "20260823-023",
+    id: "20260823-9184",
     trackers: ["os"],
     category: "重點關注",
     title: "ReactOS整合 Job Objects支援，邁向運行現代Windows應用程式的重要里程碑",
@@ -324,7 +324,7 @@ window.TRACKER_DAYS["2026-08-23"] = [
     ]
   },
   {
-    id: "20260823-024",
+    id: "20260823-9186",
     trackers: ["os"],
     category: "重點關注",
     title: "AMD透過調整GCC編譯器中的分支誤預測成本，為Zen 5與Zen 4處理器帶來效能提升",
@@ -338,7 +338,7 @@ window.TRACKER_DAYS["2026-08-23"] = [
     ]
   },
   {
-    id: "20260823-025",
+    id: "20260823-9231",
     trackers: ["os"],
     category: "重點關注",
     title: "Cursor 推出 Origin，改用物件儲存解決大規模 Git 版本控制的擴展性瓶頸",
@@ -352,7 +352,7 @@ window.TRACKER_DAYS["2026-08-23"] = [
     ]
   },
   {
-    id: "20260823-026",
+    id: "20260823-9232",
     trackers: ["os"],
     category: "重點關注",
     title: "回顧歷史：揭秘早期版 Windows 娛樂套件與 Windows 95 的收藏品軼事",
@@ -366,7 +366,7 @@ window.TRACKER_DAYS["2026-08-23"] = [
     ]
   },
   {
-    id: "20260823-027",
+    id: "20260823-9026",
     trackers: ["eu_cra"],
     category: "產業動態",
     title: "Wiz深度解析韓企雲端AI安全趨勢：強調Agentless掃描與可視性提升",
@@ -380,7 +380,7 @@ window.TRACKER_DAYS["2026-08-23"] = [
     ]
   },
   {
-    id: "20260823-028",
+    id: "20260823-9027",
     trackers: ["eu_cra"],
     category: "產業動態",
     title: "前NSA國長폴 나카소네成立「Nakasone Group」，將國家級資安戰略推向私人市場",
@@ -394,7 +394,7 @@ window.TRACKER_DAYS["2026-08-23"] = [
     ]
   },
   {
-    id: "20260823-029",
+    id: "20260823-9028",
     trackers: ["eu_cra"],
     category: "產業動態",
     title: "疑似伊朗背景的網路攻擊導致英國發電廠停機，國家基礎設施面臨威脅",
@@ -408,7 +408,7 @@ window.TRACKER_DAYS["2026-08-23"] = [
     ]
   },
   {
-    id: "20260823-030",
+    id: "20260823-9030",
     trackers: ["eu_cra"],
     category: "產業動態",
     title: "全球物理安全巨頭 Genetec 闡述 AI 與混合 SaaS 戰略，推動大型企業數位轉型",

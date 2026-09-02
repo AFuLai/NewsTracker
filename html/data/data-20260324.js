@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-03-24"] = [
   {
-    id: "20260324-001",
+    id: "20260324-637",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Dragos 2026 OT/ICS 威脅報告：資安防禦應聚焦於邊界與存取點",

@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2023-10-01"] = [
   {
-    id: "20231001-001",
+    id: "20231001-1179",
     trackers: ["os", "security"],
     category: "Android",
     title: "Android 14 安全更新公告：修補多項核心漏洞，強化系統與應用層安全保護",

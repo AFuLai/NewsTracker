@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-05-27"] = [
   {
-    id: "20260527-001",
+    id: "20260527-39",
     trackers: ["security"],
     category: "重大事件",
     title: "拉丁美洲政府機構面臨數據外洩威脅：犯罪集團專攻公部門，利用地緣政治壓力進行勒索",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-05-27"] = [
     ]
   },
   {
-    id: "20260527-002",
+    id: "20260527-7",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "銀行木馬持續進化：Grandoreiro利用DLL側載與WebRTC、BTMOB RAT透過Android權限竊取資料",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-05-27"] = [
     ]
   },
   {
-    id: "20260527-003",
+    id: "20260527-11",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "成熟的 SOC 應對現代威脅：從被動防禦轉向降低業務不確定性風險",
@@ -44,7 +44,7 @@ window.TRACKER_DAYS["2026-05-27"] = [
     ]
   },
   {
-    id: "20260527-004",
+    id: "20260527-12",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Gitea 平台曝出 CVE-2026-27771 漏洞：未經授權可拉取私有容器鏡像",
@@ -58,7 +58,7 @@ window.TRACKER_DAYS["2026-05-27"] = [
     ]
   },
   {
-    id: "20260527-005",
+    id: "20260527-38",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "FBI警告：勒索集團Silent Ransom Group鎖定律師事務所，透過實體滲透與社工詐騙竊取客戶資料",
@@ -72,7 +72,7 @@ window.TRACKER_DAYS["2026-05-27"] = [
     ]
   },
   {
-    id: "20260527-006",
+    id: "20260527-40",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "AI輔助漏洞利用開發速度驚人提升：研究指出攻擊者利用 LLM 將 PoC 建立時間從 125 天縮至半天",
@@ -86,7 +86,7 @@ window.TRACKER_DAYS["2026-05-27"] = [
     ]
   },
   {
-    id: "20260527-007",
+    id: "20260527-58",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "CISA新增三項已知遭利用漏洞：涵蓋Daemon Tools、TanStack及Nx Console等元件",
@@ -100,7 +100,7 @@ window.TRACKER_DAYS["2026-05-27"] = [
     ]
   },
   {
-    id: "20260527-008",
+    id: "20260527-103",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "資安署檢測中國App：高德地圖等四款App被曝過度蒐集剪貼簿、健康紀錄及傳輸至中國伺服器",
@@ -114,7 +114,7 @@ window.TRACKER_DAYS["2026-05-27"] = [
     ]
   },
   {
-    id: "20260527-009",
+    id: "20260527-104",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "ExifTool 處理 PNG 檔案時存在重大指令注入漏洞 (CVE-2026-3102)，macOS 用戶需立即升級至 13.50 版",
@@ -128,7 +128,7 @@ window.TRACKER_DAYS["2026-05-27"] = [
     ]
   },
   {
-    id: "20260527-010",
+    id: "20260527-105",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "互動資通平臺遭駭與數字科技原始碼外洩：資安事件警訊與開發流程風險分析",
@@ -142,7 +142,7 @@ window.TRACKER_DAYS["2026-05-27"] = [
     ]
   },
   {
-    id: "20260527-011",
+    id: "20260527-106",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Google威脅情報揭露：中國網釣PhaaS平臺「YY来鱼」大規模偽造日本服務，全球擴散威脅",
@@ -156,7 +156,7 @@ window.TRACKER_DAYS["2026-05-27"] = [
     ]
   },
   {
-    id: "20260527-012",
+    id: "20260527-108",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "7-Zip修補CVE-2026-48095：警告處理NTFS映像檔時的堆積緩衝區溢位漏洞",
@@ -170,7 +170,7 @@ window.TRACKER_DAYS["2026-05-27"] = [
     ]
   },
   {
-    id: "20260527-013",
+    id: "20260527-109",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "KnowledgeDeliver LMS遭RCE漏洞攻擊：相同金鑰讓多平臺易受，駭客植入Webshell與惡意指令碼",
@@ -184,7 +184,7 @@ window.TRACKER_DAYS["2026-05-27"] = [
     ]
   },
   {
-    id: "20260527-014",
+    id: "20260527-452",
     trackers: ["eu_cra"],
     category: "合規指引",
     title: "關於個人資料處理政策的說明與權益保障",
@@ -198,7 +198,7 @@ window.TRACKER_DAYS["2026-05-27"] = [
     ]
   },
   {
-    id: "20260527-015",
+    id: "20260527-8",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "npm 惡意套件「mouse5212-super-formatter」竊取 Anthropic Claude 工作區資料，警惕開源專案風險",
@@ -212,7 +212,7 @@ window.TRACKER_DAYS["2026-05-27"] = [
     ]
   },
   {
-    id: "20260527-016",
+    id: "20260527-10",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "CrowdStrike與Google聯手瓦解GlassWorm惡意軟體，阻斷多層次供應鏈攻擊C2通道",
@@ -226,7 +226,7 @@ window.TRACKER_DAYS["2026-05-27"] = [
     ]
   },
   {
-    id: "20260527-017",
+    id: "20260527-107",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "Google警告：中文駭客PhaaS平臺利用AI技術，提升全球網釣能力並規避偵測",
@@ -240,7 +240,7 @@ window.TRACKER_DAYS["2026-05-27"] = [
     ]
   },
   {
-    id: "20260527-018",
+    id: "20260527-110",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "警惕AI誘餌攻擊：駭客濫用Google廣告與Claude分享頁面散播macOS惡意軟體",
@@ -254,7 +254,7 @@ window.TRACKER_DAYS["2026-05-27"] = [
     ]
   },
   {
-    id: "20260527-019",
+    id: "20260527-1142",
     trackers: ["os", "security"],
     category: "Android",
     title: "Android AppLock 應用程式存在繞過生物識別驗證的漏洞 (CVE-2025-68712)",
@@ -268,7 +268,7 @@ window.TRACKER_DAYS["2026-05-27"] = [
     ]
   },
   {
-    id: "20260527-020",
+    id: "20260527-9",
     trackers: ["security"],
     category: "前瞻技術",
     title: "管理「影子AI」工具的五步驟：建立可見性與治理框架",
@@ -282,7 +282,7 @@ window.TRACKER_DAYS["2026-05-27"] = [
     ]
   },
   {
-    id: "20260527-021",
+    id: "20260527-13",
     trackers: ["security"],
     category: "前瞻技術",
     title: "AI聊天機器人被惡用：駭客透過LLM推薦惡意下載，植入持久性後門進行挖礦",
@@ -296,7 +296,7 @@ window.TRACKER_DAYS["2026-05-27"] = [
     ]
   },
   {
-    id: "20260527-022",
+    id: "20260527-41",
     trackers: ["security"],
     category: "前瞻技術",
     title: "資安產業演進回顧：從周邊防禦到 AI 原生安全，應對雲端、行動與物聯網挑戰",
@@ -310,7 +310,7 @@ window.TRACKER_DAYS["2026-05-27"] = [
     ]
   },
   {
-    id: "20260527-023",
+    id: "20260527-102",
     trackers: ["security"],
     category: "前瞻技術",
     title: "NIST擴展PQC標準化評選：九種額外數位簽章方案晉級，加速企業後量子密碼遷移",
@@ -324,7 +324,7 @@ window.TRACKER_DAYS["2026-05-27"] = [
     ]
   },
   {
-    id: "20260527-024",
+    id: "20260527-1141",
     trackers: ["os", "security"],
     category: "重點關注",
     title: "Tauri 框架存在遠端 URL 誤判為本地來源的漏洞 (CVE-2026-42184)",
@@ -338,7 +338,7 @@ window.TRACKER_DAYS["2026-05-27"] = [
     ]
   },
   {
-    id: "20260527-025",
+    id: "20260527-453",
     trackers: ["eu_cra"],
     category: "產業動態",
     title: "TVING 宣布 2028 年版權策略調整：強調 AI 內容與內容生態系合作",

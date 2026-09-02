@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-06-21"] = [
   {
-    id: "20260621-001",
+    id: "20260621-1863",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Debian 發布 DSA-6360-1：修補 OpenSSH 服務中的潛在認證繞過漏洞",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-06-21"] = [
     ]
   },
   {
-    id: "20260621-002",
+    id: "20260621-1864",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Debian 發布 DSA-6359-1：修補 OpenSSH 服務中的潛在認證繞過漏洞",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-06-21"] = [
     ]
   },
   {
-    id: "20260621-003",
+    id: "20260621-1865",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Debian 發布 DSA-6358：修補 OpenSSH 服務中的認證繞過漏洞",
@@ -44,7 +44,7 @@ window.TRACKER_DAYS["2026-06-21"] = [
     ]
   },
   {
-    id: "20260621-004",
+    id: "20260621-1866",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Debian 發布 DSA-6357：修補 OpenSSH 服務中的憑證驗證漏洞",
@@ -58,7 +58,7 @@ window.TRACKER_DAYS["2026-06-21"] = [
     ]
   },
   {
-    id: "20260621-005",
+    id: "20260621-1867",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Debian 發布 DSA-6356：修補 OpenSSH 服務中的潛在認證繞過漏洞",
@@ -72,7 +72,7 @@ window.TRACKER_DAYS["2026-06-21"] = [
     ]
   },
   {
-    id: "20260621-006",
+    id: "20260621-1868",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Debian 發布 DSA-6355-1：修補 OpenSSH 服務中的潛在認證繞過漏洞",
@@ -86,7 +86,7 @@ window.TRACKER_DAYS["2026-06-21"] = [
     ]
   },
   {
-    id: "20260621-007",
+    id: "20260621-1904",
     trackers: ["os"],
     category: "Linux",
     title: "ASUS ROG Strix G16 筆電啟動延遲問題：Linux 核心修補程式與韌體修復討論",
@@ -100,7 +100,7 @@ window.TRACKER_DAYS["2026-06-21"] = [
     ]
   },
   {
-    id: "20260621-008",
+    id: "20260621-1905",
     trackers: ["os"],
     category: "Linux",
     title: "NVIDIA 在 Linux 7.2 核心中為「Blackwell-Next」GPU 準備 CXL 支援",
@@ -114,7 +114,7 @@ window.TRACKER_DAYS["2026-06-21"] = [
     ]
   },
   {
-    id: "20260621-009",
+    id: "20260621-1906",
     trackers: ["os"],
     category: "Linux",
     title: "Linux KUnit 測試框架支援 JUnit 輸出，提升 CI/CD 系統的互通性",
@@ -128,7 +128,7 @@ window.TRACKER_DAYS["2026-06-21"] = [
     ]
   },
   {
-    id: "20260621-010",
+    id: "20260621-1907",
     trackers: ["os"],
     category: "Linux",
     title: "Broadcom 為 VMware 虛擬化開發零拷區塊共享驅動，提升 Linux 虛擬機效能",
@@ -142,7 +142,7 @@ window.TRACKER_DAYS["2026-06-21"] = [
     ]
   },
   {
-    id: "20260621-011",
+    id: "20260621-1984",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修補：ksmbd 緩慢路徑綁定會話查找邏輯修正，強化連線安全性",
@@ -156,7 +156,7 @@ window.TRACKER_DAYS["2026-06-21"] = [
     ]
   },
   {
-    id: "20260621-012",
+    id: "20260621-1975",
     trackers: ["os"],
     category: "Windows",
     title: "微軟宣布強制自動安裝 Copilot：Microsoft 365 業務版用戶需留意新 AI 功能推廣",
@@ -170,7 +170,7 @@ window.TRACKER_DAYS["2026-06-21"] = [
     ]
   },
   {
-    id: "20260621-013",
+    id: "20260621-1976",
     trackers: ["os"],
     category: "Windows",
     title: "Windows 11 26H2 測試版新增隱藏功能：可完全移除網頁搜尋結果，提升本地搜尋速度",
@@ -184,7 +184,7 @@ window.TRACKER_DAYS["2026-06-21"] = [
     ]
   },
   {
-    id: "20260621-014",
+    id: "20260621-1977",
     trackers: ["os"],
     category: "Windows",
     title: "微軟Edge瀏覽器移除Drop、Sidebar與Collections功能，全面轉型聚焦Copilot AI生態系",
@@ -198,7 +198,7 @@ window.TRACKER_DAYS["2026-06-21"] = [
     ]
   },
   {
-    id: "20260621-015",
+    id: "20260621-1683",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "新型 AryStinger 殭屍網路攻擊 D-Link 舊款路由器，將設備轉化為惡意流量代理伺服器",
@@ -212,7 +212,7 @@ window.TRACKER_DAYS["2026-06-21"] = [
     ]
   },
   {
-    id: "20260621-016",
+    id: "20260621-1769",
     trackers: ["os"],
     category: "Apple",
     title: "分析指出：Apple 新任 CEO John Ternus 可能將重塑設計團隊在公司產品規劃中的核心地位",
@@ -226,7 +226,7 @@ window.TRACKER_DAYS["2026-06-21"] = [
     ]
   },
   {
-    id: "20260621-017",
+    id: "20260621-1703",
     trackers: ["os"],
     category: "重點關注",
     title: "Google 宣布推出新一代智慧音箱，終止 Nest Mini 系列產品線",
@@ -240,7 +240,7 @@ window.TRACKER_DAYS["2026-06-21"] = [
     ]
   },
   {
-    id: "20260621-018",
+    id: "20260621-1854",
     trackers: ["os", "security"],
     category: "重點關注",
     title: "無法生成新聞標題：原文為娛樂評論，無資安事件資訊",
@@ -254,7 +254,7 @@ window.TRACKER_DAYS["2026-06-21"] = [
     ]
   },
   {
-    id: "20260621-019",
+    id: "20260621-1901",
     trackers: ["os"],
     category: "重點關注",
     title: "zlib-rs 0.6.4 發布，修復 Intel Raptor Lake 穩定性問題及 AArch64 Adler32 錯誤",
@@ -268,7 +268,7 @@ window.TRACKER_DAYS["2026-06-21"] = [
     ]
   },
   {
-    id: "20260621-020",
+    id: "20260621-1902",
     trackers: ["os"],
     category: "重點關注",
     title: "高通為 HP EliteBook X G2q 晶片組發布 Linux 補丁，加速 Snapdragon X2 筆電的 Linux 支援",
@@ -282,7 +282,7 @@ window.TRACKER_DAYS["2026-06-21"] = [
     ]
   },
   {
-    id: "20260621-021",
+    id: "20260621-1903",
     trackers: ["os"],
     category: "重點關注",
     title: "Mesa 26.2 整合 Vulkan 呈現時機支援，改善 X11/XWayland 遊戲卡頓與輸入延遲",
@@ -296,7 +296,7 @@ window.TRACKER_DAYS["2026-06-21"] = [
     ]
   },
   {
-    id: "20260621-022",
+    id: "20260621-1943",
     trackers: ["os"],
     category: "重點關注",
     title: "美國政府援引國家安全，實施出口管制限制 Anthropic 的 Mythos 與 Fable 5 模型",

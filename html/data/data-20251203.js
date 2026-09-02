@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2025-12-03"] = [
   {
-    id: "20251203-001",
+    id: "20251203-137",
     trackers: ["eu_cra", "security"],
     category: "法令更新",
     title: "歐盟《網路韌性法案》（CRA）正式實施：規範數位產品全生命週期安全要求",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2025-12-03"] = [
     ]
   },
   {
-    id: "20251203-002",
+    id: "20251203-138",
     trackers: ["eu_cra", "security"],
     category: "法令更新",
     title: "歐盟網路韌性法案（CRA）實施指引：了解適用產品與安全要求",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2025-12-03"] = [
     ]
   },
   {
-    id: "20251203-003",
+    id: "20251203-139",
     trackers: ["eu_cra", "security"],
     category: "法令更新",
     title: "歐盟《網路韌性法案》（CRA）概述：規範數位產品的設計、開發與上市要求",

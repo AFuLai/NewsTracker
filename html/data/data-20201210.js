@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2020-12-10"] = [
   {
-    id: "20201210-001",
+    id: "20201210-212",
     trackers: ["eu_cra"],
     category: "研討活動",
     title: "ENISA 透過 CSIRT 網路與成熟度框架，提升成員國網路事件應對能力",

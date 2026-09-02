@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-01-20"] = [
   {
-    id: "20260120-001",
+    id: "20260120-5805",
     trackers: ["eu_cra"],
     category: "法令更新",
     title: "歐盟提案簡化網路安全法規：修訂 NIS2 指令以提升合規性與跨國事件協調",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-01-20"] = [
     ]
   },
   {
-    id: "20260120-002",
+    id: "20260120-5806",
     trackers: ["eu_cra"],
     category: "法令更新",
     title: "歐盟提案修訂《網路安全法案》：強化數位單一市場產品的內建資安與供應鏈韌性",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-01-20"] = [
     ]
   },
   {
-    id: "20260120-003",
+    id: "20260120-5893",
     trackers: ["eu_cra"],
     category: "法令更新",
     title: "歐盟委員會提出新網路安全套件：強化ICT供應鏈韌性與產品安全標準",
@@ -44,7 +44,7 @@ window.TRACKER_DAYS["2026-01-20"] = [
     ]
   },
   {
-    id: "20260120-004",
+    id: "20260120-1288",
     trackers: ["os", "security"],
     category: "Android",
     title: "Google Chrome Blink 引擎於 Android 上的 CVE-2026-0901 漏洞：遠端攻擊可執行 UI 偽造",
@@ -58,7 +58,7 @@ window.TRACKER_DAYS["2026-01-20"] = [
     ]
   },
   {
-    id: "20260120-005",
+    id: "20260120-1289",
     trackers: ["os", "security"],
     category: "Android",
     title: "Google Chrome Android 存在 UI 偽造漏洞：遠端攻擊者可透過 HTML 頁面偽造 Omnibox 內容",
@@ -72,7 +72,7 @@ window.TRACKER_DAYS["2026-01-20"] = [
     ]
   },
   {
-    id: "20260120-006",
+    id: "20260120-5836",
     trackers: ["eu_cra"],
     category: "產業動態",
     title: "歐盟評估 ENISA 與 ECCF 角色：檢視網路安全體系效能與未來策略",

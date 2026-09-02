@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-02-14"] = [
   {
-    id: "20260214-001",
+    id: "20260214-1295",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心漏洞：arm64 系統在休眠恢復時的 CFI 檢查問題",

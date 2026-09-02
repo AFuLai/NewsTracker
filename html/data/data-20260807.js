@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-08-07"] = [
   {
-    id: "20260807-001",
+    id: "20260807-7023",
     trackers: ["security"],
     category: "重大事件",
     title: "UNC6671 勒索集團透過語音釣魚攻陷多國企業，獲利逾千萬美元",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-08-07"] = [
     ]
   },
   {
-    id: "20260807-002",
+    id: "20260807-7056",
     trackers: ["security"],
     category: "重大事件",
     title: "Metabase 零日漏洞遭用於資料竊取攻擊，Framework 與 Tally 等客戶證實受害",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-08-07"] = [
     ]
   },
   {
-    id: "20260807-003",
+    id: "20260807-7057",
     trackers: ["security"],
     category: "重大事件",
     title: "Levi Strauss 遭社交工程攻擊：三名員工電腦資料被竊，未波及消費者資料",
@@ -44,7 +44,7 @@ window.TRACKER_DAYS["2026-08-07"] = [
     ]
   },
   {
-    id: "20260807-004",
+    id: "20260807-7281",
     trackers: ["os"],
     category: "Linux",
     title: "shadow-utils 4.20.0 發布，正式移除密碼定期過期相關公用程式",
@@ -58,7 +58,7 @@ window.TRACKER_DAYS["2026-08-07"] = [
     ]
   },
   {
-    id: "20260807-005",
+    id: "20260807-7283",
     trackers: ["os"],
     category: "Linux",
     title: "LightDM 顯示管理器睽違四年釋出 1.33.0 版本，移交新社群維護",
@@ -72,7 +72,7 @@ window.TRACKER_DAYS["2026-08-07"] = [
     ]
   },
   {
-    id: "20260807-006",
+    id: "20260807-7284",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 穩定版核心釋出更新以修復 CVE-2026-68480 投機執行漏洞",
@@ -86,7 +86,7 @@ window.TRACKER_DAYS["2026-08-07"] = [
     ]
   },
   {
-    id: "20260807-007",
+    id: "20260807-7285",
     trackers: ["os"],
     category: "Linux",
     title: "多個主流 Linux 發行版發布安全更新：涵蓋核心、應用程式與多種服務元件",
@@ -100,7 +100,7 @@ window.TRACKER_DAYS["2026-08-07"] = [
     ]
   },
   {
-    id: "20260807-008",
+    id: "20260807-7317",
     trackers: ["os"],
     category: "Linux",
     title: "Linux 7.3 核心更新：新增支援 Logitech HID++ 2.0 可重新配置按鈕功能",
@@ -114,7 +114,7 @@ window.TRACKER_DAYS["2026-08-07"] = [
     ]
   },
   {
-    id: "20260807-009",
+    id: "20260807-7318",
     trackers: ["os"],
     category: "Linux",
     title: "Apple M3 Pro/Max/Ultra 晶片支援進展：主線 Linux 7.3 核心加入設備樹支援",
@@ -128,7 +128,7 @@ window.TRACKER_DAYS["2026-08-07"] = [
     ]
   },
   {
-    id: "20260807-010",
+    id: "20260807-7319",
     trackers: ["os"],
     category: "Linux",
     title: "Intel 發布 QATlib 26.08，支援下一代 Gen6 加速器與 2MB Hugepages",
@@ -142,7 +142,7 @@ window.TRACKER_DAYS["2026-08-07"] = [
     ]
   },
   {
-    id: "20260807-011",
+    id: "20260807-7320",
     trackers: ["os"],
     category: "Linux",
     title: "Linux 7.3 核心更新：提升 TTM 記憶體管理，強化 VRAM 稀缺時的資源分配效率",
@@ -156,7 +156,7 @@ window.TRACKER_DAYS["2026-08-07"] = [
     ]
   },
   {
-    id: "20260807-012",
+    id: "20260807-7321",
     trackers: ["os"],
     category: "Linux",
     title: "Intel 為 Meteor Lake 及後續硬體推出 HDMI 2.1 FRL 支援的 Linux 核心驅動程式修補程式",
@@ -170,7 +170,7 @@ window.TRACKER_DAYS["2026-08-07"] = [
     ]
   },
   {
-    id: "20260807-013",
+    id: "20260807-7357",
     trackers: ["os", "security"],
     category: "Linux",
     title: "N-able 確認 N-central 零日漏洞 CVE-2026-18577 遭利用，緊急發布 Hotfix 2 強化保護",
@@ -184,7 +184,7 @@ window.TRACKER_DAYS["2026-08-07"] = [
     ]
   },
   {
-    id: "20260807-014",
+    id: "20260807-6931",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "CISA 將 Progress LoadMaster 指令注入漏洞 CVE-2026-8037 列入已遭利用漏洞目錄",
@@ -198,7 +198,7 @@ window.TRACKER_DAYS["2026-08-07"] = [
     ]
   },
   {
-    id: "20260807-015",
+    id: "20260807-6956",
     trackers: ["os", "security"],
     category: "漏洞與威脅情報",
     title: "Elastic 揭露 AI 程式碼助理資安風險：Claude Code 與 Cursor 遭利用建立反向隧道與 LaunchAgent 持久性攻擊",
@@ -212,7 +212,7 @@ window.TRACKER_DAYS["2026-08-07"] = [
     ]
   },
   {
-    id: "20260807-016",
+    id: "20260807-7022",
     trackers: ["os", "security"],
     category: "漏洞與威脅情報",
     title: "ClickFix 社交工程攻擊入侵 macOS 系統，散播具備轉移加密貨幣功能的竊密軟體",
@@ -226,7 +226,7 @@ window.TRACKER_DAYS["2026-08-07"] = [
     ]
   },
   {
-    id: "20260807-017",
+    id: "20260807-7024",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "WordPress 登入頁面 XSS 漏洞 (CVE-2026-64638) 可鏈接至伺服器 PHP Code Execution",
@@ -240,7 +240,7 @@ window.TRACKER_DAYS["2026-08-07"] = [
     ]
   },
   {
-    id: "20260807-018",
+    id: "20260807-7026",
     trackers: ["os", "security"],
     category: "漏洞與威脅情報",
     title: "Linux SCTP 潛伏 18 年高危漏洞 CVE-2026-64564 曝光，可致特權提升與容器逃逸",
@@ -254,7 +254,7 @@ window.TRACKER_DAYS["2026-08-07"] = [
     ]
   },
   {
-    id: "20260807-019",
+    id: "20260807-7027",
     trackers: ["os", "security"],
     category: "漏洞與威脅情報",
     title: "新型 NatJack 攻擊手法揭露：可劫持 TCP 與 DNS，影響 Windows 與 Linux Netfilter 機制",
@@ -268,7 +268,7 @@ window.TRACKER_DAYS["2026-08-07"] = [
     ]
   },
   {
-    id: "20260807-020",
+    id: "20260807-7028",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "資安業者揭露新型 AitM 網路釣魚攻擊：駭客利用住宅代理與多重轉址劫持 Microsoft 365 帳號",
@@ -282,7 +282,7 @@ window.TRACKER_DAYS["2026-08-07"] = [
     ]
   },
   {
-    id: "20260807-021",
+    id: "20260807-7029",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "PortSwigger 發布 AI 輔助研究系統 HTTP Terminator，揭露新型 HTTP 非同步攻擊與 Apache 零日漏洞",
@@ -296,7 +296,7 @@ window.TRACKER_DAYS["2026-08-07"] = [
     ]
   },
   {
-    id: "20260807-022",
+    id: "20260807-7030",
     trackers: ["os", "security"],
     category: "漏洞與威脅情報",
     title: "研究人員揭露可濫用 Windows Hello for Business 繞過 PIN 與生物辨識存取 Entra ID 雲端權限",
@@ -310,7 +310,7 @@ window.TRACKER_DAYS["2026-08-07"] = [
     ]
   },
   {
-    id: "20260807-023",
+    id: "20260807-7031",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Anthropic 與 Google  AI 開發工具爆嚴重漏洞：未授權 GitHub Issue 即可觸發遠端程式碼執行",
@@ -324,7 +324,7 @@ window.TRACKER_DAYS["2026-08-07"] = [
     ]
   },
   {
-    id: "20260807-024",
+    id: "20260807-7032",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "資安業者揭露 TeamPCP 駭客集團早於 2020 年即活躍，持續擴張至軟體供應鏈與 Kubernetes 破壞性攻擊",
@@ -338,7 +338,7 @@ window.TRACKER_DAYS["2026-08-07"] = [
     ]
   },
   {
-    id: "20260807-025",
+    id: "20260807-7182",
     trackers: ["os"],
     category: "Apple",
     title: "Anthropic 推出 Claude Code 跨工作階段訊息功能，支援 macOS 與 Linux",
@@ -352,7 +352,7 @@ window.TRACKER_DAYS["2026-08-07"] = [
     ]
   },
   {
-    id: "20260807-026",
+    id: "20260807-7185",
     trackers: ["os"],
     category: "Apple",
     title: "傳聞稱 Apple 可能於下週調整 iPhone 17 系列價格",
@@ -366,7 +366,7 @@ window.TRACKER_DAYS["2026-08-07"] = [
     ]
   },
   {
-    id: "20260807-027",
+    id: "20260807-7186",
     trackers: ["os"],
     category: "Apple",
     title: "iOS 27 迎來重大更新，解決 iPhone 長期存在的 Wi-Fi 與行動網路切換延遲問題",
@@ -380,7 +380,7 @@ window.TRACKER_DAYS["2026-08-07"] = [
     ]
   },
   {
-    id: "20260807-028",
+    id: "20260807-7192",
     trackers: ["os"],
     category: "Apple",
     title: "傳聞蘋果秋季將推出搭載 M6 晶片之 MacBook Pro 與全新 MacBook Ultra",
@@ -394,7 +394,7 @@ window.TRACKER_DAYS["2026-08-07"] = [
     ]
   },
   {
-    id: "20260807-029",
+    id: "20260807-7193",
     trackers: ["os"],
     category: "Apple",
     title: "Apple 似乎已放棄「電影模式」，但這對影像功能開發是個重大失誤",
@@ -408,7 +408,7 @@ window.TRACKER_DAYS["2026-08-07"] = [
     ]
   },
   {
-    id: "20260807-030",
+    id: "20260807-7194",
     trackers: ["os"],
     category: "Apple",
     title: "Apple 官方整修品商店擴大陣容，新增 M5 MacBook Pro 與高階配置",
@@ -422,7 +422,7 @@ window.TRACKER_DAYS["2026-08-07"] = [
     ]
   },
   {
-    id: "20260807-031",
+    id: "20260807-7196",
     trackers: ["os"],
     category: "Apple",
     title: "watchOS 27 傳將迎來高血壓通知功能升級，目前正等待美國 FDA 審查",
@@ -436,7 +436,7 @@ window.TRACKER_DAYS["2026-08-07"] = [
     ]
   },
   {
-    id: "20260807-032",
+    id: "20260807-7197",
     trackers: ["os"],
     category: "Apple",
     title: "Apple 測試 iOS 26.6.1 更新，預計將包含錯誤修復與安全強化",
@@ -450,7 +450,7 @@ window.TRACKER_DAYS["2026-08-07"] = [
     ]
   },
   {
-    id: "20260807-033",
+    id: "20260807-7199",
     trackers: ["os", "security"],
     category: "Apple",
     title: "傳聞 iPhone 18 Pro 系列將迎來相機升級、更大電池容量與價格調漲",
@@ -464,7 +464,7 @@ window.TRACKER_DAYS["2026-08-07"] = [
     ]
   },
   {
-    id: "20260807-034",
+    id: "20260807-7200",
     trackers: ["os"],
     category: "Apple",
     title: "Apple 在 iOS 27 的 Apple Wallet 中加入實體通行證匯入功能",
@@ -478,7 +478,7 @@ window.TRACKER_DAYS["2026-08-07"] = [
     ]
   },
   {
-    id: "20260807-035",
+    id: "20260807-7201",
     trackers: ["os"],
     category: "Apple",
     title: "警惕詐騙集團利用FaceTime冒充銀行，竊取用戶資料",
@@ -492,7 +492,7 @@ window.TRACKER_DAYS["2026-08-07"] = [
     ]
   },
   {
-    id: "20260807-036",
+    id: "20260807-7203",
     trackers: ["os"],
     category: "Apple",
     title: "Apple Health App 功能指南：整合 Apple Watch 與第三方醫療裝置的最佳實踐",
@@ -506,7 +506,7 @@ window.TRACKER_DAYS["2026-08-07"] = [
     ]
   },
   {
-    id: "20260807-037",
+    id: "20260807-7021",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "近 800 個惡意 npm 套件遭上架，散播跨平台遠端存取木馬與竊密軟體",
@@ -520,7 +520,7 @@ window.TRACKER_DAYS["2026-08-07"] = [
     ]
   },
   {
-    id: "20260807-038",
+    id: "20260807-7101",
     trackers: ["os"],
     category: "Android",
     title: "三星 Galaxy Z Fold 8 系列正式上市：預購優惠結束與各大通路換購折扣調整",
@@ -534,7 +534,7 @@ window.TRACKER_DAYS["2026-08-07"] = [
     ]
   },
   {
-    id: "20260807-039",
+    id: "20260807-7103",
     trackers: ["os"],
     category: "Android",
     title: "Google Photos 新增設定選項：支援使用者手動關閉貼圖選取閃爍動畫",
@@ -548,7 +548,7 @@ window.TRACKER_DAYS["2026-08-07"] = [
     ]
   },
   {
-    id: "20260807-040",
+    id: "20260807-7104",
     trackers: ["os"],
     category: "Android",
     title: "Google Wear OS 版 Gemini 迎來全新覆蓋層介面，強化跨平台視覺一致性",
@@ -562,7 +562,7 @@ window.TRACKER_DAYS["2026-08-07"] = [
     ]
   },
   {
-    id: "20260807-041",
+    id: "20260807-7429",
     trackers: ["os", "security"],
     category: "Android",
     title: "Datadog Android 應用程式存在 CVE-2026-44964 漏洞，可透過共安裝惡意 App 觸發",
@@ -576,7 +576,7 @@ window.TRACKER_DAYS["2026-08-07"] = [
     ]
   },
   {
-    id: "20260807-042",
+    id: "20260807-7430",
     trackers: ["os", "security"],
     category: "Android",
     title: "Datadog Android App Widget 存在未受保護的活動，可能遭共安裝應用程式暴力破解登入",
@@ -590,7 +590,7 @@ window.TRACKER_DAYS["2026-08-07"] = [
     ]
   },
   {
-    id: "20260807-043",
+    id: "20260807-7431",
     trackers: ["os", "security"],
     category: "Android",
     title: "CVE-2026-47361：Datadog Android 應用程式允許惡意應用程式靜默清除 Bits AI 通知",
@@ -604,7 +604,7 @@ window.TRACKER_DAYS["2026-08-07"] = [
     ]
   },
   {
-    id: "20260807-044",
+    id: "20260807-7432",
     trackers: ["os", "security"],
     category: "Android",
     title: "Datadog Android 應用程式存在資料外洩風險：敏感資料以純文字儲存於本地資料庫",
@@ -618,7 +618,7 @@ window.TRACKER_DAYS["2026-08-07"] = [
     ]
   },
   {
-    id: "20260807-045",
+    id: "20260807-7433",
     trackers: ["os", "security"],
     category: "Android",
     title: "Datadog Android 應用程式存在 CVE-2026-47363 漏洞，允許惡意應用程式劫持用戶會話",
@@ -632,7 +632,7 @@ window.TRACKER_DAYS["2026-08-07"] = [
     ]
   },
   {
-    id: "20260807-046",
+    id: "20260807-7434",
     trackers: ["os", "security"],
     category: "Android",
     title: "Datadog Android 應用程式存在 CVE-2026-47364 漏洞，可能洩露用戶 UUID 及崩潰資料",
@@ -646,7 +646,7 @@ window.TRACKER_DAYS["2026-08-07"] = [
     ]
   },
   {
-    id: "20260807-047",
+    id: "20260807-7436",
     trackers: ["os", "security"],
     category: "Android",
     title: "Home Assistant Android Companion App 存在開放重定向漏洞，可能竊取新用戶憑證",
@@ -660,7 +660,7 @@ window.TRACKER_DAYS["2026-08-07"] = [
     ]
   },
   {
-    id: "20260807-048",
+    id: "20260807-6944",
     trackers: ["security"],
     category: "前瞻技術",
     title: "1Password 報告指 AI 生成修補程式失敗率達半數 易引入新漏洞與遭繞過",
@@ -674,7 +674,7 @@ window.TRACKER_DAYS["2026-08-07"] = [
     ]
   },
   {
-    id: "20260807-049",
+    id: "20260807-7098",
     trackers: ["os"],
     category: "重點關注",
     title: "Google 發布 Pixel Watch 5 宣傳影片 凸顯圓形錶面設計與 Gemini 人工智慧整合",
@@ -688,7 +688,7 @@ window.TRACKER_DAYS["2026-08-07"] = [
     ]
   },
   {
-    id: "20260807-050",
+    id: "20260807-7184",
     trackers: ["os"],
     category: "重點關注",
     title: "James Marsden將主演Apple TV新劇《Bad News Dads》，改編自Adam Frost小說",
@@ -702,7 +702,7 @@ window.TRACKER_DAYS["2026-08-07"] = [
     ]
   },
   {
-    id: "20260807-051",
+    id: "20260807-7187",
     trackers: ["os"],
     category: "重點關注",
     title: "OpenAI 正在開發功能，讓使用者可直接將自訂貼圖從 ChatGPT 匯出至 WhatsApp",
@@ -716,7 +716,7 @@ window.TRACKER_DAYS["2026-08-07"] = [
     ]
   },
   {
-    id: "20260807-052",
+    id: "20260807-7188",
     trackers: ["os"],
     category: "重點關注",
     title: "探討 Tesla、Rivian 與 GM 等主要車廠持續拒絕支援 Apple CarPlay 的原因與現狀",
@@ -730,7 +730,7 @@ window.TRACKER_DAYS["2026-08-07"] = [
     ]
   },
   {
-    id: "20260807-053",
+    id: "20260807-7190",
     trackers: ["os"],
     category: "重點關注",
     title: "Anthropic 將於下週起把 Claude Code 自動模式設為 Pro 與 Team 用戶的預設權限",
@@ -744,7 +744,7 @@ window.TRACKER_DAYS["2026-08-07"] = [
     ]
   },
   {
-    id: "20260807-054",
+    id: "20260807-7191",
     trackers: ["os"],
     category: "重點關注",
     title: "無新聞內容，無法撰寫資安新聞標題與摘要",
@@ -758,7 +758,7 @@ window.TRACKER_DAYS["2026-08-07"] = [
     ]
   },
   {
-    id: "20260807-055",
+    id: "20260807-7202",
     trackers: ["os", "security"],
     category: "重點關注",
     title: "無新聞內容：9to5Mac 每日摘要（2026年8月6日）",
@@ -772,7 +772,7 @@ window.TRACKER_DAYS["2026-08-07"] = [
     ]
   },
   {
-    id: "20260807-056",
+    id: "20260807-7256",
     trackers: ["os"],
     category: "重點關注",
     title: "Microsoft Edge 宣布逐步淘汰 Manifest Version 2，推動擴充功能生態系統邁向 MV3",
@@ -786,7 +786,7 @@ window.TRACKER_DAYS["2026-08-07"] = [
     ]
   },
   {
-    id: "20260807-057",
+    id: "20260807-7282",
     trackers: ["eu_cra", "os"],
     category: "重點關注",
     title: "Software Stewardship Lab 成立，專注於開源軟體供應鏈安全與維護者倦怠研究",
@@ -800,7 +800,7 @@ window.TRACKER_DAYS["2026-08-07"] = [
     ]
   },
   {
-    id: "20260807-058",
+    id: "20260807-7353",
     trackers: ["os"],
     category: "重點關注",
     title: "前 NSA 局長警告：水系統控制器不應連網，指美國水務設施面臨重大網路攻擊風險",
@@ -814,7 +814,7 @@ window.TRACKER_DAYS["2026-08-07"] = [
     ]
   },
   {
-    id: "20260807-059",
+    id: "20260807-7355",
     trackers: ["os", "security"],
     category: "重點關注",
     title: "七月勒索軟體攻擊激增，金融、科技、醫療與教育產業成為主要目標",
@@ -828,7 +828,7 @@ window.TRACKER_DAYS["2026-08-07"] = [
     ]
   },
   {
-    id: "20260807-060",
+    id: "20260807-7358",
     trackers: ["os", "security"],
     category: "重點關注",
     title: "駭客群 ShinyHunters 竊取 Abbott 癌症診斷業務資料，洩露 1090 萬電子郵件及個人健康資訊",
@@ -842,7 +842,7 @@ window.TRACKER_DAYS["2026-08-07"] = [
     ]
   },
   {
-    id: "20260807-061",
+    id: "20260807-7359",
     trackers: ["os"],
     category: "重點關注",
     title: "MIT 研究人員揭露 TONTOU 攻擊：利用中斷注入繞過 Intel 與 AMD CPU 的 Spectre 防禦機制",
@@ -856,7 +856,7 @@ window.TRACKER_DAYS["2026-08-07"] = [
     ]
   },
   {
-    id: "20260807-062",
+    id: "20260807-7361",
     trackers: ["os"],
     category: "重點關注",
     title: "Microsoft 將逐步淘汰 Teams Live Chat 功能，轉向 Dynamics 365 解決方案",
@@ -870,7 +870,7 @@ window.TRACKER_DAYS["2026-08-07"] = [
     ]
   },
   {
-    id: "20260807-063",
+    id: "20260807-7362",
     trackers: ["os", "security"],
     category: "重點關注",
     title: "IEH Corporation 遭釣魚攻擊，M365 帳號外洩，涉及國防與航空航太技術資訊",
@@ -884,7 +884,7 @@ window.TRACKER_DAYS["2026-08-07"] = [
     ]
   },
   {
-    id: "20260807-064",
+    id: "20260807-7363",
     trackers: ["os", "security"],
     category: "重點關注",
     title: "美國醫療軟體供應商 UTS 遭駭，380 萬人敏感健康資料外洩",
@@ -898,7 +898,7 @@ window.TRACKER_DAYS["2026-08-07"] = [
     ]
   },
   {
-    id: "20260807-065",
+    id: "20260807-7364",
     trackers: ["os"],
     category: "重點關注",
     title: "前美國國家網路主任警告：AI自主性與持久性構成巨大威脅，需重新定義安全規則",
@@ -912,7 +912,7 @@ window.TRACKER_DAYS["2026-08-07"] = [
     ]
   },
   {
-    id: "20260807-066",
+    id: "20260807-7367",
     trackers: ["os"],
     category: "重點關注",
     title: "中國網信辦對 Palo Alto Networks 產品進行安全審查，引發地緣科技供應鏈擔憂",
@@ -926,7 +926,7 @@ window.TRACKER_DAYS["2026-08-07"] = [
     ]
   },
   {
-    id: "20260807-067",
+    id: "20260807-7368",
     trackers: ["os"],
     category: "重點關注",
     title: "Cloudflare高層預測：人工網路流量將被AI驅動的機器流量超越，人類將成「四捨五入的誤差」",
@@ -940,7 +940,7 @@ window.TRACKER_DAYS["2026-08-07"] = [
     ]
   },
   {
-    id: "20260807-068",
+    id: "20260807-7435",
     trackers: ["os", "security"],
     category: "重點關注",
     title: "Element Call 應用程式：透過配置 PostHog 服務時，可能洩露用戶完整網址及加密密碼",

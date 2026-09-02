@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-04-22"] = [
   {
-    id: "20260422-001",
+    id: "20260422-1204",
     trackers: ["os", "security"],
     category: "Apple",
     title: "Apple 發布 iOS 26.4.2 與 iPadOS 26.4.2 安全更新，修補通知服務的資料記錄問題",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-04-22"] = [
     ]
   },
   {
-    id: "20260422-002",
+    id: "20260422-1205",
     trackers: ["os", "security"],
     category: "Apple",
     title: "Apple 發布 iOS 18.7.8 與 iPadOS 18.7.8 安全更新，修復通知服務的資料記錄錯誤",

@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-05-30"] = [
   {
-    id: "20260530-001",
+    id: "20260530-312",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Palo Alto Networks PAN-OS 遭利用 CVE-2026-0257 進行認證繞過，CISA 已列入 KEV 清單",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-05-30"] = [
     ]
   },
   {
-    id: "20260530-002",
+    id: "20260530-368",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "npm套件供應鏈攻擊：駭客利用依賴混淆（Dependency Confusion）植入偵察惡意程式",

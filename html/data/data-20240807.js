@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2024-08-07"] = [
   {
-    id: "20240807-001",
+    id: "20240807-274",
     trackers: ["eu_cra"],
     category: "產業動態",
     title: "新加坡警示：詐騙集團冒充政府機構（CSA/SingCERT）進行詐騙，要求提供個人資料",

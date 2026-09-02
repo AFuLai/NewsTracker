@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2018-01-18"] = [
   {
-    id: "20180118-001",
+    id: "20180118-214",
     trackers: ["eu_cra"],
     category: "合規指引",
     title: "ENISA發布網路衛生指南：提供十大基礎實踐，強化個人與設備資安防護",

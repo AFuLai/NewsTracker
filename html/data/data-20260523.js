@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-05-23"] = [
   {
-    id: "20260523-001",
+    id: "20260523-1119",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心漏洞：skbuff 處理器未正確傳播共享分片標記，可能導致權限提升",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-05-23"] = [
     ]
   },
   {
-    id: "20260523-002",
+    id: "20260523-1120",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修補 CVE-2026-46300：修復 skbuff 封包合併時遺失共享片段標記的漏洞",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-05-23"] = [
     ]
   },
   {
-    id: "20260523-003",
+    id: "20260523-28",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Anthropic Project Glasswing 揭露超過 1 萬個高風險漏洞，包含 WolfSSL 關鍵缺陷",
@@ -44,7 +44,7 @@ window.TRACKER_DAYS["2026-05-23"] = [
     ]
   },
   {
-    id: "20260523-004",
+    id: "20260523-30",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "高危險性漏洞 CVE-2026-48172 曝於 LiteSpeed cPanel 外掛，可提升權限執行任意指令",
@@ -58,7 +58,7 @@ window.TRACKER_DAYS["2026-05-23"] = [
     ]
   },
   {
-    id: "20260523-005",
+    id: "20260523-31",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "CISA將Drupal Core的SQL注入漏洞CVE-2026-9082列入KEV目錄，警告積極利用",
@@ -72,7 +72,7 @@ window.TRACKER_DAYS["2026-05-23"] = [
     ]
   },
   {
-    id: "20260523-006",
+    id: "20260523-26",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "GitHub 推出 npm 階段性發布機制，強化開源套件供應鏈安全",
@@ -86,7 +86,7 @@ window.TRACKER_DAYS["2026-05-23"] = [
     ]
   },
   {
-    id: "20260523-007",
+    id: "20260523-27",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "資安警示：Packagist 供應鏈攻擊感染 8 個 PHP 套件，透過 postinstall 腳本植入 Linux 後門",
@@ -100,7 +100,7 @@ window.TRACKER_DAYS["2026-05-23"] = [
     ]
   },
   {
-    id: "20260523-008",
+    id: "20260523-29",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "Laravel-Lang PHP套件遭供應鏈攻擊：惡意標籤植入自動竊取多種雲端與加密貨幣憑證",

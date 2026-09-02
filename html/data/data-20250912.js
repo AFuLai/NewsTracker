@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2025-09-12"] = [
   {
-    id: "20250912-001",
+    id: "20250912-5840",
     trackers: ["eu_cra"],
     category: "產業動態",
     title: "歐盟委員會發布醫療體系網路安全行動計畫：針對醫院與醫療服務提供者提出建議",

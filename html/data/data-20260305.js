@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-03-05"] = [
   {
-    id: "20260305-001",
+    id: "20260305-120",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "深入探討變異語法模糊測試（Mutational Grammar Fuzzing）的缺陷與優化技巧",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-03-05"] = [
     ]
   },
   {
-    id: "20260305-002",
+    id: "20260305-1307",
     trackers: ["os", "security"],
     category: "重點關注",
     title: "RustDesk 客戶端面臨 CVE-2026-30791 漏洞：透過不安全的加密演算法洩露敏感資料",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-03-05"] = [
     ]
   },
   {
-    id: "20260305-003",
+    id: "20260305-1308",
     trackers: ["os", "security"],
     category: "重點關注",
     title: "RustDesk 客戶端存在權限濫用漏洞 (CVE-2026-30783)，影響多平台版本 1.4.5 及以下",
@@ -44,7 +44,7 @@ window.TRACKER_DAYS["2026-03-05"] = [
     ]
   },
   {
-    id: "20260305-004",
+    id: "20260305-1309",
     trackers: ["os", "security"],
     category: "重點關注",
     title: "RustDesk 客戶端面臨 CVE-2026-30789 漏洞：透過會話重放與密碼雜湊弱點進行身份驗證繞過",
@@ -58,7 +58,7 @@ window.TRACKER_DAYS["2026-03-05"] = [
     ]
   },
   {
-    id: "20260305-005",
+    id: "20260305-1310",
     trackers: ["os", "security"],
     category: "重點關注",
     title: "RustDesk 客戶端面臨 CVE-2026-30792 漏洞：Man-in-the-Middle 攻擊可操縱應用程式 API 訊息",
@@ -72,7 +72,7 @@ window.TRACKER_DAYS["2026-03-05"] = [
     ]
   },
   {
-    id: "20260305-006",
+    id: "20260305-1311",
     trackers: ["os", "security"],
     category: "重點關注",
     title: "RustDesk 客戶端面臨 CSRF 漏洞：跨平台版本可導致權限提升",
@@ -86,7 +86,7 @@ window.TRACKER_DAYS["2026-03-05"] = [
     ]
   },
   {
-    id: "20260305-007",
+    id: "20260305-1312",
     trackers: ["os", "security"],
     category: "重點關注",
     title: "RustDesk 客戶端存在憑證驗證不當漏洞 (CVE-2026-30794)，可能遭中間人攻擊",
@@ -100,7 +100,7 @@ window.TRACKER_DAYS["2026-03-05"] = [
     ]
   },
   {
-    id: "20260305-008",
+    id: "20260305-1313",
     trackers: ["os", "security"],
     category: "重點關注",
     title: "RustDesk Client 存在明文傳輸敏感資訊漏洞，可能遭竊取密碼與聯絡人資料",
@@ -114,7 +114,7 @@ window.TRACKER_DAYS["2026-03-05"] = [
     ]
   },
   {
-    id: "20260305-009",
+    id: "20260305-1314",
     trackers: ["os", "security"],
     category: "重點關注",
     title: "RustDesk Client 存在缺失授權漏洞 (CVE-2026-30797)，允許透過中間人攻擊操縱應用程式 API 訊息",

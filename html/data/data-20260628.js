@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-06-28"] = [
   {
-    id: "20260628-001",
+    id: "20260628-2385",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Debian 發布 DSA-6373-1：修補 OpenSSH 服務的潛在遠端執行漏洞",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-06-28"] = [
     ]
   },
   {
-    id: "20260628-002",
+    id: "20260628-2386",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Debian 發布 DSA-6372-1：修補 OpenSSH 服務中的認證繞過漏洞",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-06-28"] = [
     ]
   },
   {
-    id: "20260628-003",
+    id: "20260628-2396",
     trackers: ["os"],
     category: "Linux",
     title: "Linux 核心開發進度：Kernel 7.2-rc1 預覽版發布，開發週期進入穩定階段",
@@ -44,7 +44,7 @@ window.TRACKER_DAYS["2026-06-28"] = [
     ]
   },
   {
-    id: "20260628-004",
+    id: "20260628-2411",
     trackers: ["os"],
     category: "Linux",
     title: "Linux 7.2-rc1 正式發布：搭載 AMDGPU HDMI 2.1 FRL、AMD ISP4 等新功能，預計支援 Fedora 45 與 Ubuntu 26.10",
@@ -58,7 +58,7 @@ window.TRACKER_DAYS["2026-06-28"] = [
     ]
   },
   {
-    id: "20260628-005",
+    id: "20260628-2413",
     trackers: ["os"],
     category: "Linux",
     title: "CachyOS June 2026 發行版：搭載性能優化與 Hyprland Noctalia 桌面選項",
@@ -72,7 +72,7 @@ window.TRACKER_DAYS["2026-06-28"] = [
     ]
   },
   {
-    id: "20260628-006",
+    id: "20260628-2414",
     trackers: ["os"],
     category: "Linux",
     title: "Linux 7.3 核心預計引入 DRM 色彩格式屬性，AMD GPU 驅動程式率先支援",
@@ -86,7 +86,7 @@ window.TRACKER_DAYS["2026-06-28"] = [
     ]
   },
   {
-    id: "20260628-007",
+    id: "20260628-2415",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心重大更新：移除 strncpy API、淘汰 i486 支援，並修補多個 LPE 漏洞",
@@ -100,7 +100,7 @@ window.TRACKER_DAYS["2026-06-28"] = [
     ]
   },
   {
-    id: "20260628-008",
+    id: "20260628-2416",
     trackers: ["os"],
     category: "Linux",
     title: "Linux 核心程式碼規模突破 4300 萬行，7.2 版本持續擴展與優化",
@@ -114,7 +114,7 @@ window.TRACKER_DAYS["2026-06-28"] = [
     ]
   },
   {
-    id: "20260628-009",
+    id: "20260628-2418",
     trackers: ["os"],
     category: "Linux",
     title: "介紹 Nourish：一款基於 Vulkan 技術、支援無限滾動與平移的 Wayland 合成器",
@@ -128,7 +128,7 @@ window.TRACKER_DAYS["2026-06-28"] = [
     ]
   },
   {
-    id: "20260628-010",
+    id: "20260628-2493",
     trackers: ["os"],
     category: "Linux",
     title: "微軟發布 Azure Linux 4.0：基於 Fedora 43 的雲端專用、極簡化作業系統",
@@ -142,7 +142,7 @@ window.TRACKER_DAYS["2026-06-28"] = [
     ]
   },
   {
-    id: "20260628-011",
+    id: "20260628-2494",
     trackers: ["os"],
     category: "Windows",
     title: "Windows 11 推出低延遲模式 (LLP)，提升啟動選單與系統介面反應速度",
@@ -156,7 +156,7 @@ window.TRACKER_DAYS["2026-06-28"] = [
     ]
   },
   {
-    id: "20260628-012",
+    id: "20260628-2496",
     trackers: ["os"],
     category: "Windows",
     title: "Windows 11 檔案總管性能升級：Microsoft 推出更快速的啟動與介面優化",
@@ -170,7 +170,7 @@ window.TRACKER_DAYS["2026-06-28"] = [
     ]
   },
   {
-    id: "20260628-013",
+    id: "20260628-2176",
     trackers: ["os", "security"],
     category: "漏洞與威脅情報",
     title: "高風險 Linux 權限提升漏洞 CVE-2026-46331 曝光：Root 權限可透過流量控制子系統利用",
@@ -184,7 +184,7 @@ window.TRACKER_DAYS["2026-06-28"] = [
     ]
   },
   {
-    id: "20260628-014",
+    id: "20260628-2263",
     trackers: ["os"],
     category: "Apple",
     title: "Apple Mac Studio 晶片升級預告：M5 Ultra 預計今年推出，未來規劃至 M7 系列",
@@ -198,7 +198,7 @@ window.TRACKER_DAYS["2026-06-28"] = [
     ]
   },
   {
-    id: "20260628-015",
+    id: "20260628-2417",
     trackers: ["os"],
     category: "重點關注",
     title: "Vim 介面升級：透過延遲重繪處理，大幅提升 GTK3 在 Wayland 環境下的效能",
@@ -212,7 +212,7 @@ window.TRACKER_DAYS["2026-06-28"] = [
     ]
   },
   {
-    id: "20260628-016",
+    id: "20260628-2495",
     trackers: ["os"],
     category: "重點關注",
     title: "Microsoft Edge在Mac上的優勢與發展：從性能、生態整合到去綁定帳號的趨勢分析",

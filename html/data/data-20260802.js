@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-08-02"] = [
   {
-    id: "20260802-001",
+    id: "20260802-6471",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Debian 發布 DSA-6410-1：修補 OpenSSH 服務中的潛在認證繞過漏洞",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-08-02"] = [
     ]
   },
   {
-    id: "20260802-002",
+    id: "20260802-6486",
     trackers: ["os"],
     category: "Linux",
     title: "Intel Starfire 空間級 SoC 支援：Linux 核心開始整合新硬體支援",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-08-02"] = [
     ]
   },
   {
-    id: "20260802-003",
+    id: "20260802-6487",
     trackers: ["os"],
     category: "Linux",
     title: "Qualcomm MSM 驅動程式更新：Linux 7.3 將支援 Adreno 704 與 Adreno 722 GPU，並為 Shikra SoC 準備",
@@ -44,7 +44,7 @@ window.TRACKER_DAYS["2026-08-02"] = [
     ]
   },
   {
-    id: "20260802-004",
+    id: "20260802-6488",
     trackers: ["os"],
     category: "Linux",
     title: "Ubuntu Touch 邁向 26.04 LTS：整合 Vulkan、Widevine 及提升 Android 應用相容性",
@@ -58,7 +58,7 @@ window.TRACKER_DAYS["2026-08-02"] = [
     ]
   },
   {
-    id: "20260802-005",
+    id: "20260802-6489",
     trackers: ["os"],
     category: "Linux",
     title: "Linux 核心更新：修復 AMD Zen 5/Zen 6 CPU 型號識別錯誤，提升系統兼容性",
@@ -72,7 +72,7 @@ window.TRACKER_DAYS["2026-08-02"] = [
     ]
   },
   {
-    id: "20260802-006",
+    id: "20260802-6491",
     trackers: ["os"],
     category: "Linux",
     title: "Steam 平台使用數據分析：Linux 遊戲市場佔有率於 2026 年 7 月回升至 4.01%",
@@ -86,7 +86,7 @@ window.TRACKER_DAYS["2026-08-02"] = [
     ]
   },
   {
-    id: "20260802-007",
+    id: "20260802-6778",
     trackers: ["os"],
     category: "Linux",
     title: "Linux 7.2-rc6 核心版本發布：包含多項驅動修復與硬體相容性改善",
@@ -100,7 +100,7 @@ window.TRACKER_DAYS["2026-08-02"] = [
     ]
   },
   {
-    id: "20260802-008",
+    id: "20260802-6559",
     trackers: ["os"],
     category: "Windows",
     title: "微軟持續推動 Windows 11 核心元件 WinUI 3 重建，將擴展至傳統管理工具",
@@ -114,7 +114,7 @@ window.TRACKER_DAYS["2026-08-02"] = [
     ]
   },
   {
-    id: "20260802-009",
+    id: "20260802-6803",
     trackers: ["os"],
     category: "Windows",
     title: "Microsoft Teams 重設計會議介面：大幅降低誤操作風險，改善螢幕分享與離會體驗",
@@ -128,7 +128,7 @@ window.TRACKER_DAYS["2026-08-02"] = [
     ]
   },
   {
-    id: "20260802-010",
+    id: "20260802-6344",
     trackers: ["eu_cra"],
     category: "合規指引",
     title: "【個人情報管理】防範印鑑偽造與遺失：專家建議分開保管印鑑與印鑑證明書",
@@ -142,7 +142,7 @@ window.TRACKER_DAYS["2026-08-02"] = [
     ]
   },
   {
-    id: "20260802-011",
+    id: "20260802-6384",
     trackers: ["os"],
     category: "Apple",
     title: "蘋果傳出「iPhone Ultra」可採用折疊螢幕設計，規格與三星 Galaxy Z Fold 8 相似",
@@ -156,7 +156,7 @@ window.TRACKER_DAYS["2026-08-02"] = [
     ]
   },
   {
-    id: "20260802-012",
+    id: "20260802-6386",
     trackers: ["os"],
     category: "Apple",
     title: "Apple傳聞：具備相機功能的 AirPods 可能於今年推出，整合視覺智慧功能",
@@ -170,7 +170,7 @@ window.TRACKER_DAYS["2026-08-02"] = [
     ]
   },
   {
-    id: "20260802-013",
+    id: "20260802-6388",
     trackers: ["os"],
     category: "Apple",
     title: "Apple 規劃非AR智慧眼鏡作為健康穿戴裝置，整合運動追蹤與健康監測功能",
@@ -184,7 +184,7 @@ window.TRACKER_DAYS["2026-08-02"] = [
     ]
   },
   {
-    id: "20260802-014",
+    id: "20260802-6681",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "COLDCARD硬體錢包韌體漏洞遭利用，駭客可離線推測私鑰竊取價值8860萬美元的比特幣",
@@ -198,7 +198,7 @@ window.TRACKER_DAYS["2026-08-02"] = [
     ]
   },
   {
-    id: "20260802-015",
+    id: "20260802-6691",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Google Chrome擬推出新功能，預設阻擋惡意劫持新分頁或搜尋引擎的政策安裝擴充功能",
@@ -212,7 +212,7 @@ window.TRACKER_DAYS["2026-08-02"] = [
     ]
   },
   {
-    id: "20260802-016",
+    id: "20260802-6350",
     trackers: ["os"],
     category: "Android",
     title: "Google Android 語音搜尋按鈕大改版：整合 AI 模式與多功能工具列",
@@ -226,7 +226,7 @@ window.TRACKER_DAYS["2026-08-02"] = [
     ]
   },
   {
-    id: "20260802-017",
+    id: "20260802-6351",
     trackers: ["os"],
     category: "Android",
     title: "Pixel 11 傳聞洩漏：Google 新機型規格曝光，市場評價認為規格平平",
@@ -240,7 +240,7 @@ window.TRACKER_DAYS["2026-08-02"] = [
     ]
   },
   {
-    id: "20260802-018",
+    id: "20260802-6387",
     trackers: ["os"],
     category: "重點關注",
     title: "AI數據中心需求衝擊供應鏈：MacBook Air面臨記憶體短缺與供貨困境",
@@ -254,7 +254,7 @@ window.TRACKER_DAYS["2026-08-02"] = [
     ]
   },
   {
-    id: "20260802-019",
+    id: "20260802-6490",
     trackers: ["os"],
     category: "重點關注",
     title: "Box64 v0.4.4 發布：提升跨架構模擬能力，內建配置工具與快取機制",
@@ -268,7 +268,7 @@ window.TRACKER_DAYS["2026-08-02"] = [
     ]
   },
   {
-    id: "20260802-020",
+    id: "20260802-6517",
     trackers: ["os"],
     category: "重點關注",
     title: "回顧網路早期發展：前微軟員工談 Exchange 與 Outlook 如何應對網際網路的挑戰",
@@ -282,7 +282,7 @@ window.TRACKER_DAYS["2026-08-02"] = [
     ]
   },
   {
-    id: "20260802-021",
+    id: "20260802-6560",
     trackers: ["os"],
     category: "重點關注",
     title: "實驗測試揭露：Windows 應用程式（如 MS Word）在部分筆電上開啟速度落後 Mac，但 XPS 13 仍具備優勢",
@@ -296,7 +296,7 @@ window.TRACKER_DAYS["2026-08-02"] = [
     ]
   },
   {
-    id: "20260802-022",
+    id: "20260802-6690",
     trackers: ["security"],
     category: "前瞻技術",
     title: "OpenAI 宣布 Astra 模型，宣稱其能解決十年未進展的複雜數學與理論計算問題",
@@ -310,7 +310,7 @@ window.TRACKER_DAYS["2026-08-02"] = [
     ]
   },
   {
-    id: "20260802-023",
+    id: "20260802-6337",
     trackers: ["eu_cra"],
     category: "產業動態",
     title: "Black Duck發布整合AppSec平台，支援SBOM管理與DevSecOps，應對CRA等全球供應鏈安全規範",
@@ -324,7 +324,7 @@ window.TRACKER_DAYS["2026-08-02"] = [
     ]
   },
   {
-    id: "20260802-024",
+    id: "20260802-6338",
     trackers: ["eu_cra"],
     category: "產業動態",
     title: "GS네오텍發表「Security Lens」亮相 ISEC 2026：整合式雲端安全平台，強化國內法規與AI自動化合規管理",
@@ -338,7 +338,7 @@ window.TRACKER_DAYS["2026-08-02"] = [
     ]
   },
   {
-    id: "20260802-025",
+    id: "20260802-6339",
     trackers: ["eu_cra"],
     category: "產業動態",
     title: "AI 緊急按鈕市場的演進：結合 CCTV 與 AI 語音識別的公共安全系統建構趨勢",
@@ -352,7 +352,7 @@ window.TRACKER_DAYS["2026-08-02"] = [
     ]
   },
   {
-    id: "20260802-026",
+    id: "20260802-6345",
     trackers: ["eu_cra"],
     category: "產業動態",
     title: "Toss證券革新AI治理：透過實務人員主導的「Be Smart」文化，強化資安風險管理",
@@ -366,7 +366,7 @@ window.TRACKER_DAYS["2026-08-02"] = [
     ]
   },
   {
-    id: "20260802-027",
+    id: "20260802-6340",
     trackers: ["eu_cra"],
     category: "研討活動",
     title: "韓國金融犯罪預防協會主辦：探討AI時代全球金融詐騙威脅與公私合作應對模式",
@@ -380,7 +380,7 @@ window.TRACKER_DAYS["2026-08-02"] = [
     ]
   },
   {
-    id: "20260802-028",
+    id: "20260802-6341",
     trackers: ["eu_cra"],
     category: "研討活動",
     title: "首爾市主辦「資安保全大會」：分享公部門資訊保全與個人資料保護能力強化方案",
@@ -394,7 +394,7 @@ window.TRACKER_DAYS["2026-08-02"] = [
     ]
   },
   {
-    id: "20260802-029",
+    id: "20260802-6342",
     trackers: ["eu_cra", "os", "security"],
     category: "研討活動",
     title: "CISO協會舉辦研討會：探討從資安事件到企業韌性與治理的六大核心能力",
@@ -408,7 +408,7 @@ window.TRACKER_DAYS["2026-08-02"] = [
     ]
   },
   {
-    id: "20260802-030",
+    id: "20260802-6343",
     trackers: ["eu_cra"],
     category: "研討活動",
     title: "OWASP 首爾分會分享：參與 Defcon 等全球資安會議及通過 CFP 的策略",
@@ -422,7 +422,7 @@ window.TRACKER_DAYS["2026-08-02"] = [
     ]
   },
   {
-    id: "20260802-031",
+    id: "20260802-6346",
     trackers: ["eu_cra"],
     category: "研討活動",
     title: "個人資訊保護委員會主導：2026年CPO工作坊舉辦，深入探討AI應用與數據生命週期可視化",

@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-08-22"] = [
   {
-    id: "20260822-001",
+    id: "20260822-9191",
     trackers: ["os"],
     category: "Linux",
     title: "Redox OS 升級至 EEVDF 排程器，性能與公平性大幅提升",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-002",
+    id: "20260822-9192",
     trackers: ["os"],
     category: "Linux",
     title: "Linux 核心持續修補 Apple HFS/HFS+ 文件系統支援，提升相容性",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-003",
+    id: "20260822-9193",
     trackers: ["os", "security"],
     category: "Linux",
     title: "NTFS3 驅動程式漏洞：透過預先製作的檔案系統映像，可於 Linux 上達成 Root 權限提升",
@@ -44,7 +44,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-004",
+    id: "20260822-9194",
     trackers: ["os"],
     category: "Linux",
     title: "AMD RDNA 4m 圖形晶片韌體已上游化，Linux 開源驅動堆疊準備就緒",
@@ -58,7 +58,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-005",
+    id: "20260822-9195",
     trackers: ["os"],
     category: "Linux",
     title: "Mesa 26.3整合NVK Vulkan Video支援：H.264解碼功能現已可用",
@@ -72,7 +72,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-006",
+    id: "20260822-9196",
     trackers: ["os"],
     category: "Linux",
     title: "Linux 核心升級至 7.3：擴展排程器 (sched_ext) 支援子排程器功能完整",
@@ -86,7 +86,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-007",
+    id: "20260822-9197",
     trackers: ["os"],
     category: "Linux",
     title: "Red Hat發布 Tuned 2.28，改善 Fedora 等系統的開箱 WiFi 省電效能",
@@ -100,7 +100,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-008",
+    id: "20260822-9199",
     trackers: ["os"],
     category: "Linux",
     title: "Linux 7.3 核心更新：修補 TLB Flushing 流程，大幅改善低延遲工作負載的效能",
@@ -114,7 +114,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-009",
+    id: "20260822-9200",
     trackers: ["os"],
     category: "Linux",
     title: "KDE Plasma 6.8 更新：提升效能與多語言支援，優化系統設定及螢幕錄影體驗",
@@ -128,7 +128,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-010",
+    id: "20260822-9201",
     trackers: ["os", "security"],
     category: "Linux",
     title: "OpenZFS 2.4.4 重磅發布，支援 Linux 7.2 核心並修補多項安全與穩定性漏洞",
@@ -142,7 +142,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-011",
+    id: "20260822-9267",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心漏洞：RDMA/bnxt_re 驅動程式未初始化共享頁面，可能洩露核心記憶體內容",
@@ -156,7 +156,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-012",
+    id: "20260822-9268",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心漏洞：Thunderbolt 設備可利用越界讀寫，NIST 發布修復資訊",
@@ -170,7 +170,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-013",
+    id: "20260822-9269",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux SCTP 核心漏洞：未清除對等點移除後的新傳輸，導致 Use-After-Free",
@@ -184,7 +184,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-014",
+    id: "20260822-9270",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux sctp 核心修復 use-after-free：防範 ASCONF 區塊管理與計時器關閉的競態條件",
@@ -198,7 +198,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-015",
+    id: "20260822-9271",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心 SCTP 漏洞：未更新傳輸層指針導致 Use-After-Free",
@@ -212,7 +212,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-016",
+    id: "20260822-9272",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修復 bpf/sockmap 用戶後使用問題：防止 send 判決的記憶體釋放錯誤",
@@ -226,7 +226,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-017",
+    id: "20260822-9273",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修補：解決 fsverity 中 bpf_get_fsverity_digest() 的競態條件漏洞",
@@ -240,7 +240,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-018",
+    id: "20260822-9274",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修復 mm/filemap 中的索引恢復漏洞，避免不正確的 folio 寫入",
@@ -254,7 +254,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-019",
+    id: "20260822-9275",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修補 CVE-2026-74592：強化檔案截斷（truncate）的安全性與稽核機制",
@@ -268,7 +268,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-020",
+    id: "20260822-9276",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修復 Deadlock：scx_cgroup_lock() 順序問題導致的 cgroup 鎖定衝突",
@@ -282,7 +282,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-021",
+    id: "20260822-9277",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修復競態條件：psi_schedule_rtpoll_work 與 rtpoll_trigger_destroy 的資料競爭問題",
@@ -296,7 +296,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-022",
+    id: "20260822-9278",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心 fscrypt 漏洞：掛載 IDMap 未正確檢查，可能導致權限誤判",
@@ -310,7 +310,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-023",
+    id: "20260822-9279",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修補 fsverity 檢查邏輯，修正 setattr_prepare() 中的不必要判斷",
@@ -324,7 +324,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-024",
+    id: "20260822-9280",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修補：ip6_tunnel 處理 ICMPv6 錯誤時，防止外層封包元數據殘留導致的記憶體溢出",
@@ -338,7 +338,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-025",
+    id: "20260822-9281",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修復 IPv6 路徑資訊選項驗證漏洞：防止讀取越界資料",
@@ -352,7 +352,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-026",
+    id: "20260822-9282",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修復：解決 ptdump 與頁表釋放過程中的競態條件漏洞",
@@ -366,7 +366,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-027",
+    id: "20260822-9283",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修復：防止特權程序利用零頁映射溢出導致的資訊洩漏漏洞",
@@ -380,7 +380,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-028",
+    id: "20260822-9284",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修復環狀緩衝區競態條件：解決 `ring-buffer` 的 CPU 緩衝區交換漏洞",
@@ -394,7 +394,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-029",
+    id: "20260822-9285",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心環形緩衝區 (ring-buffer) 漏洞：初始讀取頁面順序處理不當",
@@ -408,7 +408,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-030",
+    id: "20260822-9286",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心安全公告：修復 ptp OCP 驅動程式的緩衝區溢出風險",
@@ -422,7 +422,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-031",
+    id: "20260822-9287",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心：熱管理驅動程式 (thermal/drivers/hwmon) 存在使用後釋放漏洞，已修復",
@@ -436,7 +436,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-032",
+    id: "20260822-9288",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心 eventfs 漏洞修復：防止 rcu 列表迭代時讀取到損壞的目標資料",
@@ -450,7 +450,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-033",
+    id: "20260822-9289",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心：eventfs 模組存在 Use-After-Free 漏洞，可能導致系統崩潰或資訊洩露",
@@ -464,7 +464,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-034",
+    id: "20260822-9290",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心 KVM 漏洞揭露：跨 VM Context 移動與銷毀時的競態條件問題",
@@ -478,7 +478,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-035",
+    id: "20260822-9291",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心 smb 客戶端修復 use-after-free 漏洞，防止資料殘留與記憶體操作錯誤",
@@ -492,7 +492,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-036",
+    id: "20260822-9886",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心發現 tipc 模組 Use-After-Free 漏洞：非同步清理導致記憶體釋放競爭",
@@ -506,7 +506,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-037",
+    id: "20260822-9888",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修補：TLS 1.3 零拷貝路徑的訊息迭代器恢復漏洞 (CVE-2026-74611)",
@@ -520,7 +520,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-038",
+    id: "20260822-9889",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心 veth 介面修復 skb 長度計算錯誤，防止 XDP 程式導致資料截斷與記憶體讀取異常",
@@ -534,7 +534,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-039",
+    id: "20260822-9890",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心 vsock/virtio 漏洞：teardown 後 RX 佇列仍可能被意外填充",
@@ -548,7 +548,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-040",
+    id: "20260822-8960",
     trackers: ["security"],
     category: "法規與標準",
     title: "TikTok 支付 4 億美元和解金，解決美國違反兒童隱私法案指控",
@@ -562,7 +562,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-041",
+    id: "20260822-9262",
     trackers: ["os"],
     category: "Windows",
     title: "微軟推出「Outlook Classic」主題，協助用戶平穩過渡至 New Outlook",
@@ -576,7 +576,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-042",
+    id: "20260822-8988",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Perl Punk::OAuth2::Server 存在 CVE-2026-75866 漏洞，允許未經授權的範圍（Scope）獲取存取令牌",
@@ -590,7 +590,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-043",
+    id: "20260822-8989",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "CVE-2026-75870：Perl Punk 函式庫版本低於 0.18，因預設 HMAC 金鑰空值導致會話 Cookie 可偽造",
@@ -604,7 +604,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-044",
+    id: "20260822-8990",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "CHIRP應用程式Kenwood ITM驅動程式存在評估注入漏洞，可透過惡意無線電檔案執行任意代碼",
@@ -618,7 +618,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-045",
+    id: "20260822-8991",
     trackers: ["os", "security"],
     category: "漏洞與威脅情報",
     title: "Emacs 核心功能 TRAMP 存在零點擊本地命令執行漏洞，安全社群關注修復時程",
@@ -632,7 +632,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-046",
+    id: "20260822-8992",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Perl 模組 Tie::Hash::Regex 發佈 CVE-2026-77781：舊版在處理無效查找鍵時會拋出異常",
@@ -646,7 +646,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-047",
+    id: "20260822-8993",
     trackers: ["os", "security"],
     category: "漏洞與威脅情報",
     title: "Linux核心Open vSwitch資料路徑漏洞 (CVE-2026-64531)：允許未授權使用者執行Root程式碼",
@@ -660,7 +660,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-048",
+    id: "20260822-9104",
     trackers: ["os"],
     category: "Apple",
     title: "蘋果傳推出首款觸控螢幕MacBook Pro，搭載Tandem OLED與Dynamic Island",
@@ -674,7 +674,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-049",
+    id: "20260822-9049",
     trackers: ["os"],
     category: "Android",
     title: "Google 推出 Android Pulse App：用於系統資源異常偵測的診斷工具",
@@ -688,7 +688,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-050",
+    id: "20260822-9102",
     trackers: ["os"],
     category: "Android",
     title: "Google Pixel 11 系列推出新相機處理功能，提升用戶對照片外觀的控制權",
@@ -702,7 +702,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-051",
+    id: "20260822-9105",
     trackers: ["os"],
     category: "重點關注",
     title: "Apple iPhone 18 Pro 系列與首款折疊機預計於 2026 年九月發表，重點關注新產品線規劃",
@@ -716,7 +716,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-052",
+    id: "20260822-9106",
     trackers: ["os"],
     category: "重點關注",
     title: "IT領導者期待AI管理Mac設備，但新報告顯示許多企業尚未準備就緒",
@@ -730,7 +730,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-053",
+    id: "20260822-9148",
     trackers: ["os"],
     category: "重點關注",
     title: "美國政府擬撤銷「無路區規則」威脅，可能擾亂阿拉斯加等地的野生動物與水資源生態",
@@ -744,7 +744,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-054",
+    id: "20260822-9198",
     trackers: ["os"],
     category: "重點關注",
     title: "開源 Etnaviv 驅動程式支援 YOLOX 物件偵測模型，提升 Vivante NPU 的 AI 運算能力",
@@ -758,7 +758,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-055",
+    id: "20260822-9233",
     trackers: ["os"],
     category: "重點關注",
     title: "AI 代理人（Agents）成為新型攻擊面：專家警告企業必須進行主動紅隊演練防禦威脅",
@@ -772,7 +772,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-056",
+    id: "20260822-9234",
     trackers: ["os", "security"],
     category: "重點關注",
     title: "AI生成程式碼的「雜質」浪潮：專家警告缺乏紀律的應用開發風險",
@@ -786,7 +786,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-057",
+    id: "20260822-9031",
     trackers: ["security"],
     category: "產業動態",
     title: "Bitdefender揭露「SilkParasite」：針對中亞政府機構的複雜網路間諜活動分析",
@@ -800,7 +800,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-058",
+    id: "20260822-9032",
     trackers: ["eu_cra"],
     category: "產業動態",
     title: "企業PQC轉型面臨挑戰：缺乏總負責人與實戰驗證，HNDL威脅迫使加速",
@@ -814,7 +814,7 @@ window.TRACKER_DAYS["2026-08-22"] = [
     ]
   },
   {
-    id: "20260822-059",
+    id: "20260822-9033",
     trackers: ["security"],
     category: "產業動態",
     title: "加拿大兒童醫院發生資料外洩：員工個人資訊遭竊，警惕醫療產業供應鏈風險",

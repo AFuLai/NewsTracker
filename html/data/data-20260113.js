@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-01-13"] = [
   {
-    id: "20260113-001",
+    id: "20260113-1232",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心 HFSPlus 漏洞 (CVE-2025-68767)：修復 inode 模式驗證問題",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-01-13"] = [
     ]
   },
   {
-    id: "20260113-002",
+    id: "20260113-1233",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修補：修復 fqdir_pre_exit() 處理封包碎片時可能發生的死鎖問題",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-01-13"] = [
     ]
   },
   {
-    id: "20260113-003",
+    id: "20260113-1234",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux f2fs 文件系統漏洞：未處理恢復同步資料錯誤導致核心崩潰 (CVE-2025-68769)",
@@ -44,7 +44,7 @@ window.TRACKER_DAYS["2026-01-13"] = [
     ]
   },
   {
-    id: "20260113-004",
+    id: "20260113-1235",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心：bnxt_en 驅動程式修復 XDP_TX 路徑的事件旗標處理錯誤",
@@ -58,7 +58,7 @@ window.TRACKER_DAYS["2026-01-13"] = [
     ]
   },
   {
-    id: "20260113-005",
+    id: "20260113-1236",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修復 ocfs2 模組 BUG：防止因分配鏈列表錯誤導致核心崩潰",
@@ -72,7 +72,7 @@ window.TRACKER_DAYS["2026-01-13"] = [
     ]
   },
   {
-    id: "20260113-006",
+    id: "20260113-1237",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux f2fs 文件系統漏洞修復：避免寫回時更新壓縮上下文的競態條件問題",
@@ -86,7 +86,7 @@ window.TRACKER_DAYS["2026-01-13"] = [
     ]
   },
   {
-    id: "20260113-007",
+    id: "20260113-1238",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心漏洞 CVE-2025-68773：fsl-cpm 驅動程式在 SPI 傳輸中存在緩衝區溢出風險",
@@ -100,7 +100,7 @@ window.TRACKER_DAYS["2026-01-13"] = [
     ]
   },
   {
-    id: "20260113-008",
+    id: "20260113-1239",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux hfsplus 核心漏洞修復：修復 hfs_bnode_find() 競態條件導致的參考計數錯誤",
@@ -114,7 +114,7 @@ window.TRACKER_DAYS["2026-01-13"] = [
     ]
   },
   {
-    id: "20260113-009",
+    id: "20260113-1240",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心發現 Handshake 處理漏洞：重複取消請求導致 Socket 參考計數器溢出",
@@ -128,7 +128,7 @@ window.TRACKER_DAYS["2026-01-13"] = [
     ]
   },
   {
-    id: "20260113-010",
+    id: "20260113-1241",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心漏洞修復：net/hsr 模組修復 NULL 指標解引用，防止系統崩潰",
@@ -142,7 +142,7 @@ window.TRACKER_DAYS["2026-01-13"] = [
     ]
   },
   {
-    id: "20260113-011",
+    id: "20260113-1242",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修復 ti_am335x_tsc 模組的越界存取漏洞 (CVE-2025-68777)",
@@ -156,7 +156,7 @@ window.TRACKER_DAYS["2026-01-13"] = [
     ]
   },
   {
-    id: "20260113-012",
+    id: "20260113-1243",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux btrfs 文件系統漏洞：交易日誌重放時可能導致目錄硬連結計數錯誤，造成系統掛載失敗",
@@ -170,7 +170,7 @@ window.TRACKER_DAYS["2026-01-13"] = [
     ]
   },
   {
-    id: "20260113-013",
+    id: "20260113-1244",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心：mlx5e 驅動程式面臨 PSP 雙重註銷導致的參考計數器溢出漏洞 (CVE-2025-68779)",
@@ -184,7 +184,7 @@ window.TRACKER_DAYS["2026-01-13"] = [
     ]
   },
   {
-    id: "20260113-014",
+    id: "20260113-1245",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心漏洞：Deadline 佇列在離線狀態下錯誤設定 CPU 可用狀態，可能導致任務無法執行",
@@ -198,7 +198,7 @@ window.TRACKER_DAYS["2026-01-13"] = [
     ]
   },
   {
-    id: "20260113-015",
+    id: "20260113-1276",
     trackers: ["os", "security"],
     category: "Windows",
     title: "警告：Windows Secure Boot 憑證即將過期，需更新 KEK/DB 以維持系統安全與啟動功能",

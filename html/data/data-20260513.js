@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-05-13"] = [
   {
-    id: "20260513-001",
+    id: "20260513-1331",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修補：修復 USB xHCI 控制器在 Android 設備上因 HCE 導致的中斷風暴問題",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-05-13"] = [
     ]
   },
   {
-    id: "20260513-002",
+    id: "20260513-1192",
     trackers: ["os", "security"],
     category: "Apple",
     title: "Apple 發布 Safari 26.5 安全更新：修補多個 WebKit 核心漏洞，強化記憶體管理與資料保護",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-05-13"] = [
     ]
   },
   {
-    id: "20260513-003",
+    id: "20260513-1348",
     trackers: ["os", "security"],
     category: "Apple",
     title: "Palo Alto Networks Prisma Browser 於 macOS 上的程式碼注入漏洞 (CVE-2026-0236)",
@@ -44,7 +44,7 @@ window.TRACKER_DAYS["2026-05-13"] = [
     ]
   },
   {
-    id: "20260513-004",
+    id: "20260513-655",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "Red Hat與Anchore合作，透過最小化基礎映像檔與SBOM，降低容器化環境的CVE疲勞與攻擊面",
@@ -58,7 +58,7 @@ window.TRACKER_DAYS["2026-05-13"] = [
     ]
   },
   {
-    id: "20260513-005",
+    id: "20260513-1330",
     trackers: ["os", "security"],
     category: "Android",
     title: "三星Android平台漏洞：CVE-2026-21020 允許本地攻擊者觸發特權功能",
@@ -72,7 +72,7 @@ window.TRACKER_DAYS["2026-05-13"] = [
     ]
   },
   {
-    id: "20260513-006",
+    id: "20260513-1334",
     trackers: ["os", "security"],
     category: "Android",
     title: "警告：Prisma Access Agent 存在憑證驗證缺陷，Android 與 Chrome OS 可遭 MitM 竊取 VPN 流量",
@@ -86,7 +86,7 @@ window.TRACKER_DAYS["2026-05-13"] = [
     ]
   },
   {
-    id: "20260513-007",
+    id: "20260513-1332",
     trackers: ["os", "security"],
     category: "重點關注",
     title: "Palo Alto Networks Prisma Access Agent 存在資訊洩露漏洞，本地使用者可存取敏感憑證",
@@ -100,7 +100,7 @@ window.TRACKER_DAYS["2026-05-13"] = [
     ]
   },
   {
-    id: "20260513-008",
+    id: "20260513-1333",
     trackers: ["os", "security"],
     category: "重點關注",
     title: "Palo Alto Networks Prisma Access Agent 存在權限提升漏洞 (CVE-2026-0246)，影響 macOS/Linux/Windows",
@@ -114,7 +114,7 @@ window.TRACKER_DAYS["2026-05-13"] = [
     ]
   },
   {
-    id: "20260513-009",
+    id: "20260513-1335",
     trackers: ["os", "security"],
     category: "重點關注",
     title: "Palo Alto Networks GlobalProtect 應用程式存在多重本地權限提升漏洞 (CVE-2026-0251)",

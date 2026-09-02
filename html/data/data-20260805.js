@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-08-05"] = [
   {
-    id: "20260805-001",
+    id: "20260805-6949",
     trackers: ["security"],
     category: "重大事件",
     title: "Black Hat 2026：犯罪集團利用 AI 工具 ProKYC 繞過 KYC 身份驗證，詐騙產業化獲利大幅提升",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-08-05"] = [
     ]
   },
   {
-    id: "20260805-002",
+    id: "20260805-6955",
     trackers: ["security"],
     category: "重大事件",
     title: "安哥拉最大電信商 Unitel 在 IPO 當天遭網路攻擊 釀網路大斷線與金融服務停擺",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-08-05"] = [
     ]
   },
   {
-    id: "20260805-003",
+    id: "20260805-7048",
     trackers: ["security"],
     category: "重大事件",
     title: "OpenAI 瓦解波貝柬埔寨詐騙網路：揭露利用 ChatGPT 進行多重詐騙與人蛇招募",
@@ -44,7 +44,7 @@ window.TRACKER_DAYS["2026-08-05"] = [
     ]
   },
   {
-    id: "20260805-004",
+    id: "20260805-7049",
     trackers: ["security"],
     category: "重大事件",
     title: "網路犯罪論壇出現「Poison Claude」服務，利用雲端免費點數賤售 Anthropic AI API 存取權",
@@ -58,7 +58,7 @@ window.TRACKER_DAYS["2026-08-05"] = [
     ]
   },
   {
-    id: "20260805-005",
+    id: "20260805-6936",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "CISA 將 JetBrains TeamCity 不信任資料反序列化漏洞列入已遭利用漏洞目錄",
@@ -72,7 +72,7 @@ window.TRACKER_DAYS["2026-08-05"] = [
     ]
   },
   {
-    id: "20260805-006",
+    id: "20260805-6952",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "PortSwigger 研究員揭露 CSS 可在無腳本下建構鍵盤記錄器並竊取 Webmail 資料",
@@ -86,7 +86,7 @@ window.TRACKER_DAYS["2026-08-05"] = [
     ]
   },
   {
-    id: "20260805-007",
+    id: "20260805-6953",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "TP-Link Omada 零接觸配置發現 15 個漏洞，恐引發供應鏈與網路入侵風險",
@@ -100,7 +100,7 @@ window.TRACKER_DAYS["2026-08-05"] = [
     ]
   },
   {
-    id: "20260805-008",
+    id: "20260805-6993",
     trackers: ["os", "security"],
     category: "漏洞與威脅情報",
     title: "微軟揭露 macOS ClickFix 攻擊新手法：採用伺服器端瀏覽器指紋過濾隱藏惡意鏈路",
@@ -114,7 +114,7 @@ window.TRACKER_DAYS["2026-08-05"] = [
     ]
   },
   {
-    id: "20260805-009",
+    id: "20260805-7047",
     trackers: ["os", "security"],
     category: "漏洞與威脅情報",
     title: "超過 250 個 ClickFix 惡意網域利用瀏覽器指紋技術狙擊 macOS 使用者並散播 AMOS 竊密軟體",
@@ -128,7 +128,7 @@ window.TRACKER_DAYS["2026-08-05"] = [
     ]
   },
   {
-    id: "20260805-010",
+    id: "20260805-7050",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Paperclip AI 平台爆發嚴重漏洞（CVE-2026-41679），攻擊者可遠端執行任意命令",
@@ -142,7 +142,7 @@ window.TRACKER_DAYS["2026-08-05"] = [
     ]
   },
   {
-    id: "20260805-011",
+    id: "20260805-7051",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "HashiCorp、Veeam 與 Django 修補 11 個安全漏洞，含 CVSS 10.0 跨租戶金鑰洩漏風險",
@@ -156,7 +156,7 @@ window.TRACKER_DAYS["2026-08-05"] = [
     ]
   },
   {
-    id: "20260805-012",
+    id: "20260805-7053",
     trackers: ["os", "security"],
     category: "漏洞與威脅情報",
     title: "Linux Kernel 爆發 Open vSwitch 高危漏洞「OVSwrap」（CVE-2026-64531），普通使用者可直接提權至 Root",
@@ -170,7 +170,7 @@ window.TRACKER_DAYS["2026-08-05"] = [
     ]
   },
   {
-    id: "20260805-013",
+    id: "20260805-7054",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "網路釣魚工具包 Kali365 濫用 Microsoft 裝置碼驗證機制 針對美國企業進行存取權杖劫持攻擊",
@@ -184,7 +184,7 @@ window.TRACKER_DAYS["2026-08-05"] = [
     ]
   },
   {
-    id: "20260805-014",
+    id: "20260805-7055",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Gitea 爆嚴重漏洞 CVE-2026-59774（CVSS 9.8）：未身份驗證攻擊者可任意讀取伺服器檔案",
@@ -198,7 +198,7 @@ window.TRACKER_DAYS["2026-08-05"] = [
     ]
   },
   {
-    id: "20260805-015",
+    id: "20260805-7052",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "北韓駭客再升級 EtherHiding 技術：推出 NullReceiver 隱匿 C2 IP 並投毒 npm 套件",
@@ -212,7 +212,7 @@ window.TRACKER_DAYS["2026-08-05"] = [
     ]
   },
   {
-    id: "20260805-016",
+    id: "20260805-7120",
     trackers: ["os"],
     category: "Android",
     title: "三星 Galaxy Z Fold 8 預購創紀錄，Galaxy Z Flip 用戶升級 Fold 數量成長達三倍",
@@ -226,7 +226,7 @@ window.TRACKER_DAYS["2026-08-05"] = [
     ]
   },
   {
-    id: "20260805-017",
+    id: "20260805-7122",
     trackers: ["os"],
     category: "Android",
     title: "三星 Galaxy Z Fold 8 行銷稱「全螢幕」觀影引爭議，實際顯示仍存黑邊問題",
@@ -240,7 +240,7 @@ window.TRACKER_DAYS["2026-08-05"] = [
     ]
   },
   {
-    id: "20260805-018",
+    id: "20260805-7123",
     trackers: ["os"],
     category: "Android",
     title: "Google 通訊錄 APK 揭露 Pixel 11 新功能 HiLight 支援設定聯絡人專屬來電燈效",
@@ -254,7 +254,7 @@ window.TRACKER_DAYS["2026-08-05"] = [
     ]
   },
   {
-    id: "20260805-019",
+    id: "20260805-7129",
     trackers: ["os"],
     category: "Android",
     title: "Google 於 Pixel 11 發布前出清 Pixel 10 系列官方保護殼提供折價優惠",
@@ -268,7 +268,7 @@ window.TRACKER_DAYS["2026-08-05"] = [
     ]
   },
   {
-    id: "20260805-020",
+    id: "20260805-7131",
     trackers: ["os", "security"],
     category: "Android",
     title: "Google Pixel Watch 5 宣傳圖與規格遭外洩：搭載 Gemini AI 應用與心跳停止偵測功能",
@@ -282,7 +282,7 @@ window.TRACKER_DAYS["2026-08-05"] = [
     ]
   },
   {
-    id: "20260805-021",
+    id: "20260805-7132",
     trackers: ["os"],
     category: "Android",
     title: "三星 Galaxy Z Fold 8 系列韓國預購創紀錄 首週銷量達 144 萬台",
@@ -296,7 +296,7 @@ window.TRACKER_DAYS["2026-08-05"] = [
     ]
   },
   {
-    id: "20260805-022",
+    id: "20260805-7134",
     trackers: ["os"],
     category: "Android",
     title: "Google 宣佈 Android 平台 Google Assistant 將於 2026 年 9 月正式停用並由 Gemini 全面取代",
@@ -310,7 +310,7 @@ window.TRACKER_DAYS["2026-08-05"] = [
     ]
   },
   {
-    id: "20260805-023",
+    id: "20260805-6950",
     trackers: ["security"],
     category: "前瞻技術",
     title: "AI 瀏覽器面臨「PleaseFix」零點擊 Agent 劫持風險，惡意指令可引發意圖衝突與資料外洩",
@@ -324,7 +324,7 @@ window.TRACKER_DAYS["2026-08-05"] = [
     ]
   },
   {
-    id: "20260805-024",
+    id: "20260805-6951",
     trackers: ["security"],
     category: "前瞻技術",
     title: "Black Hat 2026：多家主流 AI 瀏覽器仍難防間接 Prompt Injection 攻擊",
@@ -338,7 +338,7 @@ window.TRACKER_DAYS["2026-08-05"] = [
     ]
   },
   {
-    id: "20260805-025",
+    id: "20260805-6954",
     trackers: ["security"],
     category: "前瞻技術",
     title: "Google ADK for Python 爆代理間攻擊漏洞，駭客可利用提示詞注入威脅軟體供應鏈",
@@ -352,7 +352,7 @@ window.TRACKER_DAYS["2026-08-05"] = [
     ]
   },
   {
-    id: "20260805-026",
+    id: "20260805-7121",
     trackers: ["os"],
     category: "重點關注",
     title: "UAG 透過手機殼微調切角設計，解決 Samsung Galaxy Z Fold 8 磁吸配件干擾問題",
@@ -366,7 +366,7 @@ window.TRACKER_DAYS["2026-08-05"] = [
     ]
   },
   {
-    id: "20260805-027",
+    id: "20260805-7127",
     trackers: ["os"],
     category: "重點關注",
     title: "Google DeepMind人事大地震：Demis Hassabis轉任Alphabet首席科學家，Koray Kavukcuoglu接掌營運",
@@ -380,7 +380,7 @@ window.TRACKER_DAYS["2026-08-05"] = [
     ]
   },
   {
-    id: "20260805-028",
+    id: "20260805-7130",
     trackers: ["os"],
     category: "重點關注",
     title: "Google Chrome 開始支援 Netflix 4K 高畫質串流播放，惟僅限 Windows 11 與 Chromebook 平台",
@@ -394,7 +394,7 @@ window.TRACKER_DAYS["2026-08-05"] = [
     ]
   },
   {
-    id: "20260805-029",
+    id: "20260805-7133",
     trackers: ["os", "security"],
     category: "重點關注",
     title: "Sunbird 為 Android 推出 iMessage 應用程式並上架 Google Play，曾爆資安漏洞引發隱私疑慮",

@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2025-08-07"] = [
   {
-    id: "20250807-001",
+    id: "20250807-708",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Dragos分析報告：深入探討工業控制系統（OT）的勒索軟體威脅趨勢",

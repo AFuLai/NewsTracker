@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-08-16"] = [
   {
-    id: "20260816-001",
+    id: "20260816-7959",
     trackers: ["eu_cra"],
     category: "法令更新",
     title: "首爾市擬修訂《網路安全法規施行細則》：強化 AI、雲端等新技術的資安管理",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-08-16"] = [
     ]
   },
   {
-    id: "20260816-002",
+    id: "20260816-8037",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Debian 發布安全更新 DSA-6443-1：修補 OpenSSH 服務中的潛在漏洞",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-08-16"] = [
     ]
   },
   {
-    id: "20260816-003",
+    id: "20260816-8045",
     trackers: ["os"],
     category: "Linux",
     title: "AVX-512 優化提升 Linux RAID 效能：xor_gen 函數支援現代 CPU",
@@ -44,7 +44,7 @@ window.TRACKER_DAYS["2026-08-16"] = [
     ]
   },
   {
-    id: "20260816-004",
+    id: "20260816-8046",
     trackers: ["os"],
     category: "Linux",
     title: "Linux 7.3 核心升級：擴展 binfmt_misc 功能，實現二進位檔案的動態執行環境選擇",
@@ -58,7 +58,7 @@ window.TRACKER_DAYS["2026-08-16"] = [
     ]
   },
   {
-    id: "20260816-005",
+    id: "20260816-8047",
     trackers: ["os"],
     category: "Linux",
     title: "開源驅動程式讓 Linux 可監測 ASUS ROG Astral 顯示卡 12VHPWR 電源連接埠",
@@ -72,7 +72,7 @@ window.TRACKER_DAYS["2026-08-16"] = [
     ]
   },
   {
-    id: "20260816-006",
+    id: "20260816-8048",
     trackers: ["os"],
     category: "Linux",
     title: "Mesa 核心更新：RADV 與 ACO 驅動程式修補 19 個補丁，優化 Vulkan 效能",
@@ -86,7 +86,7 @@ window.TRACKER_DAYS["2026-08-16"] = [
     ]
   },
   {
-    id: "20260816-007",
+    id: "20260816-8115",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Debian 發布安全更新 DSA-6444-1：修補 OpenSSH 處理 SSH 協議時的資訊洩漏漏洞",
@@ -100,7 +100,7 @@ window.TRACKER_DAYS["2026-08-16"] = [
     ]
   },
   {
-    id: "20260816-008",
+    id: "20260816-8116",
     trackers: ["os"],
     category: "Linux",
     title: "Linux 7.2 核心版本發布：提升 BPF 支援、CPU 排程與 Btrfs 檔案系統功能",
@@ -114,7 +114,7 @@ window.TRACKER_DAYS["2026-08-16"] = [
     ]
   },
   {
-    id: "20260816-009",
+    id: "20260816-8119",
     trackers: ["os"],
     category: "Linux",
     title: "Linux 核心新增 tlbi= 啟動選項，用於解決 AMD CPU 的 TLB 刷新問題",
@@ -128,7 +128,7 @@ window.TRACKER_DAYS["2026-08-16"] = [
     ]
   },
   {
-    id: "20260816-010",
+    id: "20260816-8120",
     trackers: ["os"],
     category: "Linux",
     title: "Debian Linux 發佈 33 週年：回顧其歷史意義與後續版本開發進度",
@@ -142,7 +142,7 @@ window.TRACKER_DAYS["2026-08-16"] = [
     ]
   },
   {
-    id: "20260816-011",
+    id: "20260816-8254",
     trackers: ["security"],
     category: "重大事件",
     title: "Anthropic 的 Claude 服務遭遇重大中斷，多個服務受影響，用戶面臨登入及性能下降問題",
@@ -156,7 +156,7 @@ window.TRACKER_DAYS["2026-08-16"] = [
     ]
   },
   {
-    id: "20260816-012",
+    id: "20260816-8087",
     trackers: ["os"],
     category: "Windows",
     title: "Windows 11 KB5121003 更新引發遊戲崩潰：與 inpoutx64.sys 驅動程式不相容",
@@ -170,7 +170,7 @@ window.TRACKER_DAYS["2026-08-16"] = [
     ]
   },
   {
-    id: "20260816-013",
+    id: "20260816-8088",
     trackers: ["os"],
     category: "Windows",
     title: "Windows 11 將全面升級介面：Microsoft 規劃用 WinUI 替換多數舊版對話框與系統介面",
@@ -184,7 +184,7 @@ window.TRACKER_DAYS["2026-08-16"] = [
     ]
   },
   {
-    id: "20260816-014",
+    id: "20260816-7922",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "WordPress發布7.0.3修補高風險XSS漏洞CVE-2026-64638，防禦者應警惕自動化攻擊鏈",
@@ -198,7 +198,7 @@ window.TRACKER_DAYS["2026-08-16"] = [
     ]
   },
   {
-    id: "20260816-015",
+    id: "20260816-8114",
     trackers: ["os"],
     category: "Apple",
     title: "Apple iOS 系統持續個性化：從鎖定畫面到應用程式圖標，未來可能擴展至系統整體設計",
@@ -212,7 +212,7 @@ window.TRACKER_DAYS["2026-08-16"] = [
     ]
   },
   {
-    id: "20260816-016",
+    id: "20260816-8274",
     trackers: ["os", "security"],
     category: "漏洞與威脅情報",
     title: "OpenZFS在Linux上的漏洞分析：未特權使用者空間可操縱zpool並逃逸核心",
@@ -226,7 +226,7 @@ window.TRACKER_DAYS["2026-08-16"] = [
     ]
   },
   {
-    id: "20260816-017",
+    id: "20260816-8275",
     trackers: ["os", "security"],
     category: "漏洞與威脅情報",
     title: "OpenZFS在Linux環境中存在權限提升漏洞：透過未特權使用者命名空間可操作zpool並逃逸核心",
@@ -240,7 +240,7 @@ window.TRACKER_DAYS["2026-08-16"] = [
     ]
   },
   {
-    id: "20260816-018",
+    id: "20260816-8276",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Perl Net::OAuth 函式庫曝 CVE-2026-72888 漏洞，可透過無限快取導致記憶體耗盡",
@@ -254,7 +254,7 @@ window.TRACKER_DAYS["2026-08-16"] = [
     ]
   },
   {
-    id: "20260816-019",
+    id: "20260816-8277",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Perl Net::OAuth::Client 存在 CVE-2026-72887 漏洞，可能導致 OAuth 1.0a 降級至 1.0",
@@ -268,7 +268,7 @@ window.TRACKER_DAYS["2026-08-16"] = [
     ]
   },
   {
-    id: "20260816-020",
+    id: "20260816-8278",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Lemonldap-NG-Portal 存在 CVE-2026-19349 漏洞，OAuth2 狀態參數可導致身分驗證繞過",
@@ -282,7 +282,7 @@ window.TRACKER_DAYS["2026-08-16"] = [
     ]
   },
   {
-    id: "20260816-021",
+    id: "20260816-8279",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "libmspack 發現堆緩衝區溢出漏洞：透過 Huffman 解碼表建構可觸發",
@@ -296,7 +296,7 @@ window.TRACKER_DAYS["2026-08-16"] = [
     ]
   },
   {
-    id: "20260816-022",
+    id: "20260816-8112",
     trackers: ["os"],
     category: "Android",
     title: "Google Pixel 11 預覽：探討 Pixel 手機功能開發的趨勢與挑戰",
@@ -310,7 +310,7 @@ window.TRACKER_DAYS["2026-08-16"] = [
     ]
   },
   {
-    id: "20260816-023",
+    id: "20260816-8113",
     trackers: ["os"],
     category: "Android",
     title: "Google Pixel 11 系列升級 Face Unlock 功能，提升低光環境下的臉部辨識準確性",
@@ -324,7 +324,7 @@ window.TRACKER_DAYS["2026-08-16"] = [
     ]
   },
   {
-    id: "20260816-024",
+    id: "20260816-8064",
     trackers: ["os"],
     category: "重點關注",
     title: "Corma 提出「防禦鴻溝」概念：AI 攻擊能力領先，強調強化防禦性 AI 代理人",
@@ -338,7 +338,7 @@ window.TRACKER_DAYS["2026-08-16"] = [
     ]
   },
   {
-    id: "20260816-025",
+    id: "20260816-8065",
     trackers: ["os"],
     category: "重點關注",
     title: "資深工程師闡述 Pull Request 描述與程式碼註解的根本差異：前者為說服，後者為知識傳承",
@@ -352,7 +352,7 @@ window.TRACKER_DAYS["2026-08-16"] = [
     ]
   },
   {
-    id: "20260816-026",
+    id: "20260816-8118",
     trackers: ["os"],
     category: "重點關注",
     title: "GIMP開發新專案檔案格式：尋求取代XCF，提升大型專案與動畫處理能力",
@@ -366,7 +366,7 @@ window.TRACKER_DAYS["2026-08-16"] = [
     ]
   },
   {
-    id: "20260816-027",
+    id: "20260816-8125",
     trackers: ["os"],
     category: "重點關注",
     title: "Canonical VP預測：Ubuntu在Windows Subsystem for Linux (WSL) 的用戶增長將超越原生Linux桌面用戶",
@@ -380,7 +380,7 @@ window.TRACKER_DAYS["2026-08-16"] = [
     ]
   },
   {
-    id: "20260816-028",
+    id: "20260816-7958",
     trackers: ["eu_cra"],
     category: "產業動態",
     title: "英國能源巨頭 National Grid內部資料疑似外洩 包含5500個檔案與DevOps腳本",
@@ -394,7 +394,7 @@ window.TRACKER_DAYS["2026-08-16"] = [
     ]
   },
   {
-    id: "20260816-029",
+    id: "20260816-7957",
     trackers: ["security"],
     category: "研討活動",
     title: "Black Hat與DEF CON：全球資安生態系統的兩大盛會與AI時代的防禦前線",
@@ -408,7 +408,7 @@ window.TRACKER_DAYS["2026-08-16"] = [
     ]
   },
   {
-    id: "20260816-030",
+    id: "20260816-7960",
     trackers: ["eu_cra"],
     category: "研討活動",
     title: "HackerOne發言：結合AI與人專業性，實現持續性威脅暴露管理（CTEM）的新趨勢",

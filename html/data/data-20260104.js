@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-01-04"] = [
   {
-    id: "20260104-001",
+    id: "20260104-168",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "警惕！Microsoft SharePoint 存在資料反序列化漏洞，可遠端執行程式碼",

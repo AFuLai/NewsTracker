@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-02-01"] = [
   {
-    id: "20260201-001",
+    id: "20260201-278",
     trackers: ["eu_cra"],
     category: "研討活動",
     title: "新加坡國家模擬詐騙演練啟動：提升公眾對數位詐騙的防護意識",

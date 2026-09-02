@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2024-03-12"] = [
   {
-    id: "20240312-001",
+    id: "20240312-211",
     trackers: ["eu_cra"],
     category: "合規指引",
     title: "ENISA強調資安重要性：提供數據保護與數位身份的實務技術指引",

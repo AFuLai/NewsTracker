@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2025-11-14"] = [
   {
-    id: "20251114-001",
+    id: "20251114-5829",
     trackers: ["eu_cra"],
     category: "研討活動",
     title: "ENISA主導國際網路安全挑戰賽（ICC）在東京舉行，歐洲隊伍連續四年奪冠",

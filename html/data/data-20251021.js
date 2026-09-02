@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2025-10-21"] = [
   {
-    id: "20251021-001",
+    id: "20251021-5633",
     trackers: ["eu_cra"],
     category: "合規指引",
     title: "德國 BSI 指引：製造商如何透過自我聲明（Self-Declaration）符合 IT 安全標籤與 CRA 要求",

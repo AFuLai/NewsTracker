@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2025-11-28"] = [
   {
-    id: "20251128-001",
+    id: "20251128-136",
     trackers: ["eu_cra", "security"],
     category: "法令更新",
     title: "歐盟《網路韌性法案》（CRA）實施指引：涵蓋數位產品全生命週期安全要求",

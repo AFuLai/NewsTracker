@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2024-02-21"] = [
   {
-    id: "20240221-001",
+    id: "20240221-207",
     trackers: ["eu_cra"],
     category: "開源影響",
     title: "ENISA 關注 AI 潛在威脅與後量子密碼學趨勢：分析 AI 法規與資安生態系統",

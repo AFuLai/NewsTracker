@@ -9,5 +9,5 @@ window.TRACKER_YEAR["eu_cra"]["2023"] = {
     "2023-03": "manifest-202303.js",
     "2023-02": "manifest-202302.js"
   },
-  lastUpdated: "2026-08-04"
+  lastUpdated: "2026-09-02"
 };

@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-01-27"] = [
   {
-    id: "20260127-001",
+    id: "20260127-5891",
     trackers: ["eu_cra"],
     category: "合規指引",
     title: "歐盟啟動 SECURE 專案，提供資金支持中小企業提升產品符合《網路韌性法案》要求",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-01-27"] = [
     ]
   },
   {
-    id: "20260127-002",
+    id: "20260127-1290",
     trackers: ["os", "security"],
     category: "重點關注",
     title: "MobSF 報告生成器存在儲存型 XSS 漏洞，攻擊者可透過惡意 APK 劫持會話",

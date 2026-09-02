@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2025-04-29"] = [
   {
-    id: "20250429-001",
+    id: "20250429-284",
     trackers: ["security"],
     category: "uncategorized",
     title: "CSA發布多項關鍵漏洞警報：Langflow、SolarWinds、Zoom、SAP等產品面臨遠端代碼執行風險",

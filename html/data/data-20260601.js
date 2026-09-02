@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-06-01"] = [
   {
-    id: "20260601-001",
+    id: "20260601-437",
     trackers: ["security"],
     category: "重大事件",
     title: "微軟修復My Sign-Ins服務中斷：因快取配置變更導致MFA設定與登入受影響",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-06-01"] = [
     ]
   },
   {
-    id: "20260601-002",
+    id: "20260601-988",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Debian 核心安全公告：修補 DSA-6318-1 相關漏洞，強化系統安全性",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-06-01"] = [
     ]
   },
   {
-    id: "20260601-003",
+    id: "20260601-1096",
     trackers: ["os"],
     category: "Linux",
     title: "Canonical Support 深度修復 Ubuntu 舊版核心元件 libnss-db 性能 Bug",
@@ -44,7 +44,7 @@ window.TRACKER_DAYS["2026-06-01"] = [
     ]
   },
   {
-    id: "20260601-004",
+    id: "20260601-307",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "中國資助駭客持續活躍，針對捷克、台灣等地區進行「Operation Dragon Weave」滲透攻擊",
@@ -58,7 +58,7 @@ window.TRACKER_DAYS["2026-06-01"] = [
     ]
   },
   {
-    id: "20260601-005",
+    id: "20260601-310",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "關鍵資安漏洞：WP Maps Pro 插件遭利用，可讓未經身份驗證攻擊者建立管理員帳號",
@@ -72,7 +72,7 @@ window.TRACKER_DAYS["2026-06-01"] = [
     ]
   },
   {
-    id: "20260601-006",
+    id: "20260601-335",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "微軟因處理零日漏洞爭議引發社群反彈：法律威脅引發資安研究界不滿",
@@ -86,7 +86,7 @@ window.TRACKER_DAYS["2026-06-01"] = [
     ]
   },
   {
-    id: "20260601-007",
+    id: "20260601-336",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Palo Alto GlobalProtect VPN 認證繞過漏洞 CVE-2026-0257 遭積極利用，建議立即修補",
@@ -102,7 +102,7 @@ window.TRACKER_DAYS["2026-06-01"] = [
     ]
   },
   {
-    id: "20260601-008",
+    id: "20260601-349",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "CISA新增CVE-2024-21182：Oracle WebLogic Server漏洞進入已知利用漏洞清單",
@@ -116,7 +116,7 @@ window.TRACKER_DAYS["2026-06-01"] = [
     ]
   },
   {
-    id: "20260601-009",
+    id: "20260601-305",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "Miasma 供應鏈攻擊：紅帽 (Red Hat) npm 套件遭植入惡意程式，竊取開發者憑證與密鑰",
@@ -130,7 +130,7 @@ window.TRACKER_DAYS["2026-06-01"] = [
     ]
   },
   {
-    id: "20260601-010",
+    id: "20260601-308",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "MSP安全成長平台：超越傳統vCISO與GRC的下一代資安管理模式",
@@ -144,7 +144,7 @@ window.TRACKER_DAYS["2026-06-01"] = [
     ]
   },
   {
-    id: "20260601-011",
+    id: "20260601-309",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "警惕 Codex 開發者：惡意 npm 套件與 Android App 竊取 OpenAI 認證令牌",
@@ -158,7 +158,7 @@ window.TRACKER_DAYS["2026-06-01"] = [
     ]
   },
   {
-    id: "20260601-012",
+    id: "20260601-319",
     trackers: ["security"],
     category: "前瞻技術",
     title: "駭客利用 Meta AI 支援機器人，透過重設密碼流程劫持 Instagram 帳號",
@@ -172,7 +172,7 @@ window.TRACKER_DAYS["2026-06-01"] = [
     ]
   },
   {
-    id: "20260601-013",
+    id: "20260601-334",
     trackers: ["eu_cra", "security"],
     category: "前瞻技術",
     title: "Anthropic 宣布開放 Mythos AI 給 ENISA 研究，強化歐盟資安防禦能力",
@@ -186,7 +186,7 @@ window.TRACKER_DAYS["2026-06-01"] = [
     ]
   },
   {
-    id: "20260601-014",
+    id: "20260601-1097",
     trackers: ["os"],
     category: "重點關注",
     title: "Canonical與NVIDIA合作，透過Ubuntu Snap發布NVIDIA OpenShell，強化AI代理工作流的安全性",
@@ -200,7 +200,7 @@ window.TRACKER_DAYS["2026-06-01"] = [
     ]
   },
   {
-    id: "20260601-015",
+    id: "20260601-450",
     trackers: ["eu_cra", "security"],
     category: "研討活動",
     title: "歐盟網路韌性法案（CRA）研討會：協助中小企業理解標準化要求與實務合規工具",

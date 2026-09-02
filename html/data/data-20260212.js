@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-02-12"] = [
   {
-    id: "20260212-001",
+    id: "20260212-122",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "深入解析 Windows 管理員保護機制：揭示 UI 存取權限的歷史漏洞與修復路徑",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-02-12"] = [
     ]
   },
   {
-    id: "20260212-002",
+    id: "20260212-1293",
     trackers: ["os", "security"],
     category: "Android",
     title: "Galaxy FDS Android SDK 存在 TLS 主機名稱驗證繞過漏洞，遭中間人攻擊竊取憑證與資料",

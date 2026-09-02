@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-06-20"] = [
   {
-    id: "20260620-001",
+    id: "20260620-1681",
     trackers: ["security"],
     category: "重大事件",
     title: "新型 Prinz Eugen 勒索軟體採用無勒索信策略，優先加密近期檔案以施壓受害者",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-06-20"] = [
     ]
   },
   {
-    id: "20260620-002",
+    id: "20260620-1908",
     trackers: ["os"],
     category: "Linux",
     title: "Linux 核心移除 strncpy API：解決長年存在的 Bug 與效能問題",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-06-20"] = [
     ]
   },
   {
-    id: "20260620-003",
+    id: "20260620-1909",
     trackers: ["os"],
     category: "Linux",
     title: "Linux 核心更新：CRC64-NVMe 檢查機制支援 32 位元 ARM，提升效能",
@@ -44,7 +44,7 @@ window.TRACKER_DAYS["2026-06-20"] = [
     ]
   },
   {
-    id: "20260620-004",
+    id: "20260620-1910",
     trackers: ["os"],
     category: "Linux",
     title: "GIMP 0.54 版本透過 Flatpak 移植，讓老式 Motif 工具組在現代 Linux 桌面環境上運行",
@@ -58,7 +58,7 @@ window.TRACKER_DAYS["2026-06-20"] = [
     ]
   },
   {
-    id: "20260620-005",
+    id: "20260620-1911",
     trackers: ["os"],
     category: "Linux",
     title: "exFAT 文件系統在 Linux 7.2 上升級支援 IOmap，提升效能與穩定性",
@@ -72,7 +72,7 @@ window.TRACKER_DAYS["2026-06-20"] = [
     ]
   },
   {
-    id: "20260620-006",
+    id: "20260620-1912",
     trackers: ["os"],
     category: "Linux",
     title: "KDE Plasma 6.8 新增彩色識別標籤，優化多螢幕配置體驗",
@@ -86,7 +86,7 @@ window.TRACKER_DAYS["2026-06-20"] = [
     ]
   },
   {
-    id: "20260620-007",
+    id: "20260620-1913",
     trackers: ["os"],
     category: "Linux",
     title: "Linux 7.2 NTFS 驅動程式升級：支援 Windows 原生符號連結並強化元數據處理",
@@ -100,7 +100,7 @@ window.TRACKER_DAYS["2026-06-20"] = [
     ]
   },
   {
-    id: "20260620-008",
+    id: "20260620-1978",
     trackers: ["os"],
     category: "Windows",
     title: "微軟揭露 Windows 11 設備錯過 Secure Boot 2023 更新的風險與處理方式",
@@ -114,7 +114,7 @@ window.TRACKER_DAYS["2026-06-20"] = [
     ]
   },
   {
-    id: "20260620-009",
+    id: "20260620-1979",
     trackers: ["os"],
     category: "Windows",
     title: "Windows 11 KB5094126 更新後，Office 應用程式與回收筒出現多項功能故障",
@@ -128,7 +128,7 @@ window.TRACKER_DAYS["2026-06-20"] = [
     ]
   },
   {
-    id: "20260620-010",
+    id: "20260620-1645",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "WordPress 外掛 Gravity SMTP 遭利用 CVE-2026-4020 資訊洩露，可竊取 API 金鑰與系統配置",
@@ -142,7 +142,7 @@ window.TRACKER_DAYS["2026-06-20"] = [
     ]
   },
   {
-    id: "20260620-011",
+    id: "20260620-1770",
     trackers: ["os"],
     category: "Apple",
     title: "Apple 宣布設備管理標準轉型：從傳統配置到聲明式管理（Declarative Management）",
@@ -156,7 +156,7 @@ window.TRACKER_DAYS["2026-06-20"] = [
     ]
   },
   {
-    id: "20260620-012",
+    id: "20260620-1771",
     trackers: ["os"],
     category: "Apple",
     title: "【App推薦】Brink：為 iPhone 打造功能豐富的播客收聽體驗",
@@ -170,7 +170,7 @@ window.TRACKER_DAYS["2026-06-20"] = [
     ]
   },
   {
-    id: "20260620-013",
+    id: "20260620-1773",
     trackers: ["os"],
     category: "Apple",
     title: "WhatsApp 在 iOS 測試版重啟訊息動畫功能，並提供開關設定",
@@ -184,7 +184,7 @@ window.TRACKER_DAYS["2026-06-20"] = [
     ]
   },
   {
-    id: "20260620-014",
+    id: "20260620-1682",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "Microsoft 指出北韓駭客組織 Sapphire Sleet 發動 Mastra AI 供應鏈攻擊",
@@ -198,7 +198,7 @@ window.TRACKER_DAYS["2026-06-20"] = [
     ]
   },
   {
-    id: "20260620-015",
+    id: "20260620-1704",
     trackers: ["os"],
     category: "Android",
     title: "三星 Galaxy Watch 9 與 Ultra 2 洩漏細節：預計取消經典錶圈設計，並更新設計與健康功能",
@@ -212,7 +212,7 @@ window.TRACKER_DAYS["2026-06-20"] = [
     ]
   },
   {
-    id: "20260620-016",
+    id: "20260620-1705",
     trackers: ["os"],
     category: "Android",
     title: "Android 17 系統更新後，Pixel 手機電池續航力表現如何？用戶分享經驗與觀察",
@@ -226,7 +226,7 @@ window.TRACKER_DAYS["2026-06-20"] = [
     ]
   },
   {
-    id: "20260620-017",
+    id: "20260620-1706",
     trackers: ["os"],
     category: "Android",
     title: "Google 宣布 Android 17 啟動：涵蓋系統升級、Pixel 特色功能與跨平台整合趨勢",
@@ -240,7 +240,7 @@ window.TRACKER_DAYS["2026-06-20"] = [
     ]
   },
   {
-    id: "20260620-018",
+    id: "20260620-1772",
     trackers: ["os"],
     category: "重點關注",
     title: "Apple宣布關閉三家美國實體店面：因購物中心衰退與零售業調整",
@@ -254,7 +254,7 @@ window.TRACKER_DAYS["2026-06-20"] = [
     ]
   },
   {
-    id: "20260620-019",
+    id: "20260620-1855",
     trackers: ["os"],
     category: "重點關注",
     title: "英國政府計畫使用AI臉部年齡估計系統篩檢庇護申請者，卻面臨技術偏見與準確性爭議",
@@ -268,7 +268,7 @@ window.TRACKER_DAYS["2026-06-20"] = [
     ]
   },
   {
-    id: "20260620-020",
+    id: "20260620-1944",
     trackers: ["os"],
     category: "重點關注",
     title: "亞馬遜資安專家：AI治理趨勢轉向「端到端責任制」，取代傳統「人為審核環節」",
@@ -282,7 +282,7 @@ window.TRACKER_DAYS["2026-06-20"] = [
     ]
   },
   {
-    id: "20260620-021",
+    id: "20260620-1946",
     trackers: ["os"],
     category: "重點關注",
     title: "英國向烏克蘭增援額外 3 萬架無人機，總計達 15 萬架",
@@ -296,7 +296,7 @@ window.TRACKER_DAYS["2026-06-20"] = [
     ]
   },
   {
-    id: "20260620-022",
+    id: "20260620-1980",
     trackers: ["os"],
     category: "重點關注",
     title: "Edge瀏覽器新增Google帳號登入選項，Microsoft正逐步放寬對MSA的強制要求",

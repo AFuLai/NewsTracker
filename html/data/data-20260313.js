@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-03-13"] = [
   {
-    id: "20260313-001",
+    id: "20260313-234",
     trackers: ["eu_cra"],
     category: "研討活動",
     title: "歐盟資安標準化會議聚焦《網路韌性法案》與立法趨勢，強調標準化對歐盟戰略自主性支持",

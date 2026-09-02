@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-05-02"] = [
   {
-    id: "20260502-001",
+    id: "20260502-1316",
     trackers: ["os", "security"],
     category: "Linux",
     title: "WordPress App Builder 插件存在越權修改用戶頭像的 Insecure Direct Object Reference 漏洞",

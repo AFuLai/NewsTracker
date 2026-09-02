@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-01-01"] = [
   {
-    id: "20260101-001",
+    id: "20260101-218",
     trackers: ["eu_cra"],
     category: "合規指引",
     title: "ENISA發布品牌識別指南：規範機構標誌使用，強化網路安全信譽",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-01-01"] = [
     ]
   },
   {
-    id: "20260101-002",
+    id: "20260101-3689",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Dragos預告2026年OT/ICS資安報告：深入分析全球工業控制系統威脅與韌性趨勢",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-01-01"] = [
     ]
   },
   {
-    id: "20260101-003",
+    id: "20260101-638",
     trackers: ["security"],
     category: "前瞻技術",
     title: "Dragos發布OT/ICS資安指南：提供關鍵基礎設施的威脅情報與防禦策略",
@@ -44,7 +44,7 @@ window.TRACKER_DAYS["2026-01-01"] = [
     ]
   },
   {
-    id: "20260101-004",
+    id: "20260101-227",
     trackers: ["eu_cra"],
     category: "產業動態",
     title: "ENISA 宣布目標：成為氣候中性機構，整合環境永續策略",
@@ -58,7 +58,7 @@ window.TRACKER_DAYS["2026-01-01"] = [
     ]
   },
   {
-    id: "20260101-005",
+    id: "20260101-220",
     trackers: ["eu_cra"],
     category: "研討活動",
     title: "ENISA 專家諮詢服務：為活動或特定主題尋求網路安全專家協助",

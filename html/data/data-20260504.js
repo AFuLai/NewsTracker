@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-05-04"] = [
   {
-    id: "20260504-001",
+    id: "20260504-493",
     trackers: ["security"],
     category: "重大事件",
     title: "教育科技公司 Instructure 遭駭客攻擊與資料外洩，涉嫌竊取 3.65 TB 數據",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-05-04"] = [
     ]
   },
   {
-    id: "20260504-002",
+    id: "20260504-281",
     trackers: ["security"],
     category: "產業動態",
     title: "新加坡資安事件報告指引：協助企業識別並處理網路安全事件",

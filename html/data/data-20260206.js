@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-02-06"] = [
   {
-    id: "20260206-001",
+    id: "20260206-162",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "CISA警告：SmarterMail存在未經身份驗證的RCE漏洞，已被勒索軟體攻擊者利用",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-02-06"] = [
     ]
   },
   {
-    id: "20260206-002",
+    id: "20260206-166",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "BeyondTrust 遠端支援/特權存取漏洞（CVE-2026-1731）：未經身份驗證即可執行系統指令",

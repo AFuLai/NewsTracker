@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-08-15"] = [
   {
-    id: "20260815-001",
+    id: "20260815-7963",
     trackers: ["eu_cra"],
     category: "法令更新",
     title: "法國憲法法院裁定限制未成年人社群媒體的法案違憲：質疑年齡驗證技術與基本權利保護",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-08-15"] = [
     ]
   },
   {
-    id: "20260815-002",
+    id: "20260815-8049",
     trackers: ["os"],
     category: "Linux",
     title: "GNOME 51 Beta 版本發布：新增指紋管理、改善 Wayland 視覺效果與 GTK 性能",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-08-15"] = [
     ]
   },
   {
-    id: "20260815-003",
+    id: "20260815-8050",
     trackers: ["os"],
     category: "Linux",
     title: "Intel Jay Shader 編譯器透過 Mesa 26.3-devel 成功通過 Vulkan CTS，支援 Xe2 與 Xe3 硬體",
@@ -44,7 +44,7 @@ window.TRACKER_DAYS["2026-08-15"] = [
     ]
   },
   {
-    id: "20260815-004",
+    id: "20260815-8051",
     trackers: ["os"],
     category: "Linux",
     title: "RustConn 0.20 重磅發布：增強 GTK4/libadwaita 介面，打造現代化 Linux 連線管理工具",
@@ -58,7 +58,7 @@ window.TRACKER_DAYS["2026-08-15"] = [
     ]
   },
   {
-    id: "20260815-005",
+    id: "20260815-8052",
     trackers: ["os"],
     category: "Linux",
     title: "Linux 7.2 核心更新：修復多款硬體音訊問題，支援 Intel Nova Lake HDMI-In 擷取",
@@ -72,7 +72,7 @@ window.TRACKER_DAYS["2026-08-15"] = [
     ]
   },
   {
-    id: "20260815-006",
+    id: "20260815-8053",
     trackers: ["os"],
     category: "Linux",
     title: "KDE Plasma 6.8 新增功能：支援精細調整滑鼠與觸控板速度，提升使用者體驗",
@@ -86,7 +86,7 @@ window.TRACKER_DAYS["2026-08-15"] = [
     ]
   },
   {
-    id: "20260815-007",
+    id: "20260815-8054",
     trackers: ["os"],
     category: "Linux",
     title: "Debian 開發者就 LLM 使用權進行投票，決定 AI 貢獻的未來方向",
@@ -100,7 +100,7 @@ window.TRACKER_DAYS["2026-08-15"] = [
     ]
   },
   {
-    id: "20260815-008",
+    id: "20260815-8055",
     trackers: ["os"],
     category: "Linux",
     title: "AMD 發布 109 個補丁，為 GFX 12.1 繪圖引擎新增 RAS 支援，強化工作站與資料中心應用",
@@ -114,7 +114,7 @@ window.TRACKER_DAYS["2026-08-15"] = [
     ]
   },
   {
-    id: "20260815-009",
+    id: "20260815-8152",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修補：修復 liveupdate 流程中 session 類型驗證漏洞",
@@ -128,7 +128,7 @@ window.TRACKER_DAYS["2026-08-15"] = [
     ]
   },
   {
-    id: "20260815-010",
+    id: "20260815-8153",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修補：修復 usb: atm: ueagle-atm 驅動程式在設備移除時的競態條件漏洞",
@@ -142,7 +142,7 @@ window.TRACKER_DAYS["2026-08-15"] = [
     ]
   },
   {
-    id: "20260815-011",
+    id: "20260815-8154",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心 ksmbd 漏洞：SMB 檔案操作時的憑證處理不當問題",
@@ -156,7 +156,7 @@ window.TRACKER_DAYS["2026-08-15"] = [
     ]
   },
   {
-    id: "20260815-012",
+    id: "20260815-8155",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修復 CVE-2026-68458：binder 交易處理中的緩衝區大小計算錯誤",
@@ -170,7 +170,7 @@ window.TRACKER_DAYS["2026-08-15"] = [
     ]
   },
   {
-    id: "20260815-013",
+    id: "20260815-8496",
     trackers: ["os", "security"],
     category: "Linux",
     title: "f2fs 文件系統修復潛在死鎖：修補 gc_merge 路徑的 f2fs_balance_fs 函式",
@@ -184,7 +184,7 @@ window.TRACKER_DAYS["2026-08-15"] = [
     ]
   },
   {
-    id: "20260815-014",
+    id: "20260815-8497",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux f2fs 文件系統修復潛在死鎖：空間耗盡時的資料寫回問題",
@@ -198,7 +198,7 @@ window.TRACKER_DAYS["2026-08-15"] = [
     ]
   },
   {
-    id: "20260815-015",
+    id: "20260815-8498",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心安全更新：修復 fwnode_handle 初始化時的未初始化記憶體洩漏風險",
@@ -212,7 +212,7 @@ window.TRACKER_DAYS["2026-08-15"] = [
     ]
   },
   {
-    id: "20260815-016",
+    id: "20260815-8499",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修補：修復 bpf 程式碼中接受負數常數偏移量導致的緩衝區越界漏洞",
@@ -226,7 +226,7 @@ window.TRACKER_DAYS["2026-08-15"] = [
     ]
   },
   {
-    id: "20260815-017",
+    id: "20260815-8500",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心安全更新：修復 mmc: sdhci-esdhc-imx 模組的電源管理漏洞",
@@ -240,7 +240,7 @@ window.TRACKER_DAYS["2026-08-15"] = [
     ]
   },
   {
-    id: "20260815-018",
+    id: "20260815-8501",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修復 mmc: sdhci-esdhc-imx 設備在系統休眠喚醒時的未處理中斷警告",
@@ -254,7 +254,7 @@ window.TRACKER_DAYS["2026-08-15"] = [
     ]
   },
   {
-    id: "20260815-019",
+    id: "20260815-8502",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心元件 sdhci-esdhc-imx 漏洞修復：防止設備無法恢復預設引腳配置",
@@ -268,7 +268,7 @@ window.TRACKER_DAYS["2026-08-15"] = [
     ]
   },
   {
-    id: "20260815-020",
+    id: "20260815-8503",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心漏洞：mtd: rawnand 驅動程式在 DMA 超時處理上存在缺陷，可能導致資料存取不安全",
@@ -282,7 +282,7 @@ window.TRACKER_DAYS["2026-08-15"] = [
     ]
   },
   {
-    id: "20260815-021",
+    id: "20260815-8504",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心漏洞：mtd: mchp23k256 驅動程式存在使用 SPI 匹配資料的風險",
@@ -296,7 +296,7 @@ window.TRACKER_DAYS["2026-08-15"] = [
     ]
   },
   {
-    id: "20260815-022",
+    id: "20260815-8505",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心漏洞：mtd: virt-concat 註冊名稱重複時的記憶體洩漏問題",
@@ -310,7 +310,7 @@ window.TRACKER_DAYS["2026-08-15"] = [
     ]
   },
   {
-    id: "20260815-023",
+    id: "20260815-8506",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心：mwifiex 驅動程式修復 Wi-Fi 漫遊後「忙碌掃描」問題",
@@ -324,7 +324,7 @@ window.TRACKER_DAYS["2026-08-15"] = [
     ]
   },
   {
-    id: "20260815-024",
+    id: "20260815-8507",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修補：mac80211 處理擴展幀時的資訊洩漏漏洞修復",
@@ -338,7 +338,7 @@ window.TRACKER_DAYS["2026-08-15"] = [
     ]
   },
   {
-    id: "20260815-025",
+    id: "20260815-8508",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心漏洞 CVE-2026-68471：Wi-Fi 802.11 協定資訊驗證缺陷",
@@ -352,7 +352,7 @@ window.TRACKER_DAYS["2026-08-15"] = [
     ]
   },
   {
-    id: "20260815-026",
+    id: "20260815-8509",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修復 Wi-Fi 驅動程式的 EHT MLE 驗證漏洞，防止資訊洩露",
@@ -366,7 +366,7 @@ window.TRACKER_DAYS["2026-08-15"] = [
     ]
   },
   {
-    id: "20260815-027",
+    id: "20260815-8510",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心 uaccess 漏洞：PowerPC 架構下地址遮罩檢查錯誤，可能導致權限提升",
@@ -380,7 +380,7 @@ window.TRACKER_DAYS["2026-08-15"] = [
     ]
   },
   {
-    id: "20260815-028",
+    id: "20260815-8511",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心漏洞：powerpc/spufs 內存映射存取存在越界風險，建議更新核心版本",
@@ -394,7 +394,7 @@ window.TRACKER_DAYS["2026-08-15"] = [
     ]
   },
   {
-    id: "20260815-029",
+    id: "20260815-8512",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心資源洩漏漏洞：Sunxi ioremap 失敗時的記憶體管理缺陷已修復",
@@ -408,7 +408,7 @@ window.TRACKER_DAYS["2026-08-15"] = [
     ]
   },
   {
-    id: "20260815-030",
+    id: "20260815-8513",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心 IPVS 模組漏洞：IP 頭部重分配後重新加載問題",
@@ -422,7 +422,7 @@ window.TRACKER_DAYS["2026-08-15"] = [
     ]
   },
   {
-    id: "20260815-031",
+    id: "20260815-8514",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心 ipvs 漏洞修復：修正 IPv6 傳輸偏移與 ICMPV6 檢查和",
@@ -436,7 +436,7 @@ window.TRACKER_DAYS["2026-08-15"] = [
     ]
   },
   {
-    id: "20260815-032",
+    id: "20260815-8515",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修補：Memory Stick 區塊計數溢位漏洞 (CVE-2026-68478)",
@@ -450,7 +450,7 @@ window.TRACKER_DAYS["2026-08-15"] = [
     ]
   },
   {
-    id: "20260815-033",
+    id: "20260815-8517",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修補：brcmfmac 處理短認證幀時的堆溢位漏洞 (CVE-2026-72003)",
@@ -464,7 +464,7 @@ window.TRACKER_DAYS["2026-08-15"] = [
     ]
   },
   {
-    id: "20260815-034",
+    id: "20260815-8735",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心 mac80211 修正記憶體洩漏：修復 ieee80211_register_hw() 函數的錯誤路徑",
@@ -478,7 +478,7 @@ window.TRACKER_DAYS["2026-08-15"] = [
     ]
   },
   {
-    id: "20260815-035",
+    id: "20260815-8736",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修補：rt2x00 驅動程式在偵測階段的資源釋放邏輯缺陷",
@@ -492,7 +492,7 @@ window.TRACKER_DAYS["2026-08-15"] = [
     ]
   },
   {
-    id: "20260815-036",
+    id: "20260815-8737",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心漏洞：mlx5 驅動程式在釋放 ST 索引資料時可能發生記憶體洩漏",
@@ -506,7 +506,7 @@ window.TRACKER_DAYS["2026-08-15"] = [
     ]
   },
   {
-    id: "20260815-037",
+    id: "20260815-8738",
     trackers: ["os", "security"],
     category: "Linux",
     title: "i.MX8MP 核心元件修復：解決 VC8000E 功耗啟動時的時序問題",
@@ -520,7 +520,7 @@ window.TRACKER_DAYS["2026-08-15"] = [
     ]
   },
   {
-    id: "20260815-038",
+    id: "20260815-8089",
     trackers: ["os"],
     category: "Windows",
     title: "Windows 11/10 頻繁重啟現象解析：多重重啟是安裝 Secure Boot 憑證與韌體更新的正常過程",
@@ -534,7 +534,7 @@ window.TRACKER_DAYS["2026-08-15"] = [
     ]
   },
   {
-    id: "20260815-039",
+    id: "20260815-8090",
     trackers: ["os"],
     category: "Windows",
     title: "Microsoft 意外損壞 Outlook Classic 的 Copilot 整合功能，用戶需透過新版或網頁版使用",
@@ -548,7 +548,7 @@ window.TRACKER_DAYS["2026-08-15"] = [
     ]
   },
   {
-    id: "20260815-040",
+    id: "20260815-7951",
     trackers: ["os", "security"],
     category: "漏洞與威脅情報",
     title: "新型 Linux 殭屍網路程式 Evooo1Bot 攻擊邊緣設備，將路由器轉為 SOCKS5 流量中繼節點",
@@ -562,7 +562,7 @@ window.TRACKER_DAYS["2026-08-15"] = [
     ]
   },
   {
-    id: "20260815-041",
+    id: "20260815-7988",
     trackers: ["os"],
     category: "Apple",
     title: "Notepad.exe：一款極簡、超快速的 Mac 程式碼編輯器介紹",
@@ -576,7 +576,7 @@ window.TRACKER_DAYS["2026-08-15"] = [
     ]
   },
   {
-    id: "20260815-042",
+    id: "20260815-7989",
     trackers: ["os"],
     category: "Apple",
     title: "Apple 家庭產品線更新：HomePod mini 與 Apple TV 等設備預計迎來重大升級",
@@ -590,7 +590,7 @@ window.TRACKER_DAYS["2026-08-15"] = [
     ]
   },
   {
-    id: "20260815-043",
+    id: "20260815-8230",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "SAP Commerce Cloud 遭高危漏洞 CVE-2026-58231 攻擊，恐致任意程式碼執行",
@@ -604,7 +604,7 @@ window.TRACKER_DAYS["2026-08-15"] = [
     ]
   },
   {
-    id: "20260815-044",
+    id: "20260815-8231",
     trackers: ["os", "security"],
     category: "漏洞與威脅情報",
     title: "Apple macOS 螢幕共享功能存在嚴重漏洞，可遠端取得 Root 權限，已遭積極利用",
@@ -618,7 +618,7 @@ window.TRACKER_DAYS["2026-08-15"] = [
     ]
   },
   {
-    id: "20260815-045",
+    id: "20260815-8280",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "CVE-2026-15689：Perl Dancer2 插件允許透過 Host 標頭進行密碼重設連結中毒攻擊",
@@ -632,7 +632,7 @@ window.TRACKER_DAYS["2026-08-15"] = [
     ]
   },
   {
-    id: "20260815-046",
+    id: "20260815-8281",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "DBI 模組存在堆疊溢出漏洞：舊版 Perl 允許未經驗證的數字佔位符進行堆記憶體寫入",
@@ -646,7 +646,7 @@ window.TRACKER_DAYS["2026-08-15"] = [
     ]
   },
   {
-    id: "20260815-047",
+    id: "20260815-8282",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "DBI 模組曝出堆疊溢寫漏洞：32位元 Perl 系統可遭利用，建議升級至 1.652 以上",
@@ -660,7 +660,7 @@ window.TRACKER_DAYS["2026-08-15"] = [
     ]
   },
   {
-    id: "20260815-048",
+    id: "20260815-8283",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "GNU Inetutils talkd 緩衝區溢位漏洞：長 DNS 名稱導致的 CVE-2026-19720 分析",
@@ -674,7 +674,7 @@ window.TRACKER_DAYS["2026-08-15"] = [
     ]
   },
   {
-    id: "20260815-049",
+    id: "20260815-7967",
     trackers: ["os"],
     category: "重點關注",
     title: "Google Pixel 11廣告曝光神秘穿戴裝置：疑似推出全新型號的健身追蹤器",
@@ -688,7 +688,7 @@ window.TRACKER_DAYS["2026-08-15"] = [
     ]
   },
   {
-    id: "20260815-050",
+    id: "20260815-7994",
     trackers: ["os"],
     category: "重點關注",
     title: "美國商務部長警告 Apple 避免採購中國記憶體晶片，籲尋求替代供應鏈",
@@ -702,7 +702,7 @@ window.TRACKER_DAYS["2026-08-15"] = [
     ]
   },
   {
-    id: "20260815-051",
+    id: "20260815-8021",
     trackers: ["os"],
     category: "重點關注",
     title: "美國發電設施趨勢分析：2026年上半年新上線電廠以太陽能與電池儲能為主",
@@ -716,7 +716,7 @@ window.TRACKER_DAYS["2026-08-15"] = [
     ]
   },
   {
-    id: "20260815-052",
+    id: "20260815-8066",
     trackers: ["os"],
     category: "重點關注",
     title: "npm供應鏈蠕蟲 ChainDrop 攻擊：透過 tarball 傳播並植入開發環境，繞過傳統防禦",
@@ -730,7 +730,7 @@ window.TRACKER_DAYS["2026-08-15"] = [
     ]
   },
   {
-    id: "20260815-053",
+    id: "20260815-8068",
     trackers: ["os"],
     category: "重點關注",
     title: "Anthropic 宣布文本水標技術：強調其依賴於非關鍵詞彙的修改，以符合 EU AI Act",
@@ -744,7 +744,7 @@ window.TRACKER_DAYS["2026-08-15"] = [
     ]
   },
   {
-    id: "20260815-054",
+    id: "20260815-7961",
     trackers: ["security"],
     category: "產業動態",
     title: "서강대 통합 로그인系統遭外部攻擊：約18萬筆學生、教職員、校友個人資料外洩",
@@ -758,7 +758,7 @@ window.TRACKER_DAYS["2026-08-15"] = [
     ]
   },
   {
-    id: "20260815-055",
+    id: "20260815-7962",
     trackers: ["eu_cra"],
     category: "產業動態",
     title: "오리엔텀與softwareQ簽署合作備忘錄，共研金融領域量子運算應用",
@@ -772,7 +772,7 @@ window.TRACKER_DAYS["2026-08-15"] = [
     ]
   },
   {
-    id: "20260815-056",
+    id: "20260815-7964",
     trackers: ["eu_cra", "security"],
     category: "產業動態",
     title: "英國犯罪紀錄處（ACRO）遭英國情報委員會（ICO）譴責：長期未修補CMS漏洞導致數千名敏感資料外洩風險",

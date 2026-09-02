@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-08-09"] = [
   {
-    id: "20260809-001",
+    id: "20260809-7279",
     trackers: ["os"],
     category: "Linux",
     title: "Linux 核心 7.2-rc7 預覽版發布，預計本週末將進行版本發布",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-08-09"] = [
     ]
   },
   {
-    id: "20260809-002",
+    id: "20260809-7280",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心頻繁更新與弱防護帶來的安全管理挑戰",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-08-09"] = [
     ]
   },
   {
-    id: "20260809-003",
+    id: "20260809-7302",
     trackers: ["os"],
     category: "Linux",
     title: "Linux 核心 7.2-rc7 版本釋出：涵蓋 HWMON、記憶體管理及 Btrfs 等多項關鍵修復",
@@ -44,7 +44,7 @@ window.TRACKER_DAYS["2026-08-09"] = [
     ]
   },
   {
-    id: "20260809-004",
+    id: "20260809-7303",
     trackers: ["os"],
     category: "Linux",
     title: "CachyOS 釋出 2026 年 8 月更新版本並為伺服器版本做準備",
@@ -58,7 +58,7 @@ window.TRACKER_DAYS["2026-08-09"] = [
     ]
   },
   {
-    id: "20260809-005",
+    id: "20260809-7304",
     trackers: ["os"],
     category: "Linux",
     title: "高通（Qualcomm）為 Kuno SoC 提交 Linux 核心補丁，支援 Cortex-A7 平台開發",
@@ -72,7 +72,7 @@ window.TRACKER_DAYS["2026-08-09"] = [
     ]
   },
   {
-    id: "20260809-006",
+    id: "20260809-7305",
     trackers: ["os"],
     category: "Linux",
     title: "Mesa 26.3 針對 Intel 顯示卡啟用大型 GRF 模式以降低暫存器溢出",
@@ -86,7 +86,7 @@ window.TRACKER_DAYS["2026-08-09"] = [
     ]
   },
   {
-    id: "20260809-007",
+    id: "20260809-7306",
     trackers: ["os"],
     category: "Linux",
     title: "獨立開發者提交 Linux 核心修補程式，解決 Dell Latitude 7320 前置相機長期無法使用問題",
@@ -100,7 +100,7 @@ window.TRACKER_DAYS["2026-08-09"] = [
     ]
   },
   {
-    id: "20260809-008",
+    id: "20260809-7307",
     trackers: ["os"],
     category: "Linux",
     title: "FreeBSD 14.5 Beta 1 發布，提供多項安全修補與回溯修復，穩定支援舊版用戶",
@@ -114,7 +114,7 @@ window.TRACKER_DAYS["2026-08-09"] = [
     ]
   },
   {
-    id: "20260809-009",
+    id: "20260809-7308",
     trackers: ["os"],
     category: "Linux",
     title: "Linux 核心開發提交修補程式，為 ASUS ROG Ryujin III 一體式水冷散熱器增加硬體監控支援",
@@ -128,7 +128,7 @@ window.TRACKER_DAYS["2026-08-09"] = [
     ]
   },
   {
-    id: "20260809-010",
+    id: "20260809-7380",
     trackers: ["os"],
     category: "Windows",
     title: "Windows 11內建天氣應用程式被批評為「MSN廣告載體」，且記憶體佔用量遠超macOS原生應用",
@@ -142,7 +142,7 @@ window.TRACKER_DAYS["2026-08-09"] = [
     ]
   },
   {
-    id: "20260809-011",
+    id: "20260809-7381",
     trackers: ["os"],
     category: "Windows",
     title: "Microsoft 意外將 OneDrive Photos 應用程式廣泛部署至 Windows 11，影響企業與個人用戶",
@@ -156,7 +156,7 @@ window.TRACKER_DAYS["2026-08-09"] = [
     ]
   },
   {
-    id: "20260809-012",
+    id: "20260809-7164",
     trackers: ["os"],
     category: "Apple",
     title: "Eve Weather 溫濕度感測器：Matter 支援提升 Apple Home 自動化應用性",
@@ -170,7 +170,7 @@ window.TRACKER_DAYS["2026-08-09"] = [
     ]
   },
   {
-    id: "20260809-013",
+    id: "20260809-7165",
     trackers: ["os"],
     category: "Apple",
     title: "Apple 因全球記憶體危機大幅調漲產品售價，面臨性價比與創新考驗",
@@ -184,7 +184,7 @@ window.TRACKER_DAYS["2026-08-09"] = [
     ]
   },
   {
-    id: "20260809-014",
+    id: "20260809-7166",
     trackers: ["os"],
     category: "Apple",
     title: "Apple iPhone 17預計打破紀錄：預測其將成為歷代最長壽命的旗艦機型",
@@ -198,7 +198,7 @@ window.TRACKER_DAYS["2026-08-09"] = [
     ]
   },
   {
-    id: "20260809-015",
+    id: "20260809-7167",
     trackers: ["os"],
     category: "Apple",
     title: "傳聞 Apple 正計畫推出全新陶瓷材質的 Apple Watch",
@@ -212,7 +212,7 @@ window.TRACKER_DAYS["2026-08-09"] = [
     ]
   },
   {
-    id: "20260809-016",
+    id: "20260809-7168",
     trackers: ["os"],
     category: "Apple",
     title: "Apple Watch 傳面臨重大重新設計，考慮推出圓形螢幕及無螢幕健身配件",
@@ -226,7 +226,7 @@ window.TRACKER_DAYS["2026-08-09"] = [
     ]
   },
   {
-    id: "20260809-017",
+    id: "20260809-7169",
     trackers: ["os"],
     category: "Apple",
     title: "Apple 曾考慮為升級計畫推出預先加載 iCloud 數據功能，因隱私疑慮作罷",
@@ -240,7 +240,7 @@ window.TRACKER_DAYS["2026-08-09"] = [
     ]
   },
   {
-    id: "20260809-018",
+    id: "20260809-7170",
     trackers: ["os"],
     category: "Apple",
     title: "Ohsnap MCON 模組化 MagSafe iPhone 遊戲控制器動手玩評測",
@@ -254,7 +254,7 @@ window.TRACKER_DAYS["2026-08-09"] = [
     ]
   },
   {
-    id: "20260809-019",
+    id: "20260809-7171",
     trackers: ["os"],
     category: "Apple",
     title: "傳聞 iPhone Ultra 摺疊手機將推出銀色與深藍色兩種外觀選擇",
@@ -268,7 +268,7 @@ window.TRACKER_DAYS["2026-08-09"] = [
     ]
   },
   {
-    id: "20260809-020",
+    id: "20260809-7089",
     trackers: ["os"],
     category: "Android",
     title: "Google Pixel 11 發表在即：新品資訊提前曝光且缺乏創新突破引發討論",

@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-05-29"] = [
   {
-    id: "20260529-001",
+    id: "20260529-82",
     trackers: ["security"],
     category: "重大事件",
     title: "遊輪營運商Carnival及有線電視業者Charter遭駭：兩大公司資料外洩事件分析",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-05-29"] = [
     ]
   },
   {
-    id: "20260529-002",
+    id: "20260529-113",
     trackers: ["eu_cra", "security"],
     category: "法令更新",
     title: "印度CERT-In發布新指導方針：因應AI加速攻擊，要求企業在12小時內修補核心關鍵資產漏洞",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-05-29"] = [
     ]
   },
   {
-    id: "20260529-003",
+    id: "20260529-144",
     trackers: ["eu_cra", "security"],
     category: "法令更新",
     title: "歐盟通過《網路韌性法案》（CRA）新規定：為具數位元素的產品設定橫向資安要求",
@@ -44,7 +44,7 @@ window.TRACKER_DAYS["2026-05-29"] = [
     ]
   },
   {
-    id: "20260529-004",
+    id: "20260529-145",
     trackers: ["eu_cra", "security"],
     category: "法令更新",
     title: "歐盟《網路韌性法案》（CRA）修訂：強化數位產品的橫向資安要求",
@@ -58,7 +58,7 @@ window.TRACKER_DAYS["2026-05-29"] = [
     ]
   },
   {
-    id: "20260529-005",
+    id: "20260529-262",
     trackers: ["eu_cra"],
     category: "法令更新",
     title: "歐盟 NIS 2 指令擴大範圍，要求成員國提升網路與資訊安全標準",
@@ -72,7 +72,7 @@ window.TRACKER_DAYS["2026-05-29"] = [
     ]
   },
   {
-    id: "20260529-006",
+    id: "20260529-341",
     trackers: ["security"],
     category: "重大事件",
     title: "資安分析揭露：The Com 犯罪集團利用網路犯罪所得支持暴力與性剝削",
@@ -86,7 +86,7 @@ window.TRACKER_DAYS["2026-05-29"] = [
     ]
   },
   {
-    id: "20260529-007",
+    id: "20260529-156",
     trackers: ["eu_cra"],
     category: "調和標準",
     title: "ETSI 針對《網路韌性法案》發布網路管理系統垂直標準草案，強調開放式標準化流程",
@@ -100,7 +100,7 @@ window.TRACKER_DAYS["2026-05-29"] = [
     ]
   },
   {
-    id: "20260529-008",
+    id: "20260529-339",
     trackers: ["security"],
     category: "法規與標準",
     title: "亞洲資安保險市場迎復甦訊號：報告指出市場滲透率低，但受威脅增加",
@@ -114,7 +114,7 @@ window.TRACKER_DAYS["2026-05-29"] = [
     ]
   },
   {
-    id: "20260529-009",
+    id: "20260529-406",
     trackers: ["eu_cra", "security"],
     category: "法規與標準",
     title: "OpenSSF呼籲：應以機器可讀的連續安全訊號取代靜態證明，支持《網路韌性法案》的盡職調查",
@@ -128,7 +128,7 @@ window.TRACKER_DAYS["2026-05-29"] = [
     ]
   },
   {
-    id: "20260529-010",
+    id: "20260529-1130",
     trackers: ["os", "security"],
     category: "Windows",
     title: "StrongDM 桌面應用程式存在明文儲存憑證資訊漏洞 (CVE-2026-4387)",
@@ -142,7 +142,7 @@ window.TRACKER_DAYS["2026-05-29"] = [
     ]
   },
   {
-    id: "20260529-011",
+    id: "20260529-84",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Google Chrome 釋出重大安全更新：修補 151 個漏洞，包含多個記憶體相關弱點",
@@ -156,7 +156,7 @@ window.TRACKER_DAYS["2026-05-29"] = [
     ]
   },
   {
-    id: "20260529-012",
+    id: "20260529-85",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "WordPress主題Avada Builder修補4項漏洞：CVE-2026-6279可遠端執行程式碼",
@@ -170,7 +170,7 @@ window.TRACKER_DAYS["2026-05-29"] = [
     ]
   },
   {
-    id: "20260529-013",
+    id: "20260529-157",
     trackers: ["eu_cra"],
     category: "合規指引",
     title: "歐盟委員會：關於關鍵產品類別（Type C）標準化與未來擴展的說明",
@@ -184,7 +184,7 @@ window.TRACKER_DAYS["2026-05-29"] = [
     ]
   },
   {
-    id: "20260529-014",
+    id: "20260529-313",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "ChatGPT摘要功能遭利用：ChatGPhish漏洞讓惡意網頁轉化為釣魚介面",
@@ -198,7 +198,7 @@ window.TRACKER_DAYS["2026-05-29"] = [
     ]
   },
   {
-    id: "20260529-015",
+    id: "20260529-315",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "分析：俄羅斯關聯的 GREYVIBE 駭客組織利用 AI 強化攻擊，鎖定烏克蘭目標",
@@ -212,7 +212,7 @@ window.TRACKER_DAYS["2026-05-29"] = [
     ]
   },
   {
-    id: "20260529-016",
+    id: "20260529-318",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "北韓駭客 Kimsuky 擴大攻擊範圍：利用偽裝安全軟體與 Webex 頁面傳播 HTTPSpy 惡意程式",
@@ -226,7 +226,7 @@ window.TRACKER_DAYS["2026-05-29"] = [
     ]
   },
   {
-    id: "20260529-017",
+    id: "20260529-350",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "CISA新增CVE-2026-0257：Palo Alto Networks PAN-OS認證繞過漏洞，警告企業用戶應優先修補",
@@ -240,7 +240,7 @@ window.TRACKER_DAYS["2026-05-29"] = [
     ]
   },
   {
-    id: "20260529-018",
+    id: "20260529-81",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "IBM與紅帽推出Project Lightwell：結合AI技術，提供企業開放原始碼套件漏洞修補服務",
@@ -254,7 +254,7 @@ window.TRACKER_DAYS["2026-05-29"] = [
     ]
   },
   {
-    id: "20260529-019",
+    id: "20260529-83",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "GitLab 19.0推出SBOM相依性掃描：強化軟體供應鏈，追蹤間接與可觸及漏洞",
@@ -268,7 +268,7 @@ window.TRACKER_DAYS["2026-05-29"] = [
     ]
   },
   {
-    id: "20260529-020",
+    id: "20260529-114",
     trackers: ["security"],
     category: "開源影響",
     title: "荷蘭資安公司 Hadrian 開源 OpenHack 框架，利用多代理人流程自動化原始碼安全審查",
@@ -282,7 +282,7 @@ window.TRACKER_DAYS["2026-05-29"] = [
     ]
   },
   {
-    id: "20260529-021",
+    id: "20260529-317",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "惡意 NuGet 套件「Sicoob.Sdk」竊取巴西金融系統憑證，警告開發者注意供應鏈風險",
@@ -296,7 +296,7 @@ window.TRACKER_DAYS["2026-05-29"] = [
     ]
   },
   {
-    id: "20260529-022",
+    id: "20260529-340",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "研究揭露雲端整合複雜性風險：過度權限與秘密洩露可導致自動化服務平台全面接管",
@@ -310,7 +310,7 @@ window.TRACKER_DAYS["2026-05-29"] = [
     ]
   },
   {
-    id: "20260529-023",
+    id: "20260529-370",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "npm生態系統遭攻擊：惡意套件利用安裝鉤子竊取雲端與CI/CD金鑰",
@@ -324,7 +324,7 @@ window.TRACKER_DAYS["2026-05-29"] = [
     ]
   },
   {
-    id: "20260529-024",
+    id: "20260529-314",
     trackers: ["security"],
     category: "前瞻技術",
     title: "資安警示：駭客利用 LLM Agent 進行後滲透，透過 Marimo 漏洞竊取內部 PostgreSQL 資料庫",
@@ -338,7 +338,7 @@ window.TRACKER_DAYS["2026-05-29"] = [
     ]
   },
   {
-    id: "20260529-025",
+    id: "20260529-316",
     trackers: ["security"],
     category: "前瞻技術",
     title: "警惕「影子AI」新風險：非開發人員使用AI建構應用程式，將敏感數據暴露於公網",
@@ -352,7 +352,7 @@ window.TRACKER_DAYS["2026-05-29"] = [
     ]
   },
   {
-    id: "20260529-026",
+    id: "20260529-337",
     trackers: ["security"],
     category: "前瞻技術",
     title: "Dark Reading 慶祝 20 週年：回顧資安產業變遷與 AI 時代的挑戰",
@@ -366,7 +366,7 @@ window.TRACKER_DAYS["2026-05-29"] = [
     ]
   },
   {
-    id: "20260529-027",
+    id: "20260529-338",
     trackers: ["security"],
     category: "前瞻技術",
     title: "全球人型機器人（Embodied AI）帶來的網路風險：從設備漏洞到地緣政治間諜戰",
@@ -380,7 +380,7 @@ window.TRACKER_DAYS["2026-05-29"] = [
     ]
   },
   {
-    id: "20260529-028",
+    id: "20260529-353",
     trackers: ["security"],
     category: "前瞻技術",
     title: "Red Hat發布OpenShift沙盒容器1.12，將機密運算帶到裸機與AI工作負載",
@@ -394,7 +394,7 @@ window.TRACKER_DAYS["2026-05-29"] = [
     ]
   },
   {
-    id: "20260529-029",
+    id: "20260529-369",
     trackers: ["security"],
     category: "前瞻技術",
     title: "微軟獲 Gartner 認可：2026 年終端保護領域領導者，強化 AI 驅動的防禦系統",
@@ -408,7 +408,7 @@ window.TRACKER_DAYS["2026-05-29"] = [
     ]
   },
   {
-    id: "20260529-030",
+    id: "20260529-257",
     trackers: ["eu_cra"],
     category: "產業動態",
     title: "G7 成立網路安全工作組：強化國際合作應對跨國網路威脅",
@@ -422,7 +422,7 @@ window.TRACKER_DAYS["2026-05-29"] = [
     ]
   },
   {
-    id: "20260529-031",
+    id: "20260529-275",
     trackers: ["security"],
     category: "產業動態",
     title: "Microsoft SharePoint 存在高風險遠端程式碼執行漏洞 (CVE-2026-45659)，建議立即更新修補程式",
@@ -436,7 +436,7 @@ window.TRACKER_DAYS["2026-05-29"] = [
     ]
   },
   {
-    id: "20260529-032",
+    id: "20260529-264",
     trackers: ["eu_cra"],
     category: "研討活動",
     title: "法國國家資安機構 ANSSI 參與新加坡國際資安週，深化與新加坡資安局 CSA 合作",
@@ -450,7 +450,7 @@ window.TRACKER_DAYS["2026-05-29"] = [
     ]
   },
   {
-    id: "20260529-033",
+    id: "20260529-115",
     trackers: ["security"],
     category: "uncategorized",
     title: "資安警示：Gogs版本存在參數注入漏洞，可能導致遠端程式碼執行與跨租戶資料竊取",
@@ -464,7 +464,7 @@ window.TRACKER_DAYS["2026-05-29"] = [
     ]
   },
   {
-    id: "20260529-034",
+    id: "20260529-276",
     trackers: ["security"],
     category: "uncategorized",
     title: "Langflow 平台面臨嚴重漏洞：CVE-2025-34291 允許未經身份驗證的遠端程式碼執行",

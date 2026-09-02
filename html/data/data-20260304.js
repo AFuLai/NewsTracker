@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-03-04"] = [
   {
-    id: "20260304-001",
+    id: "20260304-196",
     trackers: ["eu_cra"],
     category: "法令更新",
     title: "歐盟《產品安全法案》（CRA）：成員國在市場監管與符合性評定中的核心角色",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-03-04"] = [
     ]
   },
   {
-    id: "20260304-002",
+    id: "20260304-195",
     trackers: ["eu_cra"],
     category: "合規指引",
     title: "歐盟《網路韌性法案》（CRA）要求供應鏈全鏈管理：涵蓋晶片、作業系統等組件安全",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-03-04"] = [
     ]
   },
   {
-    id: "20260304-003",
+    id: "20260304-1306",
     trackers: ["os", "security"],
     category: "Android",
     title: "Google Chrome Android 漏洞曝光：PowerVR 物件生命週期問題導致堆記憶體溢出，需緊急修補",

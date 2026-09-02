@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-06-05"] = [
   {
-    id: "20260605-001",
+    id: "20260605-984",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Debian 發布 DSA-6322-1：修補 OpenSSH 服務中的潛在認證繞過漏洞",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-06-05"] = [
     ]
   },
   {
-    id: "20260605-002",
+    id: "20260605-1090",
     trackers: ["os"],
     category: "Linux",
     title: "Ubuntu 26.04 LTS 宣布優化 AI 基礎設施：簡化 GPGPU 與高速網路堆疊部署",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-06-05"] = [
     ]
   },
   {
-    id: "20260605-003",
+    id: "20260605-575",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "CISA新增 SolarWinds CVE-2026-28318 漏洞至已知利用漏洞目錄，警告攻擊風險升高",
@@ -44,7 +44,7 @@ window.TRACKER_DAYS["2026-06-05"] = [
     ]
   },
   {
-    id: "20260605-004",
+    id: "20260605-587",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "美國政府警告：工業燃油儲罐儀表（ATG）因暴露於網際網路，面臨國家級網路攻擊風險",
@@ -58,7 +58,7 @@ window.TRACKER_DAYS["2026-06-05"] = [
     ]
   },
   {
-    id: "20260605-005",
+    id: "20260605-588",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "研究警告：自適應AI蠕蟲威脅即將來臨，可透過零日漏洞與自適應機制傳播",
@@ -72,7 +72,7 @@ window.TRACKER_DAYS["2026-06-05"] = [
     ]
   },
   {
-    id: "20260605-006",
+    id: "20260605-589",
     trackers: ["security"],
     category: "前瞻技術",
     title: "白宮發布AI行政命令：建立自願框架，促進政府早期測試前沿AI模型並強化網路安全",
@@ -86,7 +86,7 @@ window.TRACKER_DAYS["2026-06-05"] = [
     ]
   },
   {
-    id: "20260605-007",
+    id: "20260605-497",
     trackers: ["security"],
     category: "產業動態",
     title: "警惕！Cisco Unified CM 存在嚴重漏洞，攻擊者可利用未經身份驗證的請求取得 Root 權限",
@@ -100,7 +100,7 @@ window.TRACKER_DAYS["2026-06-05"] = [
     ]
   },
   {
-    id: "20260605-008",
+    id: "20260605-496",
     trackers: ["os", "security"],
     category: "uncategorized",
     title: "Linux 核心高風險漏洞 CVE-2022-0492 仍遭積極利用，恐讓攻擊者逃脫容器環境",

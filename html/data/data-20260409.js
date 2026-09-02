@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-04-09"] = [
   {
-    id: "20260409-001",
+    id: "20260409-133",
     trackers: ["security"],
     category: "重大事件",
     title: "Elastic於英國國防網路演習DCM26：展示多租戶Elastic Cloud與數據隔離技術",

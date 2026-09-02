@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-05-26"] = [
   {
-    id: "20260526-001",
+    id: "20260526-47",
     trackers: ["security"],
     category: "重大事件",
     title: "回顧 Dark Reading 創辦人 Tim Wilson 傳奇：資安媒體如何從報導轉型為產業領導者",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-05-26"] = [
     ]
   },
   {
-    id: "20260526-002",
+    id: "20260526-1121",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修復藍牙 L2CAP 零指針解引用漏洞 (CVE-2026-45834)",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-05-26"] = [
     ]
   },
   {
-    id: "20260526-003",
+    id: "20260526-1122",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修補：修復藍牙 L2CAP 模組的空指針解引用漏洞 (CVE-2026-45835)",
@@ -44,7 +44,7 @@ window.TRACKER_DAYS["2026-05-26"] = [
     ]
   },
   {
-    id: "20260526-004",
+    id: "20260526-1123",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修補：修復藍牙 L2CAP 模組的空指針解引用漏洞 (CVE-2026-45836)",
@@ -58,7 +58,7 @@ window.TRACKER_DAYS["2026-05-26"] = [
     ]
   },
   {
-    id: "20260526-005",
+    id: "20260526-1124",
     trackers: ["os", "security"],
     category: "Linux",
     title: "NVIDIA顯示驅動程式曝核心漏洞 CVE-2025-33221，可能導致資料篡改與服務拒絕",
@@ -72,7 +72,7 @@ window.TRACKER_DAYS["2026-05-26"] = [
     ]
   },
   {
-    id: "20260526-006",
+    id: "20260526-1126",
     trackers: ["os", "security"],
     category: "Linux",
     title: "NVIDIA Linux顯示驅動程式曝「權限處理不當」漏洞，可能導致權限提升與程式碼執行",
@@ -86,7 +86,7 @@ window.TRACKER_DAYS["2026-05-26"] = [
     ]
   },
   {
-    id: "20260526-007",
+    id: "20260526-1127",
     trackers: ["os", "security"],
     category: "Linux",
     title: "NVIDIA Linux顯示驅動程式曝出競態條件漏洞 (CVE-2026-24199)，可能導致服務拒絕",
@@ -100,7 +100,7 @@ window.TRACKER_DAYS["2026-05-26"] = [
     ]
   },
   {
-    id: "20260526-008",
+    id: "20260526-18",
     trackers: ["eu_cra", "security"],
     category: "法規與標準",
     title: "印度 CERT-In 發布新指引：要求修補關鍵漏洞，應對 AI 輔助的網路威脅",
@@ -114,7 +114,7 @@ window.TRACKER_DAYS["2026-05-26"] = [
     ]
   },
   {
-    id: "20260526-009",
+    id: "20260526-14",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "伊朗駭客群 MuddyWater 透過 DLL Side-loading 攻擊多國組織，目標涵蓋關鍵基礎設施與金融服務",
@@ -128,7 +128,7 @@ window.TRACKER_DAYS["2026-05-26"] = [
     ]
   },
   {
-    id: "20260526-010",
+    id: "20260526-17",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "警惕 MFA 提示轟炸攻擊：分析 Cisco 案例，強調推播型 MFA 的實質風險",
@@ -142,7 +142,7 @@ window.TRACKER_DAYS["2026-05-26"] = [
     ]
   },
   {
-    id: "20260526-011",
+    id: "20260526-19",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "伊朗國家支持駭客 Nimbus Manticore 部署 MiniFast 後門，利用 AI 輔助技術與 SEO 投毒進行擴大滲透",
@@ -156,7 +156,7 @@ window.TRACKER_DAYS["2026-05-26"] = [
     ]
   },
   {
-    id: "20260526-012",
+    id: "20260526-20",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "高嚴重性漏洞曝光：KnowledgeDeliver LMS遭零日攻擊，透過ASP.NET ViewState反序列化植入Cobalt Strike",
@@ -170,7 +170,7 @@ window.TRACKER_DAYS["2026-05-26"] = [
     ]
   },
   {
-    id: "20260526-013",
+    id: "20260526-43",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "州政府呼籲國會恢復資安經費：應對 AI 帶動的網路威脅與供應鏈風險",
@@ -184,7 +184,7 @@ window.TRACKER_DAYS["2026-05-26"] = [
     ]
   },
   {
-    id: "20260526-014",
+    id: "20260526-46",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "微軟緊急修補 SharePoint 遠端代碼執行漏洞 CVE-2026-45659，警惕內部認證攻擊",
@@ -199,7 +199,7 @@ window.TRACKER_DAYS["2026-05-26"] = [
     ]
   },
   {
-    id: "20260526-015",
+    id: "20260526-59",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Eppendorf BioFlo 320 生物反應器遭硬編碼密碼漏洞攻擊，CVSS 9.8 評級",
@@ -213,7 +213,7 @@ window.TRACKER_DAYS["2026-05-26"] = [
     ]
   },
   {
-    id: "20260526-016",
+    id: "20260526-60",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "ABB Ability Camera Connect 曝 VLC 播放器漏洞：CVE-2024-46461 允許堆溢出，建議立即更新至 1.5.0.15",
@@ -227,7 +227,7 @@ window.TRACKER_DAYS["2026-05-26"] = [
     ]
   },
   {
-    id: "20260526-017",
+    id: "20260526-61",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "B&R Automation Runtime 存在資源鎖定漏洞：CVSS 10 分，可導致系統停機",
@@ -241,7 +241,7 @@ window.TRACKER_DAYS["2026-05-26"] = [
     ]
   },
   {
-    id: "20260526-018",
+    id: "20260526-62",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "ABB LVS MConfig 存在記憶體明文儲存漏洞，CVE-2025-9970 影響關鍵基礎設施",
@@ -255,7 +255,7 @@ window.TRACKER_DAYS["2026-05-26"] = [
     ]
   },
   {
-    id: "20260526-019",
+    id: "20260526-63",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "CISA新增CVE-2026-48172：LiteSpeed cPanel外掛權限提升漏洞，警告企業用戶應優先修補",
@@ -269,7 +269,7 @@ window.TRACKER_DAYS["2026-05-26"] = [
     ]
   },
   {
-    id: "20260526-020",
+    id: "20260526-64",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "ABB AC500 V2 設備存在緩衝區讀取漏洞，攻擊者可竊取歷史 Modbus 訊息片段",
@@ -283,7 +283,7 @@ window.TRACKER_DAYS["2026-05-26"] = [
     ]
   },
   {
-    id: "20260526-021",
+    id: "20260526-65",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "ABB Terra AC 充電樁面臨堆疊溢位風險：CVE-2025-5517 允許遠端惡意控制韌體",
@@ -297,7 +297,7 @@ window.TRACKER_DAYS["2026-05-26"] = [
     ]
   },
   {
-    id: "20260526-022",
+    id: "20260526-66",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "ABB Ability Zenon 平台面臨遠端未經授權重啟風險：CVE-2025-8754 漏洞分析",
@@ -311,7 +311,7 @@ window.TRACKER_DAYS["2026-05-26"] = [
     ]
   },
   {
-    id: "20260526-023",
+    id: "20260526-80",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "AI 聊天機器人與搜尋引擎被毒化：駭客利用系統工具偽裝進行 GPU 挖礦與遠端存取",
@@ -325,7 +325,7 @@ window.TRACKER_DAYS["2026-05-26"] = [
     ]
   },
   {
-    id: "20260526-024",
+    id: "20260526-112",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "AiTM 釣魚服務平台 Tycoon 2FA 繞過 MFA，竊取 Microsoft 365 與 Google 帳號會話權杖",
@@ -339,7 +339,7 @@ window.TRACKER_DAYS["2026-05-26"] = [
     ]
   },
   {
-    id: "20260526-025",
+    id: "20260526-42",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "「Megalodon」惡意程式碼感染數千 GitHub 儲存庫，竊取 CI/CD 密鑰與開發者憑證",
@@ -353,7 +353,7 @@ window.TRACKER_DAYS["2026-05-26"] = [
     ]
   },
   {
-    id: "20260526-026",
+    id: "20260526-44",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "TeamPCP 駭客團體攻擊開源生態系：透過毒化套件與開發者工具鏈竊取程式碼",
@@ -367,7 +367,7 @@ window.TRACKER_DAYS["2026-05-26"] = [
     ]
   },
   {
-    id: "20260526-027",
+    id: "20260526-914",
     trackers: ["os", "security"],
     category: "Android",
     title: "Android OS升級為智慧系統：Google推出AppFunctions與Gemini Nano 4，強化裝置端AI能力",
@@ -381,7 +381,7 @@ window.TRACKER_DAYS["2026-05-26"] = [
     ]
   },
   {
-    id: "20260526-028",
+    id: "20260526-1137",
     trackers: ["os", "security"],
     category: "Android",
     title: "Android AppLock 存在跨站腳本攻擊漏洞：透過 VIEW Intent 觸發任意 JavaScript 執行",
@@ -395,7 +395,7 @@ window.TRACKER_DAYS["2026-05-26"] = [
     ]
   },
   {
-    id: "20260526-029",
+    id: "20260526-1138",
     trackers: ["os", "security"],
     category: "Android",
     title: "Android應用程式鎖機制缺陷：本地攻擊者可透過介面流動繞過PIN密碼鎖",
@@ -409,7 +409,7 @@ window.TRACKER_DAYS["2026-05-26"] = [
     ]
   },
   {
-    id: "20260526-030",
+    id: "20260526-1139",
     trackers: ["os", "security"],
     category: "Android",
     title: "Android AppLock 存在繞過 PIN 鎖機制漏洞：透過介面流程漏洞可導致資訊洩露與權限提升",
@@ -423,7 +423,7 @@ window.TRACKER_DAYS["2026-05-26"] = [
     ]
   },
   {
-    id: "20260526-031",
+    id: "20260526-1140",
     trackers: ["os", "security"],
     category: "Android",
     title: "Android AppLockZ 應用程式存在繞過 PIN 鎖的漏洞，本地攻擊者可透過介面流程漏洞竊取資料",
@@ -437,7 +437,7 @@ window.TRACKER_DAYS["2026-05-26"] = [
     ]
   },
   {
-    id: "20260526-032",
+    id: "20260526-15",
     trackers: ["eu_cra", "security"],
     category: "前瞻技術",
     title: "AI輔助攻擊威脅升級：駭客利用人工智慧發動更智慧的DDoS攻擊",
@@ -451,7 +451,7 @@ window.TRACKER_DAYS["2026-05-26"] = [
     ]
   },
   {
-    id: "20260526-033",
+    id: "20260526-45",
     trackers: ["security"],
     category: "前瞻技術",
     title: "企業級AI代理人安全挑戰：OpenClaw漏洞與Nvidia NemoClaw的治理解決方案",
@@ -465,7 +465,7 @@ window.TRACKER_DAYS["2026-05-26"] = [
     ]
   },
   {
-    id: "20260526-034",
+    id: "20260526-1125",
     trackers: ["os", "security"],
     category: "重點關注",
     title: "NVIDIA顯示驅動程式曝出核心層漏洞：可導致權限提升與程式碼執行",
@@ -479,7 +479,7 @@ window.TRACKER_DAYS["2026-05-26"] = [
     ]
   },
   {
-    id: "20260526-035",
+    id: "20260526-232",
     trackers: ["eu_cra"],
     category: "研討活動",
     title: "ETSI 宣布 2026 量子安全密碼學會議將於加拿大渥太華舉行，聚焦後量子時代的基礎設施轉型",

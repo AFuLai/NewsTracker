@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-03-20"] = [
   {
-    id: "20260320-001",
+    id: "20260320-444",
     trackers: ["security"],
     category: "重大事件",
     title: "第三方福利管理公司 Navia 遭駭，270 萬人個人資料外洩，包含社保號與健康資訊",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-03-20"] = [
     ]
   },
   {
-    id: "20260320-002",
+    id: "20260320-170",
     trackers: ["eu_cra", "security"],
     category: "產業動態",
     title: "歐盟資安韌性法案（CRA）市場監管小組選出新主席，強化跨國執行力",

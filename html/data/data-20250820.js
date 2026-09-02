@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2025-08-20"] = [
   {
-    id: "20250820-001",
+    id: "20250820-642",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "資安分析：深入探討工業控制系統（ICS）的威脅群組活動與攻擊手法",

@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-06-24"] = [
   {
-    id: "20260624-001",
+    id: "20260624-2058",
     trackers: ["security"],
     category: "重大事件",
     title: "Salesforce 因 Klue Battlecards 整合服務遭駭客利用 OAuth 權杖竊取客戶資料，ShinyHunters 宣稱犯案",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-002",
+    id: "20260624-2059",
     trackers: ["security"],
     category: "重大事件",
     title: "密碼管理服務 LastPass 遭第三方 AI 平台 Klue 遭駭波及，部分客戶聯絡資訊與客服工單外洩",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-003",
+    id: "20260624-2060",
     trackers: ["security"],
     category: "重大事件",
     title: "AI競爭情報公司Klue遭駭致憑證外流，Salesforce等第三方平台用戶資料恐遭竊，Huntress證實受害",
@@ -44,7 +44,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-004",
+    id: "20260624-2063",
     trackers: ["security"],
     category: "重大事件",
     title: "巴西公共警報系統遭未授權利用發送假警報，影響聖保羅、里約等多地",
@@ -58,7 +58,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-005",
+    id: "20260624-2155",
     trackers: ["security"],
     category: "重大事件",
     title: "國際合作瓦解 Amadey 與 StealC 惡意網路基礎設施，回收數千萬美元資產",
@@ -72,7 +72,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-006",
+    id: "20260624-2158",
     trackers: ["security"],
     category: "重大事件",
     title: "美國司法部查扣柬埔寨HuiOne集團雲端帳戶：揭露大規模網路詐騙與洗錢網絡",
@@ -86,7 +86,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-007",
+    id: "20260624-2409",
     trackers: ["os"],
     category: "Linux",
     title: "Fedora 考慮強制實施 2FA，強化開源專案供應鏈安全防護",
@@ -100,7 +100,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-008",
+    id: "20260624-2410",
     trackers: ["os"],
     category: "Linux",
     title: "深入探討 BPF 記憶體區域 (arenas) 的應用與 libarena 函式庫的發展",
@@ -114,7 +114,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-009",
+    id: "20260624-2503",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心漏洞：netfilter nf_queue 導致 Use-After-Free，可能影響網路封包處理",
@@ -128,7 +128,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-010",
+    id: "20260624-2504",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心漏洞：batman-adv 模組在禁用介面時可能發生空指針解引用",
@@ -142,7 +142,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-011",
+    id: "20260624-2505",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心 batman-adv 模組存在資訊不一致性，可能導致本地服務拒絕 (CVE-2026-52914)",
@@ -156,7 +156,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-012",
+    id: "20260624-2506",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修補：netfilter ip6t_hbh 漏洞，防止用戶空間傳入過大選項列表",
@@ -170,7 +170,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-013",
+    id: "20260624-2507",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心：batman-adv 處理單播分片時，可透過巢狀封包導致堆疊溢出（CVE-2026-52916）",
@@ -184,7 +184,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-014",
+    id: "20260624-2508",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修補：修復 SCTP 診斷功能中，因狀態過時導致的越界讀取漏洞",
@@ -198,7 +198,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-015",
+    id: "20260624-2509",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心藍牙服務漏洞：未同步的接受佇列操作可能導致服務崩潰",
@@ -212,7 +212,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-016",
+    id: "20260624-2510",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心漏洞：batman-adv 模組計數器溢出導致資源釋放錯誤",
@@ -226,7 +226,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-017",
+    id: "20260624-2511",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心 netfilter 漏洞修復：修復 xt_policy 嚴格模式的策略匹配邏輯",
@@ -240,7 +240,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-018",
+    id: "20260624-2512",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心 netfilter ipset 漏洞：修復 hash set 範圍迭代終止問題",
@@ -254,7 +254,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-019",
+    id: "20260624-2513",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心漏洞：batman-adv 處理分配錯誤導致 NULL 指標解引用風險",
@@ -268,7 +268,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-020",
+    id: "20260624-2514",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修補：IPC ID 分配邊界檢查缺陷，防止 IDR 狀態損壞與記憶體越界存取",
@@ -282,7 +282,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-021",
+    id: "20260624-2515",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux SCTP 核心漏洞：Stale Cookie 處理流程導致 Use-After-Free 崩潰",
@@ -296,7 +296,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-022",
+    id: "20260624-2516",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心漏洞：VRF 端口移除時的 NPD 潛在風險修復",
@@ -310,7 +310,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-023",
+    id: "20260624-2517",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心漏洞：batman-adv 網關狀態殘留問題，建議更新核心版本",
@@ -324,7 +324,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-024",
+    id: "20260624-2518",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心 netfilter ebtables 修正 OOB Read 漏洞：加強使用者空間結構大小驗證",
@@ -338,7 +338,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-025",
+    id: "20260624-2519",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心漏洞：af_unix 處理 SIOCATMARK 邏輯錯誤，非串流 Socket 易受影響",
@@ -352,7 +352,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-026",
+    id: "20260624-2520",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心 SCTP 漏洞：防止狀態回滾時的空指針解引用攻擊",
@@ -366,7 +366,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-027",
+    id: "20260624-2521",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心漏洞：IPC/shm 資源清理不完整，可能導致系統不穩定的安全問題",
@@ -380,7 +380,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-028",
+    id: "20260624-2522",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心漏洞：batman-adv 模組允許未初始化變數讀取，可能導致系統崩潰",
@@ -394,7 +394,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-029",
+    id: "20260624-2523",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心漏洞：xfrm: ipcomp 錯誤導致資源洩漏，需更新核心版本修復",
@@ -408,7 +408,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-030",
+    id: "20260624-2524",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心 io_uring/poll 漏洞：簽名比較邏輯缺陷導致慢路徑無法觸發",
@@ -422,7 +422,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-031",
+    id: "20260624-2525",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心：batman-adv 處理 TVLV 封包時，因尺寸計算溢位導致的記憶體寫入錯誤（CVE-2026-52934）",
@@ -436,7 +436,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-032",
+    id: "20260624-2526",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修補：修復 xfrm/espintcp 模組的狀態重用漏洞，防止越界讀取",
@@ -450,7 +450,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-033",
+    id: "20260624-2527",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心安全公告：修復 jitterentropy 模組的 Spinlock 競態條件漏洞",
@@ -464,7 +464,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-034",
+    id: "20260624-2528",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心漏洞：tap_ioctl() 堆疊資訊洩漏，可能繞過 KASLR",
@@ -478,7 +478,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-035",
+    id: "20260624-2529",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修補：修復 bpf_sk_storage_clone 等函數中的空指針解引用漏洞",
@@ -492,7 +492,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-036",
+    id: "20260624-2530",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心漏洞：未經授權的 AF_RDS sendmsg() 可導致 NULL 指標解引用，影響 rds_ib_send_cqe_handler()",
@@ -506,7 +506,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-037",
+    id: "20260624-2531",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心漏洞：tun 模組未正確清零 vnet header，可能洩漏 14 位元組堆疊資料",
@@ -520,7 +520,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-038",
+    id: "20260624-2532",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修補：修復 smc_msg_event tracepoint 在 SMC-D 模式下可能導致的 NULL 指標解引用漏洞",
@@ -534,7 +534,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-039",
+    id: "20260624-2066",
     trackers: ["security"],
     category: "法規與標準",
     title: "金管會發布PQC遷移指引：要求金融業提升密碼治理，應對量子運算風險",
@@ -548,7 +548,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-040",
+    id: "20260624-2064",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "QNAP修補14項漏洞：高風險堆疊溢位與指令注入威脅NAS與視訊監控平臺",
@@ -562,7 +562,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-041",
+    id: "20260624-2065",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "研究揭露三星、LG智慧電視App潛藏風險：IP位址可能被用於代理伺服器，淪為網路跳板",
@@ -576,7 +576,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-042",
+    id: "20260624-2096",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "2026年FIFA世界盃面臨多層次網路威脅：從釣魚到IT/OT橫向移動風險",
@@ -590,7 +590,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-043",
+    id: "20260624-2099",
     trackers: ["os", "security"],
     category: "漏洞與威脅情報",
     title: "研究揭露 macOS XPC 服務漏洞：標準用戶可禁用 EDR/MDM 等安全工具",
@@ -604,7 +604,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-044",
+    id: "20260624-2128",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "沙烏地租車商 Budget Saudi 行動App遭非法存取，專家警示行動端資安防護落後",
@@ -618,7 +618,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-045",
+    id: "20260624-2133",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "微軟宣布瓦解 StealC 與 Amadey 資訊竊取工具，阻止網路犯罪集團獲取企業憑證",
@@ -632,7 +632,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-046",
+    id: "20260624-2154",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "CISA警告：Lantronix EDS5000設備存在嚴重注入漏洞，攻擊者已在野外利用",
@@ -646,7 +646,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-047",
+    id: "20260624-2159",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Cisco Unified CM 遭利用 SSRF 漏洞，CISA 已列入 KEV 清單，建議立即修補",
@@ -660,7 +660,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-048",
+    id: "20260624-2163",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Mandiant揭露Cisco SD-WAN零日攻擊：CVE-2026-20245允許攻擊者取得Root權限",
@@ -675,7 +675,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-049",
+    id: "20260624-2164",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "惡意 Edge 擴充功能 Edgecution：利用 Native Messaging 逃逸瀏覽器沙箱部署後門",
@@ -689,7 +689,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-050",
+    id: "20260624-2170",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "CISA警告：Ubiquiti UniFi OS及Lantronix設備存在高風險漏洞，可遭遠端利用",
@@ -703,7 +703,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-051",
+    id: "20260624-2325",
     trackers: ["os"],
     category: "Apple",
     title: "Mosyle推出Mosyle@Home，協助學校管理Mac與iPad，讓家長也能遠端監控學童使用時間與應用程式",
@@ -717,7 +717,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-052",
+    id: "20260624-2330",
     trackers: ["os"],
     category: "Apple",
     title: "Apple 傳聞 MacBook Ultra 將搭載 OLED 螢幕、Touch 支援與 Dynamic Island，重新定義 Mac 體驗",
@@ -731,7 +731,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-053",
+    id: "20260624-2331",
     trackers: ["os"],
     category: "Apple",
     title: "iPhone 17預計打破紀錄：分析蘋果旗艦機型生命週期與產品更新趨勢",
@@ -745,7 +745,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-054",
+    id: "20260624-2334",
     trackers: ["os"],
     category: "Apple",
     title: "iOS 27 內建「Siri 模式」於相機 App，強化視覺智慧功能，提升手機實用性",
@@ -759,7 +759,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-055",
+    id: "20260624-2336",
     trackers: ["os"],
     category: "Apple",
     title: "Apple傳推出MacBook Ultra，預計將使MacBook產品線達到史上最多四款機型",
@@ -773,7 +773,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-056",
+    id: "20260624-2338",
     trackers: ["os"],
     category: "Apple",
     title: "Apple Watch SE 3 與 Series 11 價格比較：Prime Day 促銷資訊",
@@ -787,7 +787,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-057",
+    id: "20260624-2339",
     trackers: ["os"],
     category: "Apple",
     title: "分析師預測 iPhone 18 Pro 價格可能漲幅有限，避免過度預期",
@@ -801,7 +801,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-058",
+    id: "20260624-2340",
     trackers: ["os"],
     category: "Apple",
     title: "Apple更新iPhone失竊應對指南：警告用戶勿在設備上留下聯絡資訊，防範社工詐騙",
@@ -815,7 +815,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-059",
+    id: "20260624-2341",
     trackers: ["os"],
     category: "Apple",
     title: "iOS 27 蘋果日曆功能升級：新增自然語言輸入、iCloud 忙/空狀態顯示與超大尺寸小工具",
@@ -829,7 +829,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-060",
+    id: "20260624-2342",
     trackers: ["os"],
     category: "Apple",
     title: "iPhone Ultra 可折疊機型解決鉸鏈結構問題，預計於九月發表",
@@ -843,7 +843,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-061",
+    id: "20260624-2343",
     trackers: ["os"],
     category: "Apple",
     title: "Apple 服務高層預告 Apple TV 將迎來重大升級與內容擴充",
@@ -856,7 +856,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-062",
+    id: "20260624-2061",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "資安公司警告：攻擊者利用Klue Battlecards整合服務，透過OAuth權杖大規模竊取Salesforce用戶資料",
@@ -870,7 +870,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-063",
+    id: "20260624-2067",
     trackers: ["os", "security"],
     category: "供應鏈與開源安全",
     title: "研究揭露：大量導入 LLM 功能的 iOS App 普遍存在憑證外洩與後端代理安全風險",
@@ -884,7 +884,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-064",
+    id: "20260624-2069",
     trackers: ["security"],
     category: "開源影響",
     title: "libssh2 函式庫揭露重大遠端程式碼執行漏洞 CVE-2026-55200，影響 1.11.1 版本前產品",
@@ -898,7 +898,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-065",
+    id: "20260624-2098",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "Palo Alto Networks 發現 OpenClaw 技能市場存在惡意代碼，威脅 AI 供應鏈安全",
@@ -912,7 +912,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-066",
+    id: "20260624-2129",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "Wordfence揭露ShapedPlugin外掛供應鏈攻擊：多款付費Pro版外掛植入後門，竊取網站憑證與雙重認證金鑰",
@@ -926,7 +926,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-067",
+    id: "20260624-2132",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "CNAPP 趨勢分析：Microsoft 平台如何從單點可見性轉向情境化風險管理",
@@ -940,7 +940,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-068",
+    id: "20260624-2156",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "Novee Security揭露Cordyceps漏洞：CI/CD工作流缺陷可讓攻擊者接管300個大型開源專案",
@@ -954,7 +954,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-069",
+    id: "20260624-2229",
     trackers: ["os"],
     category: "Android",
     title: "GM 宣布車用 Google 內建系統擴增支援 200+ 應用程式，並擴展至後座螢幕",
@@ -968,7 +968,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-070",
+    id: "20260624-2362",
     trackers: ["os", "security"],
     category: "Android",
     title: "Google Play 宣布新的開發者收入模式：提供多樣化計費選項與分開服務費",
@@ -982,7 +982,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-071",
+    id: "20260624-2534",
     trackers: ["os", "security"],
     category: "Android",
     title: "Chrome Android WebGL 存在 Use-after-free 漏洞，可能導致沙箱逃逸，需更新至 149.0.7827.197 以上版本",
@@ -996,7 +996,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-072",
+    id: "20260624-2535",
     trackers: ["os", "security"],
     category: "Android",
     title: "Chrome 瀏覽器 Android 版面臨 CVE-2026-13030 漏洞：GPU 記憶體未初始化使用導致資訊洩露",
@@ -1010,7 +1010,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-073",
+    id: "20260624-2536",
     trackers: ["os", "security"],
     category: "Android",
     title: "Chrome Android WebGL 存在 Use-after-free 漏洞，可能導致沙箱逃逸，需更新至 149.0.7827.197 以上版本",
@@ -1024,7 +1024,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-074",
+    id: "20260624-2537",
     trackers: ["os", "security"],
     category: "Android",
     title: "Google Chrome WebView 於 Android 平台存在 UAF 漏洞，允許本地攻擊者執行任意程式碼",
@@ -1038,7 +1038,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-075",
+    id: "20260624-2062",
     trackers: ["security"],
     category: "前瞻技術",
     title: "1Password併購Apono：整合AI代理身分管理與意圖存取控制，強化企業存取治理",
@@ -1052,7 +1052,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-076",
+    id: "20260624-2082",
     trackers: ["security"],
     category: "前瞻技術",
     title: "CISA 指引：利用 SASE 實現現代化 TIC 3.0 解決方案，推動零信任架構採用",
@@ -1066,7 +1066,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-077",
+    id: "20260624-2161",
     trackers: ["os", "security"],
     category: "前瞻技術",
     title: "Anbox Cloud結合Google C4A Metal，實現大規模、高保真度的Android雲端開發與測試",
@@ -1080,7 +1080,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-078",
+    id: "20260624-2219",
     trackers: ["os"],
     category: "重點關注",
     title: "Instagram Reels 支援 Google Cast 投射至電視，擴大內容觀看場景",
@@ -1094,7 +1094,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-079",
+    id: "20260624-2224",
     trackers: ["os"],
     category: "重點關注",
     title: "Gemini 整合 Chrome 瀏覽器，推出「螢幕選取」工具，並升級 3.5 Flash 支援電腦使用功能",
@@ -1108,7 +1108,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-080",
+    id: "20260624-2226",
     trackers: ["os"],
     category: "重點關注",
     title: "無法歸納為資安新聞，內容為個人閒聊與產品推薦",
@@ -1122,7 +1122,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-081",
+    id: "20260624-2228",
     trackers: ["os", "security"],
     category: "重點關注",
     title: "無法撰寫新聞標題：原文內容為消費電子產品購物清單，無資安事件資訊",
@@ -1136,7 +1136,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-082",
+    id: "20260624-2329",
     trackers: ["os"],
     category: "重點關注",
     title: "AirPods Pro 3內建心率感測器表現優異，超越多數智慧手錶與穿戴裝置",
@@ -1150,7 +1150,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-083",
+    id: "20260624-2332",
     trackers: ["os"],
     category: "重點關注",
     title: "OpenAI 更新 GPT-5.5 Instant 模型：提升對話自然度與理解複雜意圖能力",
@@ -1164,7 +1164,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-084",
+    id: "20260624-2335",
     trackers: ["os"],
     category: "重點關注",
     title: "無可用內容：9to5Mac Daily 節目回顧（2026年6月24日）",
@@ -1178,7 +1178,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-085",
+    id: "20260624-2345",
     trackers: ["os"],
     category: "重點關注",
     title: "USB-C 接口標準混亂：選購周邊設備時需注意規格差異",
@@ -1192,7 +1192,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-086",
+    id: "20260624-2070",
     trackers: ["security"],
     category: "產業動態",
     title: "多達十家資安公司受駭：Klue Battlecards應用程式遭入侵，用戶資料外洩風險升高",
@@ -1206,7 +1206,7 @@ window.TRACKER_DAYS["2026-06-24"] = [
     ]
   },
   {
-    id: "20260624-087",
+    id: "20260624-2057",
     trackers: ["security"],
     category: "uncategorized",
     title: "Microsoft Edge 發現多個漏洞，資安專家提醒用戶立即更新以防範攻擊",

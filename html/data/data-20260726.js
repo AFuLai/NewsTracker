@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-07-26"] = [
   {
-    id: "20260726-001",
+    id: "20260726-5440",
     trackers: ["os"],
     category: "Linux",
     title: "Linux 核心預修補程式 7.2-rc5 內容評估：無明顯重大安全風險",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-07-26"] = [
     ]
   },
   {
-    id: "20260726-002",
+    id: "20260726-5455",
     trackers: ["os"],
     category: "Linux",
     title: "Linux 7.2-rc5 版本發布：包含多項核心修復與網路驅動更新，持續提升穩定性",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-07-26"] = [
     ]
   },
   {
-    id: "20260726-003",
+    id: "20260726-5457",
     trackers: ["os"],
     category: "Linux",
     title: "KVM 核心重大重構：Linux 7.3 將拆分 kvm_mmu 結構，優化虛擬化記憶體管理",
@@ -44,7 +44,7 @@ window.TRACKER_DAYS["2026-07-26"] = [
     ]
   },
   {
-    id: "20260726-004",
+    id: "20260726-5458",
     trackers: ["os"],
     category: "Linux",
     title: "FreeBSD 音訊支援面臨「悲劇狀態」：用戶抱怨系統不穩定與隨機音效問題",
@@ -58,7 +58,7 @@ window.TRACKER_DAYS["2026-07-26"] = [
     ]
   },
   {
-    id: "20260726-005",
+    id: "20260726-5459",
     trackers: ["os"],
     category: "Linux",
     title: "開源 CPU 效能優化工具 Auto-CPUFreq 3.1 發布，增添 GUI 監控與藍牙控制功能",
@@ -72,7 +72,7 @@ window.TRACKER_DAYS["2026-07-26"] = [
     ]
   },
   {
-    id: "20260726-006",
+    id: "20260726-5460",
     trackers: ["os"],
     category: "Linux",
     title: "Realtek RTL8723B/RTL8723BS 晶片支援：RTW88 Linux 驅動程式進行整合更新",
@@ -86,7 +86,7 @@ window.TRACKER_DAYS["2026-07-26"] = [
     ]
   },
   {
-    id: "20260726-007",
+    id: "20260726-5461",
     trackers: ["os"],
     category: "Linux",
     title: "Linux 7.2-rc5 修復 IPv4 透過 Firewire 的長期資料包重組錯誤",
@@ -100,7 +100,7 @@ window.TRACKER_DAYS["2026-07-26"] = [
     ]
   },
   {
-    id: "20260726-008",
+    id: "20260726-5594",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修補：提升 nexthop 權重欄位位寬至 u16，支援大型 CLOS 網路部署",
@@ -114,7 +114,7 @@ window.TRACKER_DAYS["2026-07-26"] = [
     ]
   },
   {
-    id: "20260726-009",
+    id: "20260726-5595",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修復 UAF：處理 tcf_qevent_handle 時的 TC_ACT_CONSUMED 異常",
@@ -128,7 +128,7 @@ window.TRACKER_DAYS["2026-07-26"] = [
     ]
   },
   {
-    id: "20260726-010",
+    id: "20260726-5535",
     trackers: ["os"],
     category: "Windows",
     title: "微軟承認 WinUI 性能瓶頸：強調優化記憶體使用與系統合成器整合，為 Windows 11 核心元件重寫做準備",
@@ -142,7 +142,7 @@ window.TRACKER_DAYS["2026-07-26"] = [
     ]
   },
   {
-    id: "20260726-011",
+    id: "20260726-5536",
     trackers: ["os"],
     category: "Windows",
     title: "微軟宣布 KMS 硬體安全機制：僅影響企業 KMS 伺服器，非針對一般盜版用戶",
@@ -156,7 +156,7 @@ window.TRACKER_DAYS["2026-07-26"] = [
     ]
   },
   {
-    id: "20260726-012",
+    id: "20260726-5537",
     trackers: ["os"],
     category: "Windows",
     title: "微軟強制推動新版 Outlook：用戶反饋與 2027 年強制轉換時間表分析",
@@ -170,7 +170,7 @@ window.TRACKER_DAYS["2026-07-26"] = [
     ]
   },
   {
-    id: "20260726-013",
+    id: "20260726-5777",
     trackers: ["os"],
     category: "Windows",
     title: "微軟宣布 KMS 硬體安全機制：新規定僅影響企業 KMS 伺服器，不針對一般用戶盜版 Windows 11",
@@ -184,7 +184,7 @@ window.TRACKER_DAYS["2026-07-26"] = [
     ]
   },
   {
-    id: "20260726-014",
+    id: "20260726-5355",
     trackers: ["os"],
     category: "Apple",
     title: "Apple Watch Series 12 與 Ultra 4 預計九月發表，重點將聚焦於健康功能與晶片升級",
@@ -198,7 +198,7 @@ window.TRACKER_DAYS["2026-07-26"] = [
     ]
   },
   {
-    id: "20260726-015",
+    id: "20260726-5356",
     trackers: ["os"],
     category: "Apple",
     title: "蘋果AI智慧眼鏡預計於WWDC 2027發表，強調隱私保護與開發者生態系",
@@ -212,7 +212,7 @@ window.TRACKER_DAYS["2026-07-26"] = [
     ]
   },
   {
-    id: "20260726-016",
+    id: "20260726-5308",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "GitHub與PyPI強化供應鏈防禦：導入時間延遲機制限制惡意套件傳播",
@@ -226,7 +226,7 @@ window.TRACKER_DAYS["2026-07-26"] = [
     ]
   },
   {
-    id: "20260726-017",
+    id: "20260726-5462",
     trackers: ["os"],
     category: "Android",
     title: "Ubuntu Touch 24.04-2.0 發布：支援螢幕瀏海與圓角設計，並升級 Chromium 引擎至 134",
@@ -240,7 +240,7 @@ window.TRACKER_DAYS["2026-07-26"] = [
     ]
   },
   {
-    id: "20260726-018",
+    id: "20260726-5317",
     trackers: ["os"],
     category: "重點關注",
     title: "三星 Galaxy Z Fold 8 系列發表後，市場前景面臨挑戰，市場分析指出折疊手機市場進入不確定期",
@@ -254,7 +254,7 @@ window.TRACKER_DAYS["2026-07-26"] = [
     ]
   },
   {
-    id: "20260726-019",
+    id: "20260726-5415",
     trackers: ["os"],
     category: "重點關注",
     title: "Apple TV+ 宣布改編《Neuromancer》系列，預計於 2027 年 1 月 22 日首播",
@@ -268,7 +268,7 @@ window.TRACKER_DAYS["2026-07-26"] = [
     ]
   },
   {
-    id: "20260726-020",
+    id: "20260726-5456",
     trackers: ["os"],
     category: "重點關注",
     title: "GNU Binutils 2.47 發布：新增 RISC-V 擴展支援與編譯器工具鏈功能升級",

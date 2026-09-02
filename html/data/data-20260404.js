@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-04-04"] = [
   {
-    id: "20260404-001",
+    id: "20260404-134",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "Elastic Security推出多項整合，強化macOS、QRadar、AWS等數據可視性與分析能力",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-04-04"] = [
     ]
   },
   {
-    id: "20260404-002",
+    id: "20260404-1346",
     trackers: ["os", "security"],
     category: "重點關注",
     title: "Electron 框架 macOS 應用程式路徑處理漏洞 (CVE-2026-34779)",

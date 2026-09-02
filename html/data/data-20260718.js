@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-07-18"] = [
   {
-    id: "20260718-001",
+    id: "20260718-4643",
     trackers: ["os"],
     category: "Linux",
     title: "AMD Linux 顯示卡驅動程式釋出更新，修復 Apple Studio Display 的 5K 雙連結顯示問題",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-07-18"] = [
     ]
   },
   {
-    id: "20260718-002",
+    id: "20260718-4644",
     trackers: ["os"],
     category: "Linux",
     title: "GNOME OS 推出全新「安全模式」：跳過 systemd-sysext 擴充以大幅提升 Linux 系統復原力",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-07-18"] = [
     ]
   },
   {
-    id: "20260718-003",
+    id: "20260718-4645",
     trackers: ["os"],
     category: "Linux",
     title: "KDE Plasma 6.8 系統監視器全新升級：支援一鍵分配行程 CPU 親和性與多項效能優化",
@@ -44,7 +44,7 @@ window.TRACKER_DAYS["2026-07-18"] = [
     ]
   },
   {
-    id: "20260718-004",
+    id: "20260718-4648",
     trackers: ["os"],
     category: "Linux",
     title: "Linux 遊戲轉譯層 DXVK 3.0.2 正式發布，強化 GPU 當機偵錯功能並修復多款遊戲錯誤",
@@ -58,7 +58,7 @@ window.TRACKER_DAYS["2026-07-18"] = [
     ]
   },
   {
-    id: "20260718-005",
+    id: "20260718-4738",
     trackers: ["os"],
     category: "Linux",
     title: "Linux 核心更新：發布 7.1.4、6.18.39 與 6.12.96 穩定版本，修補多項重要安全與功能缺陷",
@@ -72,7 +72,7 @@ window.TRACKER_DAYS["2026-07-18"] = [
     ]
   },
   {
-    id: "20260718-006",
+    id: "20260718-4745",
     trackers: ["os"],
     category: "Linux",
     title: "Mesa 26.2 性能提升：NVK Vulkan 驅動持續追趕 NVIDIA 專有驅動，但仍有差距",
@@ -86,7 +86,7 @@ window.TRACKER_DAYS["2026-07-18"] = [
     ]
   },
   {
-    id: "20260718-007",
+    id: "20260718-4681",
     trackers: ["os", "security"],
     category: "Windows",
     title: "微軟緊急暫停 Windows 11 KB5101650 於部分 Dell 電腦推送，因與 Intel IPF 驅動程式衝突導致過熱與異常關機",
@@ -100,7 +100,7 @@ window.TRACKER_DAYS["2026-07-18"] = [
     ]
   },
   {
-    id: "20260718-008",
+    id: "20260718-4682",
     trackers: ["os"],
     category: "Windows",
     title: "微軟與 OEM 解決 Secure Boot 2023 憑證過期遷移痛點，釋出內建 PowerShell 檢測腳本",
@@ -114,7 +114,7 @@ window.TRACKER_DAYS["2026-07-18"] = [
     ]
   },
   {
-    id: "20260718-009",
+    id: "20260718-4606",
     trackers: ["os"],
     category: "Apple",
     title: "9to5Mac 報導週末 Apple 產品優惠：AirPods Pro 3、M5 系列 MacBook Pro 及 Apple Watch 降價促销",
@@ -128,7 +128,7 @@ window.TRACKER_DAYS["2026-07-18"] = [
     ]
   },
   {
-    id: "20260718-010",
+    id: "20260718-4607",
     trackers: ["os"],
     category: "Apple",
     title: "蘋果調漲多國 iCloud+ 訂閱價格，涵蓋日本、越南及埃及等市場",
@@ -142,7 +142,7 @@ window.TRACKER_DAYS["2026-07-18"] = [
     ]
   },
   {
-    id: "20260718-011",
+    id: "20260718-4608",
     trackers: ["os"],
     category: "Apple",
     title: "Apple 以證券欺詐案暫緩執行為由，請求法院暫停 Epic Games 反壟斷後續訴訟程序",
@@ -156,7 +156,7 @@ window.TRACKER_DAYS["2026-07-18"] = [
     ]
   },
   {
-    id: "20260718-012",
+    id: "20260718-4707",
     trackers: ["os", "security"],
     category: "漏洞與威脅情報",
     title: "關鍵 RCE 漏洞曝光：WordPress 核心面臨 wp2shell 攻擊，建議立即升級至 7.0.2 或 6.9.5",
@@ -170,7 +170,7 @@ window.TRACKER_DAYS["2026-07-18"] = [
     ]
   },
   {
-    id: "20260718-013",
+    id: "20260718-4711",
     trackers: ["os", "security"],
     category: "漏洞與威脅情報",
     title: "7-Zip 釋出 26.02 版本修補 XZ 壓縮資料的堆緩衝區溢出漏洞",
@@ -184,7 +184,7 @@ window.TRACKER_DAYS["2026-07-18"] = [
     ]
   },
   {
-    id: "20260718-014",
+    id: "20260718-4727",
     trackers: ["os"],
     category: "Apple",
     title: "Apple 宣布提高 Apple Music 與 Apple One 訂閱價格，用戶需評估服務組合價值",
@@ -198,7 +198,7 @@ window.TRACKER_DAYS["2026-07-18"] = [
     ]
   },
   {
-    id: "20260718-015",
+    id: "20260718-4728",
     trackers: ["os"],
     category: "Apple",
     title: "Passable App：提供更精細化的聯絡人資訊分享至 Apple Wallet",
@@ -212,7 +212,7 @@ window.TRACKER_DAYS["2026-07-18"] = [
     ]
   },
   {
-    id: "20260718-016",
+    id: "20260718-4966",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "微軟警告：ACR Stealer惡意程式潮起，透過ClickFix與WebDAV竊取企業密碼與敏感資料",
@@ -226,7 +226,7 @@ window.TRACKER_DAYS["2026-07-18"] = [
     ]
   },
   {
-    id: "20260718-017",
+    id: "20260718-4555",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "Elastic 揭露北韓駭客全新「Contagious Interview」行動：利用 SVG 隱寫術鎖定開發人員發動供應鏈攻擊",
@@ -240,7 +240,7 @@ window.TRACKER_DAYS["2026-07-18"] = [
     ]
   },
   {
-    id: "20260718-018",
+    id: "20260718-4720",
     trackers: ["os"],
     category: "Android",
     title: "三星 Galaxy Watch 9 確認採用高通 Snapdragon Wear Elite 晶片，升級 AI 性能",
@@ -254,7 +254,7 @@ window.TRACKER_DAYS["2026-07-18"] = [
     ]
   },
   {
-    id: "20260718-019",
+    id: "20260718-4721",
     trackers: ["os"],
     category: "Android",
     title: "YouTube PiP 模式故障：iOS/Android 應用程式退出後無法啟動浮動播放器",
@@ -268,7 +268,7 @@ window.TRACKER_DAYS["2026-07-18"] = [
     ]
   },
   {
-    id: "20260718-020",
+    id: "20260718-4722",
     trackers: ["os"],
     category: "Android",
     title: "Google 調整 Android 備份資料計費政策：所有備份資料將計入 Google 帳戶儲存空間",
@@ -282,7 +282,7 @@ window.TRACKER_DAYS["2026-07-18"] = [
     ]
   },
   {
-    id: "20260718-021",
+    id: "20260718-4784",
     trackers: ["os", "security"],
     category: "Android",
     title: "Android 應用程式間通訊漏洞：Stoat 允許透過 Intent 洩露內部資料庫與認證 Token",
@@ -296,7 +296,7 @@ window.TRACKER_DAYS["2026-07-18"] = [
     ]
   },
   {
-    id: "20260718-022",
+    id: "20260718-4556",
     trackers: ["security"],
     category: "前瞻技術",
     title: "1Password 攜手 Anthropic 推出 1Password for Claude 整合，打造 AI 代理專用防護與 Agentic 模式",
@@ -310,7 +310,7 @@ window.TRACKER_DAYS["2026-07-18"] = [
     ]
   },
   {
-    id: "20260718-023",
+    id: "20260718-4646",
     trackers: ["os"],
     category: "重點關注",
     title: "UXL 基金會發布 oneDNN 3.13，優化 Intel Nova Lake 架構與 AVX10.2 指令集效能",
@@ -324,7 +324,7 @@ window.TRACKER_DAYS["2026-07-18"] = [
     ]
   },
   {
-    id: "20260718-024",
+    id: "20260718-4647",
     trackers: ["os"],
     category: "重點關注",
     title: "開源相容層 D7VK 2.0 正式發布，基於 Vulkan 提升舊款 Direct3D 7 遊戲效能達兩倍以上",
@@ -338,7 +338,7 @@ window.TRACKER_DAYS["2026-07-18"] = [
     ]
   },
   {
-    id: "20260718-025",
+    id: "20260718-4658",
     trackers: ["os"],
     category: "重點關注",
     title: "Java 誕生內幕紀錄片首映，揭露當年於 SunWorld 發表前三天差點因執行緒臭蟲腰斬",
@@ -352,7 +352,7 @@ window.TRACKER_DAYS["2026-07-18"] = [
     ]
   },
   {
-    id: "20260718-026",
+    id: "20260718-4659",
     trackers: ["os"],
     category: "重點關注",
     title: "開源作業系統 NextBSD 專案重啟，結合 FreeBSD 核心與 Apple 歐美版 Darwin 基礎架構",
@@ -366,7 +366,7 @@ window.TRACKER_DAYS["2026-07-18"] = [
     ]
   },
   {
-    id: "20260718-027",
+    id: "20260718-4680",
     trackers: ["os"],
     category: "重點關注",
     title: "Nvidia 發布首款 N1X Windows 11 Arm64 顯示卡驅動程式，為 RTX Spark Arm PC 上市做準備",
@@ -380,7 +380,7 @@ window.TRACKER_DAYS["2026-07-18"] = [
     ]
   },
   {
-    id: "20260718-028",
+    id: "20260718-4729",
     trackers: ["os"],
     category: "重點關注",
     title: "SwitchBot發布RGBICWW吸頂燈，原生支援Matter與Apple Home，提升智慧家居照明體驗",
@@ -394,7 +394,7 @@ window.TRACKER_DAYS["2026-07-18"] = [
     ]
   },
   {
-    id: "20260718-029",
+    id: "20260718-4730",
     trackers: ["os", "security"],
     category: "重點關注",
     title: "個人資料外洩警示：您的電話、地址與聯絡資訊正被數據經紀商打包出售",

@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-03-19"] = [
   {
-    id: "20260319-001",
+    id: "20260319-491",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Amazon揭露：Cisco防火牆FMC存在零日漏洞，被Interlock勒索軟體群組利用攻擊",

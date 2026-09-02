@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2025-11-13"] = [
   {
-    id: "20251113-001",
+    id: "20251113-236",
     trackers: ["eu_cra"],
     category: "調和標準",
     title: "ETSI發布技術報告：提出以用戶為中心的智慧數據生態系統框架，強化數據主權與自主性",

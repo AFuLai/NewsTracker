@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-02-17"] = [
   {
-    id: "20260217-001",
+    id: "20260217-631",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Dragos 2026年報告揭示OT/ICS威脅升級：新威脅群體針對關鍵基礎設施進行操作性破壞",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-02-17"] = [
     ]
   },
   {
-    id: "20260217-002",
+    id: "20260217-633",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Dragos 2026 OT資安報告：工業控制系統面臨的威脅與可見性危機",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-02-17"] = [
     ]
   },
   {
-    id: "20260217-003",
+    id: "20260217-634",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Dragos 2026 OT資安年鑑：揭示敵對勢力深入工業控制系統，攻擊目標轉向物理流程",

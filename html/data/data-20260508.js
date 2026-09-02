@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-05-08"] = [
   {
-    id: "20260508-001",
+    id: "20260508-654",
     trackers: ["security"],
     category: "重大事件",
     title: "教育平台 Canvas 遭 ShinyHunters 勒索攻擊，資料外洩威脅衝擊數千學術機構",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-05-08"] = [
     ]
   },
   {
-    id: "20260508-002",
+    id: "20260508-1327",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心修復 cgroup 任務遷移與迭代的競態條件漏洞",

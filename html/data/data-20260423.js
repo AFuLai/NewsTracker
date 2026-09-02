@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-04-23"] = [
   {
-    id: "20260423-001",
+    id: "20260423-140",
     trackers: ["eu_cra", "security"],
     category: "法令更新",
     title: "歐盟《產品安全法案》（CRA）要求製造商於 2026 年開始報告數位產品漏洞與嚴重事件",

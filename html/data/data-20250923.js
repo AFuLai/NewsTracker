@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2025-09-23"] = [
   {
-    id: "20250923-001",
+    id: "20250923-149",
     trackers: ["eu_cra", "security"],
     category: "研討活動",
     title: "深入探討《網路韌性法案》（CRA）與橫向標準化：提升歐盟產品資安合規性",

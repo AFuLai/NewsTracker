@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-01-26"] = [
   {
-    id: "20260126-001",
+    id: "20260126-124",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "研究揭露 Windows 11 新增「管理員保護」功能漏洞：可繞過機制竊取全權管理員權限",

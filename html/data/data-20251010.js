@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2025-10-10"] = [
   {
-    id: "20251010-001",
+    id: "20251010-237",
     trackers: ["eu_cra", "security"],
     category: "調和標準",
     title: "ETSI 2025 安全會議總結：聚焦《網路韌性法案》與全球 IoT 安全標準化趨勢",

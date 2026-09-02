@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-07-25"] = [
   {
-    id: "20260725-001",
+    id: "20260725-5441",
     trackers: ["os"],
     category: "Linux",
     title: "Debian 專案考慮規範大型語言模型（LLM）在建構發行版的使用",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-07-25"] = [
     ]
   },
   {
-    id: "20260725-002",
+    id: "20260725-5443",
     trackers: ["os"],
     category: "Linux",
     title: "多主流 Linux 發行版發布安全更新：涵蓋核心、應用程式與服務層面修補",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-07-25"] = [
     ]
   },
   {
-    id: "20260725-003",
+    id: "20260725-5444",
     trackers: ["os"],
     category: "Linux",
     title: "GNU C Library (glibc) 發布 Version 2.44，新增系統級可調參數設定與安全修補",
@@ -44,7 +44,7 @@ window.TRACKER_DAYS["2026-07-25"] = [
     ]
   },
   {
-    id: "20260725-004",
+    id: "20260725-5445",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心發布 6.12.98：修復 ext4 文件描述符洩漏漏洞，建議使用者升級",
@@ -58,7 +58,7 @@ window.TRACKER_DAYS["2026-07-25"] = [
     ]
   },
   {
-    id: "20260725-005",
+    id: "20260725-5465",
     trackers: ["os"],
     category: "Linux",
     title: "GNU C Library (glibc) 2.44 發布：新增 /etc/tunables.conf 系統配置與多平台優化",
@@ -72,7 +72,7 @@ window.TRACKER_DAYS["2026-07-25"] = [
     ]
   },
   {
-    id: "20260725-006",
+    id: "20260725-5466",
     trackers: ["os"],
     category: "Linux",
     title: "KDE Plasma 6.8 更新：推出 kscreenctl 替代 kscreen-doctor，並強化遠端桌面與登入管理功能",
@@ -86,7 +86,7 @@ window.TRACKER_DAYS["2026-07-25"] = [
     ]
   },
   {
-    id: "20260725-007",
+    id: "20260725-5538",
     trackers: ["os"],
     category: "Windows",
     title: "Windows 11 內測版升級：File Explorer 提升刪除大型碎片化檔案速度，改善使用者體驗",
@@ -100,7 +100,7 @@ window.TRACKER_DAYS["2026-07-25"] = [
     ]
   },
   {
-    id: "20260725-008",
+    id: "20260725-5540",
     trackers: ["os"],
     category: "Windows",
     title: "Windows 11 24H2/25H2 內建觸控板右鍵區域自定義功能，提升用戶體驗",
@@ -114,7 +114,7 @@ window.TRACKER_DAYS["2026-07-25"] = [
     ]
   },
   {
-    id: "20260725-009",
+    id: "20260725-5244",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Google Chrome修補四個高風險漏洞：防禦沙箱逃逸與遠端執行漏洞",
@@ -128,7 +128,7 @@ window.TRACKER_DAYS["2026-07-25"] = [
     ]
   },
   {
-    id: "20260725-010",
+    id: "20260725-5277",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "警惕 Fastjson 關鍵漏洞：攻擊者可透過惡意 JSON 執行程式碼，影響 Spring Boot 應用",
@@ -142,7 +142,7 @@ window.TRACKER_DAYS["2026-07-25"] = [
     ]
   },
   {
-    id: "20260725-011",
+    id: "20260725-5278",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "研究人員公開 GitLab RCE PoC：利用 Oj 庫的記憶體漏洞攻擊自架設版本",
@@ -156,7 +156,7 @@ window.TRACKER_DAYS["2026-07-25"] = [
     ]
   },
   {
-    id: "20260725-012",
+    id: "20260725-5279",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "CTM360揭露保險業目標的進化型網路釣魚：利用Google廣告進行實時帳號劫持",
@@ -170,7 +170,7 @@ window.TRACKER_DAYS["2026-07-25"] = [
     ]
   },
   {
-    id: "20260725-013",
+    id: "20260725-5280",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Cl0p駭客群利用PTC Windmill及FlexPLM漏洞，進行未經身份驗證的遠端程式碼執行攻擊",
@@ -184,7 +184,7 @@ window.TRACKER_DAYS["2026-07-25"] = [
     ]
   },
   {
-    id: "20260725-014",
+    id: "20260725-5358",
     trackers: ["os"],
     category: "Apple",
     title: "Apple TV 宣布《Neuromancer》系列劇集首播日期，並釋出《Dark Matter》及《Matchbox》新預告片",
@@ -198,7 +198,7 @@ window.TRACKER_DAYS["2026-07-25"] = [
     ]
   },
   {
-    id: "20260725-015",
+    id: "20260725-5359",
     trackers: ["os"],
     category: "Apple",
     title: "【App介紹】NeoCam：為 iPhone/iPad 帶來復古 Game Boy 風格的相機應用程式",
@@ -212,7 +212,7 @@ window.TRACKER_DAYS["2026-07-25"] = [
     ]
   },
   {
-    id: "20260725-016",
+    id: "20260725-5360",
     trackers: ["os"],
     category: "Apple",
     title: "三星 Galaxy Z Fold8 發表：深入探討可折疊手機的最新趨勢與挑戰",
@@ -226,7 +226,7 @@ window.TRACKER_DAYS["2026-07-25"] = [
     ]
   },
   {
-    id: "20260725-017",
+    id: "20260725-5362",
     trackers: ["os"],
     category: "Apple",
     title: "蘋果 iPhone 18 系列發布異動：今年九月僅推出 Pro 與折疊機型",
@@ -240,7 +240,7 @@ window.TRACKER_DAYS["2026-07-25"] = [
     ]
   },
   {
-    id: "20260725-018",
+    id: "20260725-5365",
     trackers: ["os"],
     category: "Apple",
     title: "數位看板應用比較：新報告指出 Apple TV 在企業級可靠性上優於 Android 設備",
@@ -254,7 +254,7 @@ window.TRACKER_DAYS["2026-07-25"] = [
     ]
   },
   {
-    id: "20260725-019",
+    id: "20260725-5367",
     trackers: ["os", "security"],
     category: "Apple",
     title: "Magnet Forensics 起訴 Paradigm Shift，指控其公開的 usbliter8 漏洞利用程式使用了竊取的 Apple 晶片零日密鑰",
@@ -268,7 +268,7 @@ window.TRACKER_DAYS["2026-07-25"] = [
     ]
   },
   {
-    id: "20260725-020",
+    id: "20260725-5276",
     trackers: ["os", "security"],
     category: "供應鏈與開源安全",
     title: "SourTrade惡意廣告利用Bun Runtime，透過分段組裝方式傳遞Windows惡意執行檔",
@@ -282,7 +282,7 @@ window.TRACKER_DAYS["2026-07-25"] = [
     ]
   },
   {
-    id: "20260725-021",
+    id: "20260725-5281",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "DevMan RaaS 平台升級：駭客組織 Funky Mantis 建立中央化控制系統，強化攻擊流程",
@@ -296,7 +296,7 @@ window.TRACKER_DAYS["2026-07-25"] = [
     ]
   },
   {
-    id: "20260725-022",
+    id: "20260725-5319",
     trackers: ["os"],
     category: "重點關注",
     title: "無資安內容：科技生活習慣改變與數位戒斷經驗分享",
@@ -310,7 +310,7 @@ window.TRACKER_DAYS["2026-07-25"] = [
     ]
   },
   {
-    id: "20260725-023",
+    id: "20260725-5361",
     trackers: ["os"],
     category: "重點關注",
     title: "Amazon Basics Matter 智能插座評測：低成本實現 Apple HomeKit 互聯性",
@@ -324,7 +324,7 @@ window.TRACKER_DAYS["2026-07-25"] = [
     ]
   },
   {
-    id: "20260725-024",
+    id: "20260725-5363",
     trackers: ["os"],
     category: "重點關注",
     title: "Meirro Pro 32吋 6K 顯示器：挑戰 Apple Studio Display 的高性價替代方案",
@@ -338,7 +338,7 @@ window.TRACKER_DAYS["2026-07-25"] = [
     ]
   },
   {
-    id: "20260725-025",
+    id: "20260725-5364",
     trackers: ["os"],
     category: "重點關注",
     title: "Apple 產品線週末促銷資訊：MacBook Pro、AirPods Pro Max 及 iPhone 17 Pro 等多款設備優惠",
@@ -352,7 +352,7 @@ window.TRACKER_DAYS["2026-07-25"] = [
     ]
   },
   {
-    id: "20260725-026",
+    id: "20260725-5366",
     trackers: ["os"],
     category: "重點關注",
     title: "蘋果爭取使用中國記憶體晶片引發爭議，美光（Micron）警告可能損害美國半導體產業",
@@ -366,7 +366,7 @@ window.TRACKER_DAYS["2026-07-25"] = [
     ]
   },
   {
-    id: "20260725-027",
+    id: "20260725-5419",
     trackers: ["os"],
     category: "重點關注",
     title: "大科技公司被指控阻撓：歐盟研究人員難以獲取TikTok API，影響政治資訊研究",
@@ -380,7 +380,7 @@ window.TRACKER_DAYS["2026-07-25"] = [
     ]
   },
   {
-    id: "20260725-028",
+    id: "20260725-5464",
     trackers: ["os"],
     category: "重點關注",
     title: "GNOME Shell 擴充功能 Kiwi Menu 1.6.4 更新：強化 macOS 風格的快速選單體驗",
@@ -394,7 +394,7 @@ window.TRACKER_DAYS["2026-07-25"] = [
     ]
   },
   {
-    id: "20260725-029",
+    id: "20260725-5467",
     trackers: ["os"],
     category: "重點關注",
     title: "Wine 11.14 新版本發布：首次支援 FreeBSD 的 WoW64 模式與開始選單圖示功能",
@@ -408,7 +408,7 @@ window.TRACKER_DAYS["2026-07-25"] = [
     ]
   },
   {
-    id: "20260725-030",
+    id: "20260725-5488",
     trackers: ["os"],
     category: "重點關注",
     title: "Linux社群討論AI影響：從OpenBSD到Vendefoul Wolf Linux的抗AI開發趨勢",
@@ -422,7 +422,7 @@ window.TRACKER_DAYS["2026-07-25"] = [
     ]
   },
   {
-    id: "20260725-031",
+    id: "20260725-5539",
     trackers: ["os"],
     category: "重點關注",
     title: "微軟宣布 Surface 系列筆電相機品質超越 Apple，Surface Laptop 與 Pro 奪冠",

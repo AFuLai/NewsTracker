@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2025-10-30"] = [
   {
-    id: "20251030-001",
+    id: "20251030-5830",
     trackers: ["eu_cra"],
     category: "研討活動",
     title: "2025歐洲網路安全挑戰賽（ECSC）結果公布：義大利奪冠，強調團隊協作與專業技能提升",

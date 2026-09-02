@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-05-15"] = [
   {
-    id: "20260515-001",
+    id: "20260515-1284",
     trackers: ["os", "security"],
     category: "重點關注",
     title: "Microsoft APM 包含 Windows 檔案提取邊界錯誤，可能導致路徑遍歷漏洞",

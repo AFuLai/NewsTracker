@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-04-21"] = [
   {
-    id: "20260421-001",
+    id: "20260421-117",
     trackers: ["security"],
     category: "重大事件",
     title: "前資安犯罪嫌犯「Scattered Spider」成員認罪：透過社工詐騙與SIM交換竊取數百萬加密貨幣",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-04-21"] = [
     ]
   },
   {
-    id: "20260421-002",
+    id: "20260421-1347",
     trackers: ["os", "security"],
     category: "Apple",
     title: "macOS ClearanceKit 漏洞曝光：惡意軟體可偽裝Apple程序，存取受保護檔案",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-04-21"] = [
     ]
   },
   {
-    id: "20260421-003",
+    id: "20260421-131",
     trackers: ["security"],
     category: "前瞻技術",
     title: "研究報告：LLMs如何破解程式混淆技術，改變逆向工程格局",

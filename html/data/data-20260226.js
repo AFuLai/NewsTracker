@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-02-26"] = [
   {
-    id: "20260226-001",
+    id: "20260226-121",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "深入分析 GetProcessHandleFromHwnd API：揭示 UAC 繞過與進程句柄竊取機制",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-02-26"] = [
     ]
   },
   {
-    id: "20260226-002",
+    id: "20260226-1300",
     trackers: ["os", "security"],
     category: "Android",
     title: "Fleet 設備管理軟體：Android MDM Pub/Sub 處理漏洞，可能導致設備未經授權解除註冊",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-02-26"] = [
     ]
   },
   {
-    id: "20260226-003",
+    id: "20260226-1301",
     trackers: ["os", "security"],
     category: "Android",
     title: "VLC for Android 存在路徑穿越漏洞：未修補版本可遭認證攻擊者利用",
@@ -44,7 +44,7 @@ window.TRACKER_DAYS["2026-02-26"] = [
     ]
   },
   {
-    id: "20260226-004",
+    id: "20260226-1302",
     trackers: ["os", "security"],
     category: "Android",
     title: "VLC for Android 遠端存取伺服器存在認證繞過漏洞，可透過暴力破解 OTP 取得未授權存取權",
@@ -58,7 +58,7 @@ window.TRACKER_DAYS["2026-02-26"] = [
     ]
   },
   {
-    id: "20260226-005",
+    id: "20260226-1303",
     trackers: ["os", "security"],
     category: "Android",
     title: "Unitree Go2 韌體及 Android App 存在 RCE 漏洞：本地設備可注入惡意 Python 代碼",

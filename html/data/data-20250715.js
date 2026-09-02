@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2025-07-15"] = [
   {
-    id: "20250715-001",
+    id: "20250715-5932",
     trackers: ["eu_cra"],
     category: "亞太對應",
     title: "歐盟副主席訪摩爾多瓦：深化網路安全合作，強化民主治理與抗擊假訊息",

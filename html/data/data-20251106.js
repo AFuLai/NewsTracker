@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2025-11-06"] = [
   {
-    id: "20251106-001",
+    id: "20251106-199",
     trackers: ["eu_cra"],
     category: "產業動態",
     title: "ENISA發布最新網路威脅情勢報告：揭示七大主要威脅與未來十大挑戰",

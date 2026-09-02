@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-06-02"] = [
   {
-    id: "20260602-001",
+    id: "20260602-345",
     trackers: ["security"],
     category: "重大事件",
     title: "【資訊安全歐洲展】Infosecurity Europe 2026 盛大登場，聚焦最新資安創新與決策洞察",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-06-02"] = [
     ]
   },
   {
-    id: "20260602-002",
+    id: "20260602-436",
     trackers: ["security"],
     category: "重大事件",
     title: "微軟Exchange Online服務中斷：北美、亞太及歐洲用戶遭遇郵件延遲與傳送失敗",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-06-02"] = [
     ]
   },
   {
-    id: "20260602-003",
+    id: "20260602-986",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Debian 發布 DSA-6320-1：修補 OpenSSH 服務中的潛在認證繞過漏洞",
@@ -44,7 +44,7 @@ window.TRACKER_DAYS["2026-06-02"] = [
     ]
   },
   {
-    id: "20260602-004",
+    id: "20260602-987",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Debian 發布 DSA-6319-1：修補 OpenSSH 服務中的潛在安全漏洞",
@@ -58,7 +58,7 @@ window.TRACKER_DAYS["2026-06-02"] = [
     ]
   },
   {
-    id: "20260602-005",
+    id: "20260602-1094",
     trackers: ["os"],
     category: "Linux",
     title: "Ubuntu 在 Azure Cobalt 200 VM 上預覽：支援 Arm64 架構的雲原生與 AI 工作負載",
@@ -72,7 +72,7 @@ window.TRACKER_DAYS["2026-06-02"] = [
     ]
   },
   {
-    id: "20260602-006",
+    id: "20260602-298",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Google 6月Android更新修補124個漏洞，包含高風險權限提升漏洞CVE-2025-48595",
@@ -86,7 +86,7 @@ window.TRACKER_DAYS["2026-06-02"] = [
     ]
   },
   {
-    id: "20260602-007",
+    id: "20260602-299",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "俄羅斯駭客群 Gamaredon 利用 WinRAR 漏洞 CVE-2025-8088 進行多重惡意植入",
@@ -100,7 +100,7 @@ window.TRACKER_DAYS["2026-06-02"] = [
     ]
   },
   {
-    id: "20260602-008",
+    id: "20260602-300",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "CISA 將 Oracle WebLogic Server 漏洞 CVE-2024-21182 列入 KEV 目錄，警告高風險未經認證攻擊",
@@ -114,7 +114,7 @@ window.TRACKER_DAYS["2026-06-02"] = [
     ]
   },
   {
-    id: "20260602-009",
+    id: "20260602-303",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "巴基斯坦相關駭客組織 SideCopy 針對阿富汗財政部發動 Xeno RAT 遠端存取木馬釣魚攻擊",
@@ -128,7 +128,7 @@ window.TRACKER_DAYS["2026-06-02"] = [
     ]
   },
   {
-    id: "20260602-010",
+    id: "20260602-304",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Dashlane 帳密管理器遭暴力破解攻擊，少於 20 位個人版用戶加密金庫資料外洩",
@@ -142,7 +142,7 @@ window.TRACKER_DAYS["2026-06-02"] = [
     ]
   },
   {
-    id: "20260602-011",
+    id: "20260602-329",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "FBI警告：Phishing Kit Kali365擴大目標，利用設備代碼竊取多種服務的OAuth Token",
@@ -156,7 +156,7 @@ window.TRACKER_DAYS["2026-06-02"] = [
     ]
   },
   {
-    id: "20260602-012",
+    id: "20260602-330",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "DriveSurge大規模網路攻擊：利用zTDS劫持數千網站進行假更新與點擊修復詐騙",
@@ -170,7 +170,7 @@ window.TRACKER_DAYS["2026-06-02"] = [
     ]
   },
   {
-    id: "20260602-013",
+    id: "20260602-331",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "中國國家行為者對捷克與台灣組織進行雙層式網路釣魚攻擊，竊取高價值資料",
@@ -184,7 +184,7 @@ window.TRACKER_DAYS["2026-06-02"] = [
     ]
   },
   {
-    id: "20260602-014",
+    id: "20260602-347",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "CISA警告：自動油箱計量系統（ATG）面臨網路攻擊，建議立即移除公網暴露與強化密碼管理",
@@ -198,7 +198,7 @@ window.TRACKER_DAYS["2026-06-02"] = [
     ]
   },
   {
-    id: "20260602-015",
+    id: "20260602-348",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "CISA新增兩項已知遭利用漏洞：Linux核心與Android框架，警告企業應優先修補",
@@ -212,7 +212,7 @@ window.TRACKER_DAYS["2026-06-02"] = [
     ]
   },
   {
-    id: "20260602-016",
+    id: "20260602-352",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "多種核心頁面快取漏洞連發，強調OpenShift深度防禦機制在實務環境中的價值",
@@ -226,7 +226,7 @@ window.TRACKER_DAYS["2026-06-02"] = [
     ]
   },
   {
-    id: "20260602-017",
+    id: "20260602-360",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Ubuntu修補Unbound多項DNS處理漏洞：包含Denial of Service與任意程式碼執行風險",
@@ -240,7 +240,7 @@ window.TRACKER_DAYS["2026-06-02"] = [
     ]
   },
   {
-    id: "20260602-018",
+    id: "20260602-361",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Ubuntu Linux 核心修補多項嚴重漏洞：涵蓋 Dirty Frag、AppArmor 缺陷及多個權限提升風險",
@@ -254,7 +254,7 @@ window.TRACKER_DAYS["2026-06-02"] = [
     ]
   },
   {
-    id: "20260602-019",
+    id: "20260602-362",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Ubuntu Linux 核心修補多項高風險漏洞：包含 Dirty Frag、AppArmor 相關記憶體錯誤與權限提升風險",
@@ -268,7 +268,7 @@ window.TRACKER_DAYS["2026-06-02"] = [
     ]
   },
   {
-    id: "20260602-020",
+    id: "20260602-363",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Ubuntu 警告：age 檔案加密工具存在任意程式執行漏洞，建議立即更新系統修補",
@@ -282,7 +282,7 @@ window.TRACKER_DAYS["2026-06-02"] = [
     ]
   },
   {
-    id: "20260602-021",
+    id: "20260602-364",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Ubuntu發布多項Linux核心漏洞修補：涵蓋Dirty Frag、AppArmor及權限提升風險",
@@ -296,7 +296,7 @@ window.TRACKER_DAYS["2026-06-02"] = [
     ]
   },
   {
-    id: "20260602-022",
+    id: "20260602-365",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Ubuntu 發布 USN-8238-2，修復 EditorConfig 處理特殊配置檔時的服務拒絕漏洞",
@@ -310,7 +310,7 @@ window.TRACKER_DAYS["2026-06-02"] = [
     ]
   },
   {
-    id: "20260602-023",
+    id: "20260602-407",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Elastic Security整合Google威脅情報：提升資安偵測與狩獵能力",
@@ -324,7 +324,7 @@ window.TRACKER_DAYS["2026-06-02"] = [
     ]
   },
   {
-    id: "20260602-024",
+    id: "20260602-405",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "HeroDevs探討開源軟體生命週期結束（EOL）的風險：如何管理依賴樹中的隱性漏洞",
@@ -338,7 +338,7 @@ window.TRACKER_DAYS["2026-06-02"] = [
     ]
   },
   {
-    id: "20260602-025",
+    id: "20260602-912",
     trackers: ["os", "security"],
     category: "Android",
     title: "Android 17強制實施App記憶體限制，要求開發者優化記憶體使用以維持系統穩定性",
@@ -352,7 +352,7 @@ window.TRACKER_DAYS["2026-06-02"] = [
     ]
   },
   {
-    id: "20260602-026",
+    id: "20260602-913",
     trackers: ["os", "security"],
     category: "Android",
     title: "Google I/O 26 重點回顧：提升 Android 應用效能與跨裝置體驗的開發工具更新",
@@ -366,7 +366,7 @@ window.TRACKER_DAYS["2026-06-02"] = [
     ]
   },
   {
-    id: "20260602-027",
+    id: "20260602-301",
     trackers: ["security"],
     category: "前瞻技術",
     title: "AI加速漏洞利用週期縮短，企業需從被動修補轉向預防與驗證",
@@ -380,7 +380,7 @@ window.TRACKER_DAYS["2026-06-02"] = [
     ]
   },
   {
-    id: "20260602-028",
+    id: "20260602-302",
     trackers: ["security"],
     category: "前瞻技術",
     title: "企業如何從單純的 EDR 轉向結合 PHASR 與 MDR，建立可持續的資安營運模型",
@@ -394,7 +394,7 @@ window.TRACKER_DAYS["2026-06-02"] = [
     ]
   },
   {
-    id: "20260602-029",
+    id: "20260602-328",
     trackers: ["security"],
     category: "前瞻技術",
     title: "Zoom CISO談AI安全：強調AI為輔助工具而非取代人力，並聚焦於跨領域的資安領導力",
@@ -408,7 +408,7 @@ window.TRACKER_DAYS["2026-06-02"] = [
     ]
   },
   {
-    id: "20260602-030",
+    id: "20260602-332",
     trackers: ["security"],
     category: "前瞻技術",
     title: "Gartner警告：高自主性AI代理（AI Agents）風險極高，需建立行為監控與權限精準化防禦",
@@ -422,7 +422,7 @@ window.TRACKER_DAYS["2026-06-02"] = [
     ]
   },
   {
-    id: "20260602-031",
+    id: "20260602-333",
     trackers: ["security"],
     category: "前瞻技術",
     title: "資安趨勢預測：企業防禦將從「假設已入侵」進化至「微球體」與 AI 協調的智能安全織物",
@@ -436,7 +436,7 @@ window.TRACKER_DAYS["2026-06-02"] = [
     ]
   },
   {
-    id: "20260602-032",
+    id: "20260602-367",
     trackers: ["security"],
     category: "前瞻技術",
     title: "微軟發表 MDASH：結合多模型代理系統，實現開發生命週期中的可利用漏洞主動發現",
@@ -450,7 +450,7 @@ window.TRACKER_DAYS["2026-06-02"] = [
     ]
   },
   {
-    id: "20260602-033",
+    id: "20260602-955",
     trackers: ["os"],
     category: "重點關注",
     title: "微軟宣布 MXC SDK 強化 Windows 平台安全，為 AI 代理提供政策驅動的執行容器與隔離機制",
@@ -464,7 +464,7 @@ window.TRACKER_DAYS["2026-06-02"] = [
     ]
   },
   {
-    id: "20260602-034",
+    id: "20260602-957",
     trackers: ["os"],
     category: "重點關注",
     title: "Edge 推出多項 on-device AI 功能：新增 Aion-1.0-Instruct 模型、語言偵測與翻譯 API，強化網頁體驗",
@@ -478,7 +478,7 @@ window.TRACKER_DAYS["2026-06-02"] = [
     ]
   },
   {
-    id: "20260602-035",
+    id: "20260602-1095",
     trackers: ["os"],
     category: "重點關注",
     title: "深入解析 InfiniBand：高性能計算與 AI 數據中心的核心互連技術",

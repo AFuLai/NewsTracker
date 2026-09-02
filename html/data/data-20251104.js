@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2025-11-04"] = [
   {
-    id: "20251104-001",
+    id: "20251104-5912",
     trackers: ["eu_cra"],
     category: "研討活動",
     title: "歐盟舉行 BlueOLEx 模擬演習，檢驗成員國與委員會應對大規模網路危機的能力",

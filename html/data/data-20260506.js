@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-05-06"] = [
   {
-    id: "20260506-001",
+    id: "20260506-163",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "伊朗 APT 組織 MuddyWater 偽裝為勒索軟體攻擊，實施間諜活動竊取資料",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-05-06"] = [
     ]
   },
   {
-    id: "20260506-002",
+    id: "20260506-167",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Google Chrome 存在 Use-after-free 漏洞，遠端攻擊者可透過 HTML 頁面執行沙盒逃逸",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-05-06"] = [
     ]
   },
   {
-    id: "20260506-003",
+    id: "20260506-1317",
     trackers: ["os", "security"],
     category: "Android",
     title: "Google Chrome Android 漏洞：CVE-2026-7905 允許遠端攻擊者執行沙盒逃逸",
@@ -44,7 +44,7 @@ window.TRACKER_DAYS["2026-05-06"] = [
     ]
   },
   {
-    id: "20260506-004",
+    id: "20260506-1318",
     trackers: ["os", "security"],
     category: "Android",
     title: "Google Chrome Android 漏洞警示：CVE-2026-7912 允許透過渲染器流程執行任意讀寫",
@@ -58,7 +58,7 @@ window.TRACKER_DAYS["2026-05-06"] = [
     ]
   },
   {
-    id: "20260506-005",
+    id: "20260506-1319",
     trackers: ["os", "security"],
     category: "Android",
     title: "Google Chrome Android 漏洞警示：CVE-2026-7913 允許本地攻擊者進行權限提升",
@@ -72,7 +72,7 @@ window.TRACKER_DAYS["2026-05-06"] = [
     ]
   },
   {
-    id: "20260506-006",
+    id: "20260506-1320",
     trackers: ["os", "security"],
     category: "Android",
     title: "Google Chrome Android 漏洞曝光：DevTools 數據驗證不足，可遠端繞過導航限制",
@@ -86,7 +86,7 @@ window.TRACKER_DAYS["2026-05-06"] = [
     ]
   },
   {
-    id: "20260506-007",
+    id: "20260506-1321",
     trackers: ["os", "security"],
     category: "Android",
     title: "Google Chrome Android 存在 UXSS 漏洞：透過惡意擴充功能注入腳本",
@@ -100,7 +100,7 @@ window.TRACKER_DAYS["2026-05-06"] = [
     ]
   },
   {
-    id: "20260506-008",
+    id: "20260506-1322",
     trackers: ["os", "security"],
     category: "Android",
     title: "Google Chrome Android 存在 CVE-2026-7993 漏洞：渲染器流程被攻破可偽造 Omnibox 內容",
@@ -114,7 +114,7 @@ window.TRACKER_DAYS["2026-05-06"] = [
     ]
   },
   {
-    id: "20260506-009",
+    id: "20260506-1323",
     trackers: ["os", "security"],
     category: "Android",
     title: "Google Chrome Android 存在 CVE-2026-8020 漏洞：渲染器流程被攻破後可竊取記憶體資訊",
@@ -128,7 +128,7 @@ window.TRACKER_DAYS["2026-05-06"] = [
     ]
   },
   {
-    id: "20260506-010",
+    id: "20260506-641",
     trackers: ["security"],
     category: "前瞻技術",
     title: "AI輔助駭客攻擊水務設施：敵方利用商用AI工具偵測並嘗試突破OT邊界",

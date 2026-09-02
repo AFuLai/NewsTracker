@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-07-03"] = [
   {
-    id: "20260703-001",
+    id: "20260703-2947",
     trackers: ["security"],
     category: "重大事件",
     title: "Europol行動揭露：駭客利用WordPress弱點與憑證，散播SocGholish惡意軟體",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-07-03"] = [
     ]
   },
   {
-    id: "20260703-002",
+    id: "20260703-2953",
     trackers: ["security"],
     category: "重大事件",
     title: "PChome旗下拍付國際遭駭傳竊取350萬用戶個資，數發部啟動行政檢查",
@@ -30,7 +30,7 @@ window.TRACKER_DAYS["2026-07-03"] = [
     ]
   },
   {
-    id: "20260703-003",
+    id: "20260703-3142",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Debian 發布 DSA-6376-1：修補 OpenSSH 服務中的心臟病變漏洞",
@@ -44,7 +44,7 @@ window.TRACKER_DAYS["2026-07-03"] = [
     ]
   },
   {
-    id: "20260703-004",
+    id: "20260703-3145",
     trackers: ["os", "security"],
     category: "Linux",
     title: "GNU Guix 宣布多項漏洞：Guix Substitute 與 Guix Pull 存在遠端權限提升與檔案覆寫風險",
@@ -58,7 +58,7 @@ window.TRACKER_DAYS["2026-07-03"] = [
     ]
   },
   {
-    id: "20260703-005",
+    id: "20260703-3146",
     trackers: ["os"],
     category: "Linux",
     title: "深入探討負向目錄條目（Negative Dentries）的檔案系統問題，提升 Linux 儲存與檔案系統的穩定性",
@@ -72,7 +72,7 @@ window.TRACKER_DAYS["2026-07-03"] = [
     ]
   },
   {
-    id: "20260703-006",
+    id: "20260703-3147",
     trackers: ["os"],
     category: "Linux",
     title: "多主流 Linux 發行版發布安全更新：涵蓋核心、資料庫與應用程式元件修補",
@@ -86,7 +86,7 @@ window.TRACKER_DAYS["2026-07-03"] = [
     ]
   },
   {
-    id: "20260703-007",
+    id: "20260703-3172",
     trackers: ["os"],
     category: "Linux",
     title: "GNOME 51 Alpha 版發布：提升桌面體驗與功能性，包含離線地圖及硬體加速支援",
@@ -100,7 +100,7 @@ window.TRACKER_DAYS["2026-07-03"] = [
     ]
   },
   {
-    id: "20260703-008",
+    id: "20260703-3173",
     trackers: ["os"],
     category: "Linux",
     title: "UPower 1.91.3 修復電池充電模式預設值，避免誤觸「快速充電」導致筆電電池壽命衰退",
@@ -114,7 +114,7 @@ window.TRACKER_DAYS["2026-07-03"] = [
     ]
   },
   {
-    id: "20260703-009",
+    id: "20260703-3176",
     trackers: ["os"],
     category: "Linux",
     title: "Rust Coreutils cp 命令在處理 -L 參數時出錯，導致 Ubuntu 映像建置失敗，暫時回歸使用 GNU Coreutils",
@@ -128,7 +128,7 @@ window.TRACKER_DAYS["2026-07-03"] = [
     ]
   },
   {
-    id: "20260703-010",
+    id: "20260703-3177",
     trackers: ["os"],
     category: "Linux",
     title: "Intel 為 Linux 7.3 準備 Nova Lake 顯示支援：啟用 CMTG 與 DC3CO 低功耗功能",
@@ -142,7 +142,7 @@ window.TRACKER_DAYS["2026-07-03"] = [
     ]
   },
   {
-    id: "20260703-011",
+    id: "20260703-3178",
     trackers: ["os"],
     category: "Linux",
     title: "NVIDIA 為 Vera Rubin VR-NVL 伺服器平台上游化 BMC Device Tree，支援 OpenBMC 韌體",
@@ -156,7 +156,7 @@ window.TRACKER_DAYS["2026-07-03"] = [
     ]
   },
   {
-    id: "20260703-012",
+    id: "20260703-3179",
     trackers: ["os", "security"],
     category: "Linux",
     title: "Linux 核心強化 BPF 程式碼，修補 JIT 噴灑攻擊與 Spectre-v2 相關漏洞",
@@ -170,7 +170,7 @@ window.TRACKER_DAYS["2026-07-03"] = [
     ]
   },
   {
-    id: "20260703-013",
+    id: "20260703-3180",
     trackers: ["os"],
     category: "Linux",
     title: "Linux 核心計畫淘汰 32 位元 MSR 介面，改用 64 位元指令優化 x86 程式碼",
@@ -184,7 +184,7 @@ window.TRACKER_DAYS["2026-07-03"] = [
     ]
   },
   {
-    id: "20260703-014",
+    id: "20260703-2959",
     trackers: ["security"],
     category: "法規與標準",
     title: "歐洲央行論壇警示：AI加速金融交易與資安風險，央行需調整監理工具",
@@ -198,7 +198,7 @@ window.TRACKER_DAYS["2026-07-03"] = [
     ]
   },
   {
-    id: "20260703-015",
+    id: "20260703-2928",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "中國LLMs模型提升漏洞發現能力，專家警告防禦方需加強架構理解與修補",
@@ -212,7 +212,7 @@ window.TRACKER_DAYS["2026-07-03"] = [
     ]
   },
   {
-    id: "20260703-016",
+    id: "20260703-2945",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "資安專家警示「Zero Day Clock」：漏洞利用窗口急縮至數小時，企業防禦壓力極大",
@@ -226,7 +226,7 @@ window.TRACKER_DAYS["2026-07-03"] = [
     ]
   },
   {
-    id: "20260703-017",
+    id: "20260703-2946",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "跨國釣魚攻擊鎖定中小企業：駭客冒用國際刑警組織名義部署勒索軟體",
@@ -240,7 +240,7 @@ window.TRACKER_DAYS["2026-07-03"] = [
     ]
   },
   {
-    id: "20260703-018",
+    id: "20260703-2948",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Microsoft 雲端郵件 Exchange Online 權限提升漏洞 CVE-2026-54998 已修補，防範未授權資料存取",
@@ -254,7 +254,7 @@ window.TRACKER_DAYS["2026-07-03"] = [
     ]
   },
   {
-    id: "20260703-019",
+    id: "20260703-2950",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "駭客利用Azure CLI與ROPC機制攻擊M365帳號：Huntress揭露8,100萬次登入嘗試",
@@ -268,7 +268,7 @@ window.TRACKER_DAYS["2026-07-03"] = [
     ]
   },
   {
-    id: "20260703-020",
+    id: "20260703-2951",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "思科Unified CM重大漏洞CVE-2026-20230已遭積極利用，建議用戶立即升級修補",
@@ -282,7 +282,7 @@ window.TRACKER_DAYS["2026-07-03"] = [
     ]
   },
   {
-    id: "20260703-021",
+    id: "20260703-2952",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "執法行動 Operation Endgame 揭露竊資軟體 StealC 基礎設施漏洞，協助中斷犯罪活動",
@@ -296,7 +296,7 @@ window.TRACKER_DAYS["2026-07-03"] = [
     ]
   },
   {
-    id: "20260703-022",
+    id: "20260703-2954",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Citrix NetScaler 漏洞遭迅速濫用：CVE-2026-8451 具備高嚴重性，建議立即修補",
@@ -310,7 +310,7 @@ window.TRACKER_DAYS["2026-07-03"] = [
     ]
   },
   {
-    id: "20260703-023",
+    id: "20260703-2955",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "遠端管理工具 SimpleHelp 曝露 CVSS 10 分漏洞 CVE-2026-48558，CISA 警告已遭駭客利用",
@@ -324,7 +324,7 @@ window.TRACKER_DAYS["2026-07-03"] = [
     ]
   },
   {
-    id: "20260703-024",
+    id: "20260703-2957",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Apache Tomcat 修補 6 個漏洞：包含憑證驗證與組態檔邏輯錯誤，建議升級至指定版本",
@@ -338,7 +338,7 @@ window.TRACKER_DAYS["2026-07-03"] = [
     ]
   },
   {
-    id: "20260703-025",
+    id: "20260703-2958",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "勒索軟體利用 CitrixBleed 2 (CVE-2025-5777) 威脅，駭客透過 RaaS 滲透高價值基礎設施",
@@ -352,7 +352,7 @@ window.TRACKER_DAYS["2026-07-03"] = [
     ]
   },
   {
-    id: "20260703-026",
+    id: "20260703-2960",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Langflow 遭 RCE 漏洞攻擊：駭客利用 CVE-2026-33017 竊取挖礦程式",
@@ -366,7 +366,7 @@ window.TRACKER_DAYS["2026-07-03"] = [
     ]
   },
   {
-    id: "20260703-027",
+    id: "20260703-2961",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "IBM修補Db2資料庫重大漏洞CVE-2026-10109：遠端執行程式碼風險，建議升級至最新累積版本",
@@ -380,7 +380,7 @@ window.TRACKER_DAYS["2026-07-03"] = [
     ]
   },
   {
-    id: "20260703-028",
+    id: "20260703-2962",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "Talos揭露ARToken釣魚平臺：攻擊者濫用裝置碼流程竊取Microsoft 365權杖，威脅發動BEC",
@@ -394,7 +394,7 @@ window.TRACKER_DAYS["2026-07-03"] = [
     ]
   },
   {
-    id: "20260703-029",
+    id: "20260703-2977",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "資安警示：FatFs檔案系統庫曝七大漏洞，物理存取可導致嵌入式設備程式碼執行",
@@ -408,7 +408,7 @@ window.TRACKER_DAYS["2026-07-03"] = [
     ]
   },
   {
-    id: "20260703-030",
+    id: "20260703-2978",
     trackers: ["os", "security"],
     category: "漏洞與威脅情報",
     title: "Bad Epoll Linux 核心漏洞（CVE-2026-46242）允許普通用戶升級為 Root，影響桌面與 Android",
@@ -422,7 +422,7 @@ window.TRACKER_DAYS["2026-07-03"] = [
     ]
   },
   {
-    id: "20260703-031",
+    id: "20260703-2979",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "研究發現新型模組化惡意框架 Avalon：透過釣魚郵件與 ISO 偽裝進行多階段攻擊",
@@ -436,7 +436,7 @@ window.TRACKER_DAYS["2026-07-03"] = [
     ]
   },
   {
-    id: "20260703-032",
+    id: "20260703-2981",
     trackers: ["security"],
     category: "漏洞與威脅情報",
     title: "資安分析揭露「Armored Likho」駭客群：鎖定政府與電網，利用開源工具進行深度滲透",
@@ -450,7 +450,7 @@ window.TRACKER_DAYS["2026-07-03"] = [
     ]
   },
   {
-    id: "20260703-033",
+    id: "20260703-2982",
     trackers: ["os", "security"],
     category: "漏洞與威脅情報",
     title: "前歐議委員受襲：Citizen Lab揭露Pegasus間諜軟體攻擊，揭示歐盟監管漏洞",
@@ -464,7 +464,7 @@ window.TRACKER_DAYS["2026-07-03"] = [
     ]
   },
   {
-    id: "20260703-034",
+    id: "20260703-2983",
     trackers: ["os", "security"],
     category: "漏洞與威脅情報",
     title: "新 macOS 資訊竊取工具 PamStealer：偽裝 Maccy 剪貼簿管理器，透過 PAM 竊取登入密碼",
@@ -478,7 +478,7 @@ window.TRACKER_DAYS["2026-07-03"] = [
     ]
   },
   {
-    id: "20260703-035",
+    id: "20260703-3061",
     trackers: ["os"],
     category: "Apple",
     title: "Apple 評測 iPad 系列：分析基礎、Air、Pro 與 mini 四款機型定位與建議",
@@ -492,7 +492,7 @@ window.TRACKER_DAYS["2026-07-03"] = [
     ]
   },
   {
-    id: "20260703-036",
+    id: "20260703-3062",
     trackers: ["os"],
     category: "Apple",
     title: "Apple Home 生態系統缺乏權限轉移機制，影響用戶在新居或搬家時的智能家居設備管理",
@@ -506,7 +506,7 @@ window.TRACKER_DAYS["2026-07-03"] = [
     ]
   },
   {
-    id: "20260703-037",
+    id: "20260703-3065",
     trackers: ["os"],
     category: "Apple",
     title: "前蘋果員工官司最新進展：Prosser駁斥共謀竊取「Liquid Glass」秘密，指責對方資訊來源不當",
@@ -520,7 +520,7 @@ window.TRACKER_DAYS["2026-07-03"] = [
     ]
   },
   {
-    id: "20260703-038",
+    id: "20260703-2949",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "FBI警示：駭客TeamPCP大規模竄改開發工具，透過軟體供應鏈植入惡意程式碼",
@@ -534,7 +534,7 @@ window.TRACKER_DAYS["2026-07-03"] = [
     ]
   },
   {
-    id: "20260703-039",
+    id: "20260703-2956",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "加密貨幣預測市場 Polymarket 遭供應鏈攻擊，駭客植入惡意指令碼盜取用戶資產",
@@ -548,7 +548,7 @@ window.TRACKER_DAYS["2026-07-03"] = [
     ]
   },
   {
-    id: "20260703-040",
+    id: "20260703-2980",
     trackers: ["security"],
     category: "供應鏈與開源安全",
     title: "北韓資安威脅：惡意 npm 套件模仿 Rollup 工具，竊取開發者工作站與 CI/CD 憑證",
@@ -562,7 +562,7 @@ window.TRACKER_DAYS["2026-07-03"] = [
     ]
   },
   {
-    id: "20260703-041",
+    id: "20260703-3019",
     trackers: ["os"],
     category: "Android",
     title: "Pixel 11 系列預測：外觀設計維持傳統，重點關注 AI 整合與晶片架構的演進",
@@ -576,7 +576,7 @@ window.TRACKER_DAYS["2026-07-03"] = [
     ]
   },
   {
-    id: "20260703-042",
+    id: "20260703-3021",
     trackers: ["os"],
     category: "Android",
     title: "Gemini 在 Android Auto 上持續發言問題：用戶手動操作後仍無法停止語音回饋",
@@ -590,7 +590,7 @@ window.TRACKER_DAYS["2026-07-03"] = [
     ]
   },
   {
-    id: "20260703-043",
+    id: "20260703-3022",
     trackers: ["os"],
     category: "Android",
     title: "Google Wallet 整合 Wear OS 支付紀錄，提升智慧穿戴裝置交易追蹤便利性",
@@ -604,7 +604,7 @@ window.TRACKER_DAYS["2026-07-03"] = [
     ]
   },
   {
-    id: "20260703-044",
+    id: "20260703-3024",
     trackers: ["os"],
     category: "Android",
     title: "OxygenOS 與 Realme UI 傳將停用，OnePlus 設備將全面整合至 ColorOS 平台",
@@ -618,7 +618,7 @@ window.TRACKER_DAYS["2026-07-03"] = [
     ]
   },
   {
-    id: "20260703-045",
+    id: "20260703-3026",
     trackers: ["os"],
     category: "Android",
     title: "Google Wallet for Android 在美國推出線上訂單追蹤功能，整合 Gmail 資訊",
@@ -632,7 +632,7 @@ window.TRACKER_DAYS["2026-07-03"] = [
     ]
   },
   {
-    id: "20260703-046",
+    id: "20260703-3370",
     trackers: ["os", "security"],
     category: "Android",
     title: "ASUS Router App 存在 Android 組件匯出不當漏洞 (CVE-2026-12960)",
@@ -646,7 +646,7 @@ window.TRACKER_DAYS["2026-07-03"] = [
     ]
   },
   {
-    id: "20260703-047",
+    id: "20260703-3371",
     trackers: ["os", "security"],
     category: "Android",
     title: "Android版Microsoft Edge曝CVE-2026-58296：透過網路洩露個人私密資訊",
@@ -660,7 +660,7 @@ window.TRACKER_DAYS["2026-07-03"] = [
     ]
   },
   {
-    id: "20260703-048",
+    id: "20260703-3372",
     trackers: ["os", "security"],
     category: "Android",
     title: "Android版Microsoft Edge曝CVE-2026-58297：允許未授權攻擊者竊取個人資訊",
@@ -674,7 +674,7 @@ window.TRACKER_DAYS["2026-07-03"] = [
     ]
   },
   {
-    id: "20260703-049",
+    id: "20260703-3373",
     trackers: ["os", "security"],
     category: "Android",
     title: "Microsoft Edge for Android 存在 TOCTOU 競態條件漏洞，允許遠端程式碼執行",
@@ -688,7 +688,7 @@ window.TRACKER_DAYS["2026-07-03"] = [
     ]
   },
   {
-    id: "20260703-050",
+    id: "20260703-3374",
     trackers: ["os", "security"],
     category: "Android",
     title: "Microsoft Edge for Android 存在路徑遍歷漏洞 (CVE-2026-58300)，可能導致本地資訊洩露",
@@ -702,7 +702,7 @@ window.TRACKER_DAYS["2026-07-03"] = [
     ]
   },
   {
-    id: "20260703-051",
+    id: "20260703-3375",
     trackers: ["os", "security"],
     category: "Android",
     title: "Microsoft Edge for Android 存在路徑穿越漏洞 (CVE-2026-58522)，可能導致本地資訊洩露",
@@ -716,7 +716,7 @@ window.TRACKER_DAYS["2026-07-03"] = [
     ]
   },
   {
-    id: "20260703-052",
+    id: "20260703-3376",
     trackers: ["os", "security"],
     category: "Android",
     title: "Android版Microsoft Edge存在越權存取漏洞：可透過網路繞過安全功能",
@@ -730,7 +730,7 @@ window.TRACKER_DAYS["2026-07-03"] = [
     ]
   },
   {
-    id: "20260703-053",
+    id: "20260703-2963",
     trackers: ["security"],
     category: "前瞻技術",
     title: "AI驅動的勒索軟體攻擊：駭客團體JadePuffer利用LLM與CVE-2025-3248進行全自動入侵",
@@ -744,7 +744,7 @@ window.TRACKER_DAYS["2026-07-03"] = [
     ]
   },
   {
-    id: "20260703-054",
+    id: "20260703-2964",
     trackers: ["security"],
     category: "前瞻技術",
     title: "AI輔助開發加速軟體變更，資安報告警告傳統滲透測試難以掌握生產環境即時風險",
@@ -758,7 +758,7 @@ window.TRACKER_DAYS["2026-07-03"] = [
     ]
   },
   {
-    id: "20260703-055",
+    id: "20260703-2974",
     trackers: ["security"],
     category: "前瞻技術",
     title: "Red Hat OpenShift 4.22 推出 BackendTLSPolicy，強化 Gateway API 後端流量的端到端加密安全",
@@ -772,7 +772,7 @@ window.TRACKER_DAYS["2026-07-03"] = [
     ]
   },
   {
-    id: "20260703-056",
+    id: "20260703-3020",
     trackers: ["os"],
     category: "重點關注",
     title: "探討 2026 年實體 QWERTY 鍵盤手機市場：Unihertz Titan Elite 2 與 Clicks Power Keyboard 評測",
@@ -786,7 +786,7 @@ window.TRACKER_DAYS["2026-07-03"] = [
     ]
   },
   {
-    id: "20260703-057",
+    id: "20260703-3066",
     trackers: ["os"],
     category: "重點關注",
     title: "Apple TV 獨家串流《Silo》第三季：揭開地下避難所的起源與謎團",
@@ -800,7 +800,7 @@ window.TRACKER_DAYS["2026-07-03"] = [
     ]
   },
   {
-    id: "20260703-058",
+    id: "20260703-3122",
     trackers: ["os"],
     category: "重點關注",
     title: "無",
@@ -814,7 +814,7 @@ window.TRACKER_DAYS["2026-07-03"] = [
     ]
   },
   {
-    id: "20260703-059",
+    id: "20260703-3126",
     trackers: ["os"],
     category: "重點關注",
     title: "無資安資訊：回顧《Wing Commander IV》與 90 年代遊戲產業的發展趨勢",
@@ -828,7 +828,7 @@ window.TRACKER_DAYS["2026-07-03"] = [
     ]
   },
   {
-    id: "20260703-060",
+    id: "20260703-3174",
     trackers: ["os"],
     category: "重點關注",
     title: "Vulkan 1.4.356 發布：新增支援 OCP Microscaling MX 格式，加速機器學習運算",
@@ -842,7 +842,7 @@ window.TRACKER_DAYS["2026-07-03"] = [
     ]
   },
   {
-    id: "20260703-061",
+    id: "20260703-3175",
     trackers: ["os"],
     category: "重點關注",
     title: "Coreboot與AMD openSIL在MSI Ryzen主機板上成功支援Windows 11，開拓開源韌體生態",
@@ -856,7 +856,7 @@ window.TRACKER_DAYS["2026-07-03"] = [
     ]
   },
   {
-    id: "20260703-062",
+    id: "20260703-3181",
     trackers: ["os"],
     category: "重點關注",
     title: "ReactOS 專案實現首個 Windows NT6 系統呼叫，邁向 Vista 相容性里程碑",
@@ -870,7 +870,7 @@ window.TRACKER_DAYS["2026-07-03"] = [
     ]
   },
   {
-    id: "20260703-063",
+    id: "20260703-3193",
     trackers: ["os"],
     category: "重點關注",
     title: "Psion創始人David Potter逝世：回顧掌舵早期個人電腦與手持設備的技術歷程",
@@ -884,7 +884,7 @@ window.TRACKER_DAYS["2026-07-03"] = [
     ]
   },
   {
-    id: "20260703-064",
+    id: "20260703-3195",
     trackers: ["os", "security"],
     category: "重點關注",
     title: "Adapthealth遭駭客入侵：病患健康資料與密碼遭竊，資安警示加劇",
@@ -898,7 +898,7 @@ window.TRACKER_DAYS["2026-07-03"] = [
     ]
   },
   {
-    id: "20260703-065",
+    id: "20260703-3196",
     trackers: ["os"],
     category: "重點關注",
     title: "3D 列印核能反應爐模組：新創公司目標資料中心，引發能源與基礎設施安全疑慮",
@@ -912,7 +912,7 @@ window.TRACKER_DAYS["2026-07-03"] = [
     ]
   },
   {
-    id: "20260703-066",
+    id: "20260703-3197",
     trackers: ["os"],
     category: "重點關注",
     title: "NetNut 網路設備被破解：Google 與 FBI 鎖定價值兩百萬台設備的殭屍網路",
@@ -926,7 +926,7 @@ window.TRACKER_DAYS["2026-07-03"] = [
     ]
   },
   {
-    id: "20260703-067",
+    id: "20260703-3201",
     trackers: ["os", "security"],
     category: "重點關注",
     title: "駭客入侵個人電腦，用戶指控駭客行為如同「一般失敗」，事件揭露個人資安防護盲點",
@@ -940,7 +940,7 @@ window.TRACKER_DAYS["2026-07-03"] = [
     ]
   },
   {
-    id: "20260703-068",
+    id: "20260703-3245",
     trackers: ["os"],
     category: "重點關注",
     title: "GitHub發起CD-ROM服務，讓開發者可將公開程式碼燒錄成實體光碟，引發業界討論",

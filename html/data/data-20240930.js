@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2024-09-30"] = [
   {
-    id: "20240930-001",
+    id: "20240930-215",
     trackers: ["eu_cra"],
     category: "合規指引",
     title: "ENISA發布網路事件應對指引：強調即時通報與專業協助的重要性",

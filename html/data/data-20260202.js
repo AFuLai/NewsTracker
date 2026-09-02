@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-02-02"] = [
   {
-    id: "20260202-001",
+    id: "20260202-446",
     trackers: ["security"],
     category: "前瞻技術",
     title: "AI時代的網路攻擊趨勢：從「灑網式」轉向「狙擊式」的精準化威脅",
@@ -16,7 +16,7 @@ window.TRACKER_DAYS["2026-02-02"] = [
     ]
   },
   {
-    id: "20260202-002",
+    id: "20260202-5802",
     trackers: ["eu_cra", "security"],
     category: "研討活動",
     title: "TELEMETRY專案推動跨領域IoT資安韌性：提供全生命週期監控與漏洞檢測框架",

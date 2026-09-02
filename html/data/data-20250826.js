@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2025-08-26"] = [
   {
-    id: "20250826-001",
+    id: "20250826-5926",
     trackers: ["eu_cra", "security"],
     category: "產業動態",
     title: "歐盟啟動網路網路安全備援機制：設立「網路安全團結儲備」，強化應對大規模網路事件",

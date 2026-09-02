@@ -2,7 +2,7 @@
 window.TRACKER_DAYS = window.TRACKER_DAYS || {};
 window.TRACKER_DAYS["2026-02-11"] = [
   {
-    id: "20260211-001",
+    id: "20260211-1345",
     trackers: ["os", "security"],
     category: "Apple",
     title: "Apple 宣布修補 CVE-2026-20700：多平台記憶體溢位漏洞，警示已遭利用",
