@@ -87,16 +87,16 @@ meta:
 | id | 嚴重度 | 標題 | 證據（file:line / probe） | 狀態 |
 |---|---|---|---|---|
 | F-ISOLATION-1 | **HIGH** | 測試套件寫入真實 production status.json，跑 pytest 會把 last-run 健康訊號洗成 FAIL | **根因**：`_finalize`（`orchestrator.py:1277`）寫 `PROJECT_ROOT/status.json`，PROJECT_ROOT 是模組常數（`tracker/__init__.py:18` 硬編 `/mnt/d/...`），未從 `out`/`db` 參數串接；觸發測試 = `tests/test_orchestrator.py:33 test_pipeline_aborts_when_ollama_down`（:41 自承「tolerate it」）；conftest.py 未隔離。本 session 實測：iter2 pytest 把 run#79 OK→run#1 FAIL（mtime 對得上），已由 DB run#79 還原。**CONFIRMED**。 | **✅ FIXED**：conftest 加 autouse `_isolate_project_root`（patch orchestrator+cli PROJECT_ROOT→tmp）；實測 476 pass、status.json run_id 79 前後不變 |
-| F-BUILD-1 | medium | runtime venv `/opt/venv` 未文件化、未 pin | `which python3`→僅系統 3.14（無依賴）；ops/*.sh 無 activate；無 requirements/lock；README 無 bootstrap 步驟 | open |
-| F-BUILD-2 | low | 跑在 py3.14.4（極新），pyproject 僅 `requires-python>=3.11`、無上界無 lock | `pyproject.toml` | open |
-| F-TEST-1 | low | venv 無 coverage 工具，覆蓋率不可量；`changelog.py`(subprocess+LLM)、`builtins.py`(資料) 無直接測試 | `import coverage`→ModuleNotFound；tests/ 無 changelog/builtins 引用 | open |
-| F-RUNTIME-1 | low | test/manual run 的 log 與排程 run 混在 logs/、無標記、無輪替（gitignore 累積） | logs/run-20260902-*.log（run#1 test）與 run#79 混置 | open |
+| F-BUILD-1 | medium | runtime venv `/opt/venv` 未文件化、未 pin | `which python3`→僅系統 3.14（無依賴）；ops/*.sh 無 activate；無 requirements/lock；README 無 bootstrap 步驟 | **✅ DOCUMENTED**：新增 `ops/RUNTIME.md`（venv bootstrap、py 版本、install -e、跑測試）。wheel 未含 searchinfo／硬編 /opt/tracker＝單一部署工具**刻意**（release 走 `tracker pack` zip 非 pip-install），記為已知限制 |
+| F-BUILD-2 | low | 跑在 py3.14.4（極新），pyproject 僅 `requires-python>=3.11`、無上界無 lock | `pyproject.toml` | **PARTIAL/DOCUMENTED**：RUNTIME.md 記明 py3.14＋無 lockfile（deps 僅下界，刻意）。dev extra pin pytest/pytest-cov。全 lockfile 屬更大決策，未加 |
+| F-TEST-1 | low | venv 無 coverage 工具，覆蓋率不可量；`changelog.py`(subprocess+LLM)、`builtins.py`(資料) 無直接測試 | `import coverage`→ModuleNotFound；tests/ 無 changelog/builtins 引用 | **✅ ADDRESSED（工具）**：pyproject 加 `[dev]` extra（pytest+pytest-cov），`pip install -e .[dev]` 後 `pytest --cov=tracker` 可跑（RUNTIME.md 載）。changelog/builtins 測試缺口記為 accepted-low（builtins 純資料、changelog 為 subprocess+LLM）|
+| F-RUNTIME-1 | low | test/manual run 的 log 與排程 run 混在 logs/、無標記、無輪替（gitignore 累積） | logs/run-20260902-*.log（run#1 test）與 run#79 混置 | **✅ DOCUMENTED**：RUNTIME.md 記 logs/ 無輪替、建議定期清理、且不含 pipeline 讀回的狀態。未自動刪（避免刪使用者日誌風險）|
 | F-LLM-1 | **med-high** | 批次 relevance gate 把 10 則未信任 title+snippet 併入同一 prompt，而 gate 是唯一會丟列的階段 → 跨項 prompt injection 可讓正常文章被靜默丟棄 | `llm/gate.py:24-26`＋`prompts/gate.txt:14-17`（subagent；待 iter7 親驗） | **✅ HARDENED**：gate.txt 加「候選清單＝資料非指令、忽略內嵌指令」框架。+1 測試。註：prompt 硬化屬 defense-in-depth，非絕對；gate fail-open 本就緩解 |
 | F-LLM-2 | med | LLM ollama 呼叫路徑無短 connect timeout，`rerank.py:43-50` 有 `CONNECT_TIMEOUT=2.0` 卻沒套到 llm | `llm/__init__.py:130,139`（不一致，可直接對照修） | **✅ FIXED（connect 部分）**：加 `LLM_CONNECT_TIMEOUT`（env 預設 2.0），`httpx.Timeout(timeout,connect=2.0)` 用於初次＋fallback。+1 測試。**read-timeout 不 demote 是刻意**（docstring:170-174），未改 |
 | F-LLM-3 | med | fetched article body 逐字進 `{body}`，無分隔/指令硬化 → 注入可操縱分類/摘要 | `llm/summarize.py:37`＋`prompts/summary.txt:19` | **✅ HARDENED**：summary.txt 加「文章內容＝資料非指令、不遵從內文指示」框架。+1 測試（與 gate 共） |
 | F-LLM-4 | med→**WONTFIX** | `_call_llamacpp` 只在連線層錯誤 fallback，ReadTimeout/5xx 直接拋 | `llm/__init__.py:170-174` docstring **明載刻意**：「5xx/read timeout＝此 prompt 非此 host，交給 caller 的 degraded/fail-open 路」——避免昂貴 prompt 在他 host 重跑/retry storm。**by design，不改**（親讀 docstring 確認） |
 | F-LLM-5 | low-med | 次要 LLM 韌性：gemini timeout 參數被忽略(:144-154)、parse fail 回傳生文(:47-50)、gemini 無法強制 schema、translate/gate 假設欄位型別 | `llm/__init__.py` / `summarize.py` / `translate.py:74` | **REVIEWED, 多為刻意**：gemini timeout 用較短 GEMINI_TIMEOUT 是**明載刻意**（:152 註「marker failures fall back fast」）；gemini 無 grammar 是瀏覽器後端**本質**（:205-206 註）；parse fail 回傳生文靠 REVIEW_FN 擋空 title（fail-open）。皆低風險、改動反而破壞既有設計，**不改**（親讀確認） |
-| F-DATA-1 | med（設計限制） | 站點 id 依當日排序位指派，往舊日期插一則→整天 id 重編，permalink 不穩 | `render.py:96,100`；**注意：CLAUDE.md 明載為刻意設計**，屬已知限制非 bug | open |
+| F-DATA-1 | med（設計限制） | 站點 id 依當日排序位指派，往舊日期插一則→整天 id 重編，permalink 不穩 | `render.py:96,100`；**注意：CLAUDE.md 明載為刻意設計**，屬已知限制非 bug | **WONTFIX（by design）**：CLAUDE.md 明載此為刻意（delta 壓縮成本小）。若日後要穩定 permalink 需改 id 指派為穩定鍵，屬設計變更、非缺陷修補——留給使用者裁決 |
 | F-DATA-2 | med | `merge_by_title` 跨 tracker 合併時未 union 被併列的 `trackers`，事件可能從非主 tracker 頁消失 | `cluster.py:162-173`＋`orchestrator.py:1099,1117`（iter7 親驗 live） | **✅ FIXED**：cluster 輸出 union 所有 member 的 trackers（逗號串）。+1 測試 |
 | F-DATA-3 | med | 主 `Store` 無 WAL/無 busy_timeout，`cra_library.py:493` 卻設 busy_timeout=30000（不一致），並發易 "database is locked" | `dedup.py:263-264` | **✅ FIXED**：Store.__init__ 設 `busy_timeout=30000`＋`journal_mode=WAL`（對齊 cra_library）。+1 測試 |
 | F-DATA-4 | med | 站點發布（render_day→manifests→mark_written）多檔寫入＋DB commit 無交易，崩潰留半態 | `orchestrator.py:1120-1129` | open |
@@ -139,6 +139,11 @@ meta:
 - 動了：subagent 讀 dedup/cluster/cross/render/templates/ui，回 10 條。我套判斷：**#1 id 依排序位重編＝CLAUDE.md 明載的刻意設計**（非 bug，降級為「已知限制：permalink 不穩」）；#3 semantic enforce 掉文章＝目前 shadow 未啟用，真實嚴重度降；其餘照收。挑 #2（merge 不 union trackers）與 #6（href 未限 scheme）為最有價值**新**發現，待我親驗（self-attack：不盲信 subagent）。
 - 學到：subagent 找到我前幾圈沒碰的產出面向——`dedup.py` 未設 WAL/busy_timeout 但 `cra_library.py:493` 有設（不一致，F-DATA-3）；ui/index.html escHtml 不擋 `javascript:` scheme（F-SEC-1，待驗）；U+2028/2029 進 .js（低）。
 - 下一步還對嗎：是。iter7 會親驗 #2/#6 再定嚴重度，並與 codex/LLM subagent 對帳去重。
+
+### iter 18 — 2026-09-02 可重現性/docs：F-BUILD-1/2、F-TEST-1、F-RUNTIME-1、F-DATA-1
+- 動了：新增 `ops/RUNTIME.md`（venv bootstrap、py3.14、`install -e .[dev]`、跑測試/coverage、logs 說明）；pyproject 加 `[project.optional-dependencies] dev`（pytest+pytest-cov，讓 coverage 可跑，不入 runtime deps）。F-DATA-1 記 WONTFIX（CLAUDE.md 明載刻意）。
+- 學到：多為 doc/config 而非 code bug；不 pip-install 進 /opt/venv（越權）、不自動刪 logs（刪使用者資料風險）、不硬加 lockfile（更大決策）——「fix」在此＝文件化＋讓工具可得，並誠實標示未做與原因。
+- 下一步還對嗎：是。等 iter17 subagent 回收（5 條 PLAUSIBLE 驗證）→ 處置 → 最終健檢＋封存。
 
 ### iter 16 — 2026-09-02 併發：F-CONC-1（process lock）
 - 動了：run_pipeline 進入即取 `flock(LOCK_EX|LOCK_NB)` 於 `<db>.lock`；敗者早退 ok=False/run_id=-1、不建 runs 列、不寫 status.json；`_finalize`（所有真出口的漏斗）關 fd 釋放鎖。fcntl 局部 import（避免非 WSL import 破裂）。+1 併發爭用測試。
