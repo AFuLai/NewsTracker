@@ -104,12 +104,16 @@ def render_day(*, day: str, rows: list[dict], out_dir: Path,
                        r.get("id", 0)),
     )
     items = []
+    day8 = day.replace('-', '')
     for i, r in enumerate(sorted_rows, 1):
         tags_en = r.get("tags_en")
         if isinstance(tags_en, str):
             tags_en = [t for t in tags_en.split(",") if t]
         items.append({
-            "id": f"{day.replace('-', '')}-{i:03d}",
+            # Stable permalink id: the article's DB id, not its sorted position
+            # (F-DATA-1). Inserting an older-dated item no longer renumbers the
+            # rest of the day. Falls back to position for rows with no DB id.
+            "id": f"{day8}-{r['id']}" if r.get("id") is not None else f"{day8}-{i:03d}",
             "trackers": _trackers_of(r),
             "category": r.get("category") or "uncategorized",
             "title": r.get("title") or "",

@@ -96,6 +96,39 @@ def test_cross_cleanup_rerenders_demoted_days(monkeypatch, tmp_path):
     assert calls.get("dates") == ["2026-06-01"]
 
 
+def test_undated_items_capped_per_source(monkeypatch, tmp_path):
+    # C-DATEFLOOD: a source dumping many undated items in one run is capped, so
+    # a dateless archive backlog is not all published under today's date.
+    import logging
+    from datetime import date
+    from tracker.dedup import Store
+    from tracker.progress import NullReporter
+    from tracker.fetchers import Candidate, DateWindow, FetchResult
+    from tracker.orchestrator import _phase_fetch
+
+    monkeypatch.setenv("TRACKER_UNDATED_CAP", "8")
+
+    class _FloodFetcher:
+        def fetch(self, profile, window):
+            return FetchResult(items=[
+                Candidate(url=f"https://flood.example/{i}", title=f"item {i}",
+                          published=None, content_hash=f"h{i}")
+                for i in range(20)])
+
+    monkeypatch.setattr(orch, "get_fetcher", lambda method: _FloodFetcher())
+    store = Store(tmp_path / "t.sqlite")
+    store.upsert_profile(domain="flood.example", name="Flood",
+                         method="FEED", trackers="security", accept_all=True)
+    rep = RunReport(run_id=1, since="2026-06-01", until="2026-06-30",
+                    trackers=["security"])
+    window = DateWindow(date(2026, 6, 1), date(2026, 6, 30))
+    _phase_fetch(store, window, ["security"], rep,
+                 logging.getLogger("t"), 2, NullReporter())
+    n = store.conn.execute(
+        "SELECT COUNT(*) FROM articles WHERE source='Flood'").fetchone()[0]
+    assert n == 8, f"expected undated cap 8, got {n}"
+
+
 def test_dedupe_pending_across_trackers_keeps_id_once():
     # C-DBLSUM: a row tagged for two trackers appears in both pending lists;
     # it must be summarized once (under the first tracker), not clobbered.

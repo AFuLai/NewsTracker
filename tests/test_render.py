@@ -1,5 +1,20 @@
 """Render helpers: JSON emitted into data-YYYYMMDD.js must be valid JS."""
-from tracker.render import _tojson_unicode
+from tracker.render import _tojson_unicode, render_day
+
+
+def test_render_day_id_is_stable_db_id(tmp_path):
+    # F-DATA-1: the site id is the article's DB id, not its sorted position, so
+    # inserting an older-dated item does not renumber the rest of the day.
+    rows = [
+        {"id": 4207, "title": "T1", "summary": "S1", "category": "x",
+         "date": "2026-06-01", "trackers": "security"},
+        {"id": 88, "title": "T2", "summary": "S2", "category": "x",
+         "date": "2026-06-01", "trackers": "security"},
+    ]
+    render_day(day="2026-06-01", rows=rows, out_dir=tmp_path)
+    js = (tmp_path / "data-20260601.js").read_text(encoding="utf-8")
+    assert "20260601-4207" in js and "20260601-88" in js
+    assert "20260601-001" not in js  # not position-based any more
 
 
 def test_tojson_escapes_js_line_separators():

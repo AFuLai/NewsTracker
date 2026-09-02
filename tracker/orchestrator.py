@@ -503,6 +503,15 @@ def _phase_fetch(store, window, trackers, rep, log, concurrency, rpt, browser_ba
     # content_hash column that dedup.py documents for republish detection.
     revision_detect = os.environ.get("TRACKER_REVISION_DETECT", "").strip().lower() \
         in ("1", "true", "yes", "on", "enforce")
+    # C-DATEFLOOD: cap how many undated items one source may contribute per run.
+    # An undated item is dated with its discovery date (today) so it is not
+    # invisible; a first crawl of a large dateless archive would otherwise dump
+    # its whole backlog under today. Feeds are newest-first, so the first N kept
+    # are the freshest and the rest are treated as an archive dump.
+    try:
+        undated_cap = int(os.environ.get("TRACKER_UNDATED_CAP", "8"))
+    except ValueError:
+        undated_cap = 8
     for tname in trackers:
         info = load_tracker(tname)
         keys = [k.text for k in info.keys]
@@ -589,6 +598,7 @@ def _phase_fetch(store, window, trackers, rep, log, concurrency, rpt, browser_ba
                 except Exception as exc:
                     log.debug("[%s] %s wayback failed: %s", tname, domain, exc)
             new_for_source = 0
+            undated_kept = 0
             newest = row["last_seen_utc"] or ""
             for c in items:
                 from .dedup import url_hash
@@ -600,6 +610,11 @@ def _phase_fetch(store, window, trackers, rep, log, concurrency, rpt, browser_ba
                         seen_this_run.add(h)
                         log.info("re-queued changed content (C-REVDET): %s", c.url)
                     continue
+                # C-DATEFLOOD archive-dump guard: skip undated items past the cap.
+                if not c.published:
+                    if undated_kept >= undated_cap:
+                        continue
+                    undated_kept += 1
                 seen_this_run.add(h)
                 pending_new.append({
                     "url": c.url, "source": row["name"], "title": c.title,

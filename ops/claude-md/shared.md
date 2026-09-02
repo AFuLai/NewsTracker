@@ -25,7 +25,7 @@ repo 放 ext4 而非 `/mnt/d` 是刻意的：檔案數多、常跑 `git status` 
 - `/opt/tracker/html/` 是產生的靜態站（`index.html` ＋ `data/data-YYYYMMDD.js`），**已納入版控**（2026-08-05 起）。
 - 同時在 `.gitattributes` 標了 `html/ export-ignore`：`tracker pack` 用 `git archive` 出的發行 zip **只含引擎、不含產出**。少了這行 zip 會從 ~180 KB 膨脹到 ~5.3 MB。
 - `html/*.bak` 仍在 `.gitignore` 內。
-- 日檔的 `id` 由 `tracker/render.py` 依**排序後的序位**指派（`f"{day}-{i:03d}"`）。往舊日期插一則就會讓其後全部重新編號，該檔整份重寫——diff 行數會遠大於實際異動，但 delta 壓縮後位元組成本很小。
+- 日檔的 `id` 由 `tracker/render.py` 依文章的**穩定 DB id** 指派（`f"{day8}-{id}"`，F-DATA-1）：往舊日期插一則**不會**重編其後各項，permalink 穩定。（2026-09-02 前為排序序位 `f"{day}-{i:03d}"`，插舊日期會整天重編——已改；改動當下需全站 rebuild 一次，之後永久穩定。）
 
 ## 本檔怎麼跨機（憲法附錄 A.3）
 
