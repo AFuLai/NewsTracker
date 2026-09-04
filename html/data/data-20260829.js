@@ -114,6 +114,20 @@ window.TRACKER_DAYS["2026-08-29"] = [
     ]
   },
   {
+    id: "20260829-10775",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心漏洞：GRO 聚合機制允許非 IP 流量及越界寫入，影響舊版核心穩定性",
+    summary: "本漏洞存在於 Linux 核心的網路聚合（GRO）機制中，特別是在處理 BIG TCP 聚合時。當 GRO 嘗試聚合超過 GRO_LEGACY_MAX_SIZE (64KB) 的封包時，原本應嚴格限制為純 IPv4 或純 IPv6 TCP 流量。然而，由於 commit b1a78b9b9886 的修改，導致 skb_gro_receive() 的檢查過於寬鬆，造成三個主要問題：首先，檢查空間時使用 skb_headroom(p) 而非實際 MAC header 空間，使得透過 AF_PACKET 等方式注入的惡意封包可以通過檢查，進而導致 ipv6_gro_complete() 執行時發生記憶體越界寫入（out-of-bounds write），並覆寫 skb->mac_header。其次，它允許非 IP 協定（如軟體 VLAN）超過 64KB 進行聚合。最後，它允許了複雜的封裝流量（如 SIT / IPv6-in-IPv4）超過 64KB 聚合。修復建議是嚴格限制聚合條件，確保流量為 IPPROTO_TCP，且非封裝，並在 IPv6 的情況下檢查 MAC header 空間是否足夠。此問題主要影響舊版穩定分支（如 6.18.y），而 mainline 核心（7.0+）已透過重寫子系統進行修復，因此風險較低。",
+    tags: ["Linux 核心", "GRO", "BIG TCP", "skb_gro_receive", "CVE-2026-80725", "網路堆疊"],
+    title_en: "Linux Kernel Vulnerability: GRO Aggregation Mechanism Allows Non-IP Traffic and Out-of-Bounds Write, Affecting Older Kernel Stability",
+    summary_en: "This vulnerability resides in the Linux kernel's network aggregation (GRO) mechanism, specifically when handling BIG TCP aggregation. When GRO attempts to aggregate packets exceeding GRO_LEGACY_MAX_SIZE (64KB), the traffic should be strictly limited to pure IPv4 or pure IPv6 TCP traffic. However, due to modifications in commit b1a78b9b9886, the checks within skb_gro_receive() are overly permissive, leading to three main issues: First, the check uses skb_headroom(p) instead of the actual MAC header space, allowing malicious packets injected via methods like AF_PACKET to pass the check. This subsequently causes an out-of-bounds write during ipv6_gro_complete(), overwriting skb->mac_header. Second, it allows non-IP protocols (such as software VLANs) to aggregate beyond 64KB. Finally, it permits complex encapsulated traffic (such as SIT / IPv6-in-IPv4) to aggregate beyond 64KB. The suggested fix is to strictly limit aggregation conditions, ensuring the traffic is IPPROTO_TCP and non-encapsulated, and to check if sufficient MAC header space is available in the IPv6 case. This issue primarily affects older stable branches (such as 6.18.y), while the mainline kernel (7.0+) has addressed it by rewriting the subsystem, making the risk lower.",
+    tags_en: ["Linux Kernel", "GRO", "BIG TCP", "skb_gro_receive", "CVE-2026-80725", "Network Stack"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-80725", lang: "EN" }
+    ]
+  },
+  {
     id: "20260829-9999",
     trackers: ["security"],
     category: "法規與標準",

@@ -3,9 +3,10 @@ window.TRACKER_MONTH = window.TRACKER_MONTH || {};
 window.TRACKER_MONTH["os"] = window.TRACKER_MONTH["os"] || {};
 window.TRACKER_MONTH["os"]["2026-09"] = {
   dates: [
-    { date: "2026-09-02", file: "../data-20260902.js", count: 13 },
+    { date: "2026-09-03", file: "../data-20260903.js", count: 118 },
+    { date: "2026-09-02", file: "../data-20260902.js", count: 86 },
     { date: "2026-09-01", file: "../data-20260901.js", count: 67 }
   ],
-  totalArticles: 80,
-  lastUpdated: "2026-09-02"
+  totalArticles: 271,
+  lastUpdated: "2026-09-04"
 };
