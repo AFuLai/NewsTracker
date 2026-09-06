@@ -1462,6 +1462,20 @@ window.TRACKER_DAYS["2026-09-01"] = [
     ]
   },
   {
+    id: "20260901-10832",
+    trackers: ["security"],
+    category: "前瞻技術",
+    title: "AI時代資安風險管理：紅帽提出五大自動化策略加速修補與防禦",
+    summary: "隨著AI模型加速新漏洞的發現，傳統的資安修補和應對速度已難以跟上攻擊速度。本文提出一套綜合性的資安策略，強調利用自動化技術（如Ansible Automation Platform）來強化企業的防禦能力。建議的五大步驟包括：加速修補週期、部署自動化應對機制（如Event-Driven Ansible，可響應SIEM警報進行修復或人工審核）、在補丁發布前實施臨時解決方案（Workarounds，如強化監控、收緊防火牆規則）、建立強大的邊界防禦，以及進行全企業範圍的風險管理。企業應利用單一自動化平台管理涵蓋RHEL、Windows、多廠商網路和雲端等各類系統，以統一管理流程，加速修復，並應從評估現有資產、修補高風險CVE，到建立標準化的自動化流程來應對快速變化的威脅。",
+    tags: ["自動化", "Ansible Automation Platform", "CVE", "資安風險管理", "RHEL", "AI"],
+    title_en: "AI Era Cybersecurity Risk Management: Red Hat Proposes Five Automation Strategies to Accelerate Patching and Defense",
+    summary_en: "As AI models accelerate the discovery of new vulnerabilities, traditional cybersecurity patching and response speeds struggle to keep pace with the speed of attacks. This article proposes a comprehensive cybersecurity strategy that emphasizes leveraging automation technologies (such as Ansible Automation Platform) to strengthen enterprise defense capabilities. The five recommended steps include: accelerating the patching cycle, deploying automated response mechanisms (such as Event-Driven Ansible, which can respond to SIEM alerts for patching or manual review), implementing temporary workarounds before patches are released (such as enhancing monitoring or tightening firewall rules), establishing strong perimeter defenses, and conducting enterprise-wide risk management. Companies should utilize a single automation platform to manage various systems, including RHEL, Windows, multi-vendor networks, and cloud environments, to unify management processes, accelerate remediation, and should proceed from assessing existing assets and patching high-risk CVEs, to establishing standardized automation workflows to address rapidly changing threats.",
+    tags_en: ["Automation", "Ansible Automation Platform", "CVE", "Cybersecurity Risk Management", "RHEL", "AI"],
+    sources: [
+      { name: "Red Hat Security Blog", url: "https://redhat.com/en/blog/5-ways-augment-security-risk-management-ai-era", lang: "EN" }
+    ]
+  },
+  {
     id: "20260901-10365",
     trackers: ["eu_cra"],
     category: "產業動態",

@@ -901,6 +901,20 @@ window.TRACKER_DAYS["2026-09-02"] = [
     ]
   },
   {
+    id: "20260902-10859",
+    trackers: ["security"],
+    category: "漏洞與威脅情報",
+    title: "Dropbox帳戶遭入侵：駭客利用Lenovo電子郵件驗證漏洞，透過SSO機制登入",
+    summary: "雲端儲存服務Dropbox警告用戶，其帳戶曾被未經授權的第三方入侵。攻擊者利用Lenovo身份提供者服務（Lenovo Identity Provider Services）的電子郵件驗證流程漏洞，註冊了虛假的Lenovo ID。由於Dropbox的身份連結流程過度信任Lenovo的驗證聲明，攻擊者得以在無需用戶登入密碼的情況下，使用該虛假ID登入與該電子郵件地址綁定的Dropbox帳戶。Dropbox和Lenovo在發現問題後進行了協作修復。Dropbox的應對措施包括使所有透過Lenovo ID驗證的會話失效，並新增了登入要求，強制用戶在使用Lenovo ID進行身份驗證時，必須輸入其Dropbox帳戶密碼。據報導，約有 5,000 個帳戶受到影響，駭客曾查看和下載部分用戶的內容。用戶應立即更換密碼並啟用雙因素驗證（2FA）。",
+    tags: ["Dropbox", "Lenovo", "SSO", "電子郵件驗證漏洞", "身份提供者服務", "帳戶入侵"],
+    title_en: "Dropbox Accounts Compromised: Hackers Exploit Lenovo Email Authentication Vulnerability via SSO Mechanism",
+    summary_en: "Cloud storage service Dropbox warned users that their accounts were compromised by unauthorized third parties. Attackers exploited a vulnerability in the email authentication process of Lenovo Identity Provider Services, registering a fake Lenovo ID. Because Dropbox's identity linking process overly trusted Lenovo's authentication assertion, attackers were able to log into Dropbox accounts linked to that email address without needing the user's login password. Dropbox and Lenovo collaborated on remediation after discovering the issue. Dropbox's countermeasures included invalidating all sessions authenticated via Lenovo ID and adding a new login requirement that forces users to enter their Dropbox account password when authenticating using a Lenovo ID. Reports indicate that approximately 5,000 accounts were affected, and hackers viewed and downloaded some user content. Users should immediately change their passwords and enable two-factor authentication (2FA).",
+    tags_en: ["Dropbox", "Lenovo", "SSO", "Email Authentication Vulnerability", "Identity Provider Services", "Account Compromise"],
+    sources: [
+      { name: "BleepingComputer", url: "https://bleepingcomputer.com/news/security/dropbox-accounts-breached-through-lenovo-email-verification-flaw", lang: "EN" }
+    ]
+  },
+  {
     id: "20260902-10301",
     trackers: ["security"],
     category: "供應鏈與開源安全",

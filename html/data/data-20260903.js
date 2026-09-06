@@ -44,6 +44,20 @@ window.TRACKER_DAYS["2026-09-03"] = [
     ]
   },
   {
+    id: "20260903-10558",
+    trackers: ["security"],
+    category: "重大事件",
+    title: "法國醫院因資料外洩被罰 50 萬歐元：CNIL 指出缺乏 VPN 與存取控制機制",
+    summary: "法國資料保護機構 CNIL 對 Hôpital privé de la Loire (HPL) 處以 50 萬歐元的罰款，原因是醫院未能充分保護病患及相關人員的敏感資料。此次資料外洩事件發生在 2025 年夏季，曝光了超過 52 萬名病患和 20 萬名受信任第三方人員的資料。CNIL 調查指出，HPL 違反了《一般資料保護規範》（GDPR）的義務，主要缺陷包括：外部使用者（如私人執業醫師）可未經 VPN 或多因素驗證（MFA）存取系統；存取控制不足，導致帳號被盜後可存取所有病患紀錄；以及缺乏即時監控和警報系統，使得攻擊者能在數日內未被察覺地大量提取資料。駭客聲稱攻擊源於單一醫師帳號的洩漏，並試圖出售資料。此事件強調了醫療機構在資安上必須強化外部存取控制、實施嚴格的存取權限管理，並建立即時的監控與警報機制。",
+    tags: ["CNIL", "GDPR", "Hôpital privé de la Loire", "資料外洩", "存取控制", "多因素驗證"],
+    title_en: "French Hospital Fined €500,000 for Data Leak: CNIL Highlights Lack of VPN and Access Controls",
+    summary_en: "The French data protection authority CNIL fined Hôpital privé de la Loire (HPL) €500,000 because the hospital failed to adequately protect sensitive data belonging to patients and related personnel. The data leak, which occurred in the summer of 2025, exposed data belonging to over 520,000 patients and 200,000 trusted third-party personnel. CNIL's investigation found that HPL violated its obligations under the General Data Protection Regulation (GDPR), with key deficiencies including: external users (such as private practitioners) being able to access systems without a VPN or Multi-Factor Authentication (MFA); insufficient access controls, which allowed access to all patient records after an account was compromised; and a lack of real-time monitoring and alerting systems, which allowed attackers to exfiltrate large amounts of data undetected over several days. Hackers claimed the attack originated from a single physician's compromised account and attempted to sell the data. This incident underscores the necessity for healthcare institutions to strengthen external access controls, implement strict access permission management, and establish real-time monitoring and alerting mechanisms in cybersecurity.",
+    tags_en: ["CNIL", "GDPR", "Hôpital privé de la Loire", "Data Leak", "Access Control", "Multi-Factor Authentication"],
+    sources: [
+      { name: "BleepingComputer", url: "https://bleepingcomputer.com/news/security/french-hospital-fined-500-000-after-breach-exposes-data-of-727-000", lang: "EN" }
+    ]
+  },
+  {
     id: "20260903-10690",
     trackers: ["os", "security"],
     category: "Linux",
@@ -573,6 +587,20 @@ window.TRACKER_DAYS["2026-09-03"] = [
     tags_en: ["Linux Kernel", "Synaptics RMI4", "F55", "F54", "Buffer Overflow", "Driver"],
     sources: [
       { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-80754", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260903-11014",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心修補：SELinux 權限值檢查漏洞，防止越界堆寫攻擊",
+    summary: "本修補針對 Linux 核心中的 SELinux 權限處理機制，修復了一個允許權限值超過類別權限計數的漏洞。在原機制中，`perm_read()` 函數雖然會限制權限值，但並未限制其是否超過擁有類別或公共的 `nprim`（權限數量）。當 `security_get_permissions()` 函數將權限寫入一個大小由 `nprim` 決定的陣列時，如果一個類別宣告的權限值超過了其最大的權限值，將會導致一個越界堆寫（out-of-bounds heap write）的漏洞。此漏洞影響了頂層符號表驗證，但未驗證巢狀的每類別權限表。修補建議應確保在 `perm_read()` 執行時，權限值會被限制在 `nprim` 範圍內，以防止惡意或錯誤的策略定義導致的記憶體寫入錯誤。此修補旨在加固 SELinux 的策略完整性與安全性。",
+    tags: ["Linux 核心", "SELinux", "權限管理", "越界堆寫", "CVE-2026-80755"],
+    title_en: "Linux Kernel Patch: SELinux Permission Value Check Vulnerability Prevents Out-of-Bounds Heap Write Attack",
+    summary_en: "This patch addresses a vulnerability in the SELinux permission handling mechanism within the Linux kernel, which allowed permission values to exceed the class permission count. In the original mechanism, while the `perm_read()` function limited the permission value, it did not restrict whether the value exceeded the `nprim` (number of permissions) of the class or public scope. When the `security_get_permissions()` function writes permissions into an array sized by `nprim`, if a class-declared permission value exceeds its maximum allowed value, it results in an out-of-bounds heap write vulnerability. This vulnerability affects the top-level symbol table validation but does not validate the permissions for every nested class. The suggested fix should ensure that during `perm_read()` execution, the permission value is restricted within the `nprim` range, thereby preventing memory write errors caused by malicious or erroneous policy definitions. This patch aims to strengthen the integrity and security of SELinux policies.",
+    tags_en: ["Linux Kernel", "SELinux", "Permission Management", "Out-of-Bounds Heap Write", "CVE-2026-80755"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-80755", lang: "EN" }
     ]
   },
   {
@@ -1413,6 +1441,20 @@ window.TRACKER_DAYS["2026-09-03"] = [
     tags_en: ["Apple", "AirPods", "Siri", "Apple Intelligence", "AirPods 5", "Environmental Awareness"],
     sources: [
       { name: "9to5Mac", url: "https://9to5mac.com/2026/09/02/when-is-apple-releasing-new-airpods", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260903-10812",
+    trackers: ["security"],
+    category: "漏洞與威脅情報",
+    title: "專家警告：AI 雖加速網路攻擊，但關鍵防禦漏洞仍源於人為管理與基礎設施配置",
+    summary: "近期多數科技公司發布警告信，指出 AI 將使複雜的網路攻擊變得更便宜、更普遍，並強調需在有限的窗口期內加強網路防禦。然而，文章指出，真正的威脅並非來自於 AI 本身，而是攻擊者利用 AI 提升了對舊有、基礎設施配置漏洞的利用能力。受影響的關鍵基礎設施包括水處理廠、發電廠等，這些設備的控制系統（如 Siemens S7 controllers 和 PLC）的漏洞，更多源於「未經修復的舊有配置」而非新的技術缺陷。文章強調，最有效的緩解措施是將面向網際網路的控制設備物理隔離，這是一個「人員」和「管理」問題，而非單純的產品升級。因此，真正的防禦重點應放在提升現有操作人員的技能，並要求 AI 科技公司提供具體的資金、培訓和實地支援，而非僅止於口頭承諾。",
+    tags: ["AI 攻擊", "關鍵基礎設施", "Siemens S7", "PLC", "網路安全", "OT/ICS"],
+    title_en: "Experts Warn: While AI Accelerates Cyber Attacks, Key Defense Vulnerabilities Still Stem from Human Management and Infrastructure Configuration",
+    summary_en: "Recently, most tech companies have issued warnings stating that AI will make complex cyber attacks cheaper and more widespread, emphasizing the need to strengthen cyber defenses within a limited window. However, the article points out that the real threat does not come from AI itself, but from attackers using AI to enhance the exploitation of existing, foundational infrastructure vulnerabilities. Key critical infrastructures affected include water treatment plants and power generation facilities. The vulnerabilities in the control systems of these devices (such as Siemens S7 controllers and PLCs) stem more from 'unpatched legacy configurations' rather than new technical flaws. The article emphasizes that the most effective mitigation measure is the physical isolation of internet-facing control equipment—a 'personnel' and 'management' issue, not merely a product upgrade. Therefore, the true defense focus should be on enhancing the skills of current operational staff and demanding that AI technology companies provide concrete funding, training, and on-site support, rather than merely offering verbal commitments.",
+    tags_en: ["AI Attacks", "Critical Infrastructure", "Siemens S7", "PLC", "Cybersecurity", "OT/ICS"],
+    sources: [
+      { name: "Dark Reading", url: "https://darkreading.com/cyberattacks-data-breaches/ai-warning-letter-missed-people", lang: "EN" }
     ]
   },
   {
@@ -2323,6 +2365,20 @@ window.TRACKER_DAYS["2026-09-03"] = [
     tags_en: ["AI Security", "Data Diodes", "Frontier AI Models", "Network Architecture", "High Assurance System", "OpenAI", "Hugging Face"],
     sources: [
       { name: "The Register", url: "https://theregister.com/ai-and-ml/2026/09/03/to-keep-the-ai-hacking-genie-bottled-up-try-one-way-networks/5294121", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260903-11003",
+    trackers: ["os"],
+    category: "重點關注",
+    title: "OpenAI投入10億美元信用點支援關鍵基礎設施防禦，應對AI帶來的網路威脅",
+    summary: "OpenAI宣布啟動「Daybreak for Frontline Defenders」計畫，投入10億美元信用點，旨在為全球資源有限的網路防禦人員提供服務和訓練，特別關注關鍵基礎設施（如水系統、電網、醫院）和非營利組織。該計畫旨在應對攻擊者日益使用自主代理（autonomous agents）和AI工具進行網路入侵，導致關鍵服務中斷的風險。OpenAI指出，隨著AI技術的發展，關鍵基礎設施的停電或服務中斷可能成為常態。此外，OpenAI還與Multi-State Information Sharing and Analysis Center (MS-ISAC) 合作，為公部門和水系統防禦人員提供實地訓練和支援。值得注意的是，OpenAI最新推出的Astra模型被評為具備極高的網路安全能力，甚至能尋找和利用零日漏洞，這既是潛在的威脅，也促使OpenAI建立了多層次的限制和審核機制，確保其僅用於受控的防禦性工作流程。",
+    tags: ["OpenAI", "AI", "關鍵基礎設施", "網路安全", "Daybreak for Frontline Defenders", "Astra"],
+    title_en: "OpenAI Invests $1 Billion in Credits to Support Critical Infrastructure Defense Against AI-Driven Cyber Threats",
+    summary_en: "OpenAI has launched the \"Daybreak for Frontline Defenders\" initiative, committing $1 billion in credits to provide services and training to under-resourced cybersecurity defenders globally, with a specific focus on critical infrastructure (such as water systems, power grids, and hospitals) and non-profit organizations. The program aims to address the risk of key service disruptions caused by attackers increasingly utilizing autonomous agents and AI tools for cyber intrusions. OpenAI notes that as AI technology advances, power outages or service interruptions in critical infrastructure may become commonplace. Furthermore, OpenAI is collaborating with the Multi-State Information Sharing and Analysis Center (MS-ISAC) to provide hands-on training and support for public sector and water system defenders. Notably, OpenAI's newly released Astra model has been assessed as possessing extremely high cybersecurity capabilities, even the ability to find and exploit zero-day vulnerabilities. While this presents a potential threat, it has also prompted OpenAI to establish multi-layered restrictions and review mechanisms, ensuring the model is used only in controlled defensive workflows.",
+    tags_en: ["OpenAI", "AI", "Critical Infrastructure", "Cybersecurity", "Daybreak for Frontline Defenders", "Astra"],
+    sources: [
+      { name: "The Register", url: "https://theregister.com/security/2026/09/04/openai-commits-1b-in-ai-credits-to-frontline-cyber-defenders/5294382", lang: "EN" }
     ]
   },
   {
