@@ -268,6 +268,20 @@ window.TRACKER_DAYS["2026-09-05"] = [
     ]
   },
   {
+    id: "20260905-11059",
+    trackers: ["security"],
+    category: "漏洞與威脅情報",
+    title: "FreeIPMI 1.6.19 發布，修復多項緩衝區溢位與堆疊溢位漏洞，包含 CVE-2026-85504 至 CVE-2026-85509",
+    summary: "資安研究人員發布了 FreeIPMI 1.6.19 版本，修復了多個潛在的緩衝區溢位（buffer overflows）和堆疊溢位（stack overflows）漏洞。本次更新涵蓋了多個子命令，包括 `ipmi-oem` 的 `dell get-system-info` 和 `ipmi-oem` 的 `fujitsu get-sel-entry-long-text` 等，修復了這些地方的堆疊溢位風險。此外，還修復了 `bmc-watchdog` 的參數解析、`ipmi/rmcpping` 的 IPv6 介面查找、`libipmidetect` 的主機名稱處理，以及 `common` 模組的緩衝輸出配置解析問題。本次修補的漏洞已分配了 CVE 編號，包括 CVE-2026-85504、CVE-2026-85505、CVE-2026-85506、CVE-2026-85507、CVE-2026-85508 和 CVE-2026-85509。建議使用者應立即升級至 FreeIPMI 1.6.19 或更高版本，以修補這些潛在的資安風險。",
+    tags: ["FreeIPMI", "CVE-2026-85504", "CVE-2026-85505", "CVE-2026-85506", "CVE-2026-85507", "CVE-2026-85508", "CVE-2026-85509"],
+    title_en: "FreeIPMI 1.6.19 Released to Patch Multiple Buffer and Stack Overflows, Including CVE-2026-85504 through CVE-2026-85509",
+    summary_en: "Security researchers have released FreeIPMI version 1.6.19, which patches multiple potential buffer overflows and stack overflows. This update covers several subcommands, including `ipmi-oem`'s `dell get-system-info` and `ipmi-oem`'s `fujitsu get-sel-entry-long-text`, addressing stack overflow risks in these areas. Additionally, it fixes parameter parsing issues in `bmc-watchdog`, IPv6 interface lookup in `ipmi/rmcpping`, hostname handling in `libipmidetect`, and buffer output configuration parsing problems in the `common` module. The patched vulnerabilities have been assigned CVE IDs, including CVE-2026-85504, CVE-2026-85505, CVE-2026-85506, CVE-2026-85507, CVE-2026-85508, and CVE-2026-85509. Users are advised to immediately upgrade to FreeIPMI 1.6.19 or later to mitigate these potential security risks.",
+    tags_en: ["FreeIPMI", "CVE-2026-85504", "CVE-2026-85505", "CVE-2026-85506", "CVE-2026-85507", "CVE-2026-85508", "CVE-2026-85509"],
+    sources: [
+      { name: "Openwall oss-security", url: "https://openwall.com/lists/oss-security/2026/09/05/1", lang: "EN" }
+    ]
+  },
+  {
     id: "20260905-10848",
     trackers: ["security"],
     category: "供應鏈與開源安全",

@@ -58,6 +58,34 @@ window.TRACKER_DAYS["2026-09-03"] = [
     ]
   },
   {
+    id: "20260903-10562",
+    trackers: ["os", "security"],
+    category: "重大事件",
+    title: "OpenAI 確認 ChatGPT 與 Codex 服務發生大規模中斷，影響多項核心功能",
+    summary: "OpenAI 的 ChatGPT 和 Codex 服務於美國東部時間 9 月 3 日上午約 10:58 開始發生大規模中斷。用戶回報幾乎所有主要功能都出現錯誤，受影響的服務包括對話、登入、搜尋、檔案上傳、語音模式、GPTs、圖像生成、Deep Research、Agent 以及 ChatGPT Work 等至少 15 個組件。用戶在使用時可能遇到無法載入對話、傳送訊息時回傳錯誤，或無法使用搜尋、檔案上傳等功能。OpenAI 已在狀態頁面確認此問題，並表示正在調查。此次中斷發生在公司預計發布下一代 AI 模型 Astra 之前，但 OpenAI 尚未說明兩者之間是否有關聯。目前 OpenAI 仍在持續調查 ChatGPT 和 Codex 的錯誤問題。",
+    tags: ["OpenAI", "ChatGPT", "Codex", "AI 模型", "服務中斷", "Astra"],
+    title_en: "OpenAI Confirms Major Outage Affecting ChatGPT and Codex Services",
+    summary_en: "OpenAI's ChatGPT and Codex services experienced a major outage starting around 10:58 AM ET on September 3. Users reported errors across nearly all major functionalities, including conversation, login, search, file uploads, voice mode, GPTs, image generation, Deep Research, Agent, and ChatGPT Work—at least 15 components were affected. Users may have encountered issues such as inability to load conversations, errors when sending messages, or failure to use search and file upload features. OpenAI confirmed the issue on its status page and stated that it is investigating. The outage occurred prior to the company's planned release of the next-generation AI model, Astra, but OpenAI has not disclosed any connection between the two. OpenAI is currently continuing its investigation into the errors affecting ChatGPT and Codex.",
+    tags_en: ["OpenAI", "ChatGPT", "Codex", "AI Model", "Service Outage", "Astra"],
+    sources: [
+      { name: "BleepingComputer", url: "https://bleepingcomputer.com/news/artificial-intelligence/openai-confirms-chatgpt-is-down-ahead-of-astra-model-launch", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260903-10563",
+    trackers: ["security"],
+    category: "重大事件",
+    title: "Anthropic 宣布 Claude 服務中斷：多款模型（Mythos, Fable, Opus）遭遇連線錯誤",
+    summary: "AI 服務供應商 Anthropic 於 2026 年 9 月 3 日上午 9:41 ET 開始，宣布其 Claude 服務遭遇系統中斷（outage）。此次事件影響了多款核心 AI 模型，包括 Mythos 5.1、Fable 5.1、Opus 5、Opus 4.8 和 Opus 4.6 等。用戶在使用這些受影響的 Claude 模型時，可能會遇到請求無法完成或返回錯誤的狀況。Anthropic 隨後確認了受影響的完整模型列表，並持續進行修復工作。此次事件屬於服務層面的系統故障，目前尚未提供明確的修復時間，用戶應留意官方狀態頁面公告。建議用戶暫時調整工作流程，並關注 Anthropic 官方發布的最新修復進度。",
+    tags: ["Anthropic", "Claude", "AI 模型", "服務中斷", "Mythos", "Opus"],
+    title_en: "Anthropic Announces Claude Service Outage: Multiple Models (Mythos, Fable, Opus) Encounter Connection Errors",
+    summary_en: "AI service provider Anthropic announced a system outage for its Claude service starting at 9:41 AM ET on September 3, 2026. This incident affected multiple core AI models, including Mythos 5.1, Fable 5.1, Opus 5, Opus 4.8, and Opus 4.6. Users attempting to use these affected Claude models may encounter issues such as failed requests or returned errors. Anthropic subsequently confirmed the full list of affected models and continues to work on remediation. This incident is classified as a service-level system failure, and no clear time for restoration has been provided. Users are advised to monitor the official status page for updates. Users are recommended to temporarily adjust their workflows and follow the latest repair progress announcements from Anthropic.",
+    tags_en: ["Anthropic", "Claude", "AI Model", "Service Outage", "Mythos", "Opus"],
+    sources: [
+      { name: "BleepingComputer", url: "https://bleepingcomputer.com/news/artificial-intelligence/anthropic-confirms-claude-is-down-multiple-models-affected", lang: "EN" }
+    ]
+  },
+  {
     id: "20260903-10690",
     trackers: ["os", "security"],
     category: "Linux",
@@ -1122,6 +1150,48 @@ window.TRACKER_DAYS["2026-09-03"] = [
     ]
   },
   {
+    id: "20260903-10560",
+    trackers: ["security"],
+    category: "漏洞與威脅情報",
+    title: "HPE修補ArubaOS-CX關鍵漏洞：CVE-2026-73749允許遠端程式碼執行",
+    summary: "惠普企業 (HPE) 發布安全公告，修補了其 ArubaOS-CX 網路作業系統中的一項關鍵漏洞。此漏洞被追蹤為 CVE-2026-73749，屬於緩衝區溢出 (buffer overflow) 類型，允許未經身份驗證的遠端攻擊者透過發送特製封包，攻擊受影響的守護程序 (daemon process)，進而取得高權限的程式碼執行權限。此外，公告還涵蓋了包括 CVE-2026-73752、CVE-2026-73782 等多達 23 個其他高風險漏洞，涉及未經身份驗證的遠端攻擊、API 端點漏洞、格式字串漏洞等，可能導致遠端程式碼執行或任意檔案寫入。HPE 強烈建議客戶升級到公告中列出的修補版本，以修復這些安全風險。受影響的設備包括用於大型企業、政府機構、醫療和數據中心的 ArubaOS-CX 交換器。HPE 提醒，雖然目前未發現正在活躍利用這些漏洞的證據，但仍需立即進行修補。",
+    tags: ["HPE", "ArubaOS-CX", "CVE-2026-73749", "緩衝區溢出", "遠端程式碼執行", "網路安全"],
+    title_en: "HPE Patches Critical Vulnerability in ArubaOS-CX: CVE-2026-73749 Allows Remote Code Execution",
+    summary_en: "Hewlett Packard Enterprise (HPE) has issued a security advisory patching a critical vulnerability in its ArubaOS-CX network operating system. This vulnerability, tracked as CVE-2026-73749, is a buffer overflow type flaw that allows unauthenticated remote attackers to exploit an affected daemon process by sending specially crafted packets, thereby achieving high-privilege code execution. Furthermore, the advisory covers up to 23 other high-risk vulnerabilities, including CVE-2026-73752 and CVE-2026-73782. These vulnerabilities involve unauthenticated remote attacks, API endpoint flaws, and format string vulnerabilities, which could potentially lead to remote code execution or arbitrary file write. HPE strongly recommends that customers upgrade to the patched versions listed in the advisory to mitigate these security risks. Affected devices include ArubaOS-CX switches used in large enterprises, government institutions, medical facilities, and data centers. HPE cautions that while there is no evidence of active exploitation of these vulnerabilities currently, immediate patching is necessary.",
+    tags_en: ["HPE", "ArubaOS-CX", "CVE-2026-73749", "Buffer Overflow", "Remote Code Execution", "Network Security"],
+    sources: [
+      { name: "BleepingComputer", url: "https://bleepingcomputer.com/news/security/hpe-patches-critical-arubaos-cx-remote-code-execution-flaw", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260903-10564",
+    trackers: ["security"],
+    category: "漏洞與威脅情報",
+    title: "Elementor Pro 關鍵漏洞 CVE-2026-32475 遭利用，可遠端執行任意指令並上傳 Webshell",
+    summary: "WordPress 網站建置插件 Elementor Pro 存在一項關鍵漏洞 CVE-2026-32475。此漏洞源於 Elementor Pro 表單元件對檔案上傳陣列（file-upload arrays）驗證機制有缺陷，影響版本為 4.2.1 及更早版本。攻擊者可透過提交一個空檔案作為陣列的第一個元素，並將惡意的 PHP 檔案作為第二個元素，繞過插件的驗證機制，成功將惡意 PHP Payload 上傳至 `/wp-content/uploads/elementor/forms/` 目錄。一旦上傳，攻擊者即可透過直接請求該檔案來遠端執行任意指令，導致網站被接管。此漏洞於 8 月 19 日被修補，安全廠商 Wordfence 報告指出，修補後仍觀察到大量利用嘗試，並建議網站管理員應立即升級至 Elementor Pro 4.2.2 或更高版本，並檢查 `/wp-content/uploads/elementor/forms/` 目錄，若發現可疑 PHP 檔案，應視為已遭入侵並進行清理。",
+    tags: ["Elementor Pro", "CVE-2026-32475", "WordPress", "Webshell", "PHP", "漏洞"],
+    title_en: "Elementor Pro Critical Vulnerability CVE-2026-32475 Exploited for Remote Command Execution and Webshell Upload",
+    summary_en: "The WordPress page builder plugin Elementor Pro contains a critical vulnerability, CVE-2026-32475. This vulnerability stems from a flaw in Elementor Pro's validation mechanism for file-upload arrays, affecting versions 4.2.1 and earlier. Attackers can bypass the plugin's validation by submitting an empty file as the first element of the array and a malicious PHP file as the second element, successfully uploading the malicious PHP payload to the `/wp-content/uploads/elementor/forms/` directory. Once uploaded, the attacker can remotely execute arbitrary commands by directly requesting the file, leading to website compromise. The vulnerability was patched on August 19th. Security vendor Wordfence reported that numerous exploitation attempts were observed even after the patch, advising site administrators to immediately upgrade to Elementor Pro 4.2.2 or later, and to check the `/wp-content/uploads/elementor/forms/` directory. If suspicious PHP files are found, they should be treated as signs of compromise and cleaned up.",
+    tags_en: ["Elementor Pro", "CVE-2026-32475", "WordPress", "Webshell", "PHP", "Vulnerability"],
+    sources: [
+      { name: "BleepingComputer", url: "https://bleepingcomputer.com/news/security/critical-elementor-pro-flaw-exploited-to-take-over-wordpress-sites", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260903-10565",
+    trackers: ["security"],
+    category: "漏洞與威脅情報",
+    title: "員工密碼出現在資訊竊取器日誌：資安團隊應如何應對身份憑證與會話劫持的風險？",
+    summary: "隨著資訊竊取器（Infostealer）的日誌已成為一個常態的資安問題，安全分析師每天都可能發現員工的企業電子郵件地址出現在新收集的日誌中。這些日誌不僅包含帳號密碼，還可能包含可被利用的瀏覽器 Cookie，甚至完整的已驗證會話。如果員工在個人設備上重複使用企業憑證，且該設備未經組織管理，風險將極高。文章指出，單純重設密碼無法解決問題，因為攻擊者可能已透過劫持的會話 Cookie 繞過密碼和多因素驗證（MFA）。應優先關注企業身份提供者（Identity Provider）、會話 Cookie、VPN 和 RDP 端點等高價值資產。建議資安團隊在發現可疑日誌後，應立即進行初步評估，判斷攻擊的發生時間、受影響的系統、包含的企業憑證數量，以及是否捕獲了已驗證會話，並結合業務上下文來進行風險評分。",
+    tags: ["Infostealer", "會話劫持", "MFA", "企業身份提供者", "憑證管理", "資安日誌"],
+    title_en: "Employee Passwords Found in Infostealer Logs: How Should Security Teams Respond to Identity Credential and Session Hijacking Risks?",
+    summary_en: "As infostealer logs have become a common cybersecurity issue, security analysts frequently discover corporate employee email addresses in newly collected logs. These logs may not only contain account passwords but also usable browser cookies or even complete authenticated sessions. The risk is extremely high if employees reuse corporate credentials on personal, unmanaged devices. The article points out that simply resetting passwords is insufficient, as attackers may have bypassed passwords and multi-factor authentication (MFA) using hijacked session cookies. Security teams should prioritize high-value assets such as the Identity Provider, session cookies, VPN, and RDP endpoints. It is recommended that when suspicious logs are found, security teams should immediately conduct a preliminary assessment to determine the time of the attack, the affected systems, the number of corporate credentials included, and whether authenticated sessions were captured, combining this with business context for risk scoring.",
+    tags_en: ["Infostealer", "Session Hijacking", "MFA", "Identity Provider", "Credential Management", "Security Logs"],
+    sources: [
+      { name: "BleepingComputer", url: "https://bleepingcomputer.com/news/security/your-employees-password-appeared-in-an-infostealer-log-now-what", lang: "EN" }
+    ]
+  },
+  {
     id: "20260903-10568",
     trackers: ["security"],
     category: "漏洞與威脅情報",
@@ -1458,6 +1528,20 @@ window.TRACKER_DAYS["2026-09-03"] = [
     ]
   },
   {
+    id: "20260903-10863",
+    trackers: ["security"],
+    category: "漏洞與威脅情報",
+    title: "Plex 警告用戶立即修補多個安全漏洞：影響 Media Server v1.43.2 及更早版本",
+    summary: "媒體伺服器軟體 Plex 近期發出警告，敦促用戶立即更新其桌面客戶端和媒體伺服器，以修補多個尚未分配 CVE 編號的安全漏洞。這些漏洞已知會影響 Plex Media Server v1.43.2 及更早版本。為了解決這些安全問題，Plex 已發布了 Plex Media Server 1.43.3 和 Plex Desktop 1.115.0 版本。公司建議所有伺服器擁有者和桌面用戶盡快升級至最新版本。雖然 Plex 尚未公開這些漏洞的詳細資訊，但用戶仍應遵循官方建議，及時修補系統，以防攻擊者進行逆向工程並開發利用程式。過去，Plex 也曾修補過多個關鍵漏洞，例如 2025 年 8 月的 CVE-2025-34158，該漏洞允許攻擊者竊取伺服器擁有者憑證。此外，CISA 曾標記過一個遠端程式碼執行漏洞（CVE-2020-5741），提醒用戶保持警惕。",
+    tags: ["Plex Media Server", "Plex Desktop", "安全漏洞", "CVE-2025-34158", "遠端程式碼執行", "資安修補"],
+    title_en: "Plex Warns Users to Patch Multiple Security Vulnerabilities: Affecting Media Server v1.43.2 and Earlier",
+    summary_en: "Media server software Plex recently issued a warning urging users to immediately update both their desktop client and media server to patch multiple unassigned CVE vulnerabilities. These vulnerabilities are known to affect Plex Media Server v1.43.2 and earlier versions. To address these security issues, Plex has released Plex Media Server 1.43.3 and Plex Desktop 1.115.0. The company recommends that all server owners and desktop users upgrade to the latest versions as soon as possible. Although Plex has not disclosed detailed information about these vulnerabilities, users should follow official recommendations and patch their systems promptly to prevent attackers from reverse engineering and developing exploits. Previously, Plex also patched multiple critical vulnerabilities, such as CVE-2025-34158 in August 2025, which allowed attackers to steal the server owner's credentials. Furthermore, CISA had flagged a Remote Code Execution vulnerability (CVE-2020-5741), reminding users to remain vigilant.",
+    tags_en: ["Plex Media Server", "Plex Desktop", "Vulnerability", "CVE-2025-34158", "Remote Code Execution", "Security Patch"],
+    sources: [
+      { name: "BleepingComputer", url: "https://bleepingcomputer.com/news/security/plex-warns-users-to-patch-security-vulnerabilities-immediately", lang: "EN" }
+    ]
+  },
+  {
     id: "20260903-10484",
     trackers: ["security"],
     category: "供應鏈與開源安全",
@@ -1539,6 +1623,20 @@ window.TRACKER_DAYS["2026-09-03"] = [
     tags_en: ["IDScan.net", "Nexus", "Identity Data Leak", "Driver's License Data", "Identity Verification", "Data Leak"],
     sources: [
       { name: "SecurityWeek", url: "https://securityweek.com/153-million-driver-license-images-offered-on-dark-web", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260903-10559",
+    trackers: ["security"],
+    category: "供應鏈與開源安全",
+    title: "Coder 平台基礎設施遭入侵：惡意 Terraform 模組竊取開發者憑證與秘密",
+    summary: "開發者環境平台 Coder 的註冊中心 (registry.coder.com) 遭到未公開的惡意行為者入侵。攻擊者透過滲透 Coder 運行的 Cloudflare 基礎設施，在註冊中心中加入了未經授權的伺服器 IP 位址。這導致在 8 月 31 日的特定時間窗口（07:35 UTC 至 21:45 UTC），部分用戶的註冊請求被錯誤地導向到攻擊者控制的伺服器。這些惡意伺服器提供了修改後的 Terraform 模組，這些模組能夠在受感染的主機上執行資訊竊取行為。竊取目標包括環境變數、雲端 API 金鑰、CI/CD 憑證、OIDC token、SSH 金鑰以及各種配置密鑰。收集到的資訊隨後被外洩到仿冒網域 coder-infra[.]com。Coder 建議受影響用戶立即輪換所有潛在受影響的秘密憑證。同時，用戶應檢查防火牆、代理和 DNS 流量日誌，尋找與 coder-infra[.]com 的連線記錄，並清理潛在惡意的快取套件。",
+    tags: ["Coder", "Terraform", "Cloudflare", "供應鏈攻擊", "憑證竊取", "CI/CD"],
+    title_en: "Coder Platform Infrastructure Breached: Malicious Terraform Module Steals Developer Credentials and Secrets",
+    summary_en: "The developer environment platform Coder's registry center (registry.coder.com) was compromised by undisclosed malicious actors. The attackers penetrated the Cloudflare infrastructure running Coder, adding unauthorized server IP addresses to the registry center. This resulted in certain users' registration requests being incorrectly redirected to attacker-controlled servers during a specific time window on August 31st (07:35 UTC to 21:45 UTC). These malicious servers provided modified Terraform modules, which were capable of performing information theft on compromised hosts. Targets included environment variables, cloud API keys, CI/CD credentials, OIDC tokens, SSH keys, and various configuration secrets. The collected information was subsequently leaked to the spoofed domain coder-infra[.]com. Coder advises affected users to immediately rotate all potentially compromised secrets and credentials. Furthermore, users should check firewall, proxy, and DNS traffic logs for connection records related to coder-infra[.]com, and clean any potentially malicious cached packages.",
+    tags_en: ["Coder", "Terraform", "Cloudflare", "Supply Chain Attack", "Credential Theft", "CI/CD"],
+    sources: [
+      { name: "BleepingComputer", url: "https://bleepingcomputer.com/news/security/coders-registry-infrastructure-compromised-to-push-malicious-modules", lang: "EN" }
     ]
   },
   {

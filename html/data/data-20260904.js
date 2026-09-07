@@ -734,6 +734,76 @@ window.TRACKER_DAYS["2026-09-04"] = [
     ]
   },
   {
+    id: "20260904-11060",
+    trackers: ["security"],
+    category: "漏洞與威脅情報",
+    title: "pcre2 釋出 10.48 版本，修補多項記憶體安全漏洞，包含 Out-of-bounds Read/Write",
+    summary: "pcre2 開發團隊發布了版本 10.48，修補了多個安全漏洞和行為修正。本次更新包含針對特定 API 使用場景的記憶體安全修補，例如修復了在 `pcre2_jit_compile()` 和 `pcre2_match()` 之間模式模式不匹配時可能發生的 Out-of-bounds read (GHSA-2p8c-ff85-vh9x)。此外，還修補了在 32 位元 `size_t` 平台上使用 `pcre2_convert()` 處理不受信任輸入時可能發生的 Out-of-bounds heap write (GHSA-q8g2-wprr-34m9)。另有修復 DFA 匹配時使用堆限制的 Out-of-bounds write (GHSA-3r4p-g7gg-ppmf) 和編譯模式時的邊界檢查不足問題 (GHSA-fmgr-6ggq-9859)。本次更新也提升了 Unicode 支援至 Unicode 17.0，並修正了多個 JIT 相關的匹配錯誤。開發團隊同時宣布了五年的支援生命週期政策，並為舊版本提供了回溯修補程式。",
+    tags: ["pcre2", "GHSA-2p8c-ff85-vh9x", "GHSA-q8g2-wprr-34m9", "GHSA-3r4p-g7gg-ppmf", "Out-of-bounds", "正規表達式"],
+    title_en: "pcre2 Releases Version 10.48, Patching Multiple Memory Safety Vulnerabilities Including Out-of-bounds Read/Write",
+    summary_en: "The pcre2 development team has released version 10.48, which patches multiple security vulnerabilities and includes behavioral fixes. This update contains memory safety patches for specific API usage scenarios, such as fixing an Out-of-bounds read (GHSA-2p8c-ff85-vh9x) that could occur when the pattern does not match between `pcre2_jit_compile()` and `pcre2_match()`. Furthermore, it addresses an Out-of-bounds heap write (GHSA-q8g2-wprr-34m9) that could occur when using `pcre2_convert()` to process untrusted input on 32-bit `size_t` platforms. Additional fixes include an Out-of-bounds write (GHSA-3r4p-g7gg-ppmf) when using heap limits during DFA matching, and addressing insufficient boundary checks during pattern compilation (GHSA-fmgr-6ggq-9859). This update also upgrades Unicode support to Unicode 17.0 and corrects multiple JIT-related matching errors. The development team also announced a five-year support lifecycle policy and provided backported patches for older versions.",
+    tags_en: ["pcre2", "GHSA-2p8c-ff85-vh9x", "GHSA-q8g2-wprr-34m9", "GHSA-3r4p-g7gg-ppmf", "Out-of-bounds", "Regular Expression"],
+    sources: [
+      { name: "Openwall oss-security", url: "https://openwall.com/lists/oss-security/2026/09/04/7", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260904-11061",
+    trackers: ["os", "security"],
+    category: "漏洞與威脅情報",
+    title: "util-linux 2.42.3 修補多個掛載與系統調用漏洞，包含 TOCTOU 競態與符號連結逃逸",
+    summary: "util-linux 釋出 2.42.3 版本，修補了多個與掛載（mount(8)）和系統調用相關的嚴重安全漏洞。其中，CVE-2026-76642 修正了掛載後鉤子（post-mount hooks）在外部掛載輔助程式失敗時仍會執行，可能導致特權操作。CVE-2026-78410 修正了在受限模式下，源路徑可能因追蹤符號連結而導致特權掛載或所有權變更被重定向。此外，CVE-2026-78409 解決了在分離掛載樹中，`open_tree()` 呼叫可能因追蹤符號連結而導致逃逸。另有 CVE-2026-78408 修正了 `nsenter` 和 `unshare` 檔案描述符洩漏問題，並修補了 `wall(1)` 和 `write(1)` 中 hostname 逃逸序列注入的漏洞。開發者建議使用者立即升級至 2.42.3 版本以修補這些潛在的特權提升風險。",
+    tags: ["util-linux", "CVE-2026-76642", "CVE-2026-78410", "CVE-2026-78409", "CVE-2026-78408", "mount(8)", "TOCTOU"],
+    title_en: "util-linux 2.42.3 Patches Multiple Mount and System Call Vulnerabilities, Including TOCTOU Race and Symlink Escape",
+    summary_en: "util-linux has released version 2.42.3, which patches multiple critical security vulnerabilities related to mounting (mount(8)) and system calls. Specifically, CVE-2026-76642 fixes an issue where post-mount hooks could execute even if an external mount utility failed, potentially leading to privilege escalation. CVE-2026-78410 addresses a vulnerability where, in restricted mode, the source path could be redirected via symlink following, potentially leading to privileged mounts or ownership changes. Furthermore, CVE-2026-78409 resolves an escape vulnerability in `open_tree()` calls within isolated mount trees, which could be triggered by symlink following. Additionally, CVE-2026-78408 corrects file descriptor leakage issues in `nsenter` and `unshare`, and patches vulnerabilities allowing hostname escape sequence injection in `wall(1)` and `write(1)`. Developers recommend that users immediately upgrade to version 2.42.3 to mitigate these potential privilege escalation risks.",
+    tags_en: ["util-linux", "CVE-2026-76642", "CVE-2026-78410", "CVE-2026-78409", "CVE-2026-78408", "mount(8)", "TOCTOU"],
+    sources: [
+      { name: "Openwall oss-security", url: "https://openwall.com/lists/oss-security/2026/09/04/6", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260904-11062",
+    trackers: ["security"],
+    category: "漏洞與威脅情報",
+    title: "libxml2 函式庫修復多項漏洞，包含 xmlregexp 的越界讀取及整數溢位檢查",
+    summary: "資安研究人員在 libxml2 函式庫的更新版本 v2.15.4 中，修復了多個安全漏洞。這些修補涵蓋了 xmlregexp 模組的越界讀取（out-of-bounds read）問題，以及在 dict.c、uri.c 和 valid.c 等檔案中新增了溢位檢查。此外，還修復了 xpointer 模組中的溢位檢查，並在 xmlIO 模組中增加了在呼叫 writecallback 前的整數溢位檢查。這些修補旨在增強函式庫的穩定性和安全性，防止因惡意或格式錯誤的 XML 數據導致的記憶體操作錯誤。建議使用 libxml2 v2.15.4 或更高版本，以確保應用程式能夠抵禦這些已知的安全風險。",
+    tags: ["libxml2", "v2.15.4", "越界讀取", "整數溢位", "XML解析", "函式庫漏洞"],
+    title_en: "libxml2 Library Patches Multiple Vulnerabilities, Including Out-of-Bounds Read and Integer Overflow Checks for xmlregexp",
+    summary_en: "Security researchers have patched multiple vulnerabilities in the updated version v2.15.4 of the libxml2 library. These fixes cover out-of-bounds read issues in the xmlregexp module, and introduce overflow checks in files such as dict.c, uri.c, and valid.c. Additionally, overflow checks were added to the xpointer module, and an integer overflow check was implemented in the xmlIO module before calling writecallback. These patches aim to enhance the library's stability and security, preventing memory manipulation errors caused by malicious or malformed XML data. It is recommended to use libxml2 v2.15.4 or higher to ensure applications are protected against these known security risks.",
+    tags_en: ["libxml2", "v2.15.4", "Out-of-bounds read", "Integer overflow", "XML parsing", "Library vulnerability"],
+    sources: [
+      { name: "Openwall oss-security", url: "https://openwall.com/lists/oss-security/2026/09/04/5", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260904-11063",
+    trackers: ["security"],
+    category: "漏洞與威脅情報",
+    title: "Apache Griffin Hive Metastore Module 存在 SQL Injection 漏洞 (CVE-2026-52691)",
+    summary: "Apache Griffin Hive Metastore Module 存在一項「不當清除 SQL 命令特殊元素」的 SQL Injection 漏洞，編號為 CVE-2026-52691。此漏洞影響所有版本的 Apache Griffin Hive Metastore Module。由於該專案已退役，維護者目前不計畫發布修復版本。因此，建議使用者尋找替代方案，或限制對受影響實例的存取權限，僅限於信任的使用者。此漏洞屬於中等嚴重性（moderate）。",
+    tags: ["CVE-2026-52691", "Apache Griffin", "Hive Metastore Module", "SQL Injection", "Apache"],
+    title_en: "Apache Griffin Hive Metastore Module Contains SQL Injection Vulnerability (CVE-2026-52691)",
+    summary_en: "The Apache Griffin Hive Metastore Module contains an SQL Injection vulnerability, identified as CVE-2026-52691. This vulnerability affects all versions of the Apache Griffin Hive Metastore Module. Since the project is deprecated, the maintainers currently do not plan to release a patched version. Therefore, users are advised to seek alternative solutions or restrict access to affected instances to trusted users only. This vulnerability is rated as moderate severity.",
+    tags_en: ["CVE-2026-52691", "Apache Griffin", "Hive Metastore Module", "SQL Injection", "Apache"],
+    sources: [
+      { name: "Openwall oss-security", url: "https://openwall.com/lists/oss-security/2026/09/04/4", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260904-11064",
+    trackers: ["security"],
+    category: "漏洞與威脅情報",
+    title: "Perl模組 Robots::Validate 存在 CVE-2026-82309 漏洞，允許無界外發 DNS 查詢",
+    summary: "Perl 語言的 Robots::Validate 模組在版本 0.3.2 到 0.3.10 之間存在一個嚴重的安全漏洞，編號為 CVE-2026-82309。該漏洞允許攻擊者透過一個前向確認迴圈（forward-confirmation loop）發起無限制的外部 DNS 查詢，導致資源耗盡（CWE-770）和非對稱資源消耗（CWE-405）。具體而言，當模組的 _check_dns 函數執行時，攻擊者可以控制其自己的 IP 地址的反向 DNS 區，選擇任意數量的 PTR 答案名稱，並讓 Net::DNS 進行多次前向查詢。由於這些查詢是同步的，攻擊者可以持續發送大量查詢，耗盡目標系統的資源。修復建議是將 Robots-Validate 模組升級至 0.3.11 或更高版本。",
+    tags: ["CVE-2026-82309", "Perl", "Robots::Validate", "DNS", "資源耗盡"],
+    title_en: "Perl Module Robots::Validate Has CVE-2026-82309 Vulnerability Allowing Unbounded Outbound DNS Queries",
+    summary_en: "The Perl module Robots::Validate contains a critical security vulnerability, identified as CVE-2026-82309, affecting versions 0.3.2 through 0.3.10. This vulnerability allows an attacker to initiate unlimited external DNS queries through a forward-confirmation loop, leading to resource exhaustion (CWE-770) and asymmetric resource consumption (CWE-405). Specifically, when the module's _check_dns function executes, an attacker can control the reverse DNS zone of their own IP address and select an arbitrary number of PTR answer names, forcing Net::DNS to perform multiple forward queries. Because these queries are synchronous, an attacker can continuously send a large volume of queries, exhausting the target system's resources. The recommended fix is to upgrade the Robots-Validate module to version 0.3.11 or higher.",
+    tags_en: ["CVE-2026-82309", "Perl", "Robots::Validate", "DNS", "Resource Exhaustion"],
+    sources: [
+      { name: "Openwall oss-security", url: "https://openwall.com/lists/oss-security/2026/09/04/3", lang: "EN" }
+    ]
+  },
+  {
     id: "20260904-10813",
     trackers: ["security"],
     category: "供應鏈與開源安全",
