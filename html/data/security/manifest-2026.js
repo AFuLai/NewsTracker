@@ -14,5 +14,5 @@ window.TRACKER_YEAR["security"]["2026"] = {
     "2026-02": "manifest-202602.js",
     "2026-01": "manifest-202601.js"
   },
-  lastUpdated: "2026-09-08"
+  lastUpdated: "2026-09-09"
 };

@@ -226,6 +226,20 @@ window.TRACKER_DAYS["2026-09-07"] = [
     ]
   },
   {
+    id: "20260907-11352",
+    trackers: ["os"],
+    category: "Windows",
+    title: "微軟宣布 Windows 11 將增加更多自訂功能，重回可移動工作列與可調整的開始選單",
+    summary: "在 IFA 2026 發表會上，微軟（Microsoft）確認將為 Windows 11 增加更多個人化和自訂功能，以提升用戶對作業系統的控制權。公司承諾會根據用戶回饋進行持續改進。具體更新包括恢復可移動的工作列（taskbar），讓用戶可以將其放置在螢幕的左側、頂部或右側，以及增加調整開始選單（Start menu）大小的功能。此外，微軟也承諾將優化 Windows 11 的啟動速度和整體記憶體佔用，讓具備 8GB RAM 的電腦也能運行流暢。文章指出，這些改進體現了微軟正在積極回應用戶需求，但同時也提醒用戶，部分在 Windows 10 上成熟且靈活的自訂操作（如拖曳調整工作列或開始選單大小）在 Windows 11 上可能無法完全復現。",
+    tags: ["Microsoft", "Windows 11", "IFA 2026", "作業系統", "使用者介面", "自訂化"],
+    title_en: "Microsoft Announces Windows 11 to Feature More Customization, Bringing Back Movable Taskbar and Adjustable Start Menu",
+    summary_en: "At the IFA 2026 exhibition, Microsoft confirmed it will add more personalization and customization features to Windows 11, enhancing user control over the operating system. The company committed to continuous improvements based on user feedback. Specific updates include restoring the movable taskbar, allowing users to place it on the left, top, or right side of the screen, and adding the ability to adjust the size of the Start menu. Furthermore, Microsoft pledged to optimize Windows 11's startup speed and overall memory consumption, ensuring smooth operation even on computers with only 8GB of RAM. The article notes that these improvements demonstrate Microsoft's active response to user demands, but also reminds users that some customization operations that were mature and flexible on Windows 10 (such as dragging to adjust the taskbar or Start menu size) may not be fully replicated on Windows 11.",
+    tags_en: ["Microsoft", "Windows 11", "IFA 2026", "Operating System", "User Interface", "Customization"],
+    sources: [
+      { name: "Windows Latest", url: "https://windowslatest.com/2026/09/08/windows-10-users-were-right-microsoft-confirms-itll-add-the-missing-options-to-windows-11", lang: "EN" }
+    ]
+  },
+  {
     id: "20260907-11018",
     trackers: ["security"],
     category: "漏洞與威脅情報",
@@ -1203,6 +1217,20 @@ window.TRACKER_DAYS["2026-09-07"] = [
     tags_en: ["East Security", "Naver Cloud", "AI Foundation Model", "Cybersecurity", "NIPA", "National Project"],
     sources: [
       { name: "Boannews 韓國", url: "https://boannews.com/news/articleView.html?idxno=145673", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260907-11233",
+    trackers: ["eu_cra"],
+    category: "產業動態",
+    title: "網站利用區塊鏈儲存惡意程式，透過WebRTC誘騙用戶執行PowerShell指令",
+    summary: "根據雲端安全公司Netskope的分析，目前有超過5400個網站被入侵，用於向訪客散播惡意程式。這些惡意程式的本體被儲存在區塊鏈上，使得傳統的阻斷方式難以應對。受害網站大多是使用WordPress或PrestaShop等平台搭建的小型商戶網站。攻擊者採用了「EtherHiding」技術，將惡意程式儲存在BNB智能鏈（BSC）測試網的智能合約中。攻擊流程是，用戶訪問受感染網站後，會看到偽造的CAPTCHA畫面，並被引導打開Windows執行視窗，貼入特定指令。用戶執行指令後，PowerShell會下載最終惡意程式，這是一種誘騙用戶自行執行的「ClickFix」手法。近期還出現了使用WebRTC技術的變種活動，攻擊者會繞過正常的WebRTC連接流程，直接建立與攻擊者的加密通訊路徑。由於惡意程式儲存在區塊鏈上，無法透過伺服器沒收或網域停用等傳統方式移除，且攻擊者可以隨時替換內容，使得防禦極為困難。建議安全人員應監控指向BSC測試網RPC地址的通訊，並特別留意非網頁流量，例如UDP通訊。",
+    tags: ["Netskope", "區塊鏈", "惡意程式", "PowerShell", "WebRTC", "BNB智能鏈", "ClickFix"],
+    title_en: "Website Uses Blockchain to Store Malware, Tricking Users into Running PowerShell Commands via WebRTC",
+    summary_en: "According to analysis by cloud security company Netskope, over 5,400 websites have been compromised and are being used to distribute malware to visitors. The core of this malware is stored on the blockchain, making it difficult for traditional blocking methods to cope. The compromised sites are mostly small merchant websites built using platforms like WordPress or PrestaShop. Attackers employed an 'EtherHiding' technique, storing the malware within smart contracts on the BNB Smart Chain (BSC) testnet. The attack process involves a user visiting the infected website, where they are presented with a fake CAPTCHA screen and then guided to open a Windows execution window and paste a specific command. After the user executes the command, PowerShell downloads the final malware, which is a 'ClickFix' method that tricks the user into executing it themselves. Recently, variations using WebRTC technology have also appeared, where attackers bypass the normal WebRTC connection process and establish a direct encrypted communication path with the attacker. Because the malware is stored on the blockchain, it cannot be removed by traditional means such as server seizure or domain suspension, and the attackers can replace the content at any time, making defense extremely difficult. Security personnel are advised to monitor communications pointing to BSC testnet RPC addresses, paying special attention to non-web traffic, such as UDP communications.",
+    tags_en: ["Netskope", "Blockchain", "Malware", "PowerShell", "WebRTC", "BNB Smart Chain", "ClickFix"],
+    sources: [
+      { name: "Boannews 韓國", url: "https://boannews.com/news/articleView.html?idxno=145703", lang: "EN" }
     ]
   },
   {
