@@ -1363,6 +1363,20 @@ window.TRACKER_DAYS["2026-09-08"] = [
     ]
   },
   {
+    id: "20260908-11418",
+    trackers: ["security"],
+    category: "漏洞與威脅情報",
+    title: "中國駭客組織「Gambling Goblin」入侵巴西政府伺服器，建立反向代理網路用於釣魚詐騙",
+    summary: "資安公司 Check Point Software Technologies 報告指出，一個被稱為「Gambling Goblin」的中國語言駭客群組，已長期入侵巴西的政府和教育機構網站。該群組利用這些高信譽的網域，建立反向代理（reverse-proxy）網路，目的是提升其賭博相關釣魚網站的搜尋引擎排名和可信度。駭客已成功入侵巴西約 30 個伺服器，主要屬於地方政府和教育組織。該反向代理機制透過在 Apache 模組的名稱翻譯階段註冊，攔截並重寫所有進入的請求，將訪客悄悄導向攻擊者控制的後端伺服器，但外部看起來仍來自合法的受害網域。分析師警告，除了用於提升賭博網站能見度外，這些伺服器基礎設施極易被重新利用，可作為發佈惡意軟體、竊取憑證或進一步滲透整個政府網路的跳板。由於許多受害的 Web 伺服器屬於缺乏專業資安人員的小型市政政府，其與核心政府網路的隔離程度不明，風險極高。",
+    tags: ["Gambling Goblin", "巴西政府", "反向代理", "釣魚網站", "Check Point Software", "APT"],
+    title_en: "Chinese Hacker Group 'Gambling Goblin' Infiltrates Brazilian Government Servers to Establish Reverse Proxy Network for Phishing Scams",
+    summary_en: "According to cybersecurity firm Check Point Software Technologies, a Chinese-speaking hacking group known as 'Gambling Goblin' has been persistently infiltrating websites belonging to Brazilian government and educational institutions. The group utilizes these high-reputation domains to establish a reverse proxy network, aiming to boost the search engine ranking and credibility of its gambling-related phishing sites. The hackers have successfully compromised approximately 30 servers in Brazil, primarily belonging to local government and educational organizations. This reverse proxy mechanism operates by registering during the name translation phase of the Apache module, intercepting and rewriting all incoming requests, thereby silently redirecting visitors to attacker-controlled backend servers while making the external source appear to originate from the legitimate compromised domain. Analysts warn that beyond enhancing the visibility of gambling sites, this server infrastructure is highly susceptible to reuse, potentially serving as a jump point for distributing malware, stealing credentials, or further penetrating the entire government network. Given that many affected web servers belong to small municipal governments that lack professional cybersecurity personnel, the degree of isolation from the core government network is unclear, posing an extremely high risk.",
+    tags_en: ["Gambling Goblin", "Brazilian Government", "Reverse Proxy", "Phishing Website", "Check Point Software", "APT"],
+    sources: [
+      { name: "Dark Reading", url: "https://darkreading.com/threat-intelligence/cybercriminals-hack-brazilian-government-servers-host-phishing-sites", lang: "EN" }
+    ]
+  },
+  {
     id: "20260908-11140",
     trackers: ["os", "security"],
     category: "供應鏈與開源安全",
