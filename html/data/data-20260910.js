@@ -198,6 +198,20 @@ window.TRACKER_DAYS["2026-09-10"] = [
     ]
   },
   {
+    id: "20260910-11988",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Palo Alto Networks Prisma Access Agent 於 Linux 平台存在資訊洩露漏洞，可能讓本地使用者存取敏感配置資料",
+    summary: "Palo Alto Networks 的 Prisma Access Agent 在 Linux 系統上存在一項資訊洩露漏洞。此漏洞允許本地使用者（local user）存取系統的敏感配置資料和憑證。文章指出，此漏洞僅限於 Linux 平台，而針對 macOS、Windows、iOS、Android 和 Chrome OS 等其他作業系統的 Prisma Access Agent 版本並未受影響。實務上，若組織的基礎設施使用 Linux 部署此代理程式，應特別注意此漏洞，並儘快採取修補措施以降低風險。由於原文未提供具體的 CVSS 分數、受影響版本範圍或修補建議，使用者應參考 Palo Alto Networks 的官方安全公告，進行版本升級或配置限制，以消除此本地權限的存取風險。",
+    tags: ["Palo Alto Networks", "Prisma Access Agent", "Linux", "資訊洩露", "CVE-2026-0305"],
+    title_en: "Information Leak Vulnerability Found in Palo Alto Networks Prisma Access Agent on Linux Platform, Potentially Allowing Local User Access to Sensitive Configuration Data",
+    summary_en: "A vulnerability has been identified in the Palo Alto Networks Prisma Access Agent running on Linux systems. This vulnerability allows local users to access sensitive system configuration data and credentials. The article notes that this vulnerability is limited to the Linux platform and does not affect Prisma Access Agent versions on other operating systems such as macOS, Windows, iOS, Android, or Chrome OS. Practically, organizations whose infrastructure deploys this agent on Linux should pay special attention to this vulnerability and take prompt remediation measures to mitigate risk. Since the original text did not provide specific CVSS scores, affected version ranges, or patch recommendations, users should consult Palo Alto Networks' official security advisories for version upgrades or configuration restrictions to eliminate the risk of local privilege access.",
+    tags_en: ["Palo Alto Networks", "Prisma Access Agent", "Linux", "Information Leak", "CVE-2026-0305"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-0305", lang: "EN" }
+    ]
+  },
+  {
     id: "20260910-11414",
     trackers: ["eu_cra", "security"],
     category: "法規與標準",
@@ -965,6 +979,34 @@ window.TRACKER_DAYS["2026-09-10"] = [
     tags_en: ["Apple Watch Series 12", "Audio Intelligence", "Siri Recap", "Live Rewind", "Apple Intelligence", "Privacy"],
     sources: [
       { name: "The Register", url: "https://theregister.com/security/2026/09/10/watch-out-apple-timepiece-can-grab-snippets-of-conversation-without-both-speakers-consent/5295666", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260910-11803",
+    trackers: ["os", "security"],
+    category: "漏洞與威脅情報",
+    title: "安裝 9 月份 Windows Server 更新後，遠端桌面服務（RDS）出現連線失敗問題",
+    summary: "多位系統管理員回報，在安裝 Microsoft 2026 年 9 月份的累積更新（Patch Tuesday）後，Windows Server 2019、2022 和 2025 系統的遠端桌面服務（Remote Desktop Services, RDS）開始出現故障。問題表現為服務初期正常運作，但在使用一段時間後，連線開始失敗，甚至在使用者登出後崩潰，導致無法建立新的連線。部分用戶甚至需要進行硬重設才能恢復功能。有管理員進一步分析指出，問題可能出於遠端桌面服務與本機工作階段管理器（Local Session Manager）之間發生了死鎖（deadlock）。受影響的更新包括 KB5122876、KB5122882 和 KB5122871 等。目前，回滾（roll back）9 月份的更新似乎能暫時解決這些問題，但移除更新也會導致系統失去本月修補的安全性補丁。Microsoft 已知悉此問題並正在調查，尚未提供官方修復方案。",
+    tags: ["Microsoft", "Windows Server", "Remote Desktop Services", "RDS", "Patch Tuesday", "CVE"],
+    title_en: "Connection Failures in Remote Desktop Services (RDS) After Installing September Windows Server Updates",
+    summary_en: "Multiple system administrators have reported that after installing the Microsoft cumulative updates for September (Patch Tuesday), Remote Desktop Services (RDS) on Windows Server 2019, 2022, and 2025 systems began experiencing failures. The issue manifests as the service operating normally initially, but connections start failing after a period of use, sometimes even crashing after user logouts, making it impossible to establish new connections. Some users have even required a hard reboot to restore functionality. Some administrators further analyzed that the problem might stem from a deadlock between Remote Desktop Services and the Local Session Manager. Affected updates include KB5122876, KB5122882, and KB5122871. Currently, rolling back the September updates appears to temporarily resolve these issues, but removing the updates also causes the system to lose the security patches applied this month. Microsoft is aware of this issue and is investigating, but has not yet provided an official fix.",
+    tags_en: ["Microsoft", "Windows Server", "Remote Desktop Services", "RDS", "Patch Tuesday", "CVE"],
+    sources: [
+      { name: "BleepingComputer", url: "https://bleepingcomputer.com/news/microsoft/september-windows-server-updates-break-remote-desktop-services", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260910-11807",
+    trackers: ["os", "security"],
+    category: "漏洞與威脅情報",
+    title: "新版 Android 惡意軟體 Mantax Otax 結合勒索與間諜功能，竊取資料並騷擾受害者",
+    summary: "安全公司 Zimperium 研究發現，一種名為 Mantax Otax 的新型 Android 惡意軟體，結合了勒索軟體和間諜軟體的惡意能力。該惡意軟體透過惡意的 APK 檔案，在 Google Play 以外的管道傳播，並利用網路釣魚和社交工程手法誘騙使用者安裝。\n\n在安裝後，它會要求使用「輔助功能服務」（Accessibility service）權限，從而獲得對受害裝置的廣泛控制權。該惡意軟體會從 GitHub 獲取 C2 伺服器網域，並回傳受害者詳細資訊，包括位置、電信商、Android 版本和設備 ID。\n\n在勒索方面，Mantax Otax 專門針對 Android 9 或更早版本的設備，透過 AES 金鑰加密共享儲存區的目標檔案，並刪除原始檔案，替換成帶有「.enc」副檔名的副本。它還會用贖金通知替換本地圖片，並開啟 Firebase 主機的聊天介面進行談判。\n\n此外，它具備間諜功能，可竊取解鎖 PIN、讀取簡訊和一次性密碼、存取通話紀錄、聯絡人、瀏覽紀錄、Google 帳號資訊和位置。它甚至能利用輔助功能服務模擬互動，竊取 WhatsApp 和 Telegram 的訊息，並利用 MediaProjection API 錄製螢幕影片和照片，甚至透過 Catbox 上傳。\n\n為防禦，使用者應避免從 Google Play 以外安裝 APK，且不應授予可疑應用程式「輔助功能」權限。由於 Zimperium 是 Google 的安全合作夥伴，Mantax Otax 已被最新 Android 設備的 Play Protect 服務偵測並阻擋。",
+    tags: ["Mantax Otax", "Android 惡意軟體", "勒索軟體", "間諜軟體", "Accessibility service", "Android 9", "Google Play"],
+    title_en: "New Android Malware Mantax Otax Combines Ransomware and Spy Capabilities to Steal Data and Harass Victims",
+    summary_en: "Security company Zimperium discovered a new type of Android malware called Mantax Otax, which combines the malicious capabilities of ransomware and spyware. The malware spreads through malicious APK files via channels outside of Google Play, tricking users into installing it using phishing and social engineering techniques.\n\nOnce installed, it requests 'Accessibility service' permissions, gaining extensive control over the victim's device. The malware retrieves the C2 server domain from GitHub and reports detailed victim information, including location, carrier, Android version, and device ID.\n\nIn terms of ransomware, Mantax Otax specifically targets devices running Android 9 or earlier. It encrypts target files in shared storage using AES key encryption, deleting the original files and replacing them with copies bearing the '.enc' extension. It also replaces local images with a ransom note and opens a Firebase hosted chat interface for negotiation.\n\nFurthermore, it possesses spyware capabilities, capable of stealing unlock PINs, reading SMS and one-time passwords, accessing call logs, contacts, browsing history, Google account information, and location. It can even use the accessibility service to simulate interactions, stealing messages from WhatsApp and Telegram, and utilizing the MediaProjection API to record screen videos and photos, even uploading them via Catbox.\n\nFor defense, users should avoid installing APKs outside of Google Play and should not grant 'Accessibility' permissions to suspicious applications. Since Zimperium is a Google security partner, Mantax Otax has been detected and blocked by the Play Protect service on the latest Android devices.",
+    tags_en: ["Mantax Otax", "Android Malware", "Ransomware", "Spyware", "Accessibility service", "Android 9", "Google Play"],
+    sources: [
+      { name: "BleepingComputer", url: "https://bleepingcomputer.com/news/security/new-android-malware-encrypts-files-steals-data-and-harasses-victims", lang: "EN" }
     ]
   },
   {

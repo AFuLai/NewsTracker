@@ -170,6 +170,20 @@ window.TRACKER_DAYS["2026-09-08"] = [
     ]
   },
   {
+    id: "20260908-11207",
+    trackers: ["eu_cra", "security"],
+    category: "法規與標準",
+    title: "歐盟《網路韌性法案》要求軟體供應商證明產品交付時間與漏洞知悉時點",
+    summary: "隨著歐盟《網路韌性法案》（EU Cyber Resilience Act, CRA）的實施，所有在歐盟銷售具備數位元素的產品製造商將面臨嚴格的法規要求。根據法案規定，製造商必須在知悉產品存在漏洞並被主動利用後的 24 小時內通知 ENISA，並在 72 小時內提交完整報告。更重要的是，法案要求製造商必須證明「什麼產品被交付了」以及「何時知悉了其存在問題」。這使得軟體供應鏈的「可追溯性」（Provenance）成為核心合規挑戰。\n\n文章指出，傳統的 SBOM（軟體物料清單）僅反映生成當下的狀態，無法追蹤產品的持續變動。為應對 CRA 的要求，企業必須建立自動化、持續更新的 SBOM 流程，或採用預先經過驗證、具備不可變建置時間可追溯性的元件目錄（Curated Catalogs）。未能及時建立可證明產品交付和漏洞知悉時點的流程，將無法滿足法規要求。",
+    tags: ["EU Cyber Resilience Act", "CRA", "SBOM", "ENISA", "軟體供應鏈", "法規遵循"],
+    title_en: "EU Cyber Resilience Act Requires Software Suppliers to Prove Product Delivery and Vulnerability Awareness Timelines",
+    summary_en: "With the implementation of the EU Cyber Resilience Act (CRA), all manufacturers selling products with digital elements in the EU will face stringent regulatory requirements. According to the Act, manufacturers must notify ENISA within 24 hours of becoming aware of a product vulnerability and its active exploitation, and submit a full report within 72 hours. Crucially, the Act requires manufacturers to prove 'what product was delivered' and 'when the issue was known.' This makes 'Provenance' within the software supply chain a core compliance challenge. The article points out that traditional SBOMs (Software Bill of Materials) only reflect the state at the time of generation and cannot track continuous product changes. To meet CRA requirements, companies must establish automated, continuously updated SBOM processes, or adopt pre-validated, immutable build-time traceable component catalogs. Failure to establish processes that can prove product delivery and vulnerability awareness timelines will result in non-compliance with regulatory requirements.",
+    tags_en: ["EU Cyber Resilience Act", "CRA", "SBOM", "ENISA", "Software Supply Chain", "Regulatory Compliance"],
+    sources: [
+      { name: "BleepingComputer", url: "https://bleepingcomputer.com/news/security/the-eu-cras-real-question-what-shipped-and-when-did-you-know", lang: "EN" }
+    ]
+  },
+  {
     id: "20260908-11285",
     trackers: ["os", "security"],
     category: "Windows",
@@ -951,7 +965,8 @@ window.TRACKER_DAYS["2026-09-08"] = [
     tags_en: ["Adobe", "CVE-2026-75650", "Magento", "Adobe Commerce", "RCE", "Zero-Day Vulnerability"],
     sources: [
       { name: "SecurityWeek", url: "https://securityweek.com/adobe-patches-over-170-vulnerabilities-including-commerce-zero-day", lang: "EN" },
-      { name: "The Hacker News", url: "https://thehackernews.com/2026/09/adobe-patches-magento-zero-day.html", lang: "EN" }
+      { name: "The Hacker News", url: "https://thehackernews.com/2026/09/adobe-patches-magento-zero-day.html", lang: "EN" },
+      { name: "BleepingComputer", url: "https://bleepingcomputer.com/news/security/adobe-fixes-critical-magento-zero-day-exploited-to-backdoor-servers", lang: "EN" }
     ]
   },
   {
@@ -1094,6 +1109,76 @@ window.TRACKER_DAYS["2026-09-08"] = [
     tags_en: ["FreeIPA", "Red Hat", "CVE-2026-76578", "Kerberos", "LDAP", "CVE-2026-79678"],
     sources: [
       { name: "The Hacker News", url: "https://thehackernews.com/2026/09/freeipa-flaw-chain-lets-anonymous.html", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260908-11202",
+    trackers: ["os", "security"],
+    category: "漏洞與威脅情報",
+    title: "微軟 2026 年 9 月 Patch Tuesday 修補 966 個漏洞，包含兩起零日漏洞",
+    summary: "微軟於 2026 年 9 月的 Patch Tuesday 發布了大規模安全更新，共修補了高達 966 個漏洞，其中包含兩起目前正在被積極利用的零日漏洞。本次更新修補了 105 個「關鍵」漏洞，涵蓋了遠端程式碼執行（RCE）、提升權限（Elevation of Privileges）、資訊洩露等多種威脅。其中，兩起零日漏洞分別為 CVE-2026-81963（Windows Update Stack 提升權限漏洞）和 CVE-2026-85880（Windows ALPC 提升權限漏洞），攻擊者可利用這些漏洞在本地提升至 SYSTEM 權限。修補建議是所有用戶應立即安裝本次 Patch Tuesday 的安全更新，以修補這些關鍵的系統漏洞，特別是針對 Windows Update Stack 和 ALPC 機制的提升權限缺陷。",
+    tags: ["Microsoft", "Patch Tuesday", "CVE-2026-81963", "CVE-2026-85880", "Windows", "零日漏洞"],
+    title_en: "Microsoft Patches 966 Vulnerabilities on September 2026 Patch Tuesday, Including Two Zero-Day Flaws",
+    summary_en: "Microsoft released a massive security update on the September 2026 Patch Tuesday, patching a total of 966 vulnerabilities, including two zero-day flaws currently being actively exploited. This update addresses 105 'Critical' vulnerabilities, covering various threats such as Remote Code Execution (RCE), Elevation of Privileges, and Information Disclosure. Specifically, the two zero-day vulnerabilities are CVE-2026-81963 (Windows Update Stack Elevation of Privileges vulnerability) and CVE-2026-85880 (Windows ALPC Elevation of Privileges vulnerability). Attackers can exploit these flaws to elevate local privileges to SYSTEM level. The patch advises all users to immediately install the Patch Tuesday security updates to remediate these critical system vulnerabilities, especially the elevation of privilege flaws in the Windows Update Stack and ALPC mechanisms.",
+    tags_en: ["Microsoft", "Patch Tuesday", "CVE-2026-81963", "CVE-2026-85880", "Windows", "Zero-Day Vulnerability"],
+    sources: [
+      { name: "BleepingComputer", url: "https://bleepingcomputer.com/news/microsoft/microsoft-september-2026-patch-tuesday-fixes-966-flaws-2-zero-days", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260908-11204",
+    trackers: ["security"],
+    category: "漏洞與威脅情報",
+    title: "駭客群 ShinyHunters 聲稱入侵佛羅里達車管局資料庫 DAVID，竊取超過 20 萬名駕駛人資料",
+    summary: "駭客勒索集團 ShinyHunters 聲稱成功入侵了佛羅里達州車輛管理局（FLHSMV）的線上資料庫「DAVID」（Driver and Vehicle Information Database）。該資料庫是執法和刑事司法人員用來查詢駕駛人資訊的關鍵系統，並被用於記錄致命事故和重傷事故（FSBI）。駭客作為證據，公開釋出了一份包含 Jeffrey Epstein 個人資料的截圖，內容包括地址、社會安全碼、出生日期、駕照號碼、有效期限和註冊車輛等。ShinyHunters 聲稱透過一個「密碼重設缺陷」（password-reset flaw）進入系統，從而竊取了超過 20 萬筆駕駛人資料記錄。他們表示已失去對資料庫的存取權，並且該密碼重設缺陷正在被修補。此事件凸顯了政府關鍵基礎設施資料庫的資安漏洞風險，建議相關機構應立即修補所有身份驗證流程中的缺陷，並強化內部權限管理。",
+    tags: ["ShinyHunters", "FLHSMV", "DAVID", "密碼重設缺陷", "資料外洩", "政府系統"],
+    title_en: "Hacker Group ShinyHunters Claims Breach of Florida DMV Database DAVID, Stealing Data of Over 200,000 Drivers",
+    summary_en: "The ransomware group ShinyHunters claimed to have successfully breached the Florida Department of Highway Safety and Motor Vehicles (FLHSMV) online database, 'DAVID' (Driver and Vehicle Information Database). This database is a critical system used by law enforcement and criminal justice personnel to query driver information and is also used for recording fatal and serious injury accidents (FSBI). As evidence, the hackers publicly released a screenshot containing personal data belonging to Jeffrey Epstein, including addresses, social security numbers, dates of birth, driver's license numbers, expiration dates, and registered vehicles. ShinyHunters claimed they gained access to the system through a 'password-reset flaw,' thereby stealing over 200,000 driver data records. They stated that they have since lost access to the database and that the password-reset flaw is currently being patched. This incident highlights the security vulnerability risks within government critical infrastructure databases, suggesting that relevant agencies should immediately patch all flaws in identity authentication processes and strengthen internal access controls.",
+    tags_en: ["ShinyHunters", "FLHSMV", "DAVID", "password-reset flaw", "data leak", "government system"],
+    sources: [
+      { name: "BleepingComputer", url: "https://bleepingcomputer.com/news/security/shinyhunters-hackers-claim-breach-of-florida-david-dmv-database", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260908-11205",
+    trackers: ["os", "security"],
+    category: "漏洞與威脅情報",
+    title: "微軟警告：2026年8月更新可能導致Windows Server 2016出現0xc0000409錯誤",
+    summary: "微軟發布服務警報指出，在啟用相容性評估器診斷服務的Windows Server 2016系統上，安裝2026年8月的安全更新後，可能會觸發0xc0000409的應用程式錯誤事件。受影響的系統會看到CompatTelRunner.exe（相容性評估遙測執行器）程序崩潰。相容性評估器是Windows的一個背景系統任務，用於檢查設備是否符合下次主要累積更新或功能升級的硬體和軟體要求。微軟表示，雖然這些重複的失敗會產生事件日誌警告，但它們不會影響設備的正常功能，建議用戶在未來修復更新發布前，可以暫時忽略這些警告。微軟目前正在開發修復方案，但尚未提供永久解決方案的時間表。",
+    tags: ["Microsoft", "Windows Server 2016", "0xc0000409", "CompatTelRunner.exe", "安全更新"],
+    title_en: "Microsoft Warns: August 2026 Update May Cause 0xc0000409 Error on Windows Server 2016",
+    summary_en: "Microsoft has issued a service alert stating that installing the August 2026 security update on Windows Server 2016 systems with Compatibility Assessment Diagnostic Services enabled may trigger an application error event of 0xc0000409. Affected systems may experience a crash of the CompatTelRunner.exe (Compatibility Assessment Telemetry Runner) process. The Compatibility Assessment service is a background Windows system task used to check if a device meets the hardware and software requirements for the next major cumulative update or feature upgrade. Microsoft stated that while these repeated failures will generate event log warnings, they will not affect the device's normal functionality, and users are advised to temporarily ignore these warnings until a future fix update is released. Microsoft is currently developing a fix, but has not provided a timeline for a permanent solution.",
+    tags_en: ["Microsoft", "Windows Server 2016", "0xc0000409", "CompatTelRunner.exe", "security update"],
+    sources: [
+      { name: "BleepingComputer", url: "https://bleepingcomputer.com/news/microsoft/august-updates-trigger-0xc0000409-errors-on-windows-server-2016", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260908-11208",
+    trackers: ["os", "security"],
+    category: "漏洞與威脅情報",
+    title: "駭客利用 Linux Rootkit 攻擊 F5 BIG-IP APM 設備，注入記憶體 Web Shell",
+    summary: "Sophos 研究人員分析了一種針對 F5 BIG-IP APM 環境的 Linux rootkit。該惡意程式能夠攔截 PHP 檔案載入，並直接將無檔案 Web Shell 注入記憶體，從而避免在硬碟上留下惡意程式碼。這類攻擊被認為是利用 CVE-2025-53521 這個關鍵的遠端程式碼執行（RCE）漏洞後部署的第二階段負載。該 rootkit 透過感染 BIG-IP APM 系統上用於 Apache 的 /usr/sbin/httpd 可執行檔，並修改 SELinux 配置，實現了持久性。技術上，它透過攔截 `__libc_start_main`，並鉤取 Apache Portable Runtime (APR) 模組載入器，將 PHP Web Shell 注入記憶體，並修改合法腳本（如 apm_css.php3）以隱藏 Web Shell。Web Shell 接受特殊格式的請求，透過 PHP 的 eval() 函數解密並執行內容，並偽裝成 CSS 內容回傳 HTTP 201 響應。此外，該 rootkit 還創建了一個受密碼保護的本地通訊 Socket，可以在不開啟 TCP 監聽埠的情況下啟動互動式 Bash shell。安全廠商建議，防禦方應調查到目標 .php3 端點的異常 POST 請求，以及回傳 HTTP 201 且內容類型為 text/css 的 PHP 響應。",
+    tags: ["F5 BIG-IP APM", "Linux rootkit", "CVE-2025-53521", "Web Shell", "Sophos", "RCE"],
+    title_en: "Hackers Exploit Linux Rootkit Against F5 BIG-IP APM Device, Injecting Memory Web Shell",
+    summary_en: "Sophos researchers analyzed a Linux rootkit targeting the F5 BIG-IP APM environment. The malware is capable of intercepting PHP file loading and directly injecting a fileless Web Shell into memory, thereby avoiding leaving malicious code on the disk. This type of attack is believed to be a second-stage payload deployed after exploiting the critical Remote Code Execution (RCE) vulnerability, CVE-2025-53521. The rootkit achieves persistence by infecting the `/usr/sbin/httpd` executable used for Apache on the BIG-IP APM system and modifying SELinux configurations. Technically, it intercepts `__libc_start_main` and hooks the Apache Portable Runtime (APR) module loader to inject the PHP Web Shell into memory and modify legitimate scripts (such as apm_css.php3) to hide the Web Shell. The Web Shell accepts specially formatted requests, decrypts, and executes the content using PHP's eval() function, and returns an HTTP 201 response disguised as CSS content. Furthermore, the rootkit creates a password-protected local communication socket that can launch an interactive Bash shell without opening a TCP listening port. Security vendors recommend that defenders investigate anomalous POST requests to the target .php3 endpoint, as well as PHP responses with an HTTP 201 status code and a content type of text/css.",
+    tags_en: ["F5 BIG-IP APM", "Linux rootkit", "CVE-2025-53521", "Web Shell", "Sophos", "RCE"],
+    sources: [
+      { name: "BleepingComputer", url: "https://bleepingcomputer.com/news/security/hackers-breach-f5-big-ip-apm-devices-to-deploy-linux-rootkit", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260908-11209",
+    trackers: ["os", "security"],
+    category: "漏洞與威脅情報",
+    title: "微軟發布 Windows 10 KB5122878 安全更新，修補多達 966 個漏洞及零日漏洞",
+    summary: "微軟（Microsoft）發布了 Windows 10 KB5122878 安全更新，這是一個包含本月（2026 年 9 月）大量修補的擴展安全更新（Extended Security Update, ESU）。本次更新主要包含安全修補和錯誤修正，而非新功能。該更新修補了微軟產品中高達 966 個漏洞，其中包括兩個正在被積極利用的零日漏洞。對於運行 Windows 10 Enterprise LTSC 或參與 ESU 計劃的用戶，可透過「設定」>「Windows Update」手動檢查更新。本次更新將使 Windows 10 升級至 build 19045.7725，Windows 10 Enterprise LTSC 2021 升級至 build 19044.7725。用戶應儘快安裝此更新，以修補潛在的重大安全風險。修補內容涵蓋 Secure Boot 認證、時區調整（摩洛哥時間）、OMA DM 協定、Windows Code Integrity 策略、遠端桌面音訊重定向及 BitLocker 群組原則等多項細節。",
+    tags: ["Microsoft", "Windows 10", "KB5122878", "安全更新", "零日漏洞", "Patch Tuesday"],
+    title_en: "Microsoft Releases Windows 10 KB5122878 Security Update, Patching Up to 966 Vulnerabilities and Zero-Day Flaws",
+    summary_en: "Microsoft has released the Windows 10 KB5122878 security update, an Extended Security Update (ESU) containing numerous patches for this month (September 2026). This update primarily includes security patches and bug fixes, rather than new features. The update patches up to 966 vulnerabilities in Microsoft products, including two actively exploited zero-day vulnerabilities. Users running Windows 10 Enterprise LTSC or participating in the ESU program can manually check for the update via 'Settings' > 'Windows Update'. This update will upgrade Windows 10 to build 19045.7725, and Windows 10 Enterprise LTSC 2021 to build 19044.7725. Users should install this update promptly to mitigate potential critical security risks. The patches cover details such as Secure Boot certification, time zone adjustments (Morocco time), OMA DM protocol, Windows Code Integrity policies, remote desktop audio redirection, and BitLocker group policies.",
+    tags_en: ["Microsoft", "Windows 10", "KB5122878", "Security Update", "Zero-Day Vulnerability", "Patch Tuesday"],
+    sources: [
+      { name: "BleepingComputer", url: "https://bleepingcomputer.com/news/microsoft/microsoft-releases-windows-10-kb5122878-extended-security-update", lang: "EN" }
     ]
   },
   {
@@ -1377,6 +1462,20 @@ window.TRACKER_DAYS["2026-09-08"] = [
     ]
   },
   {
+    id: "20260908-11775",
+    trackers: ["os", "security"],
+    category: "漏洞與威脅情報",
+    title: "Red Hat OpenShift AI 3.5 推出 OpenShell，提供核心層級沙盒機制強化 AI Agent 安全性",
+    summary: "隨著 AI Agent 在企業級應用中的普及，其過度權限和缺乏完善治理成為重大安全挑戰。傳統的容器邊界和模型層級的保護機制已不足以應對 Agent 複雜的行為，特別是面對 Prompt Injection 等攻擊。Red Hat 推出 OpenShell agent sandboxing，作為 Red Hat OpenShift AI 3.5 的 Developer Preview，旨在提供更底層的強制邊界。OpenShell 採用多層防禦深度機制：第一層是 Linux 核心級隔離（Landlock LSM, seccomp filters, network namespace isolation），確保 OS 層級的邊界強制執行；第二層是 OPA 政策強制執行，控制 L4 和 L7 級別的存取權限；第三層是 NeMo Guardrails，在輸入、檢索、對話、執行和輸出等五個流程階段進行內容審核，以防範工具呼叫的注入攻擊；第四層是 Garak 進行紅隊測試，系統性地探測 Agent 的漏洞；第五層是供應鏈安全，提供簽名且符合 FIPS 標準的 UBI9 基礎映像檔和 Agent 專用套件。這套機制旨在滿足金融、電信等受監管產業對「確定性政策強制執行」和「監管可追溯性」的嚴格要求。",
+    tags: ["Red Hat", "OpenShift AI", "OpenShell", "AI Agent", "沙盒機制", "Linux Kernel", "CVE"],
+    title_en: "Red Hat OpenShift AI 3.5 Launches OpenShell, Providing Core-Level Sandboxing to Enhance AI Agent Security",
+    summary_en: "As AI Agents become increasingly prevalent in enterprise applications, their excessive privileges and lack of robust governance pose significant security challenges. Traditional container boundaries and model-level protection mechanisms are insufficient to address the complex behaviors of Agents, especially when facing attacks like Prompt Injection. Red Hat introduces OpenShell agent sandboxing, available as a Developer Preview in Red Hat OpenShift AI 3.5, designed to provide a deeper, more foundational boundary. OpenShell employs a multi-layered defense-in-depth mechanism: The first layer is Linux kernel-level isolation (Landlock LSM, seccomp filters, network namespace isolation), ensuring OS-level boundary enforcement; the second layer is OPA policy enforcement, controlling L4 and L7 access permissions; the third layer is NeMo Guardrails, which performs content review across five stages—input, retrieval, dialogue, execution, and output—to prevent tool-call injection attacks; the fourth layer is Garak for red-teaming, systematically detecting Agent vulnerabilities; and the fifth layer is supply chain security, providing signed and FIPS-compliant UBI9 base images and dedicated Agent packages. This comprehensive mechanism is designed to meet the stringent requirements of regulated industries, such as finance and telecommunications, for 'deterministic policy enforcement' and 'regulatory traceability.'",
+    tags_en: ["Red Hat", "OpenShift AI", "OpenShell", "AI Agent", "Sandboxing", "Linux Kernel", "CVE"],
+    sources: [
+      { name: "Red Hat Security Blog", url: "https://redhat.com/en/blog/beyond-container-boundaries-kernel-level-agent-security-red-hat-openshift-ai-35", lang: "EN" }
+    ]
+  },
+  {
     id: "20260908-11140",
     trackers: ["os", "security"],
     category: "供應鏈與開源安全",
@@ -1444,6 +1543,20 @@ window.TRACKER_DAYS["2026-09-08"] = [
     tags_en: ["BengalSEO", "SEO poisoning", "MayaBot", "Black Hat SEO", "Redirector", "Microsoft Bing", "Cybersecurity Threat"],
     sources: [
       { name: "The Hacker News", url: "https://thehackernews.com/2026/09/bengalseo-poisons-bing-search-results.html", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260908-11206",
+    trackers: ["security"],
+    category: "供應鏈與開源安全",
+    title: "大規模詐騙網路「DoppelCart」利用超過 119,000 個假商店竊取信用卡資料",
+    summary: "德國資安新創公司 Nebty 揭露了一個名為「DoppelCart」的巨大詐騙網路。該網路利用超過 119,000 個網域，主要集中在 .SHOP 頂級網域，建立大量假冒的電子商務商店。這些假商店透過複製合法品牌的產品目錄、描述、品牌形象和圖片來欺騙消費者，甚至直接從真實公司的伺服器載入資產。攻擊者模仿了 44,182 個不同品牌，其中一些知名品牌如 SodaStream、Daniel Wellington 等被建立了超過 30 個假商店。\n\n在結帳頁面測試中，Nebty 發現這些假網站的程式碼能夠即時透過 WebSockets 將敏感的支付卡資訊（包括卡號、有效期限、安全碼、持卡人姓名、電子郵件、電話和實體地址）傳輸到命令與控制（C2）伺服器。更危險的是，該程式碼甚至可以轉發受害者銀行發出的一次性確認碼，可能被攻擊者用於繞過安全保護措施。\n\nNebty 提醒，這些假網站甚至會顯示被冒用品牌的合法支援地址，可能導致受害者誤以為是真實公司並聯繫其官方客服。Nebty 已建立可搜尋的資料庫，協助企業識別 DoppelCart 的冒用行為和品牌濫用，以進行防禦和保護。",
+    tags: ["DoppelCart", "Nebty", "詐騙網路", "電子商務", "品牌冒用", "WebSockets", "支付資訊竊取"],
+    title_en: "Large-Scale Fraud Network 'DoppelCart' Uses Over 119,000 Fake Stores to Steal Credit Card Data",
+    summary_en: "German cybersecurity startup Nebty exposed a massive fraud network called 'DoppelCart.' This network utilizes over 119,000 domains, primarily concentrated on the .SHOP top-level domain, to establish a large number of fake e-commerce stores. These fake stores deceive consumers by replicating the product catalogs, descriptions, brand images, and visual assets of legitimate brands, sometimes even loading assets directly from the real company's servers. The attackers imitated 44,182 different brands, including well-known brands such as SodaStream and Daniel Wellington, which had over 30 fake stores established. During testing on the checkout page, Nebty discovered that the code on these fake websites could transmit sensitive payment card information (including card number, expiration date, security code, cardholder name, email, phone, and physical address) in real-time via WebSockets to a command and control (C2) server. Even more dangerously, the code could relay one-time confirmation codes issued by the victim's bank, which attackers might use to bypass security measures. Nebty warned that these fake websites even display the legitimate support addresses of the impersonated brands, potentially leading victims to believe they are contacting the real company and thus reaching out to official customer service. Nebty has established a searchable database to help businesses identify DoppelCart's impersonation and brand abuse activities for defense and protection.",
+    tags_en: ["DoppelCart", "Nebty", "Fraud Network", "E-commerce", "Brand Impersonation", "WebSockets", "Payment Data Theft"],
+    sources: [
+      { name: "BleepingComputer", url: "https://bleepingcomputer.com/news/security/doppelcart-fraud-network-uses-119-000-fake-shops-to-steal-credit-cards", lang: "EN" }
     ]
   },
   {

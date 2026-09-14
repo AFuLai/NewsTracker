@@ -2455,6 +2455,20 @@ window.TRACKER_DAYS["2026-09-09"] = [
     ]
   },
   {
+    id: "20260909-11774",
+    trackers: ["security"],
+    category: "前瞻技術",
+    title: "Red Hat推出Certificate System 11，協助企業進行後量子密碼（PQC）遷移",
+    summary: "隨著量子運算技術的發展，傳統的公開金鑰加密（asymmetric cryptography）正被視為結構性漏洞。美國政府已將其列為需盤點、淘汰和替換的資安風險。為應對此趨勢，Red Hat推出了Red Hat Certificate System 11，這是一個基於Dogtag開源專案、高度可擴展的企業級公鑰基礎設施（PKI）引擎。該系統能夠作為中央化的後量子信任錨點，支援標準化的量子抗性演算法，包括用於數位簽章的ML-DSA（FIPS-204）和用於金鑰封裝的ML-KEM（FIPS-203）。它能讓企業在混合雲和物聯網環境中，自動化地發行、管理和撤銷x.509後量子憑證。使用該系統，企業可以透過與RHEL的全球加密政策整合，只需單一指令即可將整個作業系統的加密態勢轉為後量子標準，從而避免了手動配置的複雜性，並應對了憑證生命週期縮短帶來的營運挑戰。",
+    tags: ["Red Hat", "Certificate System 11", "PQC", "PKI", "FIPS-204", "FIPS-203", "量子密碼學"],
+    title_en: "Red Hat Launches Certificate System 11 to Assist Enterprises with Post-Quantum Cryptography Transition",
+    summary_en: "With the advancement of quantum computing technology, traditional asymmetric cryptography is increasingly viewed as a structural vulnerability. The US government has designated this as a security risk requiring inventory, deprecation, and replacement. To address this trend, Red Hat has launched Red Hat Certificate System 11, a highly scalable, enterprise-grade Public Key Infrastructure (PKI) engine based on the Dogtag open-source project. This system serves as a centralized post-quantum trust anchor, supporting standardized quantum-resistant algorithms, including ML-DSA (FIPS-204) for digital signatures and ML-KEM (FIPS-203) for key encapsulation. It enables enterprises to automatically issue, manage, and revoke x.509 post-quantum certificates across hybrid cloud and IoT environments. By using this system, enterprises can integrate with RHEL's global encryption policies, transitioning the entire operating system's cryptographic posture to post-quantum standards with a single command. This avoids the complexity of manual configuration and addresses operational challenges arising from shortened certificate lifecycles.",
+    tags_en: ["Red Hat", "Certificate System 11", "PQC", "PKI", "FIPS-204", "FIPS-203", "Quantum Cryptography"],
+    sources: [
+      { name: "Red Hat Security Blog", url: "https://redhat.com/en/blog/accelerating-post-quantum-security-migration-red-hat-certificate", lang: "EN" }
+    ]
+  },
+  {
     id: "20260909-11218",
     trackers: ["eu_cra"],
     category: "產業動態",
