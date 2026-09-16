@@ -436,6 +436,174 @@ window.TRACKER_DAYS["2026-09-11"] = [
     ]
   },
   {
+    id: "20260911-12330",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心修復 wifi: mwifiex 模組的堆疊緩衝區汙染漏洞",
+    summary: "本修補針對 Linux 核心中的 `wifi: mwifiex` 模組，解決了一個堆疊緩衝區汙染（stack corruption）的漏洞。當使用 `mwifiex` 模組處理同步命令（synchronous commands）時，如果呼叫方提供的資料緩衝區（data buffer）是堆疊分配的物件，且在等待命令（`wait_event_interruptible_timeout()`）過程中被中斷，後續的韌體回應（firmware response）可能會將資料寫入這個已經失效（stale）的堆疊地址。這導致了惡意的指標解引用（bad pointer dereference）和核心堆疊汙染，可能引發系統崩潰（Kernel panic）。修補措施是在取消待處理命令時，將呼叫方擁有的資料緩衝區從當前仍在執行的命令中分離（detach），從而防止晚期回應寫入到生命週期已結束的指標。此漏洞在進行重複的連線和斷線循環（association and disassociation cycles）時可被觸發。本修補已在 i.MX8MP 平台上進行測試。",
+    tags: ["Linux 核心", "mwifiex", "堆疊汙染", "Kernel panic", "wifi"],
+    title_en: "Linux Kernel Fix for WiFi: Stack Buffer Corruption Vulnerability in mwifiex Module",
+    summary_en: "This patch addresses a stack corruption vulnerability in the `wifi: mwifiex` module within the Linux kernel. When the `mwifiex` module processes synchronous commands, if the data buffer provided by the caller is a stack-allocated object and is interrupted during the waiting process (`wait_event_interruptible_timeout()`), a subsequent firmware response may write data to this stale stack address. This leads to a malicious pointer dereference and kernel stack corruption, potentially causing a system crash (Kernel panic). The fix detaches the data buffer owned by the caller from the currently executing command when the pending command is canceled, thereby preventing late responses from writing to an expired pointer. This vulnerability can be triggered during repeated association and disassociation cycles. This patch has been tested on the i.MX8MP platform.",
+    tags_en: ["Linux Kernel", "mwifiex", "Stack Corruption", "Kernel panic", "wifi"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-80944", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260911-12331",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心修補：crypto: iaa 軟體回退機制存在記憶體未解除映射的漏洞",
+    summary: "本漏洞存在於 Linux 核心的加密模組 `crypto: iaa` 中。當硬體分析器發生錯誤時，解壓縮機制會嘗試透過軟體回退（software fallback）進行重試。在特定條件下，如果啟用了 SWIOTLB，軟體回退會在 DMA_FROM_DEVICE 仍處於映射狀態時寫入 `req->dst`。此時，後續的 `dma_unmap_sg()` 呼叫會將過時的 bounce buffer 覆蓋到 `req->dst`，導致結果資料被破壞。修補措施要求在軟體回退機制執行前，必須先解除記憶體映射（Unmap）。修補後的非同步路徑（async path）已內聯解除映射；同步路徑（sync path）則透過發出 `-EAGAIN` 訊號，確保 `iaa_comp_adecompress()` 在解除映射之後再執行回退機制。建議系統管理員應立即更新 Linux 核心以修補此記憶體處理漏洞。",
+    tags: ["Linux 核心", "crypto: iaa", "記憶體管理", "DMA", "CVE-2026-80945"],
+    title_en: "Linux Kernel Patch: Memory Unmapping Vulnerability in crypto: iaa Software Fallback Mechanism",
+    summary_en: "This vulnerability exists in the Linux kernel's crypto module, `crypto: iaa`. When a hardware accelerator encounters an error, the decompression mechanism attempts a retry via software fallback. Under specific conditions, if SWIOTLB is enabled, the software fallback writes to `req->dst` while `DMA_FROM_DEVICE` is still mapped. Subsequently, the `dma_unmap_sg()` call overwrites the outdated bounce buffer into `req->dst`, leading to corrupted result data. The patch requires that the memory mapping must be unmapped before the software fallback mechanism executes. For the patched asynchronous path, unmapping is now inlined; for the synchronous path, it ensures that `iaa_comp_adecompress()` only executes the fallback mechanism after unmapping by issuing an `-EAGAIN` signal. System administrators are advised to immediately update their Linux kernel to patch this memory handling vulnerability.",
+    tags_en: ["Linux Kernel", "crypto: iaa", "Memory Management", "DMA", "CVE-2026-80945"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-80945", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260911-12332",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心修復 fuse-io-uring 傳輸層的堆疊緩衝區複製漏洞",
+    summary: "本漏洞存在於 Linux 核心的 fuse-io-uring 傳輸層，允許攻擊者透過不安全的堆疊緩衝區複製（stack buffer copy）來執行攻擊。問題出在 `fuse-io-uring` 傳輸函式庫在 `fuse_uring_copy_to_ring()` 和 `fuse_uring_commit()` 中，直接將 `req->in.h` 和 `req->out.h` 標頭複製到環（ring）中。由於這些標頭位於 `fuse_request` 的 SLUB 物件內，而該快取（`fuse_req_cachep`）在創建時缺乏使用者複製白名單（usercopy whitelist），直接從/到使用者空間複製這些標頭會觸發 `CONFIG_HARDENED_USERCOPY`，進而導致系統崩潰（panic）。修復措施是將這兩個標頭透過在堆疊上的複製（on-stack copy）進行傳輸，確保使用者複製操作觸及的是堆疊記憶體，而非 SLUB 物件，從而繞過安全檢查，解決了核心記憶體暴露的潛在風險。",
+    tags: ["Linux 核心", "fuse", "io-uring", "堆疊緩衝區", "CONFIG_HARDENED_USERCOPY"],
+    title_en: "Linux Kernel Fixes Stack Buffer Copy Vulnerability in fuse-io-uring Transport Layer",
+    summary_en: "This vulnerability resides in the fuse-io-uring transport layer of the Linux kernel, allowing an attacker to execute an attack through an unsafe stack buffer copy. The issue stems from the `fuse-io-uring` transport library, which directly copies the `req->in.h` and `req->out.h` headers into the ring within `fuse_uring_copy_to_ring()` and `fuse_uring_commit()`. Since these headers are located within the `fuse_request` SLUB object, and the cache (`fuse_req_cachep`) lacks a usercopy whitelist upon creation, directly copying these headers from/to user space triggers `CONFIG_HARDENED_USERCOPY`, leading to a system panic. The fix involves transmitting these two headers via an on-stack copy, ensuring that the usercopy operation accesses stack memory rather than the SLUB object, thereby bypassing the safety check and resolving the potential risk of kernel memory exposure.",
+    tags_en: ["Linux Kernel", "fuse", "io-uring", "stack buffer", "CONFIG_HARDENED_USERCOPY"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-80946", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260911-12333",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心 Wi-Fi 驅動程式 rtl8xxxu 修正 use-after-free 漏洞",
+    summary: "本漏洞存在於 Linux 核心的 rtl8xxxu Wi-Fi 驅動程式中，屬於使用後釋放（use-after-free）類型。攻擊條件是在活躍的接收（RX）流量（即待處理的 URB 數量超過水位線）發生後，執行介面斷開（disconnect）操作。當系統執行 `rtl8xxxu_stop()` 時，雖然會取消其他工作項目，但未能取消 `rx_urb_wq` 工作佇列。這導致在 `rtl8xxxu_disconnect()` 呼叫了 `ieee80211_free_hw()` 釋放 `priv` 結構體之後，一個在接收流量高峰期啟動的工作執行緒仍可能運行，並嘗試使用已釋放的 `priv` 指標，從而觸發 use-after-free。修補措施包括：1. 在 `rtl8xxxu_queue_rx_urb()` 中，將 `schedule_work()` 呼叫移動到與 `!shutdown` 檢查原子性的範圍內。2. 在 `rtl8xxxu_stop()` 中，在執行 `usb_kill_anchored_urbs()` 之前，先呼叫 `cancel_work_sync(&priv->rx_urb_wq)`，確保工作執行緒在釋放資源前被完全處理。修補後，系統在介面斷開時，會確保所有相關工作佇列被正確取消和清理。",
+    tags: ["Linux 核心", "rtl8xxxu", "use-after-free", "Wi-Fi 驅動程式", "CVE"],
+    title_en: "Linux Kernel Wi-Fi Driver rtl8xxxu Fixes Use-After-Free Vulnerability",
+    summary_en: "This vulnerability resides in the rtl8xxxu Wi-Fi driver within the Linux kernel and is classified as a use-after-free type. The attack condition occurs after active reception (RX) traffic (i.e., when the number of pending URBs exceeds the watermark) and subsequently executing a disconnect operation. When the system executes `rtl8xxxu_stop()`, although it cancels other work items, it fails to cancel the `rx_urb_wq` work queue. This leads to a scenario where a work thread started during a reception traffic peak may still run and attempt to use the freed `priv` pointer, after `rtl8xxxu_disconnect()` calls `ieee80211_free_hw()` to release the `priv` structure, thereby triggering a use-after-free. The patches include: 1. Moving the `schedule_work()` call in `rtl8xxxu_queue_rx_urb()` to within the scope atomic with the `!shutdown` check. 2. In `rtl8xxxu_stop()`, calling `cancel_work_sync(&priv->rx_urb_wq)` before executing `usb_kill_anchored_urbs()`, ensuring that the work thread is fully processed before resources are released. After the fix, the system ensures that all relevant work queues are correctly canceled and cleaned up when the interface disconnects.",
+    tags_en: ["Linux Kernel", "rtl8xxxu", "use-after-free", "Wi-Fi Driver", "CVE"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-80947", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260911-12334",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心修復 iwl_op_mode_dvm_start() 記憶體洩漏漏洞",
+    summary: "本漏洞存在於 Linux 核心的 `wifi: iwlwifi: dvm` 驅動程式中。問題出在 `iwl_op_mode_dvm_start()` 函式中，當程式執行到 `out_free_eeprom` 時，會繞過 `out_free_eeprom_blob` 標籤。因此，在成功解析 EEPROM 自由位址（priv->nvm_data）之後，若觸發錯誤路徑，會導致 `priv->eeprom_blob` 記憶體洩漏。開發團隊已透過重新排序錯誤處理標籤來修復此記憶體洩漏。此錯誤最初是在分析 v6.13-rc1 時被發現的，目前已確認在 v7.1-rc6 版本中仍存在，但已提供修復方案。修補建議是更新到修復了此記憶體洩漏的 Linux 核心版本。",
+    tags: ["Linux 核心", "iwlwifi", "dvm", "記憶體洩漏", "CVE-2026-80948"],
+    title_en: "Linux Kernel Fixes iwl_op_mode_dvm_start() Memory Leak Vulnerability",
+    summary_en: "This vulnerability exists in the `wifi: iwlwifi: dvm` driver within the Linux kernel. The issue resides in the `iwl_op_mode_dvm_start()` function, where execution reaches `out_free_eeprom` while bypassing the `out_free_eeprom_blob` label. Consequently, after successfully parsing the EEPROM free address (priv->nvm_data), triggering an error path results in a memory leak of `priv->eeprom_blob`. The development team fixed this memory leak by reordering the error handling labels. This error was initially discovered while analyzing v6.13-rc1 and was confirmed to persist in v7.1-rc6, but a fix has been provided. The recommended patch is to update to a Linux kernel version that resolves this memory leak.",
+    tags_en: ["Linux Kernel", "iwlwifi", "dvm", "Memory Leak", "CVE-2026-80948"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-80948", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260911-12335",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心修補：brcmfmac 驅動程式修復記憶體洩漏漏洞",
+    summary: "本修補針對 Linux 核心的 wifi: brcmfmac 驅動程式，解決了 `brcmf_sdio_read_control()` 函式中存在的記憶體洩漏（memory leak）問題。在某些錯誤處理路徑（error paths）中，為 `buf` 分配的記憶體未能被釋放。修補措施透過增加 `vfree()` 呼叫來確保記憶體資源得到正確釋放，防止系統資源耗盡。此類記憶體洩漏漏洞屬於核心元件層面的穩定性問題，修補後能提升系統的穩定性和資源管理效率。建議系統管理員應透過核心更新機制，將 Linux 核心升級至包含此修補的最新版本，以確保系統的穩定運行。",
+    tags: ["Linux 核心", "brcmfmac", "記憶體洩漏", "wifi", "核心修補"],
+    title_en: "Linux Kernel Patch: Fixes Memory Leak Vulnerability in brcmfmac Driver",
+    summary_en: "This patch addresses the `wifi: brcmfmac` driver within the Linux kernel, resolving a memory leak issue found in the `brcmf_sdio_read_control()` function. In certain error handling paths, memory allocated for `buf` was not being released. The fix introduces an additional `vfree()` call to ensure that memory resources are correctly freed, preventing system resource exhaustion. This type of memory leak vulnerability is a core component stability issue; applying the patch enhances system stability and resource management efficiency. System administrators are advised to upgrade the Linux kernel to the latest version containing this patch via the kernel update mechanism to ensure stable system operation.",
+    tags_en: ["Linux Kernel", "brcmfmac", "Memory Leak", "wifi", "Kernel Patch"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-80949", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260911-12336",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心 i3c 驅動程式修復空轉處理漏洞，防止中斷處理器存取已釋放記憶體",
+    summary: "本漏洞存在於 Linux 核心的 Renesas I3C 驅動程式中。該驅動程式採用非同步模型進行資料傳輸，在等待完成時，如果傳輸逾時，等待執行緒會釋放相關的資料結構（struct renesas_i3c_xfer）。若此時發生中斷（interrupt），中斷處理器（interrupt handler）可能會嘗試存取這些已被釋放的記憶體，進而導致系統崩潰（crash）。修復措施要求在中斷處理器中，存取資料前必須檢查傳輸是否仍然有效。此外，建議清除所有狀態旗標並禁用所有中斷，以避免再次觸發相同的中斷，確保系統穩定性。",
+    tags: ["Linux 核心", "i3c", "Renesas", "驅動程式", "記憶體安全", "中斷處理"],
+    title_en: "Linux Kernel i3c Driver Fixes Race Condition Vulnerability, Preventing Interrupt Handler Access to Freed Memory",
+    summary_en: "This vulnerability resides in the Renesas I3C driver within the Linux kernel. The driver uses an asynchronous model for data transfer. If the transfer times out while waiting for completion, the waiting thread releases the associated data structure (struct renesas_i3c_xfer). If an interrupt occurs at this point, the interrupt handler may attempt to access this already freed memory, potentially leading to a system crash. The fix requires that the interrupt handler must check if the transfer is still valid before accessing the data. Furthermore, it is recommended to clear all status flags and disable all interrupts to prevent re-triggering the same interrupt, thereby ensuring system stability.",
+    tags_en: ["Linux Kernel", "i3c", "Renesas", "Driver", "Memory Safety", "Interrupt Handler"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-80950", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260911-12337",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心 i3c 驅動程式存在越界寫入漏洞，可能導致 IBI 緩衝區溢出",
+    summary: "本漏洞存在於 Linux 核心的 i3c 驅動程式中，具體為 `i3c: master: svc: bound IBI payload to the requested max_payload_len`。問題出在 `svc_i3c_master_handle_ibi()` 函數，該函數從 RX FIFO 讀取 IBI 負載到 IBI 槽位。由於循環的邊界僅受限於硬體 FIFO 大小（SVC_I3C_FIFO_SIZE），而非目標槽位大小。當設備發送的位元組數超過了槽位實際容量時，會導致寫入超出 `slot->data` 的範圍，造成 IBI 緩衝區越界寫入（out-of-bounds write）。這類漏洞可能被利用來執行任意程式碼或造成系統崩潰。修補建議是將讀取循環的邊界限制在 `dev->ibi->max_payload_len`，並確保每次讀取數據時，都根據槽位剩餘空間進行限制，以防止數據洩漏到下一次傳輸。此類修補屬於核心層面的安全加固。",
+    tags: ["Linux 核心", "i3c", "CVE-2026-80951", "越界寫入", "IBI 緩衝區"],
+    title_en: "Out-of-bounds write vulnerability found in Linux kernel i3c driver, potentially causing IBI buffer overflow",
+    summary_en: "This vulnerability resides in the Linux kernel's i3c driver, specifically within the function `i3c: master: svc: bound IBI payload to the requested max_payload_len`. The issue lies in the `svc_i3c_master_handle_ibi()` function, which reads an IBI payload from the RX FIFO into the IBI slot. Because the loop boundary is only limited by the hardware FIFO size (SVC_I3C_FIFO_SIZE) and not the target slot size, an out-of-bounds write occurs when the number of bytes sent by the device exceeds the actual capacity of the slot. This type of vulnerability could potentially be exploited to execute arbitrary code or cause a system crash. The recommended fix is to limit the reading loop boundary to `dev->ibi->max_payload_len` and ensure that data is read based on the remaining space in the slot during each read operation, thereby preventing data leakage into the next transmission. This fix constitutes a core-level security hardening.",
+    tags_en: ["Linux kernel", "i3c", "CVE-2026-80951", "Out-of-bounds write", "IBI buffer"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-80951", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260911-12338",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心修復 i3c 設備註冊路徑的資訊洩漏與 UAF 漏洞",
+    summary: "本漏洞存在於 Linux 核心的 i3c 總線驅動程式中，主要影響設備的註冊與解除註冊流程。當執行 `device_unregister()` 時，如果設備描述符（device descriptor）尚未被正確處理，可能會導致 `i3c_device_uevent()` 和 `modalias_show()` 等函式觀察到 NULL 的描述符。這不僅可能導致核心堆疊內容洩漏（information leak），還可能使驅動程式的 `.remove()` 回呼函式在解除綁定（unbind）時遇到意外的 NULL 描述符，造成潛在的 Use-After-Free (UAF) 問題。修復建議是，在呼叫 `device_unregister()` 之前，必須使用 `get_device()` 取得額外的設備參考計數，確保設備描述符在整個註冊流程中保持有效。在完成註冊後，再清除描述符並釋放額外的參考計數，以避免資訊洩漏和 UAF。",
+    tags: ["Linux 核心", "i3c", "資訊洩漏", "Use-After-Free", "Linux 驅動程式"],
+    title_en: "Linux Kernel Fixes Information Leak and UAF Vulnerability in i3c Device Registration Path",
+    summary_en: "This vulnerability resides in the i3c bus driver within the Linux kernel, primarily affecting the device registration and unregistration process. When `device_unregister()` is executed, if the device descriptor has not been properly handled, it may cause functions like `i3c_device_uevent()` and `modalias_show()` to observe NULL descriptors. This not only risks kernel stack information leakage but can also cause the driver's `.remove()` callback function to encounter unexpected NULL descriptors during unbinding, leading to a potential Use-After-Free (UAF) issue. The suggested fix is that before calling `device_unregister()`, an additional device reference must be acquired using `get_device()` to ensure the device descriptor remains valid throughout the entire registration process. After completing the registration, the descriptor should be cleared and the extra reference count released to prevent information leakage and UAF.",
+    tags_en: ["Linux Kernel", "i3c", "Information Leak", "Use-After-Free", "Linux Driver"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-80952", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260911-12339",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心 i3c 驅動程式存在競態條件漏洞：未初始化鎖可能導致系統崩潰",
+    summary: "本漏洞存在於 Linux 核心的 i3c 驅動程式中，具體為 `adi_i3c_master_probe()` 函式。當此函式請求並解除 i3c 控制器的 REG_IRQ_PENDING_CMDR 訊號後，在控制器內部狀態（如 IBI 狀態、傳輸佇列列表和傳輸佇列鎖）尚未初始化時，一個待處理的 CMDR 中斷（pending CMDR interrupt）可能會觸發 `adi_i3c_master_irq()`。此中斷會在動態鎖（dynamic lock）初始化之前，嘗試獲取 `master->xferqueue.lock`，從而導致鎖定機制上的競態條件（race condition）和潛在的系統不穩定性。此問題已透過靜態分析工具發現並進行人工審核，修補建議是在請求和解除 IRQ 訊號之前，必須先初始化傳輸佇列和 IBI 狀態，以確保鎖定資源的完整性。建議系統維護者應更新至修補後的 Linux 核心版本以修復此漏洞。",
+    tags: ["Linux 核心", "i3c", "adi", "競態條件", "Linux 驅動程式"],
+    title_en: "Race Condition Vulnerability in Linux Kernel i3c Driver: Uninitialized Lock May Cause System Crash",
+    summary_en: "This vulnerability resides in the Linux kernel's i3c driver, specifically within the `adi_i3c_master_probe()` function. When this function requests and releases the REG_IRQ_PENDING_CMDR signal from the i3c controller, a pending CMDR interrupt may trigger `adi_i3c_master_irq()` before the controller's internal state (such as IBI status, transfer queue list, and transfer queue lock) has been initialized. This interrupt attempts to acquire `master->xferqueue.lock` before the dynamic lock is initialized, leading to a race condition in the locking mechanism and potential system instability. This issue was discovered through static analysis tools and subsequent manual review. The suggested fix is to ensure that the transfer queue and IBI status are initialized before requesting and releasing the IRQ signal, thereby guaranteeing the integrity of the locking resources. System maintainers are advised to update to a patched Linux kernel version to resolve this vulnerability.",
+    tags_en: ["Linux Kernel", "i3c", "adi", "Race Condition", "Linux Driver"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-80953", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260911-12340",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心 i3c 驅動程式修復空指針解引用漏洞，提升設備存取安全性",
+    summary: "本漏洞存在於 Linux 核心的 i3c 驅動程式中，具體影響於 `i3c_device_get_supported_xfer_mode()` 函數。該函數在取得主控制器時，錯誤地使用了 `dev->desc` 指標，但未確保在解引用前持有 `bus->lock`。這可能導致在未正確鎖定資源的情況下，對設備描述符進行解引用，引發空指針或記憶體存取錯誤，從而造成系統不穩定或潛在的本地權限提升風險。修復建議是修改該函數，改為使用 `dev->bus` 來取得與設備總線相關的主控制器，因為 `dev->bus` 在設備生命週期內始終有效，且無需解引用 `dev->desc`，從而避免了不安全的記憶體操作。此修補屬於核心元件層面的安全加固。",
+    tags: ["Linux 核心", "i3c", "空指針", "驅動程式", "安全修補"],
+    title_en: "Linux Kernel i3c Driver Fixes Null Pointer Dereference Vulnerability, Enhancing Device Access Security",
+    summary_en: "This vulnerability resides in the Linux kernel's i3c driver, specifically affecting the `i3c_device_get_supported_xfer_mode()` function. This function incorrectly uses the `dev->desc` pointer when obtaining the master controller, without ensuring that `bus->lock` is held before dereferencing. This could lead to dereferencing the device descriptor without properly locked resources, triggering a null pointer or memory access error, potentially causing system instability or a local privilege escalation risk. The recommended fix is to modify the function to use `dev->bus` to obtain the master controller associated with the device bus. This is because `dev->bus` remains valid throughout the device lifecycle and eliminates the need to dereference `dev->desc`, thereby preventing unsafe memory operations. This patch constitutes a security hardening at the core component level.",
+    tags_en: ["Linux Kernel", "i3c", "Null Pointer", "Driver", "Security Patch"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-80954", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260911-12341",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心修復 dm-pcache：解決 kset_replay() 中的 Use-After-Free 漏洞",
+    summary: "本漏洞存在於 Linux 核心的 dm-pcache 元件，具體發生在 kset_replay() 函數中。當 key->seg_gen 狀態過時（即 key->seg_gen < key->cache_pos.cache_seg->gen）時，系統會呼叫 cache_key_put(key)，但隨後仍嘗試存取 key->cache_pos.cache_seg 作為 cache_seg_get() 的參數。這導致了對已釋放的 key 記憶體進行存取，屬於典型的 Use-After-Free (UAF) 漏洞。此外，文章指出對於過期的無效 key，設定 cache->seg_map 位元並呼叫 cache_seg_get() 是不合理的，因為對應的區段資料已無效。修補措施是將 cache_seg_get() 和 __set_bit() 的執行時機，移至完成生成（gen）檢查之後，確保它們僅在有效 key 上執行，並使用 continue 跳過無效 key，從而修復了這兩個潛在的記憶體操作錯誤。",
+    tags: ["Linux 核心", "dm-pcache", "kset_replay", "Use-After-Free", "Linux 核心漏洞"],
+    title_en: "Linux Kernel Fixes dm-pcache: Resolving Use-After-Free Vulnerability in kset_replay()",
+    summary_en: "This vulnerability resides in the Linux kernel's dm-pcache component, specifically within the kset_replay() function. When the key->seg_gen state is stale (i.e., key->seg_gen < key->cache_pos.cache_seg->gen), the system calls cache_key_put(key), but subsequently attempts to access key->cache_pos.cache_seg as an argument to cache_seg_get(). This leads to accessing already freed key memory, which constitutes a typical Use-After-Free (UAF) vulnerability. Furthermore, the article notes that setting the cache->seg_map bit and calling cache_seg_get() for expired, invalid keys is improper, as the corresponding segment data is already invalid. The patch addresses this by moving the execution of cache_seg_get() and __set_bit() until after the generation (gen) check is completed, ensuring they are only executed on valid keys and using continue to skip invalid keys, thereby fixing these two potential memory manipulation errors.",
+    tags_en: ["Linux Kernel", "dm-pcache", "kset_replay", "Use-After-Free", "Linux Kernel Vulnerability"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-80955", lang: "EN" }
+    ]
+  },
+  {
     id: "20260911-11759",
     trackers: ["security"],
     category: "法規與標準",
@@ -1696,6 +1864,20 @@ window.TRACKER_DAYS["2026-09-11"] = [
     tags_en: ["iPhone Duo", "Surface Duo", "Apple", "Microsoft", "Foldable Phone", "Product Design"],
     sources: [
       { name: "Windows Latest", url: "https://windowslatest.com/2026/09/11/iphone-duos-photos-could-pass-for-microsofts-surface-duo-ads-from-2020", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260911-12006",
+    trackers: ["security"],
+    category: "前瞻技術",
+    title: "SpiderSilk推出AI掃描工具，主動偵測企業網際網路暴露資產與零日漏洞",
+    summary: "資安新創公司 SpiderSilk 推出利用人工智慧（AI）的掃描工具，旨在主動搜尋企業在網際網路上的暴露資產、洩露資料和零日漏洞。該工具只需公司名稱，無需客戶提供 IP 位址或網域清單，即可掃描數十億個 IP 位址。其核心功能是模擬外部駭客視角，利用 AI 進行情境化分析，找出企業未曾預期暴露給公眾的系統、憑證或敏感資料。例如，它能偵測到在程式碼平台（如 GitHub）中意外洩露的內部系統登入頁面或資料庫索引。SpiderSilk 的旗艦產品 Resonance 能夠分析和過濾這些資料，並將風險情境化，幫助企業在被駭客利用前採取修補或矯正措施。此外，其 AI 代理平台 SilkRunner 甚至可以建立工作流程，協助驗證和應用修補程式。這項技術強調了從被動應對轉向主動預防的趨勢，讓 CISO 能更有效地管理外部威脅。",
+    tags: ["SpiderSilk", "AI", "Resonance", "零日漏洞", "外部威脅", "資安掃描"],
+    title_en: "SpiderSilk Launches AI Scanning Tool to Proactively Detect Corporate Internet-Exposed Assets and Zero-Day Vulnerabilities",
+    summary_en: "Cybersecurity startup SpiderSilk has launched an AI-powered scanning tool designed to proactively search for corporate internet-exposed assets, leaked data, and zero-day vulnerabilities. The tool requires only a company name, eliminating the need for clients to provide IP addresses or domain lists, allowing it to scan billions of IP addresses. Its core function is to simulate an external hacker's perspective, using AI for contextual analysis to identify systems, credentials, or sensitive data unexpectedly exposed to the public. For instance, it can detect internal system login pages or database indices accidentally leaked on code platforms (such as GitHub). SpiderSilk's flagship product, Resonance, analyzes and filters this data, contextualizing the risk to help enterprises take remediation or corrective measures before they are exploited by hackers. Furthermore, its AI agent platform, SilkRunner, can even build workflows to assist with validating and applying patches. This technology underscores the trend of shifting from passive response to proactive prevention, enabling CISOs to manage external threats more effectively.",
+    tags_en: ["SpiderSilk", "AI", "Resonance", "Zero-Day Vulnerabilities", "External Threats", "Cybersecurity Scanning"],
+    sources: [
+      { name: "Dark Reading", url: "https://darkreading.com/endpoint-security/spidersilk-hunts-external-threats-ai-scanning", lang: "EN" }
     ]
   },
   {

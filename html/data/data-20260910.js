@@ -996,6 +996,20 @@ window.TRACKER_DAYS["2026-09-10"] = [
     ]
   },
   {
+    id: "20260910-11806",
+    trackers: ["security"],
+    category: "漏洞與威脅情報",
+    title: "Microsoft Excel KB5002914 更新導致複製貼上功能故障，用戶需回滾或移除補丁修復",
+    summary: "近期，部分 Microsoft Excel 用戶發現，安裝了本週的 KB5002914 Office 安全更新後，Excel 的複製貼上（Copy-Paste）和公式拖曳（Formula Dragging）功能出現故障。此問題已在 Reddit 和 Microsoft Q&A 論壇上廣泛回報，影響範圍涵蓋 Office 2016 至 2024，無論是 MSI 或 Click-to-Run 安裝方式均受影響。受影響用戶指出，移除或回滾 KB5002914 補丁後，功能即可恢復正常。Microsoft 已正式承認此錯誤，並在 KB5002914 的發布說明中將其列為已知問題。雖然 Microsoft 正在研究，但用戶目前可透過移除或降級 Office Build 來恢復正常操作。建議用戶留意 Microsoft 後續的官方修復指引。",
+    tags: ["Microsoft", "Excel", "KB5002914", "Office", "功能故障", "補丁管理"],
+    title_en: "Microsoft Excel KB5002914 Update Causes Copy-Paste Function Failure; Users Must Rollback or Remove Patch to Fix",
+    summary_en: "Recently, some Microsoft Excel users have discovered that after installing this week's KB5002914 Office security update, Excel's Copy-Paste and Formula Dragging functions are malfunctioning. This issue has been widely reported on Reddit and the Microsoft Q&A forums, affecting Office versions from 2016 to 2024, regardless of whether they are installed via MSI or Click-to-Run. Affected users point out that the functions resume normal operation after removing or rolling back the KB5002914 patch. Microsoft has officially acknowledged this bug and listed it as a known issue in the KB5002914 release notes. Although Microsoft is investigating, users can currently restore normal operation by removing or downgrading the Office Build. Users are advised to monitor Microsoft's subsequent official remediation guidelines.",
+    tags_en: ["Microsoft", "Excel", "KB5002914", "Office", "Function Failure", "Patch Management"],
+    sources: [
+      { name: "BleepingComputer", url: "https://bleepingcomputer.com/news/microsoft/microsoft-excel-kb5002914-update-breaks-copy-and-paste-for-some-users", lang: "EN" }
+    ]
+  },
+  {
     id: "20260910-11807",
     trackers: ["os", "security"],
     category: "漏洞與威脅情報",
@@ -1175,6 +1189,34 @@ window.TRACKER_DAYS["2026-09-10"] = [
     tags_en: ["Android", "Password Management", "Password Manager", "Google Password Manager", "Data Migration", "Information Security"],
     sources: [
       { name: "Ars Technica", url: "https://arstechnica.com/gadgets/2026/09/android-can-now-securely-migrate-your-logins-between-password-managers", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260910-12345",
+    trackers: ["os", "security"],
+    category: "Android",
+    title: "聯想檔案管理器 Android 應用程式存在權限不足漏洞，可能允許本地認證用戶讀寫受保護檔案",
+    summary: "聯想（Lenovo）為中國市場獨家發布的檔案管理器 Android 應用程式，被發現存在潛在的權限不足（improper authorization）漏洞。該漏洞允許已經透過本地認證的用戶，讀取或修改應用程式內受保護的檔案。這類漏洞的攻擊向量為本地攻擊，影響範圍限制在已登入系統的用戶，但仍可能導致用戶資料的機密性與完整性受損。修補建議是聯想應立即修復該應用程式的權限管理機制，確保用戶只能存取其應有的資源，並考慮為所有市場版本進行安全審核，以防止類似的本地權限提升風險。",
+    tags: ["Lenovo", "Android", "權限不足", "檔案管理器", "本地攻擊"],
+    title_en: "Lenovo File Manager Android App Contains Improper Authorization Vulnerability, Potentially Allowing Local Authenticated Users to Read and Write Protected Files",
+    summary_en: "The File Manager Android application, exclusively released by Lenovo for the Chinese market, was found to contain a potential improper authorization vulnerability. This vulnerability allows users who have already authenticated locally to read or modify protected files within the application. The attack vector for this type of vulnerability is local, limiting the scope of impact to users logged into the system, but it could still compromise the confidentiality and integrity of user data. The recommended remediation is for Lenovo to immediately fix the application's permission management mechanism, ensuring that users can only access resources they are entitled to, and to consider conducting a security audit across all market versions to prevent similar local privilege escalation risks.",
+    tags_en: ["Lenovo", "Android", "Improper Authorization", "File Manager", "Local Attack"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-18994", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260910-12346",
+    trackers: ["os", "security"],
+    category: "Android",
+    title: "Lenovo Health Android App 存在漏洞，可能讓攻擊者存取敏感健康資料",
+    summary: "Lenovo Health Android 應用程式在中國市場獨家發行，被發現存在一項漏洞。此漏洞可能允許攻擊者存取使用者高度敏感的健康相關資訊。由於該應用程式專門處理健康資料，一旦遭利用，將構成嚴重的個人隱私與資料安全風險。建議使用者和相關組織應密切關注 Lenovo 官方的安全公告，並儘快更新或修補該應用程式，以降低資料外洩的風險。由於原文未提供具體的 CVE 編號、CVSS 分數或修補版本，建議用戶以官方指引為準，並考慮使用其他替代的健康管理工具，直到官方發布安全修補。",
+    tags: ["Lenovo Health", "Android", "健康資料", "資安漏洞", "中國市場"],
+    title_en: "Vulnerability Found in Lenovo Health Android App, Potentially Allowing Access to Sensitive Health Data",
+    summary_en: "The Lenovo Health Android application, which is exclusively distributed in the Chinese market, has been found to contain a vulnerability. This flaw could potentially allow attackers to access highly sensitive user health-related information. Given that the application specifically handles health data, exploitation could pose a severe risk to personal privacy and data security. Users and relevant organizations are advised to closely monitor official Lenovo security announcements and update or patch the application promptly to mitigate the risk of data leakage. Since the original text did not provide specific CVE IDs, CVSS scores, or patched versions, users are advised to follow official guidelines and consider using alternative health management tools until an official security patch is released.",
+    tags_en: ["Lenovo Health", "Android", "Health Data", "Cybersecurity Vulnerability", "Chinese Market"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-75940", lang: "EN" }
     ]
   },
   {
@@ -1679,6 +1721,34 @@ window.TRACKER_DAYS["2026-09-10"] = [
     tags_en: ["VMware", "VDDK", "SDK", "Virtualization", "Backup", "Migration"],
     sources: [
       { name: "The Register", url: "https://theregister.com/virtualization/2026/09/10/vmware-defends-ending-downloads-of-sdk-that-helps-vm-backups-or-migrations-to-rivals/5295421", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260910-12343",
+    trackers: ["os", "security"],
+    category: "重點關注",
+    title: "Palo Alto Networks Prisma Access Agent 漏洞：本地使用者可繞過 DLP 策略竊取敏感資料",
+    summary: "Palo Alto Networks 的 Prisma Access Agent 在其資料外洩防護（DLP）強制執行機制中存在一項漏洞。該漏洞允許本地使用者繞過預先設定的 DLP 策略強制控制，從而竊取敏感資料。此漏洞的實務影響是，攻擊者無需具備高權限，即可利用本地使用者權限執行資料外洩行為。雖然文章指出此漏洞影響的是 Prisma Access Agent 的 DLP 執行部分，但特別強調此漏洞不影響部署在 macOS、Linux、iOS、Android 和 Chrome OS 上的 Prisma Access Agent 版本。建議組織應密切關注 Palo Alto Networks 的官方安全公告，並儘速更新或修補受影響的 Agent 版本，以防止資料外洩風險。",
+    tags: ["Palo Alto Networks", "Prisma Access Agent", "DLP", "資料外洩", "CVE-2026-0306"],
+    title_en: "Palo Alto Networks Prisma Access Agent Vulnerability: Local Users Can Bypass DLP Policies to Exfiltrate Sensitive Data",
+    summary_en: "A vulnerability exists in the Data Loss Prevention (DLP) enforcement mechanism of Palo Alto Networks' Prisma Access Agent. This flaw allows local users to bypass pre-configured DLP policy controls, thereby exfiltrating sensitive data. The practical impact of this vulnerability is that attackers can perform data exfiltration using only local user privileges, without requiring elevated permissions. Although the article notes that the vulnerability affects the DLP enforcement component of the Prisma Access Agent, it specifically emphasizes that the vulnerability does not impact Prisma Access Agent versions deployed on macOS, Linux, iOS, Android, and Chrome OS. Organizations are advised to closely monitor official security announcements from Palo Alto Networks and promptly update or patch the affected Agent versions to prevent data leakage risks.",
+    tags_en: ["Palo Alto Networks", "Prisma Access Agent", "DLP", "Data Exfiltration", "CVE-2026-0306"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-0306", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260910-12344",
+    trackers: ["os", "security"],
+    category: "重點關注",
+    title: "Palo Alto Networks GlobalProtect™ 應用程式存在多個本地權限提升漏洞，影響 Windows、macOS 與 Linux",
+    summary: "Palo Alto Networks 的 GlobalProtect™ 應用程式在 Windows、macOS 和 Linux 作業系統上存在多個本地權限提升（Local Privilege Escalation, LPE）漏洞。這些漏洞允許本地普通使用者提升權限，在 Windows 環境下可提升至 NT AUTHORITY\\SYSTEM，在 macOS 和 Linux 環境下可提升至 root 權限。這意味著未具備管理員權限的使用者，可以執行具有最高管理員權限的任意指令，造成極高的安全風險。需要注意的是，此類漏洞僅影響 GlobalProtect™ 在 Windows、macOS 和 Linux 上的版本，而 iOS、Android 和 ChromeOS 版本的 GlobalProtect™ 應用程式則不受影響。建議用戶應立即更新 GlobalProtect™ 應用程式至修補版本，以防止攻擊者利用這些漏洞進行系統接管。",
+    tags: ["Palo Alto Networks", "GlobalProtect", "LPE", "Windows", "macOS", "Linux"],
+    title_en: "Multiple Local Privilege Escalation Vulnerabilities Found in Palo Alto Networks GlobalProtect™ Application Affecting Windows, macOS, and Linux",
+    summary_en: "The Palo Alto Networks GlobalProtect™ application contains multiple Local Privilege Escalation (LPE) vulnerabilities across Windows, macOS, and Linux operating systems. These vulnerabilities allow a local standard user to escalate privileges, reaching NT AUTHORITY\\SYSTEM in Windows environments, and root privileges in macOS and Linux environments. This means that a user without administrator privileges can execute arbitrary commands with the highest administrative permissions, posing an extremely high security risk. It should be noted that these vulnerabilities only affect the GlobalProtect™ versions on Windows, macOS, and Linux, while the GlobalProtect™ applications for iOS, Android, and ChromeOS are unaffected. Users are advised to immediately update the GlobalProtect™ application to a patched version to prevent attackers from exploiting these vulnerabilities to take over the system.",
+    tags_en: ["Palo Alto Networks", "GlobalProtect", "LPE", "Windows", "macOS", "Linux"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-0307", lang: "EN" }
     ]
   },
   {
