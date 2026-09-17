@@ -857,6 +857,20 @@ window.TRACKER_DAYS["2026-09-14"] = [
     ]
   },
   {
+    id: "20260914-12554",
+    trackers: ["os", "security"],
+    category: "Apple",
+    title: "Apple 發布 visionOS 26.6.1 安全更新，修補 Authentication Services 與 WebKit 的資訊洩漏漏洞",
+    summary: "Apple 於 2026 年 8 月 17 日發布 visionOS 26.6.1 安全更新，旨在保護用戶的隱私。本次更新主要修補了兩個資訊洩漏（information disclosure）問題。第一個漏洞為 CVE-2026-65355，影響 Authentication Services，可能導致網站即使開啟 Private Relay，仍能偵測到用戶的 IP 位址，透過改善狀態管理來修復此問題。第二個漏洞為 CVE-2026-65352，影響 WebKit，同樣可能讓網站在開啟 Private Relay 的情況下，仍能判斷出用戶的 IP 位址。Apple 強調，所有安全更新都必須經過調查並有補丁或版本發布後才會公開，建議用戶應及時更新至 visionOS 26.6.1 版本以確保系統安全。",
+    tags: ["Apple", "visionOS", "CVE-2026-65355", "CVE-2026-65352", "WebKit", "資訊洩漏", "Private Relay"],
+    title_en: "Apple Releases visionOS 26.6.1 Security Update to Patch Information Disclosure Vulnerabilities in Authentication Services and WebKit",
+    summary_en: "On August 17, 2026, Apple released visionOS 26.6.1 security update aimed at protecting user privacy. This update primarily addresses two information disclosure vulnerabilities. The first vulnerability is CVE-2026-65355, affecting Authentication Services. It could potentially allow websites to detect a user's IP address even when Private Relay is enabled. This issue was fixed by improving state management. The second vulnerability is CVE-2026-65352, affecting WebKit. Similarly, it could potentially allow websites to determine a user's IP address even when Private Relay is active. Apple emphasized that all security updates are only made public after investigation and the release of a patch or version. Users are advised to update to visionOS 26.6.1 promptly to ensure system security.",
+    tags_en: ["Apple", "visionOS", "CVE-2026-65355", "CVE-2026-65352", "WebKit", "Information Disclosure", "Private Relay"],
+    sources: [
+      { name: "Apple Security Releases", url: "https://support.apple.com/en-us/148353", lang: "EN" }
+    ]
+  },
+  {
     id: "20260914-12039",
     trackers: ["security"],
     category: "供應鏈與開源安全",
