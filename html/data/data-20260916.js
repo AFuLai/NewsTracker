@@ -310,6 +310,426 @@ window.TRACKER_DAYS["2026-09-16"] = [
     ]
   },
   {
+    id: "20260916-12992",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心修復 Bluetooth SCO 漏洞：防止 `sk` 引用計數錯誤導致 UAF",
+    summary: "本漏洞存在於 Linux 核心的 Bluetooth 相關元件中，具體影響 `sco_conn_ready` 和 `sco_get_sock_listen()` 函數。問題點在於在執行這些函數時，對 socket 結構體 `sk` 的存取缺乏適當的同步機制和引用計數保護。當多個任務（Task 1 和 Task 2）同時操作時，可能導致 `sk` 結構體被釋放（release）或銷毀（kill）時，其他任務仍嘗試使用其指標，從而引發使用後釋放（Use-After-Free, UAF）的記憶體安全問題。修復建議是：在 `sco_conn_ready()` 中持有 `sk` 的引用計數（refcount），並修改 `sco_get_sock_listen()` 增加引用計數。此外，應在取得鎖定（lock_sock）之後，額外檢查 socket 是否仍然有效，並調整 `conn->sk` 的鎖定保護範圍，確保其能被相關 socket 的鎖定機制保護。這類核心層面的記憶體管理缺陷，若未修復，可能被惡意利用執行任意程式碼。",
+    tags: ["Linux 核心", "Bluetooth", "SCO", "UAF", "記憶體安全", "Linux Kernel"],
+    title_en: "Linux Kernel Fixes Bluetooth SCO Vulnerability: Prevents UAF Due to `sk` Reference Counting Error",
+    summary_en: "This vulnerability exists within the Bluetooth-related components of the Linux kernel, specifically affecting the `sco_conn_ready` and `sco_get_sock_listen()` functions. The issue stems from insufficient synchronization and reference counting protection when accessing the socket structure `sk` while executing these functions. When multiple tasks (Task 1 and Task 2) operate concurrently, it may lead to other tasks attempting to use the `sk` structure's pointer even after it has been released or destroyed, thereby triggering a Use-After-Free (UAF) memory safety issue. The suggested fix involves holding the reference count of `sk` within `sco_conn_ready()`, and modifying `sco_get_sock_listen()` to increment the reference count. Furthermore, it is recommended to check if the socket is still valid after acquiring the lock (`lock_sock`), and to adjust the locking protection scope for `conn->sk` to ensure it is protected by the relevant socket locking mechanism. If left unpatched, such core-level memory management defects could be exploited maliciously to execute arbitrary code.",
+    tags_en: ["Linux Kernel", "Bluetooth", "SCO", "UAF", "Memory Safety", "Linux Kernel"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-89774", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260916-12993",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心 KVM 漏洞修復：修復 arm64 處理 VNCR TLB 尺寸計算時負數層級的邏輯錯誤",
+    summary: "本修復針對 Linux 核心的 KVM 組件，特別是針對 arm64 架構的處理。原始問題出在計算 TLB (Translation Lookaside Buffer) 失效時，用於 S1 映射（如 VNCR）的尺寸評估邏輯。當 MMU（Memory Management Unit）處於關閉狀態時，系統會使用一個特殊的負數值（S1_MMU_DISABLED）來表示。然而，原有的 `pgshift_level_to_ttl()` 函式未能正確處理這些負數層級，導致層級值被誤解，最終計算出的失效尺寸為 0，造成功能異常。本次修復優化了 `pgshift_level_to_ttl()` 和 `ttl_to_size()` 函式，使其能正確處理負數層級，並在沒有有效 TTL 時，確保返回預設的 SZ_1G 尺寸。此修復旨在提高核心的穩定性與準確性，特別是在處理複雜的記憶體管理和虛擬化場景。",
+    tags: ["Linux 核心", "KVM", "arm64", "TLB", "MMU", "VNCR"],
+    title_en: "Linux Kernel KVM Vulnerability Fix: Correcting Logic Error for Negative Levels During VNCR TLB Size Calculation on arm64",
+    summary_en: "This fix addresses the KVM component within the Linux kernel, specifically for the arm64 architecture. The original issue lay in the size estimation logic used for S1 mappings (such as VNCR) when a TLB (Translation Lookaside Buffer) miss occurs. When the MMU (Memory Management Unit) is disabled, the system uses a special negative value (S1_MMU_DISABLED) to represent this state. However, the existing `pgshift_level_to_ttl()` function failed to correctly handle these negative levels, leading to a misinterpretation of the level value. Consequently, the calculated miss size was 0, causing functional anomalies. This fix optimizes the `pgshift_level_to_ttl()` and `ttl_to_size()` functions, enabling them to correctly process negative levels and ensure that a default size of SZ_1G is returned when no valid TTL is present. This patch aims to enhance the kernel's stability and accuracy, particularly when handling complex memory management and virtualization scenarios.",
+    tags_en: ["Linux Kernel", "KVM", "arm64", "TLB", "MMU", "VNCR"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-89775", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260916-12994",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心修補：VXLAN VNI 過濾器允許短屬性長度，導致核心記憶體洩露漏洞",
+    summary: "本漏洞存在於 Linux 核心的 VXLAN VNI 過濾器功能中。當該策略宣告 GROUP/GROUP6 位址屬性為僅有最大長度的 NLA_BINARY 時，`validate_nla()` 函數會接受比實際位址短的負載。然而，消費者程式使用 `nla_get_in_addr()` 進行無條件的 4 位元組載入，導致短屬性會過度讀取（over-read）最多 3 位元組未初始化（uninitialised）的 Slab 資料。這些未初始化資料會被儲存到 `remote_ip` 變數中，並透過 `RTM_GETTUNNEL` 傳回，最終洩露核心記憶體內容。修補措施建議將相關的兩個入口點都更改為使用 `NLA_POLICY_EXACT_LEN()`，確保驗證器會拒絕任何非精確長度的 GROUP/GROUP6 屬性，從而防止有效位址以完整寬度傳送。",
+    tags: ["Linux 核心", "VXLAN", "VNI", "NLA_BINARY", "記憶體洩露", "CVE"],
+    title_en: "Linux Kernel Patch: VXLAN VNI Filter Allows Short Attribute Length, Leading to Kernel Memory Leak Vulnerability",
+    summary_en: "This vulnerability exists in the VXLAN VNI filter functionality of the Linux kernel. When the policy declares the GROUP/GROUP6 address attribute as an NLA_BINARY with only maximum length, the `validate_nla()` function accepts a payload shorter than the actual address. However, consumer programs use `nla_get_in_addr()` for unconditional 4-byte loading, causing the short attribute to over-read up to 3 bytes of uninitialized Slab data. This uninitialized data is stored in the `remote_ip` variable and subsequently returned via `RTM_GETTUNNEL`, ultimately leaking kernel memory content. The patch suggests changing both relevant entry points to use `NLA_POLICY_EXACT_LEN()`, ensuring the validator rejects any GROUP/GROUP6 attribute that is not of an exact length, thereby preventing the transmission of valid addresses with incomplete width.",
+    tags_en: ["Linux Kernel", "VXLAN", "VNI", "NLA_BINARY", "Memory Leak", "CVE"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-89776", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260916-12995",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux vfio 驅動程式存在 Use-After-Free 與 Double Free 漏洞，可能導致系統崩潰",
+    summary: "本漏洞位於 Linux 核心的 vfio/pci 驅動程式中，具體為 `vfio/pci: clear vdev->msi_perm after freeing it on init failure` 的問題。當 `init_pci_cap_msi_perm()` 函式在分配 MSI 權限表時失敗（例如遇到 -ENOMEM），它會釋放 `vdev->msi_perm` 指標，但在錯誤路徑中並未將該指標設為 NULL。這導致了兩個嚴重的安全問題：首先是「重用」（Reuse），後續的 `vfio_config_init()` 會看到這個過時的指標並重複使用已釋放的物件，進而導致 MSI 配置存取時，會解引用並呼叫已釋放的 `perm->readfn` 或 `perm->writefn` 指標，造成 Use-After-Free。其次是「雙重釋放」（Double Free），後續的 `vfio_config_free()` 會對這個已經釋放的物件再次執行 `kfree()`，最終可能導致系統崩潰（Kernel panic）。修補建議是在 `kfree()` 之後，將 `vdev->msi_perm` 設為 NULL，以符合 NULL-after-free 的安全慣例。",
+    tags: ["Linux 核心", "vfio", "pci", "Use-After-Free", "Double Free", "Kernel"],
+    title_en: "Linux vfio Driver Contains Use-After-Free and Double Free Vulnerabilities, Potentially Causing System Crash",
+    summary_en: "This vulnerability resides in the Linux kernel's vfio/pci driver, specifically in the issue `vfio/pci: clear vdev->msi_perm after freeing it on init failure`. When the `init_pci_cap_msi_perm()` function fails to allocate the MSI permission table (for example, encountering -ENOMEM), it frees the `vdev->msi_perm` pointer but fails to set the pointer to NULL along the error path. This leads to two serious security issues: first, 'Reuse'. Subsequently, `vfio_config_init()` sees this stale pointer and reuses the already freed object, leading to Use-After-Free when accessing MSI configuration, as it dereferences and calls the freed `perm->readfn` or `perm->writefn` pointers. Second, 'Double Free'. Later, `vfio_config_free()` attempts to call `kfree()` on this already freed object, potentially resulting in a system crash (Kernel panic). The suggested fix is to set `vdev->msi_perm` to NULL after `kfree()` to adhere to the security practice of NULL-after-free.",
+    tags_en: ["Linux Kernel", "vfio", "pci", "Use-After-Free", "Double Free", "Kernel"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-89777", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260916-12996",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心修復 isofs 漏洞：修正 zisofs 處理空區塊時的越界讀取問題",
+    summary: "本修補針對 Linux 核心中處理 ISO9660 格式壓縮檔案的 zisofs 功能，修復了一個空區塊（empty block）的越界頁面陣列存取（out-of-bounds page array access）漏洞。當 zisofs 區塊大小小於 PAGE_SIZE，且子頁面區塊從 poffset 中途結束時，後續的空區塊會錯誤地過度計算頁面數，導致 pages[] 陣列索引超出範圍。此漏洞的觸發條件是透過對掛載的 ISO9660 壓縮檔案執行普通的 read() 操作。修復內容要求 zisofs_uncompress_block() 在空區塊快速路徑中，必須返回相對於 poffset 的位元組計數，並只將第一頁的 [poffset, PAGE_SIZE) 範圍歸零，以與解壓縮路徑保持一致。此修補旨在防止在處理特定構造的「ZF」Rock Ridge 記錄時，導致的記憶體越界讀取（KASAN: slab-out-of-bounds）。",
+    tags: ["Linux 核心", "isofs", "zisofs", "CVE-2026-89778", "ISO9660", "越界讀取"],
+    title_en: "Linux Kernel Fixes isofs Vulnerability: Corrects Out-of-Bounds Read When Handling Empty Blocks in zisofs",
+    summary_en: "This patch addresses a vulnerability in the Linux kernel's zisofs functionality, which handles ISO9660 format compressed files. The vulnerability is an out-of-bounds page array access issue related to empty blocks. When the zisofs block size is smaller than PAGE_SIZE, and the sub-page block ends midway from the poffset, subsequent empty blocks incorrectly overcalculate the number of pages, leading to an out-of-bounds index access in the pages[] array. The vulnerability is triggered by performing a standard read() operation on a mounted ISO9660 compressed file. The fix requires that zisofs_uncompress_block() must return the byte count relative to poffset in the empty block fast path, and only zero out the range [poffset, PAGE_SIZE) for the first page, maintaining consistency with the decompression path. This patch aims to prevent a memory out-of-bounds read (KASAN: slab-out-of-bounds) that occurs when processing 'ZF' Rock Ridge records of a specific structure.",
+    tags_en: ["Linux Kernel", "isofs", "zisofs", "CVE-2026-89778", "ISO9660", "Out-of-bounds Read"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-89778", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260916-12997",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux ntfs3 核心漏洞：透過處理 EA 記錄可導致堆記憶體讀取越界與資訊洩漏",
+    summary: "本漏洞存在於 Linux 核心的 ntfs3 文件系統驅動程式中，具體影響是 `fs/ntfs3: validate ef->size covers the record's name and value`。當處理具有非零 `ef->size` 的 EA 記錄時，`ntfs_read_ea()` 僅檢查記錄是否能放入剩餘緩衝區，但並未驗證 `ef->size` 是否足夠容納記錄自身的名稱長度 (`name_len`) 和值長度 (`elength`)。攻擊者可以利用此缺陷，透過構造的映像檔，使 `ntfs_get_ea()` 信任過大的 `elength`，從而讀取超出分配大小的記憶體，導致堆記憶體洩漏給使用者空間，攻擊路徑經由 `getxattr()` 系統呼叫。修補建議是確保計算記錄所需的完整大小，並要求 `ef->size` 能夠完全覆蓋該大小。",
+    tags: ["Linux 核心", "ntfs3", "堆記憶體洩漏", "getxattr", "CVE-2026-89779"],
+    title_en: "Linux ntfs3 Kernel Vulnerability: Heap Memory Read Out-of-Bounds and Information Leakage via EA Record Processing",
+    summary_en: "This vulnerability resides in the ntfs3 file system driver within the Linux kernel, specifically affecting the function `fs/ntfs3: validate ef->size covers the record's name and value`. When processing an EA record with a non-zero `ef->size`, `ntfs_read_ea()` only checks if the record fits into the remaining buffer, but fails to validate if `ef->size` is sufficient to accommodate the record's own name length (`name_len`) and value length (`elength`). An attacker can exploit this flaw by constructing a malicious image file, causing `ntfs_get_ea()` to trust an overly large `elength`, thereby reading memory beyond the allocated size. This leads to heap memory leakage into user space, with the attack path traversing the `getxattr()` system call. The suggested fix is to ensure the complete size required for the record is calculated and that `ef->size` is required to fully cover this size.",
+    tags_en: ["Linux Kernel", "ntfs3", "Heap Memory Leakage", "getxattr", "CVE-2026-89779"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-89779", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260916-12998",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心漏洞：Qualcomm rmnet 處理 deaggregated 幀時，可能導致空指針解引用",
+    summary: "本漏洞位於 Linux 核心的網路驅動程式 `net: qualcomm: rmnet: restore skb->dev on deaggregated frames`。當使用 `rmnet_map_deaggregate()` 函數分配子幀時，會將 `skb->dev` 設為 NULL。雖然 `__rmnet_map_ingress_handler()` 僅在資料路徑上設定 `skb->dev`，但如果先發送一個 MAP 指令幀到 `rmnet_map_command()`，`rmnet_map_send_ack()` 仍會在 NULL 設備上執行 `netif_tx_lock(skb->dev)`，從而觸發空指針解引用（null-ptr-deref）。攻擊者只需在 unshared 的 user+net namespace 中，建立一個透過 tap 設備的 rmnet 連線，並寫入帶有流控指令的聚合幀，即可觸發此漏洞。修補建議是修復 `378e25357ac7` 提交中遺漏的設備指派，確保所有離開 `rmnet_map_deaggregate()` 的 skb 都有有效的設備。此漏洞屬於核心層級的嚴重問題，可能導致系統崩潰（Kernel panic）。",
+    tags: ["Linux 核心", "Qualcomm", "rmnet", "CVE-2026-89780", "空指針解引用", "netif_tx_lock"],
+    title_en: "Linux Kernel Vulnerability: Qualcomm rmnet Handling of Deaggregated Frames May Cause Null Pointer Dereference",
+    summary_en: "This vulnerability resides in the Linux kernel network driver `net: qualcomm: rmnet: restore skb->dev on deaggregated frames`. When the `rmnet_map_deaggregate()` function allocates sub-frames, it sets `skb->dev` to NULL. Although `__rmnet_map_ingress_handler()` only sets `skb->dev` in the data path, if a MAP command frame is first sent via `rmnet_map_command()`, `rmnet_map_send_ack()` still executes `netif_tx_lock(skb->dev)` on a NULL device, thereby triggering a null-pointer dereference. An attacker only needs to establish an rmnet connection via a tap device in an unshared user+net namespace and write aggregated frames containing flow control instructions to exploit this vulnerability. The suggested fix is to correct the missing device assignment in the `378e25357ac7` commit, ensuring that all skbs leaving `rmnet_map_deaggregate()` have a valid device. This is a severe, kernel-level issue that could potentially lead to a system crash (Kernel panic).",
+    tags_en: ["Linux Kernel", "Qualcomm", "rmnet", "CVE-2026-89780", "Null Pointer Dereference", "netif_tx_lock"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-89780", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260916-12999",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux NTFS-3 文件系統發現緩衝區溢出漏洞：透過掛載惡意映像可觸發",
+    summary: "本漏洞存在於 Linux 核心的 fs/ntfs3 模組中，具體位於 read_log_rec_buf() 函數。該函數在將日誌記錄（log record）複製到呼叫者緩衝區時，由於對 on-disk restart area 來源的 log->record_header_len 僅檢查了 8 位元組對齊，導致計算的偏移量 off 可能超出 log->page_size。當計算「tail」時發生下溢（underflows），進而導致 memcpy() 讀取超出 page_size 大小的緩衝區，將相鄰的 slab 記憶體內容洩漏到重放緩衝區。攻擊者只需掛載一個精心構造的 NTFS 映像（crafted NTFS image）即可觸發此漏洞，可能導致記憶體讀取越界（out-of-bounds read），進而造成系統不穩定或被惡意利用。修補建議是修改邏輯，在執行複製操作前，拒絕任何超出當前頁面範圍的內部頁面偏移量。",
+    tags: ["Linux 核心", "ntfs3", "緩衝區溢出", "CVE-2026-89781", "記憶體安全"],
+    title_en: "Linux NTFS-3 Filesystem Discovers Buffer Overflow Vulnerability: Triggerable via Mounting Malicious Image",
+    summary_en: "This vulnerability exists in the Linux kernel's fs/ntfs3 module, specifically within the read_log_rec_buf() function. This function, when copying a log record to the caller's buffer, only checks for 8-byte alignment of the log->record_header_len sourced from the on-disk restart area. This insufficient check allows the calculated offset 'off' to potentially exceed log->page_size. When calculating the 'tail' occurs an underflow, which subsequently causes memcpy() to read a buffer exceeding the page_size, leading to the leakage of adjacent slab memory content into the replay buffer. An attacker can trigger this vulnerability simply by mounting a carefully crafted NTFS image, potentially causing an out-of-bounds read, which could lead to system instability or malicious exploitation. The recommended fix is to modify the logic to reject any internal page offset that exceeds the current page range before performing the copy operation.",
+    tags_en: ["Linux Kernel", "ntfs3", "Buffer Overflow", "CVE-2026-89781", "Memory Safety"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-89781", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260916-13000",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux NTFS3 核心漏洞：Crafted 映像可導致越界寫入，影響檔案系統完整性",
+    summary: "本漏洞存在於 Linux 核心的 fs/ntfs3 模組中，涉及 $LogFile 重放機制。當處理一個惡意構造的 NTFS 映像時，攻擊者可以利用 `check_log_rec()` 僅驗證 `transact_id` 非零且對齊，而未檢查其實際大小。這使得攻擊者可以請求一個任意大的索引。在 `alloc_rsttbl_from_idx()` 函數中，雖然計算的增量 `used + add` 是 u32，但傳遞給 `init_rsttbl()` 的參數卻是 u16，導致超過 U16_MAX 的值被截斷。這使得 `init_rsttbl()` 分配的表格遠小於實際所需的索引大小。隨後，`alloc_rsttbl_from_idx()` 嘗試在原始、未截斷的偏移量處進行解引用和寫入，造成了越界存取（out-of-bounds access）。此漏洞可透過掛載（mounting）一個惡意構造的 NTFS 映像觸發，可能導致系統崩潰或資訊洩露。修補建議是在 `extend_rsttbl()` 中拒絕任何超出 U16_MAX 限制的重啟表（restart table）增長請求。此漏洞已在 Linux 核心中修復。",
+    tags: ["Linux 核心", "ntfs3", "fs/ntfs3", "越界寫入", "NTFS", "Linux 核心漏洞"],
+    title_en: "Linux NTFS3 Kernel Vulnerability: Crafted Image Can Lead to Out-of-Bounds Write, Affecting Filesystem Integrity",
+    summary_en: "This vulnerability resides in the fs/ntfs3 module of the Linux kernel, involving the $LogFile replay mechanism. When processing a maliciously crafted NTFS image, an attacker can exploit the fact that `check_log_rec()` only validates that `transact_id` is non-zero and aligned, without checking its actual size. This allows the attacker to request an arbitrarily large index. In the `alloc_rsttbl_from_idx()` function, although the calculated increment `used + add` is a u32, the parameter passed to `init_rsttbl()` is a u16, causing values exceeding U16_MAX to be truncated. This results in `init_rsttbl()` allocating a table much smaller than the actual required index size. Subsequently, `alloc_rsttbl_from_idx()` attempts to dereference and write at the original, un-truncated offset, causing an out-of-bounds access. This vulnerability can be triggered by mounting a maliciously crafted NTFS image, potentially leading to system crashes or information leakage. The recommended fix is to reject any restart table growth request exceeding the U16_MAX limit within `extend_rsttbl()`. This vulnerability has been patched in the Linux kernel.",
+    tags_en: ["Linux Kernel", "ntfs3", "fs/ntfs3", "Out-of-Bounds Write", "NTFS", "Linux Kernel Vulnerability"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-89782", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260916-13001",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心 xfrm6 漏洞修復：secpath 滿載時的越界寫入問題",
+    summary: "本漏洞存在於 Linux 核心的 xfrm6 模組中，具體發生在 xfrm6_input_addr() 函數。當 secpath 達到最大深度 (XFRM_MAX_DEPTH) 時，原始的深度檢查邏輯存在「差一」的錯誤。在特定條件下，例如內層封包攜帶目的地選項 (destination-options HAO option) 或類型-2路由標頭 (type-2 routing header)，當 xfrm_trans_reinject() 重新進入 IPv6 輸入路徑時，如果 secpath 的長度 (sp->len) 已經等於 XFRM_MAX_DEPTH，xfrm6_input_addr() 會被呼叫。此時，由於檢查邏輯錯誤，會導致程式嘗試寫入超過 6 個元素的 xvec[] 陣列的第 7 個位置，造成越界寫入 (out-of-bounds write)。雖然此寫入行為在 KASAN 檢測中不可見，但 UBSAN 會偵測到此問題，並在設定了 panic_on_warn 的環境下導致系統崩潰。修復建議是將深度檢查條件從 `1 + sp->len == XFRM_MAX_DEPTH` 修改為 `sp->len >= XFRM_MAX_DEPTH`，以正確匹配 xfrm_input() 的邏輯，並恢復舊檢查在 `sp->len == 5` 時拒絕的鏈路層級。",
+    tags: ["Linux 核心", "xfrm6", "越界寫入", "CVE-2026-89783", "IPv6", "secpath"],
+    title_en: "Linux Kernel xfrm6 Vulnerability Fix: Out-of-Bounds Write Issue During secpath Overflow",
+    summary_en: "This vulnerability resides in the xfrm6 module of the Linux kernel, specifically within the xfrm6_input_addr() function. When the secpath reaches its maximum depth (XFRM_MAX_DEPTH), the original depth checking logic contains an 'off-by-one' error. Under specific conditions, such as when the inner packet carries a destination-options HAO option or a type-2 routing header, if xfrm_trans_reinject() re-enters the IPv6 input path and the secpath length (sp->len) is already equal to XFRM_MAX_DEPTH, xfrm6_input_addr() is called. Due to this flawed checking logic, the program attempts to write to the 7th position of the xvec[] array, which is designed for a maximum of 6 elements, causing an out-of-bounds write. Although this write behavior is invisible to KASAN detection, UBSAN can detect the issue, leading to a system crash when panic_on_warn is enabled. The suggested fix is to modify the depth checking condition from `1 + sp->len == XFRM_MAX_DEPTH` to `sp->len >= XFRM_MAX_DEPTH`, to correctly match the logic of xfrm_input(), and restore the link layer rejection that was previously enforced when `sp->len == 5`.",
+    tags_en: ["Linux Kernel", "xfrm6", "Out-of-Bounds Write", "CVE-2026-89783", "IPv6", "secpath"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-89783", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260916-13002",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心 SUNRPC 漏洞：未檢查 rpc_sockaddr2uaddr() 返回值導致空指針解引用",
+    summary: "本漏洞存在於 Linux 核心的 SUNRPC 服務中，具體為 rpcb_register_inet4() 和 rpcb_register_inet6() 函數。這些函數在將 rpc_sockaddr2uaddr() 的結果儲存到 map->r_addr 時，並未檢查其是否為 NULL。當 rpc_sockaddr2uaddr() 由於最終的 kstrdup() 失敗而返回 NULL 時，這個未經檢查的 NULL 值會被傳遞到同步的 RPCBPROC_SET encode 路徑，最終在 encode_rpcb_string() 函數中執行 strlen(string) 時，導致空指針解引用（NULL dereference）並使核心崩潰（oops）。此漏洞可透過在記憶體壓力下，讓一個在核心層級運行的 RPC 服務（如 nfsd, lockd, nfs-callback）向本地 rpcbind 註冊時觸發。修補建議是在 rpcb_register_inet4() 和 rpcb_register_inet6() 中加入檢查，當 rpc_sockaddr2uaddr() 返回 NULL 時，應立即以 -ENOMEM 退出，避免將地址傳遞給編碼器。",
+    tags: ["Linux 核心", "SUNRPC", "rpcb_register_inet4", "空指針解引用", "CVE-2026-89784"],
+    title_en: "Linux Kernel SUNRPC Vulnerability: Unchecked rpc_sockaddr2uaddr() Return Value Causes Null Pointer Dereference",
+    summary_en: "This vulnerability exists in the SUNRPC service within the Linux kernel, specifically in the rpcb_register_inet4() and rpcb_register_inet6() functions. These functions fail to check if the result of rpc_sockaddr2uaddr() is NULL when storing it in map->r_addr. When rpc_sockaddr2uaddr() returns NULL due to a subsequent kstrdup() failure, this unchecked NULL value is passed to the synchronous RPCBPROC_SET encode path. This ultimately leads to a null pointer dereference (NULL dereference) and a kernel crash (oops) when strlen(string) is executed within the encode_rpcb_string() function. The vulnerability can be triggered by having an RPC service running at the kernel level (such as nfsd, lockd, or nfs-callback) attempt to register with the local rpcbind under memory pressure. The recommended fix is to add a check within rpcb_register_inet4() and rpcb_register_inet6(); if rpc_sockaddr2uaddr() returns NULL, the function should immediately exit with -ENOMEM, preventing the address from being passed to the encoder.",
+    tags_en: ["Linux Kernel", "SUNRPC", "rpcb_register_inet4", "Null Pointer Dereference", "CVE-2026-89784"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-89784", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260916-13003",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux ntfs3 核心修復：修補 out-of-bounds read 漏洞，防禦惡意掛載映像檔",
+    summary: "本漏洞存在於 Linux 核心的 ntfs3 檔案系統驅動程式中，影響 `ntfs_reparse_init()` 和 `ntfs_objid_init()` 函數。這些函數在解析 $Extend/$Reparse 和 $Extend/$ObjId 元資料檔案時，透過 `resident_data()` 讀取索引根（INDEX_ROOT）的類型和規則欄位。問題出在 `resident_data()` 沒有檢查該屬性是否足夠大，導致當 `mi_enum_attr()` 接受 `data_off == asize` 且 `data_size == 0` 的屬性，且該屬性位於 MFT 記錄的末尾時，`resident_data()` 會返回指向 `record_size` 緩衝區末尾的指標。這使得讀取根->type / root->rule 時會超出分配範圍，造成 out-of-bounds read。此漏洞僅在掛載（mounting）惡意構造的映像檔時觸發，因此需要 CAP_SYS_ADMIN 權限。修復建議是使用 `resident_data_ex(attr, sizeof(struct INDEX_ROOT))` 並在返回 NULL 時退出，類似於 `ntfs_security_init()` 的處理方式。此修補屬於核心層面的安全強化，旨在提高對惡意 NTFS 結構的抵抗力。",
+    tags: ["Linux 核心", "ntfs3", "out-of-bounds read", "CVE-2026-89785", "CAP_SYS_ADMIN", "NTFS"],
+    title_en: "Linux kernel ntfs3 core fix: Patching out-of-bounds read vulnerability to defend against malicious mounted images",
+    summary_en: "This vulnerability resides in the ntfs3 file system driver within the Linux kernel, affecting the `ntfs_reparse_init()` and `ntfs_objid_init()` functions. These functions read the type and rule fields of the index root (INDEX_ROOT) while parsing the $Extend/$Reparse and $Extend/$ObjId metadata files using `resident_data()`. The issue arises because `resident_data()` fails to check if the attribute is sufficiently large. This leads to `resident_data()` returning a pointer pointing to the end of the `record_size` buffer when `mi_enum_attr()` accepts an attribute where `data_off == asize` and `data_size == 0`, and this attribute is located at the end of the MFT record. Consequently, reading root->type / root->rule can result in an out-of-bounds read. This vulnerability is only triggered when mounting maliciously constructed images, thus requiring CAP_SYS_ADMIN privileges. The suggested fix is to use `resident_data_ex(attr, sizeof(struct INDEX_ROOT))` and exit upon a NULL return, similar to the handling in `ntfs_security_init()`. This patch constitutes a core-level security enhancement designed to improve resistance against malicious NTFS structures.",
+    tags_en: ["Linux kernel", "ntfs3", "out-of-bounds read", "CVE-2026-89785", "CAP_SYS_ADMIN", "NTFS"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-89785", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260916-13004",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux ext4 文件系統修復：修復 getdents64() 函式中的越界讀取漏洞",
+    summary: "本漏洞存在於 Linux 核心的 ext4 文件系統中，具體影響 getdents64() 函式。攻擊者可利用 ext4_read_inline_dir() 函式在處理目錄條目時，讀取超出其內聯緩衝區（inline buffer）邊界的位置資訊。當迭代目錄時，如果位置資訊的目錄條目頭部（dirent header）超出預期的緩衝區大小，系統會接受這個超出邊界的長度參數，導致在執行 rescan 或主迴圈時，程式會嘗試解引用（dereference）一個不存在的目錄條目長度（rec_len）。修復措施要求在形成目錄條目（de）之前，檢查其最小尺寸的目錄條目頭部是否能完全容納在實際的緩衝區大小（inline_size）內，並確保在呼叫 ext4_check_dir_entry() 時，傳遞的長度參數為物理緩衝區大小，而非更大的位置空間大小（extra_size）。此修復旨在防止越界讀取（out-of-bounds read），提升 ext4 文件系統的穩定性和安全性。",
+    tags: ["Linux 核心", "ext4", "getdents64", "越界讀取", "CVE-2026-89786"],
+    title_en: "Linux ext4 Filesystem Repair: Fixes Out-of-Bounds Read Vulnerability in getdents64() Function",
+    summary_en: "This vulnerability exists in the ext4 filesystem within the Linux kernel, specifically affecting the getdents64() function. An attacker can exploit the ext4_read_inline_dir() function to read information beyond the boundaries of its inline buffer while processing directory entries. When iterating through a directory, if the directory entry header's position information exceeds the expected buffer size, the system accepts this out-of-bounds length parameter. This causes the program to attempt to dereference a non-existent directory entry length (rec_len) when performing a rescan or main loop. The fix requires checking before forming the directory entry (de) whether its minimum-sized directory entry header can be fully contained within the actual buffer size (inline_size), and ensuring that the length parameter passed to ext4_check_dir_entry() is the physical buffer size, rather than the larger position space size (extra_size). This patch aims to prevent out-of-bounds reads, thereby enhancing the stability and security of the ext4 filesystem.",
+    tags_en: ["Linux Kernel", "ext4", "getdents64", "Out-of-bounds Read", "CVE-2026-89786"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-89786", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260916-13005",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux ext4 文件系統漏洞：目錄條目檢查不完整導致越界讀取與 Use-After-Free",
+    summary: "本漏洞存在於 Linux 核心的 ext4 文件系統中，影響目錄條目（directory entry）的處理機制。當處理大小寫折疊加密目錄（casefolded encrypted directories）時，ext4 在 `ext4_search_dir()` 函數中進行的預先檢查，僅驗證了名稱本身是否在區塊邊界內，但未能正確檢查包含額外 8 位元組雜湊尾部（hash trailer）的完整條目是否在區塊內。攻擊者可以構造一個名稱在區塊邊界結束的條目，使得 `ext4_match()` 在執行查找時，越界讀取（read out of bounds）到位於區塊邊界之後的記憶體。這導致了 KASAN 報告的 Use-After-Free 漏洞。修復措施要求在呼叫 `ext4_match()` 之前，必須確保包含雜湊尾部的完整條目能夠完全容納在區塊內，這與現有的 `ext4_check_dir_entry()` 檢查機制一致，確保了對所有結構完整條目的保護。",
+    tags: ["Linux 核心", "ext4", "Use-After-Free", "越界讀取", "CVE"],
+    title_en: "Linux ext4 Filesystem Vulnerability: Incomplete Directory Entry Check Leads to Out-of-Bounds Read and Use-After-Free",
+    summary_en: "This vulnerability exists in the ext4 filesystem within the Linux kernel and affects the mechanism for handling directory entries. When processing casefolded encrypted directories, the pre-check performed by ext4 in the `ext4_search_dir()` function only validates whether the name itself is within the block boundary, but fails to correctly check if the complete entry, which includes an additional 8-byte hash trailer, is fully contained within the block. An attacker can construct an entry whose name ends at the block boundary, causing `ext4_match()` to read out of bounds into memory located after the block boundary. This leads to a Use-After-Free vulnerability, as reported by KASAN. The fix requires ensuring that the complete entry, including the hash trailer, is fully contained within the block before calling `ext4_match()`, consistent with the existing `ext4_check_dir_entry()` check mechanism, thereby ensuring protection for all complete structure entries.",
+    tags_en: ["Linux Kernel", "ext4", "Use-After-Free", "Out-of-Bounds Read", "CVE"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-89787", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260916-13006",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心 ksmbd 修復 smb2_tree_connect 函數的 Use-After-Free 漏洞",
+    summary: "本修補針對 Linux 核心中的 ksmbd 服務，解決了 `smb2_tree_connect()` 函數中潛在的 Use-After-Free (UAF) 漏洞。該漏洞發生在處理樹連接 (tree connection) 的生命週期時，當一個新的樹連接被發布到 `sess->tree_conns` 後，如果一個併發的會話登出 (concurrent session logoff) 發生，可能會在處理程序仍在初始化和構建回應時，提前清除並釋放該連接對象，導致處理程序使用到已釋放的記憶體。修補建議在 `xa_store()` 成功後，在釋放 `tree_conns_lock` 之前，額外取得一個第二個參考計數 (second reference)，以確保在所有退出路徑（包括正常退出、錯誤處理、SMB2 TREE_DISCONNECT 和會話登出）中，對象的參考計數能夠得到平衡和正確管理。修補旨在原子性地聲明斷開狀態並清除確切的條目，確保無論哪個清理路徑獲勝，對 xarray 參考計數都能精確地釋放一次，從而防止資源洩漏和崩潰。",
+    tags: ["Linux 核心", "ksmbd", "smb2_tree_connect", "Use-After-Free", "CVE-2026-89788"],
+    title_en: "Linux Kernel Fixes Use-After-Free Vulnerability in ksmbd's smb2_tree_connect Function",
+    summary_en: "This patch addresses a potential Use-After-Free (UAF) vulnerability in the `smb2_tree_connect()` function within the Linux kernel's ksmbd service. The vulnerability occurs during the lifecycle handling of a tree connection. Specifically, after a new tree connection is published to `sess->tree_conns`, if a concurrent session logoff occurs, the connection object may be prematurely cleared and freed while the process is still initializing and constructing the response. This leads to the process attempting to use already freed memory. The fix suggests acquiring a second reference after `xa_store()` succeeds, but before releasing `tree_conns_lock`. This ensures that the object's reference count is properly balanced and managed across all exit paths (including normal exit, error handling, SMB2 TREE_DISCONNECT, and session logoff). The patch aims to atomically declare the disconnected state and clear the specific entry, ensuring that the xarray reference count is precisely released once, regardless of which cleanup path is executed, thereby preventing resource leaks and crashes.",
+    tags_en: ["Linux Kernel", "ksmbd", "smb2_tree_connect", "Use-After-Free", "CVE-2026-89788"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-89788", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260916-13007",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心 gtp 模組修復 Use-After-Free 漏洞，防止競態條件下的記憶體存取錯誤",
+    summary: "本漏洞存在於 Linux 核心的 gtp 模組中。當執行 gtp_newlink() 的錯誤處理路徑時，程式碼會在清除 sk_user_data 後，立即釋放 tid_hash 和 addr_hash 記憶體。然而，如果同時有另一個 gtp_encap_recv() 函數在 softirq 中執行，它可能仍持有透過 rcu_dereference_sk_user_data() 取得的 gtp_dev 指標，並嘗試存取已被釋放的記憶體，從而導致 Use-After-Free (UAF) 漏洞。這類漏洞可能導致系統崩潰或惡意程式碼執行。修復建議是在 gtp_encap_enable() 和 gtp_create_sockets() 的所有錯誤路徑中，在執行 kfree 呼叫之前，加入 synchronize_net() 函數，以確保在釋放資源前等待 RCU (Read-Copy-Update) 的安全時間點，從而解決此記憶體競態條件問題。",
+    tags: ["Linux 核心", "gtp", "Use-After-Free", "RCU", "記憶體安全"],
+    title_en: "Linux Kernel gtp Module Fixes Use-After-Free Vulnerability, Preventing Memory Access Errors in Race Conditions",
+    summary_en: "This vulnerability exists in the Linux kernel's gtp module. When executing the error handling path of gtp_newlink(), the code immediately frees the tid_hash and addr_hash memory after clearing sk_user_data. However, if another gtp_encap_recv() function is running concurrently in softirq, it might still hold a gtp_dev pointer obtained via rcu_dereference_sk_user_data() and attempt to access the already freed memory, leading to a Use-After-Free (UAF) vulnerability. Such vulnerabilities can potentially cause system crashes or arbitrary code execution. The suggested fix is to add a call to synchronize_net() in all error paths within gtp_encap_enable() and gtp_create_sockets() before executing kfree, ensuring that the system waits for a safe RCU (Read-Copy-Update) time point before releasing resources, thereby resolving this memory race condition issue.",
+    tags_en: ["Linux Kernel", "gtp", "Use-After-Free", "RCU", "Memory Safety"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-89789", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260916-13008",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心修補：修復 IPv6 路由計算中的除零錯誤，避免服務中斷",
+    summary: "本漏洞位於 Linux 核心的 IPv6 路由處理機制中，具體涉及 `rt6_multipath_rebalance()` 函數。該函數在計算可用的下一跳權重時，如果一個併發的 `ignore_routes_with_linkdown` 更新操作導致第一輪計算返回零，但第二輪計算仍偵測到可用的下一跳，將會導致 `rt6_upper_bound_set()` 函數執行除零錯誤（divide by zero）。此問題可能導致系統崩潰或路由配置異常。修補建議是增加邏輯判斷，當第一輪計算報告總權重為零時，應跳過後續的上限計算，以確保系統穩定性，同時兼顧鎖定機制下的效能考量。",
+    tags: ["Linux 核心", "IPv6", "除零錯誤", "rt6_multipath_rebalance", "CVE-2026-89790"],
+    title_en: "Linux Kernel Patch: Fixes Zero Division Error in IPv6 Routing Calculation to Prevent Service Disruption",
+    summary_en: "This vulnerability resides in the IPv6 routing handling mechanism of the Linux kernel, specifically involving the `rt6_multipath_rebalance()` function. When calculating the available next-hop weight, if a concurrent `ignore_routes_with_linkdown` update operation causes the first calculation round to return zero, but the second round still detects available next hops, it can lead to a divide-by-zero error when executing the `rt6_upper_bound_set()` function. This issue may cause system crashes or abnormal routing configurations. The suggested patch is to add logical checks such that when the first calculation round reports a total weight of zero, subsequent upper bound calculations are skipped. This ensures system stability while considering performance within the locking mechanism.",
+    tags_en: ["Linux Kernel", "IPv6", "Zero Division Error", "rt6_multipath_rebalance", "CVE-2026-89790"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-89790", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260916-13009",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心修復 perf 模組的 Use-After-Free 漏洞，防止權限提升",
+    summary: "本漏洞存在於 Linux 核心的 perf 模組中，涉及 `perf mmap()` 和 `perf_mmap_close()` 兩個函數之間的競態條件。當 `perf_mmap_close()` 釋放資源時，如果沒有正確持有 `event->mmap_mutex`，而同時有另一個進程執行 `perf_mmap_rb()` 進行「復甦」操作，可能導致一個頁級的 Use-After-Free (UAF) 漏洞。攻擊者可利用此漏洞，在預設的 `kernel.perf_event_paranoid=2` 配置下，由任何未特權使用者執行，進而達到本地權限提升至 root 的目的。修復的重點是調整兩個計數器更新的順序，確保 `event->mmap_count` 的遞減和 `ring_buffer_attach()` 操作能夠被序列化，從而防止資源過早釋放。建議系統管理員應立即更新 Linux 核心版本以修補此安全問題。",
+    tags: ["Linux 核心", "perf 模組", "Use-After-Free", "本地權限提升", "CVE-2026-89791"],
+    title_en: "Linux Kernel Fixes perf Module Use-After-Free Vulnerability to Prevent Privilege Escalation",
+    summary_en: "This vulnerability resides in the Linux kernel's perf module, involving a race condition between the `perf mmap()` and `perf_mmap_close()` functions. When `perf_mmap_close()` releases resources without properly holding `event->mmap_mutex`, and simultaneously another process executes `perf_mmap_rb()` to perform a 'resurrection' operation, it can lead to a page-level Use-After-Free (UAF) vulnerability. An attacker can exploit this vulnerability, under the default `kernel.perf_event_paranoid=2` configuration, by any unprivileged user to achieve local privilege escalation to root. The fix focuses on adjusting the order of two counter updates, ensuring that the decrement of `event->mmap_count` and the `ring_buffer_attach()` operation are serialized, thereby preventing premature resource release. System administrators are advised to immediately update their Linux kernel version to patch this security issue.",
+    tags_en: ["Linux Kernel", "perf module", "Use-After-Free", "Local Privilege Escalation", "CVE-2026-89791"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-89791", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260916-13010",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux ksmbd 核心修補：防止共享配置回應中的越界讀取漏洞",
+    summary: "本修補針對 Linux 核心中的 ksmbd 服務，解決了在處理共享配置回應時可能發生的越界讀取（out-of-bounds reads）漏洞。該漏洞的根源在於未在消費可變長度欄位之前，充分驗證 IPC 共享配置負載的尺寸。修補措施包括對 Bound veto list 的解析進行修正，並在推導路徑長度時，正確考慮分隔符位元組（separator byte）的佔用。此類核心漏洞若未修補，可能允許攻擊者利用不當的配置資料，讀取到超出預期範圍的記憶體內容，可能導致資訊洩露或進一步的系統不穩定性。建議系統管理員應立即更新至修補後的 Linux 核心版本，以確保 ksmbd 服務的安全性。",
+    tags: ["Linux 核心", "ksmbd", "越界讀取", "IPC", "Linux 安全更新"],
+    title_en: "Linux ksmbd Core Patch: Prevents Out-of-Bounds Read Vulnerability in Shared Configuration Responses",
+    summary_en: "This patch addresses an out-of-bounds read vulnerability in the ksmbd service within the Linux kernel. The vulnerability stems from insufficient validation of the size of the IPC shared configuration payload before consuming variable-length fields. The fix involves correcting the parsing of the Bound veto list and accurately accounting for the separator byte when deriving path lengths. If left unpatched, such a kernel vulnerability could allow an attacker to utilize improperly configured data to read memory content beyond the expected range, potentially leading to information leakage or further system instability. System administrators are advised to immediately update to the patched Linux kernel version to ensure the security of the ksmbd service.",
+    tags_en: ["Linux Kernel", "ksmbd", "Out-of-Bounds Read", "IPC", "Linux Security Update"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-89792", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260916-13011",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux ublk 核心漏洞：未清除 VM_MAYWRITE 導致使用者空間可寫入命令緩衝區",
+    summary: "本漏洞存在於 Linux 核心的 ublk 驅動程式中。當 ublk_ch_mmap() 處理只讀的 ublk 字串設備時，它會拒絕設定 VM_WRITE 權限的 mmap 請求，但卻未能清除結果映射上的 VM_MAYWRITE 標記。這使得未經特權的使用者空間守護程序（daemon）能夠透過 mmap 取得一個只讀的命令緩衝區，隨後再利用 mprotect() 將其升級為可寫入（PROT_READ|PROT_WRITE）。由於命令緩衝區包含核心寫入的 ABI 結構（如 struct ublksrv_io_desc），攻擊者可以透過寫入操作來惡意破壞這些欄位（例如 addr、op_flags、nr_sectors 和 start_sector）。此類漏洞與 drm/panthor 和 drm/vc4 的 VM_MAYWRITE 修復，以及 2026-08-13 的 ptp/vmclock 修復屬於同一類別。修復後，嘗試使用 mprotect() 升級權限將會返回 -EACCES 錯誤，有效防止了未授權的寫入操作。",
+    tags: ["Linux 核心", "ublk", "VM_MAYWRITE", "mmap", "LPE", "Linux 漏洞"],
+    title_en: "Linux ublk Kernel Vulnerability: Failure to Clear VM_MAYWRITE Allows User-Space Write Access to Command Buffer",
+    summary_en: "This vulnerability exists in the ublk driver within the Linux kernel. When ublk_ch_mmap() processes a read-only ublk character device, it correctly rejects mmap requests that attempt to set VM_WRITE permissions, but it fails to clear the VM_MAYWRITE flag on the resulting mapping. This flaw allows an unprivileged user-space daemon to obtain a read-only command buffer via mmap, which it can subsequently elevate to writable using mprotect(). Since the command buffer contains ABI structures written by the kernel (such as struct ublksrv_io_desc), an attacker can maliciously corrupt these fields (e.g., addr, op_flags, nr_sectors, and start_sector) through write operations. This type of vulnerability is related to the VM_MAYWRITE fixes in drm/panthor and drm/vc4, as well as the ptp/vmclock fix from 2026-08-13. After the fix, attempts to elevate permissions using mprotect() will return the -EACCES error, effectively preventing unauthorized write operations.",
+    tags_en: ["Linux Kernel", "ublk", "VM_MAYWRITE", "mmap", "LPE", "Linux Vulnerability"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-89793", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260916-13012",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心 ksmbd 發現零管道讀取堆疊填充漏洞，可能洩露未初始化記憶體",
+    summary: "本漏洞位於 Linux 核心的 ksmbd 組件，屬於「零管道讀取堆疊填充」（zero pipe read compound padding）類型。該漏洞的根本原因在於處理複合回應時，將最後一個回應的 I/O 變長度對齊到八位元組邊界。然而，`smb2_read_pipe()` 函數僅為負載大小分配記憶體，導致對齊填充（alignment padding）可能會意外地暴露最多七位元組的未初始化核心堆記憶體。這可能允許攻擊者讀取到系統內部的敏感、未清除的記憶體內容。修補建議是，在固定回應緩衝區（response buffer）之前，應先分配出對齊後的完整大小，並清除未使用的尾部空間，以防止未初始化記憶體的洩漏。此漏洞的修復已納入 Linux 核心的更新中。",
+    tags: ["Linux 核心", "ksmbd", "smb2_read_pipe", "堆疊填充", "未初始化記憶體"],
+    title_en: "Linux Kernel ksmbd Discovered with Zero Pipe Read Stack Padding Vulnerability, Potentially Leaking Uninitialized Memory",
+    summary_en: "This vulnerability resides in the ksmbd component of the Linux kernel and is classified as a \"zero pipe read compound padding\" vulnerability. The root cause lies in how the component handles composite responses, specifically by aligning the variable size of the last response to an eight-byte boundary. However, the `smb2_read_pipe()` function only allocates memory for the payload size, which can cause the alignment padding to inadvertently expose up to seven bytes of uninitialized kernel stack memory. This could allow an attacker to read sensitive, uncleared memory contents from within the system. The recommended fix is to allocate the full, aligned size before the response buffer and subsequently clear any unused trailing space, thereby preventing the leakage of uninitialized memory. A patch for this vulnerability has been included in Linux kernel updates.",
+    tags_en: ["Linux Kernel", "ksmbd", "smb2_read_pipe", "stack padding", "uninitialized memory"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-89794", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260916-13013",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心 PCI 槽位重置漏洞：s390 系統多功能設備處理不當導致錯誤重置與記憶體洩漏",
+    summary: "本漏洞存在於 Linux 核心的 PCI 設備管理機制中，特別影響運行在 s390 系統上的虛擬化環境。當 s390 系統使用機器級 Hypervisor 透過 PCI pass-through 存取設備時，PCI 設備通常以每個功能（per PCI function）的粒度進行操作。問題出在 `pci_create_slot()` 函數目前將相同的 `pci_slot` 物件分配給多功能設備（multifunction devices）。自從引入了支援多功能 PCI 設備拓撲結構的機制後，當透過熱插拔驅動程式（hotplug driver）的 `slot_reset()` 介面嘗試重置單一功能時，由於共享的槽位分配，會導致錯誤的功能被重置，而非預期的目標。此外，在 `pci_slot_release()` 函數中未能正確釋放分配給功能的 `pci_slot` 物件，也造成了記憶體洩漏。修補建議是為 `struct pci_slot` 新增一個標誌位，以允許在 Hypervisor 管理下，針對每個功能的 PCI 槽位進行處理，同時保留設備的拓撲結構。此外，還需修改槽位編號（slot 'number'）的類型，以支援特殊值 PCI_SLOT_PLACEHOLDER 和 PCI_SLOT_ALL_DEVICES。",
+    tags: ["Linux 核心", "s390", "PCI", "Hypervisor", "pci_slot", "記憶體洩漏"],
+    title_en: "Linux Kernel PCI Slot Reset Vulnerability: Improper Handling of Multifunction Devices on s390 Leads to Incorrect Reset and Memory Leak",
+    summary_en: "This vulnerability resides in the Linux kernel's PCI device management mechanism, specifically affecting virtualized environments running on s390 systems. When an s390 system uses a machine-level Hypervisor to access devices via PCI pass-through, PCI devices are typically operated at the granularity of each PCI function (per PCI function). The issue lies in the fact that the `pci_create_slot()` function currently assigns the same `pci_slot` object to multifunction devices. Since the mechanism supporting multifunction PCI device topology structures was introduced, attempting to reset a single function via the hotplug driver's `slot_reset()` interface can cause the incorrect function to be reset, rather than the intended target, due to the shared slot assignment. Furthermore, the failure to correctly release the `pci_slot` object assigned to the function within the `pci_slot_release()` function leads to a memory leak. The proposed fix is to add a flag to `struct pci_slot` to allow processing of PCI slots for each function under Hypervisor management, while preserving the device's topology structure. Additionally, the slot number type needs modification to support the special values PCI_SLOT_PLACEHOLDER and PCI_SLOT_ALL_DEVICES.",
+    tags_en: ["Linux Kernel", "s390", "PCI", "Hypervisor", "pci_slot", "Memory Leak"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-89795", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260916-13014",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心修補：修復 DAMON 模組 kdamond_merge_regions() 潛在無限迴圈漏洞",
+    summary: "本修補針對 Linux 核心的 mm/damon/core 模組，解決了 kdamond_merge_regions() 函數中潛在的無限迴圈（infinite loop）問題。該漏洞發生在進行線上參數更新（如事件）時，DAMON 區域數量可能超過使用者設定的上限。當 kdamond_merge_regions() 嘗試合併區域以符合限制時，如果其內部閾值（threshold）超過了理論最大值，且無法將區域數量降低到使用者定義的上限，則迴圈將會無限執行。修補的關鍵是將迴圈的退出條件檢查提前，並防止閾值超過最大限制，避免潛在的溢位（overflow）導致錯誤的合併閾值。雖然開發者指出此問題在實際世界中發生機率極低，但修補提供了簡單且必要的安全加固。此修補屬於核心元件層面的修復，建議所有使用 Linux 核心的系統應更新至包含此修補的版本。",
+    tags: ["Linux 核心", "DAMON", "kdamond_merge_regions()", "無限迴圈", "核心修補"],
+    title_en: "Linux Kernel Patch: Fixing Potential Infinite Loop Vulnerability in DAMON Module kdamond_merge_regions()",
+    summary_en: "This patch addresses the mm/damon/core module in the Linux kernel, resolving a potential infinite loop issue within the kdamond_merge_regions() function. The vulnerability occurs when performing online parameter updates (such as events), and the number of DAMON regions may exceed the user-defined limit. When kdamond_merge_regions() attempts to merge regions to comply with the limit, if its internal threshold exceeds the theoretical maximum and fails to reduce the region count to the user-defined limit, the loop will execute infinitely. The key fix involves advancing the loop exit condition check and preventing the threshold from exceeding the maximum limit, thereby avoiding potential overflow that could lead to an incorrect merge threshold. Although developers note that the probability of this issue occurring in a real-world scenario is extremely low, the patch provides a simple and necessary security hardening. As this patch pertains to a core component level fix, all systems utilizing the Linux kernel are advised to update to a version containing this patch.",
+    tags_en: ["Linux Kernel", "DAMON", "kdamond_merge_regions()", "Infinite Loop", "Kernel Patch"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-89796", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260916-13015",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心修復：power: supply: ab8500_fg 驅動程式的 use-after-free 漏洞",
+    summary: "本修補針對 Linux 核心中的 power: supply: ab8500_fg 驅動程式，解決了一個 use-after-free 漏洞。該漏洞發生在 `ab8500_fg_remove()` 函式執行時，此函式會銷毀驅動程式的 workqueue，但此時執行緒中斷處理器（threaded interrupt handlers）仍處於啟用狀態。由於這些處理器是在 `->remove()` 返回後才釋放資源，導致在資源釋放的窗口期內，處理器會向已釋放的 workqueue 排入工作（work）。修復建議是透過 `devm` 機制來逐步關閉 workqueue。具體步驟包括：先在電源供應和中斷請求之前註冊清理工作，讓 `devm` 先釋放中斷，使處理器無法再排入工作；接著禁用延遲和普通工作項目，並銷毀 workqueue。這種禁用而非取消的做法，可以確保即使有生產者（例如 `power-supply` 的 `external_power_changed` 回呼）嘗試重新排隊，這些工作項目仍保持禁用狀態，從而防止利用。",
+    tags: ["Linux 核心", "use-after-free", "power: supply", "ab8500_fg", "devm", "Linux 驅動程式"],
+    title_en: "Linux Kernel Fix: Use-After-Free Vulnerability in power:supply:ab8500_fg Driver",
+    summary_en: "This patch addresses a use-after-free vulnerability in the `power:supply:ab8500_fg` driver within the Linux kernel. The vulnerability occurs when the `ab8500_fg_remove()` function executes. While this function deallocates the driver's workqueue, the threaded interrupt handlers remain active. Because these handlers only release resources after `->remove()` returns, the handlers attempt to enqueue work into the already released workqueue during the resource deallocation window. The suggested fix is to gradually disable the workqueue using the `devm` mechanism. Specific steps include: first, registering cleanup work before the power supply and interrupt request are removed, allowing `devm` to release the interrupt first, thus preventing the handlers from enqueuing work; second, disabling delayed and regular work items, and then destroying the workqueue. This approach of disabling rather than canceling ensures that even if a producer (such as the `power-supply` `external_power_changed` callback) attempts to requeue, these work items remain disabled, thereby preventing exploitation.",
+    tags_en: ["Linux Kernel", "use-after-free", "power:supply", "ab8500_fg", "devm", "Linux Driver"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-89797", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260916-13016",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心 rpcrdma 漏洞修復：防止設備移除與新註冊競態條件導致的空指針解引用",
+    summary: "本漏洞存在於 Linux 核心的 rpcrdma 模組中，涉及 rpcrdma_rn_register() 和 rpcrdma_remove_one() 函數的時序問題。當設備移除操作與新的通知註冊操作發生競態條件時，系統可能會觀察到未完全初始化（即 `rn_done` 仍為 NULL）的通知物件。這可能導致系統嘗試呼叫一個 NULL 指針的函數，引發空指針解引用。修復措施要求將儲存 `rn->rn_done` 的操作，移至 `xa_alloc()` 成功發布（publish）之後。此外，在 `rpcrdma_rn_unregister()` 處理失敗註冊時，必須確保在 `xa_alloc()` 失敗時重新清除 `rn_done`，以防止在失敗接受清理路徑中錯誤地呼叫 `rpcrdma_rn_unregister()`，進而導致不相關的 `rd_xa` 槽位被清除並造成 `rd_kref` 數值不足（underflowing）。",
+    tags: ["Linux 核心", "rpcrdma", "空指針解引用", "競態條件", "Linux 核心元件"],
+    title_en: "Linux Kernel rpcrdma Vulnerability Fix: Preventing Null Pointer Dereference Caused by Device Removal and New Registration Race Condition",
+    summary_en: "This vulnerability resides in the Linux kernel's rpcrdma module, involving a timing issue between the `rpcrdma_rn_register()` and `rpcrdma_remove_one()` functions. When a device removal operation and a new notification registration operation occur under a race condition, the system might encounter an uninitialized notification object (i.e., where `rn_done` is still NULL). This can lead to the system attempting to call a function using a NULL pointer, triggering a null pointer dereference. The fix requires moving the operation that stores `rn->rn_done` to occur after a successful publish of `xa_alloc()`. Furthermore, when handling failed registrations in `rpcrdma_rn_unregister()`, it is essential to ensure that `rn_done` is cleared if `xa_alloc()` fails. This prevents the incorrect calling of `rpcrdma_rn_unregister()` within the failure acceptance cleanup path, which could otherwise clear an unrelated `rd_xa` slot and cause the `rd_kref` count to underflow.",
+    tags_en: ["Linux Kernel", "rpcrdma", "Null Pointer Dereference", "Race Condition", "Linux Kernel Component"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-89798", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260916-13017",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心修復 bpf_get_stackid 漏洞：禁用搶佔機制以確保程式執行穩定性",
+    summary: "本篇公告指出在 Linux 核心中修復了一個與 bpf_get_stackid 相關的漏洞。該漏洞的修復重點在於，由於 get_perf_callchain 呼叫需要禁用搶佔機制（preemption），並且在存取其回傳的 trace entries buffer 期間也必須保持禁用狀態。為了確保程式的執行穩定性，開發者已在 bpf_get_stackid_pe 函數中執行了禁用搶佔的機制。此修復屬於核心層面的安全強化，旨在防止在處理 BPF 相關功能時，因搶佔機制導致的潛在執行錯誤或資料不一致問題。建議使用更新版本的 Linux 核心來修補此問題，以確保系統的穩定性和安全性。",
+    tags: ["Linux 核心", "bpf_get_stackid", "preemption", "Linux 核心更新", "CVE"],
+    title_en: "Linux Kernel Fixes bpf_get_stackid Vulnerability: Disabling Preemption Mechanism for Execution Stability",
+    summary_en: "This announcement details a vulnerability fixed in the Linux kernel related to bpf_get_stackid. The core focus of the fix is that the get_perf_callchain call requires disabling preemption. Furthermore, this state must be maintained while accessing the returned trace entries buffer. To ensure program execution stability, developers implemented a mechanism to disable preemption within the bpf_get_stackid_pe function. This fix represents a kernel-level security enhancement aimed at preventing potential execution errors or data inconsistency issues caused by preemption when handling BPF-related functionality. Users are advised to use an updated version of the Linux kernel to patch this issue, thereby ensuring system stability and security.",
+    tags_en: ["Linux Kernel", "bpf_get_stackid", "preemption", "Linux Kernel Update", "CVE"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-89799", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260916-13018",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心漏洞修復：drm/nouveau/uvmm 處理 OP_UNMAP_SPARSE 流程時的狀態清理問題",
+    summary: "本漏洞位於 Linux 核心的 `drm/nouveau/uvmm` 模組中，涉及處理 `OP_UNMAP_SPARSE` 操作時的狀態管理缺陷。當系統執行 `OP_UNMAP_SPARSE` 標記區域為「髒」（dirty）後，會將清理工作延遲到 `nouveau_uvmm_bind_job_cleanup()` 函數中。若後續的作業（op）在該清理流程中失敗，系統的「回滾路徑」（unwind path）將無法清除區域的 `dirty` 標記。這導致該區域在資料結構樹中殘留，且其完成訊號（completion）永遠無法發出。後續嘗試綁定（bind）該範圍的資源時，可能會因為「髒」標記檢查失敗，導致永久性的 `-ENOENT` 或 `-EINVAL` 錯誤，甚至可能在 `bind_validate_region()` 函數中造成無法終止的 `wait_for_completion()` 阻塞。修復建議是在回滾（unwind）執行稀疏解除映射（sparse unmap）時，明確清除區域的 `dirty` 標記，以恢復區域到其被發現時的正確狀態。",
+    tags: ["Linux 核心", "drm", "nouveau", "uvmm", "OP_UNMAP_SPARSE", "CVE-2026-89800"],
+    title_en: "Linux Kernel Vulnerability Fix: State Cleanup Issue in drm/nouveau/uvmm during OP_UNMAP_SPARSE Processing",
+    summary_en: "This vulnerability resides in the `drm/nouveau/uvmm` module of the Linux kernel, concerning a state management defect when handling the `OP_UNMAP_SPARSE` operation. After the system marks a region as 'dirty' during `OP_UNMAP_SPARSE`, the cleanup work is deferred to the `nouveau_uvmm_bind_job_cleanup()` function. If subsequent operations (ops) fail during this cleanup process, the system's 'unwind path' fails to clear the region's 'dirty' mark. This results in the region persisting in the data structure tree, and its completion signal never being issued. Subsequent attempts to bind resources to this range may fail due to the 'dirty' mark check, leading to permanent `-ENOENT` or `-EINVAL` errors, or even causing an unresolvable `wait_for_completion()` deadlock within the `bind_validate_region()` function. The suggested fix is to explicitly clear the region's 'dirty' mark during the unwind execution of sparse unmapping, thereby restoring the region to its correct state as when it was discovered.",
+    tags_en: ["Linux Kernel", "drm", "nouveau", "uvmm", "OP_UNMAP_SPARSE", "CVE-2026-89800"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-89800", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260916-13019",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心：drm/nouveau/uvmm 漏洞修復，修復不當釋放區域的潛在 Use-After-Free 問題",
+    summary: "本漏洞位於 Linux 核心的 `drm/nouveau/uvmm` 模組中，涉及 `OP_UNMAP_SPARSE` 處理流程。問題出在 `nouveau_uvmm_bind_job_submit()` 函數的兩個失敗路徑（當區域忙碌時的 `-ENOENT` 檢查，以及 `drm_gpuvm_sm_unmap_ops_create()` 失敗）未能正確清除結構體 `op->reg`。當發生這些失敗時，`op->reg` 會保持設定，導致後續的 `nouveau_uvmm_bind_job_cleanup()` 函數進入 `if (op->reg)` 分支，並錯誤地呼叫 `nouveau_uvma_region_remove()` 和 `nouveau_uvma_region_put()`。這會導致在未相關的失敗情境下，釋放一個活著的區域（live region），進而造成 Use-After-Free (UAF) 漏洞。若另一個工作（job）擁有該區域，其清理流程會進一步移除和釋放這個已經被錯誤釋放的區域。修復建議是確保在所有失敗路徑中，明確將 `op->reg` 設為 NULL，以維持程式的不變性（invariant）。",
+    tags: ["Linux 核心", "drm", "nouveau", "uvmm", "Use-After-Free", "CVE-2026-89801"],
+    title_en: "Linux Kernel: drm/nouveau/uvmm vulnerability fixed, addressing potential Use-After-Free from improper region release",
+    summary_en: "This vulnerability resides in the Linux kernel's `drm/nouveau/uvmm` module, specifically within the `OP_UNMAP_SPARSE` handling process. The issue stems from two failure paths in the `nouveau_uvmm_bind_job_submit()` function (the `-ENOENT` check when the region is busy, and failure in `drm_gpuvm_sm_unmap_ops_create()`). In these failure scenarios, `op->reg` fails to be correctly cleared. This causes the subsequent `nouveau_uvmm_bind_job_cleanup()` function to enter the `if (op->reg)` branch and incorrectly call `nouveau_uvma_region_remove()` and `nouveau_uvma_region_put()`. This results in the release of a live region under unrelated failure conditions, leading to a Use-After-Free (UAF) vulnerability. If another job holds this region, its cleanup process will further remove and release this already incorrectly released region. The suggested fix is to ensure that `op->reg` is explicitly set to NULL in all failure paths, thereby maintaining the program's invariant.",
+    tags_en: ["Linux Kernel", "drm", "nouveau", "uvmm", "Use-After-Free", "CVE-2026-89801"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-89801", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260916-13020",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心：nouveau 驅動程式修復 NULL 參考錯誤，防止 OP_MAP_SPARSE 操作時的崩潰",
+    summary: "本修補針對 Linux 核心中的 `drm/nouveau/uvmm` 模組，修復了一個與 `OP_MAP_SPARSE` 操作相關的 NULL 參考錯誤。當一個綁定工作（bind job）中的後續操作失敗時，回溯清理機制會不條件地呼叫 `drm_gpuva_ops_free()`。如果該操作的 `op->ops` 欄位為 NULL，而 `drm_gpuva_ops_free()` 嘗試解引用此欄位，將會導致 NULL 參考錯誤（oops）。此漏洞的路徑可由任何持有 render-node file descriptor 的程序觸發，因為 `NOUVEAU_VM_BIND` 權限等同於 `DRM_RENDER_ALLOW`。修補建議在相關的清理函式中加入 `IS_ERR_OR_NULL()` 檢查，以確保在執行釋放操作前，檢查 `op->ops` 是否為 NULL，避免不必要的崩潰。",
+    tags: ["Linux 核心", "nouveau", "drm", "CVE-2026-89802", "NULL 參考錯誤", "Linux 驅動程式"],
+    title_en: "Linux Kernel: Nouveau Driver Fixes NULL Reference Error to Prevent Crash During OP_MAP_SPARSE Operation",
+    summary_en: "This patch addresses a NULL reference error in the `drm/nouveau/uvmm` module within the Linux kernel, related to the `OP_MAP_SPARSE` operation. When a subsequent operation in a bind job fails, the rollback cleanup mechanism unconditionally calls `drm_gpuva_ops_free()`. If the `op->ops` field of this operation is NULL, and `drm_gpuva_ops_free()` attempts to dereference this field, it will result in a NULL reference error (oops). This vulnerability can be triggered by any program holding a render-node file descriptor, as the `NOUVEAU_VM_BIND` permission is equivalent to `DRM_RENDER_ALLOW`. The patch suggests adding an `IS_ERR_OR_NULL()` check in the relevant cleanup function to ensure that `op->ops` is checked for NULL before performing the release operation, thereby preventing unnecessary crashes.",
+    tags_en: ["Linux Kernel", "nouveau", "drm", "CVE-2026-89802", "NULL Reference Error", "Linux Driver"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-89802", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260916-13021",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心：修復 drm/nouveau 漏洞，防止在設備解除綁定時發生 Use-After-Free",
+    summary: "本漏洞存在於 Linux 核心的 drm/nouveau 驅動程式中。當系統執行 `nouveau_channel_del()` 流程時，如果設備解除綁定（teardown）的順序不當，可能會導致在處理 `channel-kill` 事件時，嘗試對已被釋放的 fence context 執行操作。具體來說，在 `nvif_object_dtor(&chan->vram)` 和 `nvif_event_dtor(&chan->kill)` 之間，如果接收到 kill 事件，會導致程式嘗試使用已釋放的資源（Use-After-Free）。修補建議是將 `channel-kill` 事件的訂閱（subscription）移動到依賴的資源（如 fence context）被解除綁定之前，確保資源釋放的順序正確，從而修復此類時序相關的記憶體安全問題。",
+    tags: ["Linux 核心", "drm/nouveau", "Use-After-Free", "Linux 驅動程式", "CVE-2026-89803"],
+    title_en: "Linux Kernel: Fixes drm/nouveau vulnerability to prevent Use-After-Free during device unbinding",
+    summary_en: "This vulnerability resides in the Linux kernel's drm/nouveau driver. If the device unbinding (teardown) process executes in an incorrect sequence, it may lead to an attempt to operate on an already released fence context when handling a `channel-kill` event. Specifically, if a kill event is received between `nvif_object_dtor(&chan->vram)` and `nvif_event_dtor(&chan->kill)`, the program attempts to use a released resource (Use-After-Free). The suggested patch is to move the subscription for the `channel-kill` event to occur before the dependent resources (such as the fence context) are unbound, ensuring the correct order of resource release, thereby fixing this type of timing-related memory safety issue.",
+    tags_en: ["Linux Kernel", "drm/nouveau", "Use-After-Free", "Linux Driver", "CVE-2026-89803"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-89803", lang: "EN" }
+    ]
+  },
+  {
     id: "20260916-12019",
     trackers: ["eu_cra", "security"],
     category: "法規與標準",
@@ -1404,6 +1824,20 @@ window.TRACKER_DAYS["2026-09-16"] = [
     tags_en: ["DuoxMe", "Android", "CVE-2026-86443", "Local Access", "Cleartext Storage", "Credential Theft"],
     sources: [
       { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-86443", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260916-12611",
+    trackers: ["security"],
+    category: "供應鏈與開源安全",
+    title: "IBM與Red Hat發布Lightwell，革新開源資安修補流程，避免強制升級帶來的開發延遲",
+    summary: "本文討論了現代企業在應對開源漏洞（CVE）時面臨的「升級稅」（upgrade tax）困境：為了修補高風險漏洞，往往必須將整個函式庫升級到最新大版本，但新版本帶來的破壞性變更（breaking changes）和API棄用，會導致程式碼重寫、測試時間過長，嚴重延遲產品上市時間。Lightwell是IBM與Red Hat的合作成果，旨在從根本上解決此問題。它透過「解耦安全與升級」的技術，提供經過徹底測試、數位簽署的資安修補程式，這些修補程式能無縫整合到現有的軟體堆疊中，同時保留API相容性和系統穩定性。這使得企業無需進行耗時的強制升級，即可快速修補漏洞，大幅降低了修補時間（MTTR），讓開發團隊能專注於業務創新，而非維護程式碼。",
+    tags: ["Lightwell", "IBM", "Red Hat", "開源安全", "CVE", "軟體供應鏈", "API相容性"],
+    title_en: "IBM and Red Hat Release Lightwell to Revolutionize Open Source Security Patching and Avoid Development Delays Caused by Forced Upgrades",
+    summary_en: "This article discusses the 'upgrade tax' dilemma faced by modern enterprises when addressing open-source vulnerabilities (CVEs): To patch high-risk vulnerabilities, organizations often must upgrade entire libraries to the latest major version. However, the breaking changes and API deprecations introduced by these new versions necessitate extensive code refactoring and lengthy testing, severely delaying product time-to-market. Lightwell, a collaboration between IBM and Red Hat, aims to fundamentally solve this problem. It achieves this through a technique of 'decoupling security from upgrading,' providing thoroughly tested, digitally signed security patches. These patches can integrate seamlessly into existing software stacks while preserving API compatibility and system stability. This allows enterprises to quickly patch vulnerabilities without undergoing time-consuming forced upgrades, significantly reducing Mean Time To Repair (MTTR) and enabling development teams to focus on business innovation rather than code maintenance.",
+    tags_en: ["Lightwell", "IBM", "Red Hat", "Open Source Security", "CVE", "Software Supply Chain", "API Compatibility"],
+    sources: [
+      { name: "Red Hat Security Blog", url: "https://redhat.com/en/blog/stop-rewriting-stable-code-how-lightwell-protects-your-bottom-line-and-developer-velocity", lang: "EN" }
     ]
   },
   {
