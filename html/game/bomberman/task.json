@@ -1,0 +1,33 @@
+{
+  "id": "CASE-BOMBERMAN-001",
+  "mode": "implement",
+  "role": "writer",
+  "engine": "agy",
+  "tier": "T2",
+  "reasoning_effort": "medium",
+  "intent": "auto",
+  "root": "d:/Claude/Tool/Harness/cases/bomberman",
+  "prompt": "Implement a full Web 3D Bomberman (炸彈超人 / 爆彈人) Battle Royale Remake featuring high-resolution 3D procedural modeling for 4 combatants (White, Black, Red, Blue bombers), high-res arena blocks and textured floor, dynamic lighting and particle cross-explosions with chain reactions, full power-up mechanics (Extra Bomb, Fire Range, Speed Skates, Kick Glove, Heart Shield, Remote Detonator, Skull Curse), smart 4-player AI danger heatmap pathfinding, sudden death inward spiral stage shrink, multi-perspective camera director system (Classic Top-Down, 2.5D Isometric, Third-Person Chase, Dynamic Action Director, and Free Spectator), cinematic round intro and slow-mo bullet-time victory sequence, modern glassmorphic arcade UX HUD, Web Audio chiptune synthesizer, 5-slot save/load match configuration system, Konami code easter egg, and headless regression test suite.",
+  "touch_allow": [
+    "index.html",
+    "style.css",
+    "bomberman.js",
+    "test_bomberman.py"
+  ],
+  "retry_policy": {
+    "max_retries": 2,
+    "tail_prune": true
+  },
+  "acceptance": [
+    {
+      "id": "ACC-BOMBERMAN-01",
+      "argv": [
+        "python",
+        "cases/bomberman/test_bomberman.py"
+      ],
+      "expect": "OK"
+    }
+  ],
+  "timeout_s": 300,
+  "note": "Regression benchmark test case for Web 3D Bomberman Battle Royale featuring procedural 3D models, multi-perspective director camera, smart danger-avoidance AI, chain explosions, sudden death, powerups, audio synthesis, and headless verification probes."
+}

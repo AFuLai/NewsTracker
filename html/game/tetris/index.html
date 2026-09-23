@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>CYBER TETRIS 2026 - Modern Web Block Engine</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="stars-bg"></div>
+  <div class="scanlines"></div>
+
+  <div class="game-container">
+    <header class="game-header">
+      <h1 class="glitch-title" data-text="CYBER TETRIS">CYBER TETRIS</h1>
+      <div class="sub-title">HARNESS REGRESSION BENCHMARK CASE #1</div>
+    </header>
+
+    <div class="main-layout">
+      <!-- Left Sidebar: Hold & Stats -->
+      <aside class="sidebar side-left">
+        <div class="panel hold-panel">
+          <div class="panel-header">HOLD</div>
+          <canvas id="holdCanvas" width="100" height="100"></canvas>
+          <div class="hint-key">[C / SHIFT]</div>
+        </div>
+
+        <div class="panel stats-panel">
+          <div class="stat-box">
+            <span class="stat-label">LEVEL</span>
+            <span class="stat-value" id="levelDisplay">1</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">LINES</span>
+            <span class="stat-value" id="linesDisplay">0</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">COMBO</span>
+            <span class="stat-value" id="comboDisplay">0</span>
+          </div>
+        </div>
+
+        <div class="panel controls-panel">
+          <div class="panel-header">CONTROLS</div>
+          <div class="key-list">
+            <div><kbd>&larr;</kbd> <kbd>&rarr;</kbd> Move</div>
+            <div><kbd>&uarr;</kbd> / <kbd>X</kbd> Rotate CW</div>
+            <div><kbd>Z</kbd> / <kbd>Ctrl</kbd> Rotate CCW</div>
+            <div><kbd>&darr;</kbd> Soft Drop</div>
+            <div><kbd>Space</kbd> Hard Drop</div>
+            <div><kbd>C</kbd> / <kbd>Shift</kbd> Hold</div>
+            <div><kbd>P</kbd> / <kbd>Esc</kbd> Pause</div>
+            <div><kbd>R</kbd> Restart</div>
+            <div><kbd>M</kbd> Mute Audio</div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Center: Main Board -->
+      <main class="board-container">
+        <div class="canvas-wrapper">
+          <canvas id="tetrisCanvas" width="300" height="600"></canvas>
+          
+          <div id="overlayScreen" class="overlay hidden">
+            <div class="overlay-content">
+              <h2 id="overlayTitle">CYBER TETRIS</h2>
+              <p id="overlayMessage">Press START or SPACE to play</p>
+              <button id="startBtn" class="cyber-button">START MISSION</button>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <!-- Right Sidebar: Score, Next Queue & High Score -->
+      <aside class="sidebar side-right">
+        <div class="panel score-panel">
+          <div class="panel-header">SCORE</div>
+          <div class="score-display" id="scoreDisplay">0000000</div>
+          <div class="high-score-box">
+            <span class="stat-label">TOP RECORD</span>
+            <span class="stat-value" id="highScoreDisplay">0000000</span>
+          </div>
+        </div>
+
+        <div class="panel next-panel">
+          <div class="panel-header">NEXT QUEUE</div>
+          <canvas id="nextCanvas" width="100" height="240"></canvas>
+        </div>
+
+        <div class="panel audio-panel">
+          <button id="audioToggleBtn" class="cyber-btn-small">AUDIO: ON</button>
+          <button id="pauseBtn" class="cyber-btn-small">PAUSE [P]</button>
+          <button id="restartBtn" class="cyber-btn-small">RESET [R]</button>
+        </div>
+      </aside>
+    </div>
+
+    <!-- Mobile Virtual Gamepad -->
+    <div class="mobile-controls">
+      <div class="dpad-cluster">
+        <button class="dpad-btn" id="mBtnLeft">&larr;</button>
+        <button class="dpad-btn" id="mBtnDown">&darr;</button>
+        <button class="dpad-btn" id="mBtnRight">&rarr;</button>
+      </div>
+      <div class="action-cluster">
+        <button class="action-btn" id="mBtnHold">HOLD</button>
+        <button class="action-btn" id="mBtnRotCCW">&#8634;</button>
+        <button class="action-btn action-primary" id="mBtnRotCW">&#8635;</button>
+        <button class="action-btn action-hard" id="mBtnHardDrop">&dArr;</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="tetris.js"></script>
+</body>
+</html>

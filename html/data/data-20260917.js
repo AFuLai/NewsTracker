@@ -156,6 +156,426 @@ window.TRACKER_DAYS["2026-09-17"] = [
     ]
   },
   {
+    id: "20260917-13242",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心 fq 流量控制元件漏洞修復：允許極小量子值繞過初始限制",
+    summary: "本漏洞存在於 Linux 核心的 `net/sched` 模組中的 fq 流量控制機制。該機制原本限制了 `fq_init()` 函數的量子值範圍為 [1, 1<<20]。然而，攻擊者可以透過 `tc qdisc change` 命令，使用 `TCA_FQ_QUANTUM` 和 `TCA_FQ_INITIAL_QUANTUM` 參數，將量子值設定為超出初始限制的範圍（高達 INT_MAX）。這使得攻擊者能夠繞過原本的量子值限制，恢復一個原本被初始限制所阻止的「小量子值赤字 spin」。修復措施包括將 `iq_range.max` 限制為 1<<20，並在 `fq_change()` 和 `fq_init()` 函數中，將 `TCA_FQ_QUANTUM` 和 `fq_init()` 的量子值範圍限制在 [256, 1<<20]，特別針對小型 MTU 設備。重現此漏洞需要編譯核心時啟用 `CONFIG_NET_SCH_FQ`，並需具備 `CAP_NET_ADMIN` 權限。",
+    tags: ["Linux 核心", "net/sched", "fq", "TCA_FQ_QUANTUM", "CAP_NET_ADMIN", "Linux 漏洞"],
+    title_en: "Linux Kernel fq Traffic Control Component Vulnerability Fixed: Allows Extremely Small Quantum Values to Bypass Initial Limits",
+    summary_en: "This vulnerability resides in the fq traffic control mechanism within the Linux kernel's `net/sched` module. This mechanism originally limited the quantum value range of the `fq_init()` function to [1, 1<<20]. However, an attacker could use the `tc qdisc change` command, utilizing the `TCA_FQ_QUANTUM` and `TCA_FQ_INITIAL_QUANTUM` parameters, to set the quantum value to a range exceeding the initial limit (up to INT_MAX). This allowed the attacker to bypass the original quantum value restriction, restoring a 'small quantum deficit spin' that was previously prevented by the initial limit. The fix involves restricting `iq_range.max` to 1<<20, and within the `fq_change()` and `fq_init()` functions, limiting the quantum value range for `TCA_FQ_QUANTUM` and `fq_init()` to [256, 1<<20], especially for devices with small MTUs. Reproducing this vulnerability requires enabling `CONFIG_NET_SCH_FQ` during kernel compilation and possessing `CAP_NET_ADMIN` privileges.",
+    tags_en: ["Linux Kernel", "net/sched", "fq", "TCA_FQ_QUANTUM", "CAP_NET_ADMIN", "Linux Vulnerability"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-90050", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260917-13243",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心修補：修復 TCP 傳輸層在非零複製模式下使用 devmem 的漏洞",
+    summary: "本修補針對 Linux 核心中的一個網路傳輸漏洞，涉及 TCP 協議在非零複製（zero-copy）模式下使用 `devmem` 進行資料傳輸時的行為異常。原先的設計允許在缺少 `NETIF_F_SG` 標記的情況下，`tcp_sendmsg_locked()` 會嘗試使用複製路徑（copy path）處理資料。若此時傳輸的 iovec 包含指向 dma-buf 的偏移量，理論上應失敗，但現有邏輯未能嚴格強制此限制。更重要的是，相關的網路功能（如 `d9c56501c72fd`）依賴於 `devmem` 綁定（binding）僅在零複製路徑使用時存在，而此漏洞允許在非零複製路徑下混用 `net-iov` 和頁面，從而破壞了網路封包（skb）的內部不變性（invariants）。修補內容旨在透過更嚴格的參數驗證，強制要求 `devmem` 傳輸必須在零複製模式下進行，從而防止資料處理流程的混亂與潛在的記憶體安全問題。此修補提升了 Linux 核心網路堆疊的穩定性和安全性。",
+    tags: ["Linux 核心", "TCP", "devmem", "zero-copy", "網路堆疊", "CVE"],
+    title_en: "Linux Kernel Patch: Fixes Vulnerability in TCP Transport Layer Using devmem in Non-Zero-Copy Mode",
+    summary_en: "This patch addresses a network transport vulnerability in the Linux kernel, concerning abnormal behavior when the TCP protocol uses `devmem` for data transmission in non-zero-copy mode. The original design allowed `tcp_sendmsg_locked()` to attempt processing data via the copy path even when the `NETIF_F_SG` flag was missing. If the iovec transmitted at this time contained an offset pointing to a dma-buf, it should theoretically fail, but the existing logic failed to strictly enforce this limitation. More critically, related network functions (such as `d9c56501c72fd`) rely on `devmem` binding only existing when used in the zero-copy path. This vulnerability allowed the mixing of `net-iov` and pages in the non-zero-copy path, thereby corrupting the internal invariants of the network packet (skb). The patch aims to enforce that `devmem` transmission must occur in zero-copy mode through stricter parameter validation, preventing data processing flow confusion and potential memory safety issues. This patch enhances the stability and security of the Linux kernel network stack.",
+    tags_en: ["Linux Kernel", "TCP", "devmem", "zero-copy", "Network Stack", "CVE"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-90051", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260917-13244",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心修補：dm-integrity 緩衝區溢位，修復 keyed discard 填充物計算錯誤",
+    summary: "本漏洞存在於 Linux 核心的 dm-integrity 功能中，涉及處理帶鍵的丟棄（keyed discard）時的緩衝區溢位（buffer overflow）。當 `integrity_metadata` 計算每個丟棄區塊的校驗和（checksum）並寫入「checksums」緩衝區時，如果標籤大小（tag size）小於完整摘要（digest）大小，計算出的校驗和會超出預定的緩衝區邊界。例如，使用 hmac(sha256) 且標籤大小為 16 位元組時，一個 4MiB 的丟棄操作可能會導致校驗和寫入超過 kmalloc 分配頁的末端。\n\n修補措施是調整 `max_blocks` 的計算，在計算時從緩衝區大小中減去額外空間（extra_space），以確保校驗和寫入不會溢出。此修補旨在提高 dm-integrity 的記憶體安全性和資料完整性，防止惡意輸入或錯誤計算導致的記憶體寫入越界。",
+    tags: ["Linux 核心", "dm-integrity", "緩衝區溢位", "keyed discard", "CVE-2026-90052"],
+    title_en: "Linux Kernel Patch: dm-integrity Buffer Overflow in Keyed Discard Padding Calculation",
+    summary_en: "This vulnerability exists in the Linux kernel's dm-integrity feature, involving a buffer overflow when processing keyed discard. When `integrity_metadata` calculates the checksum for each discarded block and writes it to the 'checksums' buffer, if the tag size is smaller than the digest size, the calculated checksum can exceed the designated buffer boundary. For instance, using hmac(sha256) with a tag size of 16 bytes, a 4MiB discard operation could cause the checksum write to exceed the end of the kmalloc allocated page.\n\nThe fix adjusts the calculation of `max_blocks`, subtracting extra space from the buffer size during calculation to ensure that checksum writes do not overflow. This patch aims to enhance the memory safety and data integrity of dm-integrity, preventing memory write out-of-bounds caused by malicious input or incorrect calculations.",
+    tags_en: ["Linux Kernel", "dm-integrity", "Buffer Overflow", "keyed discard", "CVE-2026-90052"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-90052", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260917-13245",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心修補：修復 net/sched sch_htb 內層過濾器無限循環導致的軟鎖定/崩潰漏洞",
+    summary: "本修補針對 Linux 核心中的 `net/sched: sch_htb` 模組，修復了一個內層過濾器（inner-class filter）的無限循環漏洞。在正常情況下，`htb_classify()` 函數在處理過濾器時，如果過濾器指向自身或指向另一個會反向指向它的內層類別，可能會在持有 qdisc 鎖的情況下，導致封包分類路徑進入無限循環，最終造成軟鎖定（soft lockup）甚至系統崩潰（panic）。修補內容增加了跳數計數器（hop counter）來限制過濾器遍歷的深度，一旦超過預設的 `TC_HTB_MAXDEPTH` 限制，系統將會丟棄該封包並發出速率限制警告。此漏洞的利用條件需要啟用 `CONFIG_NET_SCHED`、`CONFIG_NET_SCH_HTB`、`CONFIG_NET_CLS_U32` 和 `CONFIG_LOCKUP_DETECTOR` 等配置，並且攻擊者需要具備 `CAP_NET_ADMIN` 權限，可透過未特權使用者執行 `unshare -Urn` 達到。修補後，即使在沒有啟用動作（actions）的環境下，`htb_enqueue()` 也能正確處理 NULL 類別，避免了潛在的崩潰風險。",
+    tags: ["Linux 核心", "sch_htb", "net/sched", "無限循環", "CVE-2026-90053", "qdisc"],
+    title_en: "Linux Kernel Patch: Fixes Soft Lockup/Crash Vulnerability Caused by Inner Filter Infinite Loop in net/sched sch_htb",
+    summary_en: "This patch addresses a vulnerability in the `net/sched: sch_htb` module within the Linux kernel, which involves an infinite loop in the inner-class filter. Under normal circumstances, if the `htb_classify()` function processes filters where a filter points to itself or points to another inner class that subsequently points back, the packet classification path can enter an infinite loop while holding the qdisc lock. This can ultimately lead to a soft lockup or even a system panic. The patch introduces a hop counter to limit the depth of filter traversal. Once the predefined `TC_HTB_MAXDEPTH` limit is exceeded, the system will drop the packet and issue a rate-limiting warning. Exploiting this vulnerability requires enabling configurations such as `CONFIG_NET_SCHED`, `CONFIG_NET_SCH_HTB`, `CONFIG_NET_CLS_U32`, and `CONFIG_LOCKUP_DETECTOR`, and the attacker must possess `CAP_NET_ADMIN` privileges, which can be achieved by an unprivileged user using `unshare -Urn`. After the patch, `htb_enqueue()` can correctly handle NULL classes even in environments without defined actions, mitigating the potential crash risk.",
+    tags_en: ["Linux Kernel", "sch_htb", "net/sched", "infinite loop", "CVE-2026-90053", "qdisc"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-90053", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260917-13246",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心修復 TCP 重傳路徑的緊急資料處理漏洞，防止資料流被篡改",
+    summary: "本漏洞存在於 Linux 核心的 TCP 協定實現中，影響的是在多分段重傳（multi-segment retransmit）路徑下處理緊急資料（urgent data）時的資料完整性。當 TCP 處於緊急模式時，正常的發送路徑（xmit path）會限制 TSO（TCP Segmentation Offload）封包的建立，確保每個分段都有獨立的 `urg_ptr`。然而，在重傳路徑（retransmit path）中，缺乏此保護機制，允許建立多個分段（segs > 1）的 SKB，並將 `urg_ptr` 值逐字複製給每個分段。由於 `urg_ptr` 是相對於分段自身序列號的偏移量，當接收端嘗試重建絕對的緊急序列號時，會誤將其視為每個分段序列號加上相同的偏移量，導致接收端無法正確定位原始的 Out-of-Band (OOB) 緊急位元組，最終將其誤判為正常的資料流，造成資料串流（stream）的混亂與資料損壞。修復建議是在重傳路徑中，當處於緊急模式時，應像發送路徑一樣，限制分段數量為 1。此修復旨在確保 TCP 緊急資料的處理準確性與資料流的完整性。",
+    tags: ["Linux 核心", "TCP", "CVE-2026-90054", "緊急資料", "重傳路徑", "TSO"],
+    title_en: "Linux Kernel Fixes Urgent Data Handling Vulnerability in TCP Retransmit Path to Prevent Data Stream Tampering",
+    summary_en: "This vulnerability resides in the TCP protocol implementation within the Linux kernel, affecting data integrity when handling urgent data during a multi-segment retransmit path. When TCP is in urgent mode, the normal transmission path (xmit path) restricts the creation of TSO (TCP Segmentation Offload) packets, ensuring that each segment has an independent `urg_ptr`. However, this protection mechanism is missing in the retransmit path, which allows the creation of multiple segments (segs > 1) and copies the `urg_ptr` value character by character to each segment. Since `urg_ptr` is an offset relative to the segment's own sequence number, when the receiving end attempts to reconstruct the absolute urgent sequence number, it incorrectly treats it as the same offset added to each segment's sequence number. This causes the receiving end to fail to correctly locate the original Out-of-Band (OOB) urgent byte, ultimately misinterpreting it as normal data flow, leading to data stream confusion and corruption. The suggested fix is that in the retransmit path, when in urgent mode, the segment count should be restricted to 1, similar to the transmission path. This fix aims to ensure the accuracy of TCP urgent data handling and the integrity of the data stream.",
+    tags_en: ["Linux Kernel", "TCP", "CVE-2026-90054", "Urgent Data", "Retransmit Path", "TSO"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-90054", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260917-13247",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心修復 ATM 設備初始化漏洞：防止無效位移操作導致的 UBSAN 警告",
+    summary: "本修補針對 Linux 核心中的 ATM 設備（`usb: atm: usbatm`）初始化過程中的一個潛在漏洞。問題出在 `usbatm_atm_init()` 函數中，它將 `ci_range.vpi_bits` 和 `ci_range.vci_bits` 設置為 `ATM_CI_MAX`，該值為 `-1`。在後續的網路堆棧操作中，核心程式碼直接將這些欄位用作位移次數（bit shift counts），導致了對負數（-1）進行位移操作，觸發了 UBSAN（Undefined Behavior Sanitizer）警告，這屬於未定義行為。ATM 設備的 `ci_range` 欄位本應代表 VPI 和 VCI 位址支援的位元數。修補建議是，在初始化 `vpi_bits` 和 `vci_bits` 時，應使用正確的預設值，例如將 `vpi_bits` 設置為 8 位，`vci_bits` 設置為 16 位，以符合 ATM UNI cell headers 的標準定義，避免使用作為標記值的 `-1`。",
+    tags: ["Linux 核心", "ATM 設備", "usbatm", "UBSAN", "ci_range", "網路堆棧"],
+    title_en: "Linux Kernel Fixes ATM Device Initialization Vulnerability: Prevents UBSAN Warnings from Invalid Shift Operations",
+    summary_en: "This patch addresses a potential vulnerability during the initialization process of the ATM device (``usb: atm: usbatm``) within the Linux kernel. The issue resides in the `usbatm_atm_init()` function, which sets `ci_range.vpi_bits` and `ci_range.vci_bits` to `ATM_CI_MAX`, a value of -1. In subsequent network stack operations, the kernel code directly uses these fields as bit shift counts, leading to bit shift operations on negative numbers (-1), which triggers a UBSAN (Undefined Behavior Sanitizer) warning, indicating undefined behavior. The `ci_range` fields in the ATM device are intended to represent the number of bits supported for VPI and VCI addresses. The suggested fix is that when initializing `vpi_bits` and `vci_bits`, correct default values should be used—for example, setting `vpi_bits` to 8 bits and `vci_bits` to 16 bits—to comply with the standard definition of ATM UNI cell headers, thereby avoiding the use of -1 as a placeholder value.",
+    tags_en: ["Linux Kernel", "ATM Device", "usbatm", "UBSAN", "ci_range", "Network Stack"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-90055", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260917-13248",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心安全更新：修復 fec 驅動程式在設備移除與初始化失敗時不當停止 PTP 服務的漏洞",
+    summary: "本更新針對 Linux 核心中的 `net: fec` 驅動程式，修復了一個邏輯漏洞。該漏洞的本質在於，當設備初始化失敗或設備被移除時，`fec_probe()` 和 `fec_drv_remove()` 函式都會無條件地呼叫 `fec_ptp_stop()` 函式，即使 PTP (Precision Time Protocol) 服務從未被初始化。這可能導致系統不必要地停止 PTP 服務，造成服務中斷或不穩定的運行狀態。修補建議是在這兩個路徑（`failed_init` 和設備移除）呼叫 `fec_ptp_stop()` 之前，必須先檢查 `fep->bufdesc_ex` 的狀態，確保 PTP 服務確實已經初始化，從而避免在未初始化時執行停止操作。此修補屬於核心邏輯修正，旨在提高系統穩定性。",
+    tags: ["Linux 核心", "fec 驅動程式", "PTP", "net", "核心漏洞"],
+    title_en: "Linux Kernel Security Update: Fixes Improper Stopping of PTP Service in fec Driver Upon Device Removal or Initialization Failure",
+    summary_en: "This update addresses a logical vulnerability in the `net: fec` driver within the Linux kernel. The vulnerability stems from the fact that both the `fec_probe()` and `fec_drv_remove()` functions unconditionally call `fec_ptp_stop()`, even if the PTP (Precision Time Protocol) service was never initialized. This could cause the system to unnecessarily stop the PTP service, leading to service disruption or unstable operation. The patch suggests that before calling `fec_ptp_stop()` in both paths (failed initialization and device removal), a check must be performed on the status of `fep->bufdesc_ex` to ensure that the PTP service has indeed been initialized, thereby preventing the stop operation from executing when it is not necessary. This fix is a core logic correction aimed at improving system stability.",
+    tags_en: ["Linux Kernel", "fec driver", "PTP", "net", "kernel vulnerability"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-90056", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260917-13249",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心：修復 tty 相關的 Use-After-Free 漏洞，解決競態條件下的記憶體釋放問題",
+    summary: "本漏洞存在於 Linux 核心的 tty 相關元件中，具體影響於處理串列埠（slip）的邏輯。問題出在 `slip_hangup()` 函式在處理 tty 斷線（hangup）時，僅持有 `tty->ldisc_sem` 的讀取鎖。當此函式執行 `slip_close()` 時，會解除註冊並釋放 net device 及其私有結構 `slip`。然而，由於 `slip_hangup()` 與讀取資料的 `slip_receive_buf()` 函式是並行執行的，導致正在讀取資料的執行緒會嘗試解引用已被釋放的記憶體，造成 Use-After-Free (UAF) 漏洞。修復建議是移除 `slip_hangup()` 函式，確保設備的拆除（teardown）流程能透過 `slip_close()` 進行序列化處理，從而避免競態條件下的記憶體存取錯誤。",
+    tags: ["Linux 核心", "Use-After-Free", "tty", "slip", "記憶體安全"],
+    title_en: "Linux Kernel: Fixes Use-After-Free Vulnerability in tty Component, Resolving Memory Release Issue in Race Condition",
+    summary_en: "This vulnerability resides in the tty component of the Linux kernel, specifically affecting the logic that handles serial ports (slip). The issue arises because the `slip_hangup()` function only holds a read lock on `tty->ldisc_sem` when processing a tty hangup. When this function executes `slip_close()`, it unregisters and releases the net device and its private structure `slip`. However, because `slip_hangup()` and `slip_receive_buf()`, which reads data, run concurrently, a thread reading data may attempt to dereference already freed memory, causing a Use-After-Free (UAF) vulnerability. The suggested fix is to remove `slip_hangup()`, ensuring that the device teardown process is serialized through `slip_close()`, thereby preventing memory access errors in a race condition.",
+    tags_en: ["Linux Kernel", "Use-After-Free", "tty", "slip", "Memory Safety"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-90057", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260917-13250",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心修補 qdisc 漏洞：防止 size-table 放大導致的資源耗盡與軟鎖定",
+    summary: "本漏洞存在於 Linux 核心的網路排程（net/sched）模組中。攻擊者可以透過構造惡意的 size-table (TCA_STAB)，利用 `__qdisc_calculate_pkt_len()` 函式，將 qdisc_pkt_len() 放大至極大的值（約 1 GiB）。當搭配如 DRR 或 ETS 等缺乏流量的排程器（deficit schedulers）時，如果量子（quantum）設置得極小（例如 1），排程器會在 qdisc 鎖定（qdisc lock）下進入無限制的循環（unbounded loop），導致系統發生軟鎖定（soft lockup）或 RCU stall，進而造成系統崩潰。修補措施是在 `qdisc_get_stab()` 函式中，對最終的 qdisc_pkt_len() 設置上限（QDISC_PKT_LEN_MAX），將其限制為 1 MiB。此限制足以防止惡意放大，同時仍能涵蓋所有合法單個封包的傳輸長度。該漏洞的重現條件要求系統開啟 `CONFIG_NET_SCH=y` 和特定的排程器（如 DRR 或 ETS），並需具備 `CAP_NET_ADMIN` 權限。",
+    tags: ["Linux 核心", "net/sched", "qdisc", "DRR", "ETS", "soft lockup", "CVE-2026-90058"],
+    title_en: "Linux Kernel Fix for qdisc Vulnerability: Preventing Resource Exhaustion and Soft Lockup via size-table Amplification",
+    summary_en: "This vulnerability resides in the networking scheduling (net/sched) module of the Linux kernel. An attacker can construct a malicious size-table (TCA_STAB) and utilize the `__qdisc_calculate_pkt_len()` function to amplify `qdisc_pkt_len()` to an extremely large value (approximately 1 GiB). When combined with deficit schedulers, such as DRR or ETS, which lack traffic, if the quantum is set extremely low (e.g., 1), the scheduler enters an unbounded loop under the qdisc lock, leading to a soft lockup or RCU stall, which can subsequently cause system crashes. The fix involves setting an upper limit (QDISC_PKT_LEN_MAX) on the final `qdisc_pkt_len()` within the `qdisc_get_stab()` function, restricting it to 1 MiB. This limit is sufficient to prevent malicious amplification while still accommodating the transmission length of all legitimate single packets. Reproducing this vulnerability requires the system to have `CONFIG_NET_SCH=y` enabled and specific schedulers (such as DRR or ETS), and requires `CAP_NET_ADMIN` privileges.",
+    tags_en: ["Linux Kernel", "net/sched", "qdisc", "DRR", "ETS", "soft lockup", "CVE-2026-90058"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-90058", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260917-13251",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心漏洞：stmmac 接收路徑零拷貝導致 IP 標頭位元組對齊錯誤，可能引發系統崩潰",
+    summary: "本漏洞存在於 Linux 核心的網路驅動程式 stmmac 的接收 (RX) 路徑中。當 RX 路徑從傳統的資料複製模式轉換為零拷貝 (zero-copy) 模式後，系統在計算資料包的偏移量時，忽略了原本用於確保 IP 標頭位元組對齊 (NET_IP_ALIGN) 的空間。在某些架構（特別是 ARM32）上，當 IP 標頭位元組無法正確對齊時，會導致 CPU 執行指令（如 ldm/ldr）發生「對齊例外 (alignment exception)」，進而引發核心崩潰 (Kernel panic)。此問題尤其在處理如 ICMP echo request 等網路封包時觸發。修復方法是在 RX 偏移量計算中重新加入 NET_IP_ALIGN，以恢復堆疊層原本的對齊機制。開發者應注意，此問題與過去嘗試修正對齊但導致封包損壞的歷史修補程式有關，建議升級到包含此修復的 Linux 核心版本。",
+    tags: ["Linux 核心", "stmmac", "CVE-2026-90059", "zero-copy", "Kernel panic", "NET_IP_ALIGN"],
+    title_en: "Linux Kernel Vulnerability: stmmac Receive Path Zero-Copy Causes IP Header Byte Misalignment, Potentially Leading to System Crash",
+    summary_en: "This vulnerability exists in the stmmac network driver's receive (RX) path within the Linux kernel. When the RX path transitioned from traditional data copying to a zero-copy mode, the system failed to account for the space originally used to ensure IP header byte alignment (NET_IP_ALIGN) when calculating packet offsets. On certain architectures (especially ARM32), if the IP header bytes cannot be correctly aligned, it can cause a CPU instruction (such as ldm/ldr) to trigger an 'alignment exception,' leading to a kernel panic. This issue is particularly triggered when processing network packets like ICMP echo requests. The fix involves reintroducing NET_IP_ALIGN into the RX offset calculation to restore the stack layer's original alignment mechanism. Developers should note that this issue is related to historical patches that attempted to fix alignment but resulted in packet corruption, and they are advised to upgrade to a Linux kernel version containing this fix.",
+    tags_en: ["Linux Kernel", "stmmac", "CVE-2026-90059", "zero-copy", "Kernel panic", "NET_IP_ALIGN"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-90059", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260917-13252",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心 ALSA 漏洞修復：防止無效 kcontrol 元素導致 NULL 指標解引用",
+    summary: "本漏洞位於 Linux 核心的 ALSA (Advanced Linux Sound Architecture) 驅動層。問題出在 kcontrol LED 狀態層，它在追蹤相關 kcontrol 元素時，會過度假設這些元素都是可讀取的。攻擊者可以創建一個僅支援寫入（write-only）且沒有 `get` 回呼的 kcontrol 元素（即使是使用者空間元素也可以做到）。當系統呼叫 `snd_ctl_led_notify()` 時，如果遇到這種無效的 kcontrol，可能會導致 NULL 指標解引用（NULL dereference），進而造成系統崩潰（Oops）。此漏洞由 syzkaller 工具發現。修復建議是在將 kcontrol 賦值給 LED 層之前，增加對 kcontrol 資訊和 `get` 回呼的健全性檢查（sanity check），並跳過所有無效的 kcontrol，以避免發生 Oops。此修復屬於核心元件層面的安全加固。",
+    tags: ["Linux 核心", "ALSA", "kcontrol", "NULL 指標解引用", "syzkaller"],
+    title_en: "Linux Kernel ALSA Vulnerability Fixed: Prevents NULL Pointer Dereference from Invalid kcontrol Element",
+    summary_en: "This vulnerability resides in the ALSA (Advanced Linux Sound Architecture) driver layer within the Linux kernel. The issue lies in the kcontrol LED state layer, which incorrectly assumes that associated kcontrol elements are readable while tracking them. An attacker can create a kcontrol element that is write-only and lacks a `get` callback (even if it is a userspace element). When the system calls `snd_ctl_led_notify()`, encountering such an invalid kcontrol may lead to a NULL pointer dereference, causing a system crash (Oops). This vulnerability was discovered using the syzkaller tool. The suggested fix involves adding a sanity check for the kcontrol information and the `get` callback before assigning the kcontrol to the LED layer, and skipping all invalid kcontrols to prevent the Oops. This patch constitutes a security hardening measure at the core component level.",
+    tags_en: ["Linux Kernel", "ALSA", "kcontrol", "NULL Pointer Dereference", "syzkaller"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-90060", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260917-13253",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心修復 netfilter nf_tables 漏洞：優化 set 表格表達式複製機制",
+    summary: "本修補針對 Linux 核心的 netfilter nf_tables 組件，解決了在設定 set 元素表達式時可能發生的「雙重複製」（double clone）問題。當未提供覆寫表達式（override expressions）時，系統會對現有的 set 表達式進行兩次複製，導致邏輯複雜且效率降低。修補內容新增了 `override_exprs` 旗標，用於判斷使用者空間是否提供了覆寫表達式。若有，則直接使用該表達式；否則，則從 set 中借用現有表達式。此外，此修補還修正了與 `connlimit` 表達式相關的 Bug，該 Bug 在對預設 set 表達式進行排序時，會導致模組引用計數（module refcount）不平衡的警告（WARNING splat）。修補旨在簡化現有邏輯，提升系統穩定性與效率。",
+    tags: ["Linux 核心", "netfilter", "nf_tables", "CVE-2026-90061", "set expressions", "module refcount"],
+    title_en: "Linux Kernel Fixes netfilter nf_tables Vulnerability: Optimizes set Table Expression Cloning Mechanism",
+    summary_en: "This patch addresses the netfilter nf_tables component in the Linux kernel, resolving a 'double clone' issue that can occur when setting set element expressions. When override expressions are not provided, the system would duplicate the existing set expression twice, leading to complex logic and reduced efficiency. The fix introduces the `override_exprs` flag to determine if user space has provided override expressions. If so, the provided expression is used directly; otherwise, the existing expression is borrowed from the set. Furthermore, this patch corrects a bug related to the `connlimit` expression. This bug caused a warning (WARNING splat) of unbalanced module refcount when sorting default set expressions. The patch aims to simplify the existing logic, thereby improving system stability and efficiency.",
+    tags_en: ["Linux Kernel", "netfilter", "nf_tables", "CVE-2026-90061", "set expressions", "module refcount"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-90061", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260917-13254",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心修補：netfilter nf_tables 提升穩定性，修正硬體卸載步驟順序問題",
+    summary: "本更新針對 Linux 核心中的 netfilter nf_tables 模組，修復了一個潛在的穩定性漏洞。該漏洞涉及硬體卸載（hardware offload）的步驟順序問題。若未正確處理，可能會導致在網路介面卡（NIC）上的卸載規則集與軟體層的規則集產生不一致的狀態。修補內容要求在執行規則集卸載（ruleset offload）之前，先分配（Allocate）鏈塊（chain blob）。這能有效降低系統進入不一致狀態的機率，從而提升網路處理流程的可靠性。建議所有使用 Linux 核心的系統管理員應留意核心更新，以確保網路安全與穩定性。",
+    tags: ["Linux 核心", "netfilter", "nf_tables", "硬體卸載", "網路安全", "CVE-2026-90062"],
+    title_en: "Linux Kernel Patch: netfilter nf_tables Improves Stability by Fixing Hardware Offload Step Order Issue",
+    summary_en: "This update addresses a potential stability vulnerability in the Linux kernel's netfilter nf_tables module. The vulnerability involves an incorrect step order during hardware offloading. If not properly handled, this could lead to an inconsistent state between the offloaded ruleset on the Network Interface Card (NIC) and the ruleset in the software layer. The patch requires allocating the chain blob before performing the ruleset offload. This significantly reduces the probability of the system entering an inconsistent state, thereby enhancing the reliability of the network processing flow. System administrators using Linux kernels are advised to monitor kernel updates to ensure network security and stability.",
+    tags_en: ["Linux Kernel", "netfilter", "nf_tables", "Hardware Offload", "Network Security", "CVE-2026-90062"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-90062", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260917-13255",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心 virtio-net 漏洞修復：防止 TCP 封包 GSO 尺寸溢位風險",
+    summary: "本漏洞存在於 Linux 核心的 virtio-net 驅動程式中。攻擊者可透過使用 AF_PACKET PACKET_VNET_HDR socket 構造的封包，指定一個小於標準 TCP_MIN_GSO_SIZE（即 8）的 gso_size。當用戶構造的封包具有此類異常的 gso_size 時，在計算 SKB 長度除以 gso_size 的過程中，可能會導致 16 位元的 gso_segs 欄位發生部分溢位。這類溢位風險可能影響系統的網路處理穩定性。修復建議是調整 TCP 封包的 gso_size，確保其至少為 TCP_MIN_GSO_SIZE = 8。對於 UDP GSO 封包，則應保留其 gso_size 的處理方式，因為 gso_size=1 是有效的，並已在測試工具中明確驗證。",
+    tags: ["Linux 核心", "virtio-net", "CVE-2026-90063", "GSO", "TCP", "網路驅動"],
+    title_en: "Linux Kernel virtio-net Vulnerability Fixed: Preventing TCP Packet GSO Size Overflow Risk",
+    summary_en: "This vulnerability resides in the virtio-net driver within the Linux kernel. An attacker can exploit this by constructing packets using the AF_PACKET PACKET_VNET_HDR socket and specifying a gso_size smaller than the standard TCP_MIN_GSO_SIZE (i.e., 8). When a user-constructed packet has such an abnormal gso_size, the process of calculating the SKB length divided by gso_size may cause a partial overflow in the 16-bit gso_segs field. This overflow risk could potentially affect the stability of the system's network processing. The recommended fix is to adjust the TCP packet's gso_size, ensuring it is at least TCP_MIN_GSO_SIZE = 8. For UDP GSO packets, however, the current gso_size handling should be maintained, as gso_size=1 is valid and has been explicitly verified in testing tools.",
+    tags_en: ["Linux Kernel", "virtio-net", "CVE-2026-90063", "GSO", "TCP", "Network Driver"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-90063", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260917-13256",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心修補：修復 drm/xe 驅動程式中處理非故障模式虛擬機的頁面錯誤漏洞",
+    summary: "本修補針對 Linux 核心的 `drm/xe` 驅動程式，解決了一個與處理頁面錯誤（page faults）相關的漏洞。當啟用 `scratch` 功能，且虛擬機（VM）未處於故障模式（fault-mode）時，如果該 VM 在一個已有效的 VMA 上發生故障，處理程序會誤報成功，但並未修復故障。這會導致 GPU 無限重試，造成系統不穩定或功能異常。修補措施限制了 ASID 查找只能允許處於故障模式的 VM，同時仍支援使用 `scratch` 的故障模式 VM。此變更旨在提高系統的穩定性與安全性，特別是針對 3D 虛擬機的故障處理機制進行了限制，以確保只有符合安全標準的 VM 才能通過 ASID 查找。",
+    tags: ["Linux 核心", "drm/xe", "頁面錯誤", "ASID", "虛擬機", "CVE-2026-90064"],
+    title_en: "Linux Kernel Patch: Fixes Page Fault Vulnerability in drm/xe Driver Handling Non-Fault-Mode Virtual Machines",
+    summary_en: "This patch addresses a vulnerability in the Linux kernel's `drm/xe` driver related to handling page faults. When the `scratch` feature is enabled, and a virtual machine (VM) is not in fault-mode, if the VM experiences a fault within an already valid VMA, the handling process incorrectly reports success without actually resolving the fault. This can cause the GPU to enter an infinite retry loop, leading to system instability or functional anomalies. The fix restricts ASID lookups to only allow VMs that are in fault-mode, while still supporting fault-mode VMs that utilize `scratch`. This change aims to enhance system stability and security by limiting the fault handling mechanism, especially for 3D virtual machines, ensuring that only VMs meeting security standards can pass ASID lookups.",
+    tags_en: ["Linux Kernel", "drm/xe", "Page Fault", "ASID", "Virtual Machine", "CVE-2026-90064"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-90064", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260917-13257",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心漏洞：IPPROTO_SMC 創建失敗導致 TCP socket 記憶體洩漏",
+    summary: "本漏洞存在於 Linux 核心的網路堆疊中，特別是處理 IPPROTO_SMC socket 的部分。當嘗試創建此類 socket 失敗時，如果 cgroup BPF 程式（例如附加到 BPF_CGROUP_INET_SOCK_CREATE）拒絕創建 socket，核心的資源釋放機制（sk_common_release()）無法正確釋放內部建立的 TCP socket（clcsock）。這導致每次失敗的 socket 呼叫都會洩漏一個 tcp_sock 資源，使得未授權的任務只要能附加一個拒絕所有連線的 BPF 程式到其 cgroup，就能無限增長核心記憶體，造成資源耗盡。修補措施要求為 smc_inet_prot 和 smc_inet6_prot 增加一個 .destroy hook，透過 smc_clcsock_release() 來釋放 clcsock，並在釋放前執行 unhash 步驟，以確保在同時進行核心記憶體傾印（dump）時，不會觀察到資源釋放的狀態。修補此漏洞可防止攻擊者利用 BPF 程式的限制來造成核心記憶體洩漏。",
+    tags: ["Linux 核心", "IPPROTO_SMC", "CVE-2026-90065", "BPF", "記憶體洩漏", "cgroup"],
+    title_en: "Linux Kernel Vulnerability: IPPROTO_SMC Creation Failure Causes TCP Socket Memory Leak",
+    summary_en: "This vulnerability resides in the Linux kernel's network stack, specifically in the handling of IPPROTO_SMC sockets. When an attempt to create such a socket fails, if a cgroup BPF program (such as one attached to BPF_CGROUP_INET_SOCK_CREATE) denies the socket creation, the kernel's resource release mechanism (sk_common_release()) fails to properly release the internally created TCP socket (clcsock). This results in a tcp_sock resource leak with every failed socket call, allowing an unauthorized task to infinitely grow kernel memory by attaching a BPF program that denies all connections to its cgroup, leading to resource exhaustion. The patch requires adding a .destroy hook to smc_inet_prot and smc_inet6_prot, utilizing smc_clcsock_release() to release clcsock, and performing an unhash step before release to ensure that the resource release state is not observed during a simultaneous kernel memory dump. Patching this vulnerability prevents attackers from causing kernel memory leaks by exploiting BPF program restrictions.",
+    tags_en: ["Linux Kernel", "IPPROTO_SMC", "CVE-2026-90065", "BPF", "Memory Leak", "cgroup"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-90065", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260917-13258",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心修復 ftrace-direct-multi-modify 模組的空指針解引用漏洞",
+    summary: "本修復針對 Linux 核心中的 ftrace-direct-multi-modify 模組，解決了一個空指針解引用（null-pointer-dereference）的漏洞。問題出在 ftrace_direct_multi_init() 函數中，它將 kthread_run() 的回傳值賦給 simple_tsk，但缺乏對該回傳值是否為錯誤指標（IS_ERR()）的檢查。當 kthread_run() 失敗時，它會回傳 ERR_PTR(-ENOMEM)，但 init 函數仍會返回 0，導致模組載入時 simple_tsk 內部持有錯誤指標。當模組卸載時，ftrace_direct_multi_exit() 會將這個錯誤指標傳遞給 kthread_stop()，進而引發空指針解引用。修復建議是在呼叫 kthread_run() 後，必須使用 IS_ERR() 檢查其回傳值；若檢查失敗，應取消註冊 ftrace direct 呼叫並傳播錯誤代碼，以確保系統穩定性。",
+    tags: ["Linux 核心", "ftrace", "kthread_stop", "空指針解引用", "Linux 模組"],
+    title_en: "Linux Kernel Fix Addresses Null Pointer Dereference Vulnerability in ftrace-direct-multi-modify Module",
+    summary_en: "This fix addresses a null-pointer-dereference vulnerability in the Linux kernel's ftrace-direct-multi-modify module. The issue resides in the ftrace_direct_multi_init() function, which assigns the return value of kthread_run() to simple_tsk but fails to check if this return value is an error pointer (IS_ERR()). When kthread_run() fails, it returns ERR_PTR(-ENOMEM), but the init function still returns 0, causing simple_tsk to hold an error pointer internally when the module is loaded. When the module is unloaded, ftrace_direct_multi_exit() passes this error pointer to kthread_stop(), which subsequently triggers the null-pointer-dereference. The recommended fix is that after calling kthread_run(), the return value must be checked using IS_ERR(); if the check fails, the ftrace direct call should be unregistered, and an error code should be propagated to ensure system stability.",
+    tags_en: ["Linux Kernel", "ftrace", "kthread_stop", "Null Pointer Dereference", "Linux Module"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-90066", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260917-13259",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心漏洞：Ceph Messenger v2 協議處理不當，可能導致不必要的警告與狀態機異常",
+    summary: "本漏洞存在於 Linux 核心的 Ceph Messenger v2 協議處理機制中，具體為 `libceph` 模組。當客戶端發送的 Ceph 訊息標頭（banner）中，`payload_len` 欄位被設定為 0 時，核心在解析過程中會嘗試進行零長度的 socket 讀取。這違反了內部狀態機的不變性（invariant），並觸發了 `populate_in_iter()` 警告。根據 msgr2 協議規範，訊息標頭的 payload 至少應包含兩個 64 位元整數（`server_feat` 和 `server_req_feat`），因此 `payload_len` 必須至少為 16 位元組。修補措施是在 `process_banner_prefix()` 函數中增加檢查，要求 `payload_len` 必須大於等於 16 位元組。若不符合要求，系統將拒絕該協議，並正確地以協議錯誤中止連線，從而修復了潛在的狀態機異常和警告。",
+    tags: ["Linux 核心", "Ceph", "libceph", "Messenger v2", "協議解析", "CVE-2026-90067"],
+    title_en: "Linux Kernel Vulnerability: Ceph Messenger v2 Protocol Handling Flaw May Cause Unnecessary Warnings and State Machine Anomalies",
+    summary_en: "This vulnerability resides in the Ceph Messenger v2 protocol handling mechanism within the Linux kernel, specifically in the `libceph` module. When a Ceph message banner sent by a client sets the `payload_len` field to 0, the kernel attempts a zero-length socket read during parsing. This violates the internal state machine invariant and triggers a `populate_in_iter()` warning. According to the msgr2 protocol specification, the message banner payload must contain at least two 64-bit integers (`server_feat` and `server_req_feat`), meaning `payload_len` must be at least 16 bytes. The fix involves adding a check within the `process_banner_prefix()` function, requiring `payload_len` to be greater than or equal to 16 bytes. If this requirement is not met, the system will reject the protocol and correctly terminate the connection with a protocol error, thereby resolving the potential state machine anomaly and warning.",
+    tags_en: ["Linux Kernel", "Ceph", "libceph", "Messenger v2", "Protocol Parsing", "CVE-2026-90067"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-90067", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260917-13260",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心 ASoC 漏洞修復：dapm 函式在處理列舉通道時存在越界檢查缺陷",
+    summary: "本漏洞位於 Linux 核心的 ASoC (Audio System on Chip) 子系統中，具體影響 `snd_soc_dapm_put_enum_double()` 函式。該函式在檢查第一個通道 (item[0]) 時會正確地拒絕超出範圍的項目，但對於第二個通道 (item[1]) 的檢查卻存在缺陷，允許其等於或超過項目數量。當此缺陷觸發時，後續呼叫 `snd_soc_enum_item_to_val()` 函式時，由於該函式缺乏自身的邊界限制，導致列舉（enum）具有值表（value table）的結構會讀取到超出範圍的記憶體元素，造成越界讀取。此問題主要在 MUX 整合後被放寬了 item[1] 的檢查。目前觀察到 adav80x 設備組合是觸發此漏洞的場景，寫入第三個值會導致越界讀取。此漏洞的修復與核心的配置選項 `CONFIG_SND_CTL_INPUT_VALIDATION` 有關，若該選項啟用，核心會捕獲此類越界行為。修補建議是更新 Linux 核心版本，並確保相關音訊子系統的邊界檢查機制得到強化。",
+    tags: ["Linux 核心", "ASoC", "dapm", "越界讀取", "snd_soc_dapm_put_enum_double"],
+    title_en: "Linux Kernel ASoC Vulnerability Fix: Out-of-Bounds Check Flaw in dapm Function During Enumeration",
+    summary_en: "This vulnerability resides in the Audio System on Chip (ASoC) subsystem of the Linux kernel, specifically affecting the `snd_soc_dapm_put_enum_double()` function. While this function correctly rejects out-of-range items when checking the first channel (item[0]), it has a flaw in checking the second channel (item[1]), allowing it to be equal to or exceed the item count. When this flaw is triggered, subsequent calls to the `snd_soc_enum_item_to_val()` function, which lacks its own boundary checks, cause the enumeration (enum) structure, which has a value table, to read out-of-bounds memory elements, resulting in an out-of-bounds read. This issue was primarily relaxed after MUX integration, which loosened the check on item[1]. Currently, the adav80x device combination has been observed to trigger this vulnerability, where writing a third value leads to an out-of-bounds read. The fix is related to the kernel configuration option `CONFIG_SND_CTL_INPUT_VALIDATION`; if this option is enabled, the kernel will catch such out-of-bounds behavior. The recommended patch is to update the Linux kernel version and ensure that the boundary checking mechanism of the relevant audio subsystems is strengthened.",
+    tags_en: ["Linux Kernel", "ASoC", "dapm", "Out-of-Bounds Read", "snd_soc_dapm_put_enum_double"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-90068", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260917-13261",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心修復 crypto: acomp 漏洞，防止異步請求上下文複製時的緩存溢寫",
+    summary: "本漏洞存在於 Linux 核心的 crypto: acomp 模組中。當程式呼叫者選擇異步（async）實作時，會複製堆疊（stack）請求。然而，現有的 `acomp_request_clone()` 函式只複製了堆疊大小的物件，導致複製後的物件無法容納異步提供者（如 QAT）所需的請求上下文儲存空間。這使得提供者在呼叫 `acomp_request_ctx()` 時，會寫入超過分配的記憶體範圍（OOB write），進而造成緩存溢寫（slab OOB write）。修復措施建議分配一個足夠大的零初始化副本，用於運行時的 acomp 請求大小，僅複製來源物件中的位元組，並保留現有的分配失敗時的備用行為。此修補旨在確保異步請求上下文的完整性和記憶體安全。",
+    tags: ["Linux 核心", "crypto", "acomp", "CVE-2026-90069", "緩存溢寫", "記憶體安全"],
+    title_en: "Linux Kernel Fix for crypto:acomp Vulnerability to Prevent Slab Overwrite During Asynchronous Request Context Cloning",
+    summary_en: "This vulnerability resides in the crypto:acomp module of the Linux kernel. When the calling program selects an asynchronous (async) implementation, it clones the stack request. However, the existing `acomp_request_clone()` function only clones the object's stack size, which prevents the cloned object from accommodating the required request context storage space needed by asynchronous providers (such as QAT). This allows the provider, when calling `acomp_request_ctx()`, to write beyond the allocated memory range (OOB write), causing a slab OOB write. The proposed fix suggests allocating a sufficiently large zero-initialized copy for the runtime acomp request size, only cloning the bytes from the source object, and retaining the existing fallback behavior upon allocation failure. This patch aims to ensure the integrity and memory safety of asynchronous request contexts.",
+    tags_en: ["Linux Kernel", "crypto", "acomp", "CVE-2026-90069", "Slab Overwrite", "Memory Safety"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-90069", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260917-13262",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心 TPM 驅動程式發現狀態讀取失敗時回傳零值漏洞 (CVE-2026-90070)",
+    summary: "本漏洞存在於 Linux 核心的 TPM 驅動程式中，具體為 `tpm: st33zp24` 相關元件。問題點在於 `st33zp24_status()` 函式在執行傳輸讀取（transport read）失敗時，會忽略實際的讀取結果，並錯誤地回傳零值（zero）資料。例如，在 I2C 傳輸中，若註冊選擇寫入（register-select write）是短傳輸或失敗，系統會跳過 `i2c_master_recv()` 呼叫，導致資料未初始化。這使得堆疊值可能被誤解為 TPM_STS 旗標，使狀態檢查流程異常完成（spuriously）。由於狀態回呼無法傳播傳輸錯誤，當 `recv()` 未報告確切一個位元組時，系統會回傳零值。這可能導致呼叫方無法正確判斷傳輸錯誤，而是誤以為狀態檢查成功，從而可能導致安全狀態檢查的繞過或錯誤處理。此問題已由靜態分析檢查工具發現，並經手動原始碼審查確認。建議使用者應更新至修補此漏洞的 Linux 核心版本以確保系統的完整性與安全性。",
+    tags: ["Linux 核心", "tpm", "st33zp24", "CVE-2026-90070", "I2C", "資安漏洞"],
+    title_en: "Linux Kernel TPM Driver Returns Zero Value Upon Status Read Failure Vulnerability (CVE-2026-90070)",
+    summary_en: "This vulnerability exists in the Linux kernel's TPM driver, specifically within the `tpm: st33zp24` component. The issue is that the `st33zp24_status()` function, when a transport read fails, ignores the actual read result and incorrectly returns a zero value. For instance, in an I2C transfer, if a register-select write is a short transfer or fails, the system skips the `i2c_master_recv()` call, leading to uninitialized data. This allows the stack value to be misinterpreted as a TPM_STS flag, causing the status check process to complete spuriously. Because the status callback cannot propagate the transport error, when `recv()` does not report an exact byte, the system returns zero. This may cause the caller to incorrectly assume the status check was successful, rather than recognizing a transport error, potentially leading to the bypass or incorrect handling of security state checks. This issue was discovered by static analysis checking tools and confirmed by manual code review. Users are advised to update to the Linux kernel version that patches this vulnerability to ensure system integrity and security.",
+    tags_en: ["Linux Kernel", "tpm", "st33zp24", "CVE-2026-90070", "I2C", "Vulnerability"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-90070", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260917-13263",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心修復 net/sched: sch_teql 虛擬記憶體使用後釋放漏洞 (CVE-2026-90071)",
+    summary: "本漏洞存在於 Linux 核心的網路排程 (net/sched: sch_teql) 模組中，屬於典型的使用後釋放 (Use-After-Free, UAF) 類型。問題出在 `teql_master_xmit()` 函數在呼叫從屬設備 (slave) 的 `ndo_start_xmit()` 之後，未能正確恢復 `skb->dev` 指標。當傳輸失敗後，`skb` 仍指向前一個設備，導致後續處理流程（如 `teql_resolve()` 傳遞給 `neigh_event_send()`）使用一個過時的、指向已釋放資源的 `skb->dev`。當系統執行到 `arp_error_report()` 或 `neigh_direct_output()` 時，會嘗試對該過時的 `skb->dev` 進行操作，進而觸發 KASAN 報告的 UAF 錯誤。修復建議是在每個從屬設備迭代結束時，將 `skb->dev` 恢復到主設備 (master) 的狀態，以確保網路數據包結構 (skb) 的設備指針的正確性。",
+    tags: ["Linux 核心", "CVE-2026-90071", "net/sched", "Use-After-Free", "skb", "網路堆疊"],
+    title_en: "Linux Kernel Fixes net/sched: sch_teql Use-After-Free Vulnerability (CVE-2026-90071)",
+    summary_en: "This vulnerability resides in the Linux kernel's networking scheduler (net/sched: sch_teql) module and is a classic Use-After-Free (UAF) type. The issue stems from the `teql_master_xmit()` function failing to correctly restore the `skb->dev` pointer after calling the slave device's `ndo_start_xmit()`. When transmission fails, the `skb` still points to the previous device, causing subsequent processing routines (such as `teql_resolve()` passed to `neigh_event_send()`) to use an outdated `skb->dev` pointing to a freed resource. When the system executes `arp_error_report()` or `neigh_direct_output()`, it attempts to operate on this stale `skb->dev`, thereby triggering a UAF error reported by KASAN. The suggested fix is to restore `skb->dev` to the master device's state at the end of each slave device iteration, ensuring the correctness of the network packet structure (skb) device pointer.",
+    tags_en: ["Linux Kernel", "CVE-2026-90071", "net/sched", "Use-After-Free", "skb", "Network Stack"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-90071", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260917-13264",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心 net/sched: sfq 佇列管理漏洞，防止帶號溢位導致軟鎖定",
+    summary: "本漏洞存在於 Linux 核心的 net/sched 模組中的 sfq 佇列管理功能。當設備的 MTU 值過大，導致 `psched_mtu()` 函數返回帶號溢位的值（例如 0x80000000）時，`sfq_init()` 會將此值設定為 `slot->allot`。進而，在 `sfq_dequeue()` 函數中，`INT_MIN` 與 `0` 之間會無限切換，導致在持有 qdisc 鎖的情況下持續執行，造成軟鎖定（soft lockup）。修復措施是將 quantum 的範圍限制在 [256, 1 << 20] 之間，確保在重新填充迴圈（refill loop）能夠正常終止。此漏洞的重現條件需要一個 MTU 值會導致 `psched_mtu()` 溢位的設備，並需要擁有 CAP_NET_ADMIN 權限。修補建議是升級 Linux 核心版本以修復此溢位和無限迴圈問題。",
+    tags: ["Linux 核心", "net/sched", "sfq", "軟鎖定", "CVE-2026-90072"],
+    title_en: "Linux Kernel net/sched: sfq Queue Management Vulnerability Prevents Signed Overflow from Causing Soft Lockup",
+    summary_en: "This vulnerability resides in the sfq queue management function within the Linux kernel's net/sched module. When a device's MTU value is excessively large, causing the `psched_mtu()` function to return a signed overflow value (e.g., 0x80000000), `sfq_init()` sets this value to `slot->allot`. Subsequently, within the `sfq_dequeue()` function, an infinite switching occurs between `INT_MIN` and `0`, leading to continuous execution while holding the qdisc lock, which causes a soft lockup. The fix involves restricting the range of the quantum to [256, 1 << 20] to ensure that the refill loop terminates correctly. Reproducing this vulnerability requires a device whose MTU value causes `psched_mtu()` to overflow, and the attacker must possess CAP_NET_ADMIN privileges. The patch recommends upgrading the Linux kernel version to resolve both the overflow and the infinite loop issues.",
+    tags_en: ["Linux Kernel", "net/sched", "sfq", "soft lockup", "CVE-2026-90072"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-90072", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260917-13265",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心修復 net/sched hhf 溢位漏洞，避免超大 MTU 導致 hhf_dequeue 陷入無限循環",
+    summary: "本漏洞存在於 Linux 核心的網路排程模組 net/sched 中的 hhf 實現。當系統上的網路設備具有極大的 MTU（例如，MTU 值導致 `psched_mtu()` 函數計算溢位），且該設備的 MTU 加上硬體標頭長度導致 `psched_mtu()` 計算出超出簽名位元的數值時，在執行 `hhf_dequeue()` 函數時，可能會導致計算溢位，進而使系統進入無限循環（spinning forever）。修復措施要求在呼叫 `hhf_change()` 之前，對 `q->quantum` 進行限制（clamp），確保無論是使用選項（opt）還是不使用選項（!opt）的路徑都能看到一個合理的量子值。若未修復，使用 `tc qdisc add ... hhf limit 1000` 等帶有選項的指令時，`hhf_change()` 會重新驗證未受限制的預設值，導致指令失敗並返回 `-EINVAL`。重現此漏洞的條件是使用具有特定 MTU 值的設備，並需要 `CAP_NET_ADMIN` 權限。",
+    tags: ["Linux 核心", "net/sched", "hhf", "MTU", "CVE-2026-90073", "CAP_NET_ADMIN"],
+    title_en: "Linux Kernel Fixes net/sched hhf Overflow Vulnerability to Prevent Infinite Loop from Oversized MTU",
+    summary_en: "This vulnerability resides in the hhf implementation within the Linux kernel's networking scheduler module, net/sched. When a system's network device has an extremely large MTU (for example, an MTU value that causes overflow during the `psched_mtu()` function calculation), and the device's MTU plus the hardware header length causes `psched_mtu()` to calculate a value exceeding the signed bit, calling the `hhf_dequeue()` function may result in a calculation overflow, causing the system to enter an infinite loop (spinning forever). The fix requires clamping `q->quantum` before calling `hhf_change()`, ensuring that a reasonable quantum value is seen regardless of whether the option (opt) or no-option (!opt) path is used. If unpatched, using commands with options, such as `tc qdisc add ... hhf limit 1000`, will cause `hhf_change()` to re-validate the unconstrained default value, leading to the command failing and returning `-EINVAL`. Reproducing this vulnerability requires using a device with a specific MTU value and possessing `CAP_NET_ADMIN` privileges.",
+    tags_en: ["Linux Kernel", "net/sched", "hhf", "MTU", "CVE-2026-90073", "CAP_NET_ADMIN"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-90073", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260917-13266",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心 net/sched 漏洞修復：防止 fq_pie 佇列因 MTU 溢位導致無限循環與軟鎖定",
+    summary: "本漏洞存在於 Linux 核心的網路排程模組 net/sched，具體影響 fq_pie 佇列的初始化與處理流程。當設備的 MTU 值極大（例如使用 max_mtu == 0 的 dummy 設備，接受 MTU 2147483634）時，`psched_mtu()` 函數可能返回超出有符號範圍的值（如 0x80000000）。此值在 `fq_pie_qdisc_dequeue()` 函數中會導致 `flow->deficit` 發生有符號溢位，使其變為 `INT_MIN`。這進而引發一個無限循環，最終導致系統發生軟鎖定（soft lockup）。修復措施為在 `fq_pie_init()` 中，對預設的 quantum 值進行限制（clamp），將其範圍限定在 [256, 1 << 20] 之間，以匹配 fq_codel 的底層限制，確保系統穩定性。重現此漏洞需要擁有 CAP_NET_ADMIN 權限，並在使用者命名空間內操作特定 MTU 的設備。",
+    tags: ["Linux 核心", "net/sched", "fq_pie", "soft lockup", "CAP_NET_ADMIN", "MTU"],
+    title_en: "Linux Kernel net/sched Vulnerability Fixed: Preventing Infinite Loop and Soft Lockup in fq_pie Queue Due to MTU Overflow",
+    summary_en: "This vulnerability resides in the Linux kernel's networking scheduling module, net/sched, and specifically affects the initialization and processing flow of the fq_pie queue. When a device has an extremely large MTU value (for example, a dummy device using max_mtu == 0, accepting MTU 2147483634), the `psched_mtu()` function may return a value exceeding the signed range (such as 0x80000000). This value subsequently causes signed overflow in `flow->deficit` within the `fq_pie_qdisc_dequeue()` function, setting it to `INT_MIN`. This, in turn, triggers an infinite loop, ultimately leading to a system soft lockup. The fix involves clamping the default quantum value in `fq_pie_init()`, restricting its range to [256, 1 << 20], to match the underlying limits of fq_codel, thereby ensuring system stability. Reproducing this vulnerability requires CAP_NET_ADMIN privileges and operating on a device with a specific MTU within a user namespace.",
+    tags_en: ["Linux Kernel", "net/sched", "fq_pie", "soft lockup", "CAP_NET_ADMIN", "MTU"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-90074", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260917-13267",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心 net/sched: fq_codel 漏洞修復，防止超大 MTU 導致無限迴圈與系統鎖定",
+    summary: "本漏洞存在於 Linux 核心的網路排程元件 `net/sched: fq_codel` 中。問題出在 `fq_codel_init()` 函式在設定 `q->quantum` 時，未對值進行適當的限制（clamping）。當設備具有極大的 MTU（例如 `max_mtu == 0` 且接受 MTU 為 2147483634）時，`psched_mtu()` 會返回超出標準整數範圍的值（0x80000000）。此超大值在 `fq_codel_dequeue()` 中會導致有符號溢位（overflow），使 `flow->deficit` 變為 `INT_MIN`，進而引發無限迴圈和軟鎖定（soft lockup）。此外，未限制的 `psched_mtu()` 值也導致 `codel_should_drop()` 測試條件錯誤，使得 CoDel 濾波器被靜默且完全禁用。修復措施包括：1. 宣告單一受限的 MTU 值，並將其同時賦予 `q->quantum` 和 `q->cparams.mtu`。2. 在 `fq_codel_init()` 中對 `q->quantum` 進行限制，並將其約束在 [256, FQ_CODEL_QUANTUM_MAX] 範圍內。修復後，系統將能正確處理極端 MTU 的設備，避免資源耗盡和服務中斷。",
+    tags: ["Linux 核心", "net/sched", "fq_codel", "MTU", "soft lockup", "CVE-2026-90075"],
+    title_en: "Linux Kernel net/sched: fq_codel Vulnerability Fixed, Preventing Infinite Loops and System Lockups Caused by Oversized MTU",
+    summary_en: "This vulnerability resides in the Linux kernel's network scheduling component, `net/sched: fq_codel`. The issue occurs because the `fq_codel_init()` function fails to properly clamp the value when setting `q->quantum`. When a device has an extremely large MTU (for example, `max_mtu == 0` and accepting an MTU of 2147483634), `psched_mtu()` returns a value exceeding the standard integer range (0x80000000). This oversized value causes a signed overflow in `fq_codel_dequeue()`, setting `flow->deficit` to `INT_MIN`, which subsequently triggers an infinite loop and a soft lockup. Furthermore, the unrestricted `psched_mtu()` value leads to incorrect conditions in `codel_should_drop()`, causing the CoDel filter to be silently and completely disabled. The remediation measures include: 1. Declaring a single restricted MTU value and assigning it simultaneously to `q->quantum` and `q->cparams.mtu`. 2. Implementing clamping for `q->quantum` within `fq_codel_init()`, constraining it to the range [256, FQ_CODEL_QUANTUM_MAX]. After the fix, the system will correctly handle devices with extreme MTUs, preventing resource exhaustion and service disruption.",
+    tags_en: ["Linux Kernel", "net/sched", "fq_codel", "MTU", "soft lockup", "CVE-2026-90075"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-90075", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260917-13268",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心 fq 隊列機制漏洞修復：防止 MTU 值過大導致的軟鎖定 (Soft Lockup)",
+    summary: "本漏洞存在於 Linux 核心的網路排程（net/sched）中的 fq 隊列機制。問題出在 `fq_init()` 函數計算 `quantum` 和 `initial_quantum` 時，缺乏對溢位（overflow）的檢查。當裝置的 MTU 值極大（例如，MTU 達到 2147483634）時，`psched_mtu()` 會返回一個極大的數值，導致後續的乘法運算（2 * 和 10 *）在 32 位元算術中發生環繞（wrap），使 `q->quantum` 等於 0。進而，在 `fq_dequeue()` 函數中，信用補充迴圈（credit-refill loop）會無限次地執行，並在 `qdisc` 鎖定下進入無限迴圈，造成系統的軟鎖定（soft lockup）。修復措施是在進行乘法運算前，將 `psched_mtu()` 的值限制在 [1, 1 << 20] 範圍內，防止數值環繞，並將結果上限設定為 1 << 20，以確保與 `fq_change()` 中已強制執行的邊界一致。重現此漏洞需要一個 MTU 值極大的裝置，並需要使用者命名空間擁有 CAP_NET_ADMIN 權限。",
+    tags: ["Linux 核心", "net/sched", "fq", "soft lockup", "MTU", "CVE-2026-90076"],
+    title_en: "Linux Kernel fq Queue Mechanism Vulnerability Fixed: Prevents Soft Lockup Caused by Excessive MTU Value",
+    summary_en: "This vulnerability exists in the fq queue mechanism within the Linux kernel's network scheduling (net/sched). The issue arises because the `fq_init()` function fails to check for overflow when calculating `quantum` and `initial_quantum`. When a device's MTU value is extremely large (e.g., MTU reaching 2147483634), `psched_mtu()` returns a massive number. This leads to subsequent multiplication operations (by 2 and by 10) causing integer wrap-around in 32-bit arithmetic, setting `q->quantum` to 0. Consequently, the credit-refill loop within the `fq_dequeue()` function executes infinitely, entering an infinite loop under the `qdisc` lock and causing a system soft lockup. The fix involves limiting the value returned by `psched_mtu()` to the range [1, 1 << 20] before performing multiplication, preventing numerical wrap-around. Furthermore, the result is capped at 1 << 20 to ensure consistency with the boundary already enforced in `fq_change()`. Reproducing this vulnerability requires a device with an excessively large MTU value and a user namespace possessing CAP_NET_ADMIN privileges.",
+    tags_en: ["Linux Kernel", "net/sched", "fq", "soft lockup", "MTU", "CVE-2026-90076"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-90076", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260917-13269",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心修補資源洩漏：修正 copy_net_ns() 錯誤處理路徑的資源管理問題",
+    summary: "本修補針對 Linux 核心中的一個資源洩漏漏洞，主要發生在 `preinit_net()` 函數的錯誤處理路徑中。原設計中，`preinit_net()` 函數會先呼叫 `ns_common_init()`（此步驟可能失敗），然後再初始化其他資源。當第一個步驟失敗時，`preinit_net()` 會提前返回，導致由 `net_alloc()` 分配的資源無法被正確釋放，造成資源洩漏。為了解決此問題，開發者重新調整了資源初始化順序，將 `ns_common_init()` 的呼叫從 `preinit_net()` 中分離出來，並確保在 `preinit_net()` 成功執行後，再呼叫 `ns_common_init()`。此修補透過調整函數流程和資源釋放邏輯，確保在任何錯誤路徑下，都能正確呼叫 `key_remove_domain()` 和 `net_passive_dec()` 等函數來釋放所有分配的資源，從而修復了資源洩漏的潛在風險。",
+    tags: ["Linux 核心", "resource leak", "preinit_net()", "copy_net_ns()", "net_alloc()", "CVE-2026-90077"],
+    title_en: "Linux Kernel Fixes Resource Leak: Correcting Resource Management in copy_net_ns() Error Path",
+    summary_en: "This patch addresses a resource leak vulnerability in the Linux kernel, primarily occurring within the error handling path of the `preinit_net()` function. In the original design, `preinit_net()` would first call `ns_common_init()` (a step that might fail), and then initialize other resources. If the first step failed, `preinit_net()` would return prematurely, causing resources allocated by `net_alloc()` to be improperly released, leading to a resource leak. To resolve this issue, developers readjusted the resource initialization order, separating the call to `ns_common_init()` from `preinit_net()`, and ensuring that `ns_common_init()` is only called after `preinit_net()` successfully executes. This patch fixes the resource leak potential by adjusting the function flow and resource release logic, ensuring that functions such as `key_remove_domain()` and `net_passive_dec()` are correctly called to free all allocated resources, even in the event of an error path.",
+    tags_en: ["Linux Kernel", "resource leak", "preinit_net()", "copy_net_ns()", "net_alloc()", "CVE-2026-90077"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-90077", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260917-13270",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心修復 net/sched: act_skbmod 函數的長度計算錯誤，避免處理不正確的網路封包",
+    summary: "本次修復針對 Linux 核心中的 `net/sched: act_skbmod` 函數，主要解決了在處理網路封包時的長度計算邏輯錯誤和警告問題。原有的問題包括：1. `skb_network_header_len()` 假設 `skb->transport_header` 已設定，但在 TC ingress 階段執行時並不保證。2. 在 `tcf_skbmod_act()` 開頭無條件呼叫 `skb_mac_header_len()`，在 MAC header 未設定的 L3 設備（如 TUN）上會觸發警告，並計算出錯誤的長度。3. 在 TC ingress 階段，計算 MAC header 長度並加到 IP header 長度時，可能導致 `skb_ensure_writable()` 請求的位元組數超過實際 IP 封包長度，進而丟棄了有效的短封包（例如 28 位元的 UDP/IPv4 封包）。修復方案是透過使用 `skb_network_offset(skb) + sizeof(struct iphdr/ipv6hdr)` 來正確計算所需的長度，確保在 ingress 和 egress 階段都能正確運作；同時，在進行 Ethernet header 修改後，應在驗證了 ARPHRD_ETHER 之後，將 `max_edit_len` 設定為 `ETH_HLEN`。此修復旨在提高核心在處理網路流量時的穩定性和準確性。",
+    tags: ["Linux 核心", "net/sched", "act_skbmod", "skb_network_header_len", "TC ingress", "網路封包"],
+    title_en: "Linux Kernel Fix for net/sched: act_skbmod Length Calculation Error to Prevent Misprocessing Network Packets",
+    summary_en: "This fix addresses the `net/sched: act_skbmod` function within the Linux kernel, primarily resolving logical errors and warnings related to length calculation when processing network packets. The original issues included: 1. `skb_network_header_len()` assumes `skb->transport_header` is set, but this is not guaranteed during the TC ingress phase. 2. `tcf_skbmod_act()` unconditionally calls `skb_mac_header_len()` at the start, which triggers a warning and calculates an incorrect length on L3 devices (such as TUN) where the MAC header is not set. 3. During the TC ingress phase, calculating the MAC header length and adding it to the IP header length could cause `skb_ensure_writable()` to request a byte count exceeding the actual IP packet length, consequently dropping valid short packets (e.g., a 28-byte UDP/IPv4 packet). The remediation involves using `skb_network_offset(skb) + sizeof(struct iphdr/ipv6hdr)` to accurately calculate the required length, ensuring correct operation during both ingress and egress phases; additionally, after modifying the Ethernet header, `max_edit_len` should be set to `ETH_HLEN` only after verifying ARPHRD_ETHER. This fix aims to enhance the stability and accuracy of the kernel when handling network traffic.",
+    tags_en: ["Linux Kernel", "net/sched", "act_skbmod", "skb_network_header_len", "TC ingress", "Network Packet"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-90078", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260917-13271",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心修復 octeontx2-af 漏洞：改善 cn20k mailbox 生命週期與資源釋放",
+    summary: "本修補針對 Linux 核心中的 octeontx2-af 驅動程式，解決了 cn20k mailbox 的生命週期管理問題。原先的設計在呼叫 rvu_mbox_init() 時，無論是針對 AF-PF 或 AF-VF mailbox，都會重複分配 ng_rvu 物件，導致第一次分配的資源洩漏。此外，當共用一個 ng_rvu 處理路徑時，錯誤處理路徑（error path）存在多個問題：它會釋放所有 cn20k mailbox DMA 和 ng_rvu，即使只有失敗的初始化類型需要解除。這可能導致在 AF-VF 初始化失敗後，仍有活的 AF-PF mailbox 記憶體被佔用。此外，在 AF-VF 路徑上重複執行了 mutex_init()，而 AF-PF mailbox 處理器可能仍持有 rvu->mbox_lock。修補後，開發者改為使用 devm_kzalloc() 一次性分配 ng_rvu，並在同一區塊初始化 mbox_lock；同時，修復了在 probe 和 pci_enable_sriov() 錯誤路徑中，未能正確釋放 cn20k mailbox DMA 的問題，確保資源釋放的精確性。",
+    tags: ["Linux 核心", "octeontx2-af", "cn20k mailbox", "Linux 驅動程式", "資源洩漏"],
+    title_en: "Linux Kernel Fix for octeontx2-af Vulnerability: Improving cn20k mailbox lifecycle and resource release",
+    summary_en: "This patch addresses the octeontx2-af driver in the Linux kernel, resolving issues with the lifecycle management of the cn20k mailbox. The original design redundantly allocated ng_rvu objects when calling rvu_mbox_init(), regardless of whether it was for an AF-PF or AF-VF mailbox, leading to resource leaks from the initial allocation. Furthermore, when sharing an ng_rvu processing path, the error handling path contained multiple issues: it would release all cn20k mailbox DMA and ng_rvu, even if only the failed initialization type needed cleanup. This could result in AF-PF mailbox memory remaining occupied even after an AF-VF initialization failure. Additionally, mutex_init() was executed redundantly in the AF-VF path, and the AF-PF mailbox processor might still hold rvu->mbox_lock. The patch modifies the approach to use devm_kzalloc() for a single allocation of ng_rvu, and initializes mbox_lock within the same block. Concurrently, it fixes the issue in the probe and pci_enable_sriov() error paths where cn20k mailbox DMA was not correctly released, ensuring precise resource cleanup.",
+    tags_en: ["Linux Kernel", "octeontx2-af", "cn20k mailbox", "Linux Driver", "Resource Leak"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-90079", lang: "EN" }
+    ]
+  },
+  {
     id: "20260917-12379",
     trackers: ["os", "security"],
     category: "法規與標準",

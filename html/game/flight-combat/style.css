@@ -1,0 +1,364 @@
+/* Ace Combat Vector 2026 - Tactical Flight Avionics CSS */
+:root {
+  --hud-green: #00ff66;
+  --hud-green-dim: rgba(0, 255, 102, 0.25);
+  --hud-green-glow: 0 0 10px rgba(0, 255, 102, 0.7), 0 0 20px rgba(0, 255, 102, 0.3);
+  --hud-red: #ff3344;
+  --hud-red-glow: 0 0 10px rgba(255, 51, 68, 0.8);
+  --hud-amber: #ffaa00;
+  --hud-cyan: #00f0ff;
+  --hud-bg-dark: rgba(4, 12, 8, 0.85);
+  --font-hud: 'Consolas', 'Courier New', monospace;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+body {
+  background-color: #020508;
+  color: var(--hud-green);
+  font-family: var(--font-hud);
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.hud-overlay-scanlines {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(rgba(18, 24, 16, 0) 50%, rgba(0, 0, 0, 0.35) 50%);
+  background-size: 100% 4px;
+  pointer-events: none;
+  z-index: 20;
+  opacity: 0.65;
+}
+
+.sim-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  max-width: 1920px;
+  max-height: 1080px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #000;
+}
+
+#flightCanvas {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+/* Top HUD Bar */
+.hud-top-bar {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 16px;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.hud-badge {
+  background: var(--hud-bg-dark);
+  border: 1px solid var(--hud-green);
+  padding: 6px 14px;
+  border-radius: 3px;
+  font-size: 0.85rem;
+  letter-spacing: 1.5px;
+  box-shadow: inset 0 0 8px rgba(0, 255, 102, 0.15);
+}
+
+.hud-badge .label {
+  color: #88cc99;
+  font-size: 0.75rem;
+}
+
+.val-gold { color: var(--hud-amber); font-weight: bold; }
+.val-cyan { color: var(--hud-cyan); font-weight: bold; }
+.val-red { color: var(--hud-red); font-weight: bold; }
+
+/* Radar Panel (Bottom Right) */
+.hud-radar-panel {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  background: var(--hud-bg-dark);
+  border: 1.5px solid var(--hud-green);
+  padding: 8px;
+  border-radius: 6px;
+  box-shadow: var(--hud-green-glow);
+  z-index: 10;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.radar-header {
+  font-size: 0.75rem;
+  letter-spacing: 1px;
+  color: var(--hud-green);
+  margin-bottom: 6px;
+}
+
+#radarCanvas {
+  background: rgba(0, 20, 10, 0.8);
+  border: 1px solid var(--hud-green-dim);
+  border-radius: 50%;
+}
+
+.radar-legend {
+  display: flex;
+  gap: 8px;
+  font-size: 0.65rem;
+  margin-top: 6px;
+}
+
+.leg-self { color: var(--hud-green); }
+.leg-enemy { color: var(--hud-red); }
+.leg-missile { color: var(--hud-amber); }
+
+/* Avionics Panel (Bottom Left) */
+.hud-avionics-panel {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  background: var(--hud-bg-dark);
+  border: 1.5px solid var(--hud-green);
+  padding: 10px 14px;
+  border-radius: 6px;
+  box-shadow: var(--hud-green-glow);
+  z-index: 10;
+  pointer-events: none;
+  width: 250px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.avionics-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.75rem;
+}
+
+.av-label {
+  color: #77bb88;
+}
+
+.av-val {
+  font-weight: bold;
+  color: var(--hud-green);
+}
+
+.gauge-bar {
+  width: 70px;
+  height: 8px;
+  background: #0d2616;
+  border: 1px solid var(--hud-green);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.gauge-fill {
+  height: 100%;
+  background: var(--hud-green);
+}
+
+.val-health {
+  background: linear-gradient(90deg, #00ff66, #00cc44);
+}
+
+.av-badge {
+  padding: 1px 6px;
+  border-radius: 2px;
+  font-size: 0.7rem;
+  font-weight: bold;
+}
+
+.av-badge.off {
+  background: #112211;
+  color: #557755;
+  border: 1px solid #335533;
+}
+
+.av-badge.on {
+  background: var(--hud-amber);
+  color: #000;
+  box-shadow: 0 0 8px var(--hud-amber);
+}
+
+.av-weapon {
+  color: var(--hud-cyan);
+  font-weight: bold;
+}
+
+/* Controls Info (Top Left) */
+.hud-controls-panel {
+  position: absolute;
+  top: 14px;
+  left: 20px;
+  background: var(--hud-bg-dark);
+  border: 1px solid rgba(0, 255, 102, 0.4);
+  padding: 10px 14px;
+  border-radius: 4px;
+  z-index: 10;
+  pointer-events: none;
+  font-size: 0.7rem;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.panel-header {
+  font-weight: bold;
+  letter-spacing: 1px;
+  border-bottom: 1px solid var(--hud-green-dim);
+  padding-bottom: 4px;
+  margin-bottom: 4px;
+}
+
+.key-item {
+  color: #99ddaa;
+}
+
+kbd {
+  background: #113322;
+  color: var(--hud-green);
+  border: 1px solid var(--hud-green-dim);
+  padding: 1px 4px;
+  border-radius: 2px;
+  font-size: 0.65rem;
+}
+
+/* Warnings Box */
+.hud-warning-box {
+  position: absolute;
+  top: 18%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(40, 5, 10, 0.9);
+  border: 2px solid var(--hud-red);
+  padding: 10px 24px;
+  border-radius: 4px;
+  box-shadow: var(--hud-red-glow);
+  z-index: 15;
+  pointer-events: none;
+  animation: flash-warning 0.5s infinite alternate;
+}
+
+.hud-warning-box.hidden {
+  display: none;
+}
+
+.warning-text {
+  color: var(--hud-red);
+  font-size: 1.2rem;
+  font-weight: 900;
+  letter-spacing: 3px;
+  text-shadow: var(--hud-red-glow);
+}
+
+@keyframes flash-warning {
+  0% { opacity: 0.3; transform: translateX(-50%) scale(0.98); }
+  100% { opacity: 1.0; transform: translateX(-50%) scale(1.02); }
+}
+
+/* Sim Modal */
+.sim-modal {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(2, 6, 4, 0.92);
+  backdrop-filter: blur(6px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 30;
+}
+
+.sim-modal.hidden {
+  display: none;
+}
+
+.modal-card {
+  background: rgba(6, 18, 12, 0.95);
+  border: 2px solid var(--hud-green);
+  box-shadow: var(--hud-green-glow);
+  border-radius: 8px;
+  padding: 32px;
+  max-width: 480px;
+  text-align: center;
+}
+
+.tactical-title {
+  font-size: 2rem;
+  letter-spacing: 4px;
+  color: var(--hud-green);
+  text-shadow: var(--hud-green-glow);
+  margin-bottom: 6px;
+}
+
+.tactical-sub {
+  font-size: 0.8rem;
+  letter-spacing: 2px;
+  color: var(--hud-amber);
+  margin-bottom: 18px;
+}
+
+.modal-desc {
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: #aaddbb;
+  margin-bottom: 24px;
+}
+
+.tactical-btn {
+  background: var(--hud-green);
+  color: #001a08;
+  font-family: var(--font-hud);
+  font-weight: 900;
+  font-size: 1.1rem;
+  letter-spacing: 2px;
+  padding: 12px 28px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  box-shadow: var(--hud-green-glow);
+  transition: all 0.2s;
+}
+
+.tactical-btn:hover {
+  transform: scale(1.05);
+  background: #33ff88;
+}
+
+@media (max-width: 900px) {
+  .hud-controls-panel {
+    display: none;
+  }
+  .hud-avionics-panel {
+    width: 180px;
+    font-size: 0.65rem;
+  }
+}

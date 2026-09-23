@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>BOMBERMAN 3D: ARENA BATTLE ROYALE - 炸彈超人 3D 豪華重製版</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Three.js 3D Library with local copy and CDN fallback -->
+  <script src="three.min.js"></script>
+  <script>
+    if (typeof THREE === 'undefined') {
+      document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"><\/script>');
+    }
+  </script>
+</head>
+<body>
+  <div id="gameContainer" class="game-container">
+    <!-- 3D WebGL Canvas Viewport -->
+    <canvas id="bombermanCanvas"></canvas>
+
+    <!-- Scanline CRT Retro Filter Overlay -->
+    <div id="scanlineOverlay" class="scanline-overlay"></div>
+
+    <!-- Cinematic Director Letterbox Bars -->
+    <div id="cinematicBars" class="cinematic-bars hidden">
+      <div class="bar top"></div>
+      <div class="bar bottom"></div>
+    </div>
+
+    <!-- Alert / Toast Banner -->
+    <div id="toastBanner" class="toast-banner">BOMBERMAN ARENA READY</div>
+
+    <!-- Top Master HUD -->
+    <header class="hud-top">
+      <div class="hud-group">
+        <div class="hud-badge logo-badge">
+          <span class="hud-logo-icon">💣</span>
+          <span class="hud-title">BOMBERMAN 3D</span>
+        </div>
+        <div class="hud-badge">
+          <span class="hud-label">TIMER</span>
+          <span id="hudTimer" class="hud-val cyan">02:00</span>
+        </div>
+        <div class="hud-badge sudden-death-badge" id="hudSuddenDeathBadge">
+          <span class="hud-label">STATUS</span>
+          <span id="hudStatus" class="hud-val green">NORMAL</span>
+        </div>
+      </div>
+
+      <!-- Center Announcer Ticker -->
+      <div class="announcer-container">
+        <div id="announcerTicker" class="announcer-ticker">WELCOME TO BOMBERMAN 3D ARENA! PRESS SPACE TO DROP BOMB.</div>
+      </div>
+
+      <!-- Right Director Controls -->
+      <div class="hud-group">
+        <div class="hud-badge camera-badge">
+          <span class="hud-label">CAM</span>
+          <span id="hudCameraMode" class="hud-val orange">2.5D ISOMETRIC</span>
+        </div>
+        <div class="hud-badge button-badge" id="btnToggleHUD" title="Toggle HUD (H)">
+          <span id="hudToggleIcon" class="hud-icon">👁️</span>
+        </div>
+        <div class="hud-badge button-badge" id="btnAudioToggle" title="Toggle Sound (M)">
+          <span id="hudAudioIcon" class="hud-icon">🔊</span>
+        </div>
+        <div class="hud-badge button-badge" id="btnScanlineToggle" title="Toggle CRT Filter">
+          <span class="hud-icon">📺</span>
+        </div>
+        <div class="hud-badge button-badge" id="btnPauseToggle" title="Pause / Menu (P)">
+          <span id="hudPauseIcon" class="hud-icon">⏸️</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- 4 Players Battle Status Cards -->
+    <div class="players-hud" id="playersHud">
+      <!-- Player 1: White Bomber (Human) -->
+      <div class="player-card active" id="cardP1">
+        <div class="avatar-ring white-ring">
+          <div class="avatar-circle white-avatar">👑</div>
+          <span class="player-tag">P1 YOU</span>
+        </div>
+        <div class="player-stats">
+          <div class="stat-row">
+            <span class="stat-name">BOMBS</span>
+            <span class="stat-val" id="p1Bombs">1/1</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-name">FIRE</span>
+            <span class="stat-val" id="p1Fire">🔥 2</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-name">SPEED</span>
+            <span class="stat-val" id="p1Speed">⚡ 1.0</span>
+          </div>
+          <div class="badges-row" id="p1Badges">
+            <span class="item-badge" id="p1ShieldBadge" title="Shield">🛡️</span>
+            <span class="item-badge" id="p1GloveBadge" title="Kick Glove">🥊</span>
+            <span class="item-badge" id="p1RemoteBadge" title="Remote Detonator">⏰</span>
+          </div>
+        </div>
+        <div class="alive-indicator alive" id="p1Status">ALIVE</div>
+      </div>
+
+      <!-- Player 2: Black Bomber (AI) -->
+      <div class="player-card" id="cardP2">
+        <div class="avatar-ring black-ring">
+          <div class="avatar-circle black-avatar">🤖</div>
+          <span class="player-tag">P2 BOT</span>
+        </div>
+        <div class="player-stats">
+          <div class="stat-row">
+            <span class="stat-name">BOMBS</span>
+            <span class="stat-val" id="p2Bombs">1/1</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-name">FIRE</span>
+            <span class="stat-val" id="p2Fire">🔥 2</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-name">SPEED</span>
+            <span class="stat-val" id="p2Speed">⚡ 1.0</span>
+          </div>
+          <div class="badges-row" id="p2Badges">
+            <span class="item-badge" id="p2ShieldBadge">🛡️</span>
+          </div>
+        </div>
+        <div class="alive-indicator alive" id="p2Status">ALIVE</div>
+      </div>
+
+      <!-- Player 3: Red Bomber (AI) -->
+      <div class="player-card" id="cardP3">
+        <div class="avatar-ring red-ring">
+          <div class="avatar-circle red-avatar">🔥</div>
+          <span class="player-tag">P3 BOT</span>
+        </div>
+        <div class="player-stats">
+          <div class="stat-row">
+            <span class="stat-name">BOMBS</span>
+            <span class="stat-val" id="p3Bombs">1/1</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-name">FIRE</span>
+            <span class="stat-val" id="p3Fire">🔥 2</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-name">SPEED</span>
+            <span class="stat-val" id="p3Speed">⚡ 1.0</span>
+          </div>
+          <div class="badges-row" id="p3Badges">
+            <span class="item-badge" id="p3ShieldBadge">🛡️</span>
+          </div>
+        </div>
+        <div class="alive-indicator alive" id="p3Status">ALIVE</div>
+      </div>
+
+      <!-- Player 4: Blue Bomber (AI) -->
+      <div class="player-card" id="cardP4">
+        <div class="avatar-ring blue-ring">
+          <div class="avatar-circle blue-avatar">⚡</div>
+          <span class="player-tag">P4 BOT</span>
+        </div>
+        <div class="player-stats">
+          <div class="stat-row">
+            <span class="stat-name">BOMBS</span>
+            <span class="stat-val" id="p4Bombs">1/1</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-name">FIRE</span>
+            <span class="stat-val" id="p4Fire">🔥 2</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-name">SPEED</span>
+            <span class="stat-val" id="p4Speed">⚡ 1.0</span>
+          </div>
+          <div class="badges-row" id="p4Badges">
+            <span class="item-badge" id="p4ShieldBadge">🛡️</span>
+          </div>
+        </div>
+        <div class="alive-indicator alive" id="p4Status">ALIVE</div>
+      </div>
+    </div>
+
+    <!-- Director Camera Perspective Toolbar -->
+    <div class="camera-toolbar" id="cameraToolbar">
+      <span class="toolbar-label">DIRECTOR CAM:</span>
+      <button class="cam-btn" data-cam="0" id="btnCamTop">1: Top-Down</button>
+      <button class="cam-btn active" data-cam="1" id="btnCamIso">2: 2.5D Isometric</button>
+      <button class="cam-btn" data-cam="2" id="btnCamFollow">3: 3rd-Person Chase</button>
+      <button class="cam-btn" data-cam="3" id="btnCamDirector">4: Dynamic Director</button>
+      <button class="cam-btn" data-cam="4" id="btnCamFree">5: Free Spectator</button>
+    </div>
+
+    <!-- Mobile Virtual Touch D-Pad and Action Buttons -->
+    <div class="touch-controls" id="touchControls">
+      <div class="touch-dpad">
+        <button class="dpad-btn dpad-up" id="btnTouchUp">▲</button>
+        <button class="dpad-btn dpad-left" id="btnTouchLeft">◀</button>
+        <button class="dpad-btn dpad-right" id="btnTouchRight">▶</button>
+        <button class="dpad-btn dpad-down" id="btnTouchDown">▼</button>
+        <div class="dpad-center"></div>
+      </div>
+      <div class="touch-actions">
+        <button class="action-btn btn-bomb" id="btnTouchBomb">💣<br><span>BOMB</span></button>
+        <button class="action-btn btn-special" id="btnTouchSpecial">⚡<br><span>TRIG</span></button>
+      </div>
+    </div>
+
+    <!-- Keyboard Helper Legend -->
+    <div class="control-legend" id="controlLegend">
+      <div class="legend-header" id="legendHeader">
+        <span class="legend-title">⌨️ CONTROLS</span>
+        <button id="btnToggleLegend" class="legend-toggle-btn" title="Toggle Help">?</button>
+      </div>
+      <div class="legend-content" id="legendContent">
+        <span>[WASD / ⬆️⬇️⬅️➡️]: Move</span>
+        <span>[Space]: Drop Bomb</span>
+        <span>[E]: Detonate Remote / Kick</span>
+        <span>[1-5 / C]: Camera Angle</span>
+        <span>[H]: Toggle Status HUD</span>
+        <span>[P]: Pause | [R]: Restart</span>
+      </div>
+    </div>
+
+    <!-- Round Start / Ready Banner -->
+    <div id="roundOverlay" class="round-overlay">
+      <div class="round-title" id="roundTitle">ROUND 1</div>
+      <div class="round-subtitle" id="roundSubtitle">READY... FIGHT!</div>
+    </div>
+
+    <!-- Victory / Game Over Overlay Modal -->
+    <div id="victoryModal" class="victory-modal hidden">
+      <div class="modal-box">
+        <div class="winner-trophy" id="winnerTrophy">🏆</div>
+        <h1 id="victoryHeading" class="victory-heading">VICTORY!</h1>
+        <p id="victorySubtitle" class="victory-subtitle">WHITE BOMBER IS THE ARENA CHAMPION!</p>
+        
+        <div class="match-summary-stats">
+          <div class="summary-item">
+            <span class="sum-label">SURVIVORS</span>
+            <span class="sum-val" id="sumSurvivors">1 / 4</span>
+          </div>
+          <div class="summary-item">
+            <span class="sum-label">BOMBS DETONATED</span>
+            <span class="sum-val" id="sumBombs">28</span>
+          </div>
+          <div class="summary-item">
+            <span class="sum-label">BLOCKS DESTROYED</span>
+            <span class="sum-val" id="sumBlocks">45</span>
+          </div>
+          <div class="summary-item">
+            <span class="sum-label">POWER-UPS GRABBED</span>
+            <span class="sum-val" id="sumPowerups">12</span>
+          </div>
+        </div>
+
+        <div class="modal-buttons">
+          <button class="modal-btn primary-btn" id="btnPlayAgain">PLAY NEXT ROUND</button>
+          <button class="modal-btn secondary-btn" id="btnOpenSaveModal">SAVE / LOAD MATCH</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5-Slot Save / Load Progress Modal -->
+    <div id="saveModal" class="save-modal hidden">
+      <div class="modal-box save-box">
+        <h2>5-SLOT MATCH PROGRESS & RECORDS</h2>
+        <div class="slot-list" id="slotList">
+          <!-- Populated dynamically via JS -->
+        </div>
+        <div class="modal-buttons">
+          <button class="modal-btn secondary-btn" id="btnCloseSaveModal">CLOSE</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Game Engine Script -->
+  <script src="bomberman.js"></script>
+</body>
+</html>

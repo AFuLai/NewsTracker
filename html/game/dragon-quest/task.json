@@ -1,0 +1,33 @@
+{
+  "id": "CASE-DQ-001",
+  "mode": "implement",
+  "role": "writer",
+  "engine": "agy",
+  "tier": "T2",
+  "reasoning_effort": "medium",
+  "intent": "auto",
+  "root": "d:/Claude/Tool/Harness/cases/dragon-quest",
+  "prompt": "Implement a complete, high-fidelity, zero-dependency HTML5 Canvas Dragon Quest Retro JRPG with 24x16 tilemap, animated hero and NPCs, King dialogue, treasure chests, random encounters, classic turn-based battle scene with Slime, Skeleton and Dark Dragon boss, Hoimi/Mera/Raidein spells, Level Up stat progression, Web Audio synthesizer, and unit regression test suite.",
+  "touch_allow": [
+    "index.html",
+    "style.css",
+    "dq.js",
+    "test_dq.py"
+  ],
+  "retry_policy": {
+    "max_retries": 2,
+    "tail_prune": true
+  },
+  "acceptance": [
+    {
+      "id": "ACC-DQ-01",
+      "argv": [
+        "python",
+        "cases/dragon-quest/test_dq.py"
+      ],
+      "expect": "OK"
+    }
+  ],
+  "timeout_s": 300,
+  "note": "Regression benchmark test case for retro turn-based JRPG game engine."
+}

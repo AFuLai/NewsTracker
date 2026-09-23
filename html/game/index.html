@@ -1,0 +1,1612 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ARCADE UNIVERSE - 經典復刻與 3D 遊戲遊樂場</title>
+  <meta name="description" content="集合 3D WebGL、經典 16-Bit 平台、街機空戰與復古 JRPG 的零依賴極速網頁遊戲遊樂場。">
+  <style>
+    :root {
+      --bg-base: #090b10;
+      --bg-surface: #11141d;
+      --bg-surface-elevated: #181d29;
+      --bg-glass: rgba(17, 20, 29, 0.75);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-glow: rgba(0, 240, 255, 0.35);
+      --text-main: #f0f4fc;
+      --text-muted: #8e9bb0;
+      --text-dim: #5c667a;
+      --accent-cyan: #00f0ff;
+      --accent-pink: #ff007f;
+      --accent-gold: #ffbe0b;
+      --accent-green: #00f59b;
+      --accent-purple: #9d4edd;
+      --card-radius: 16px;
+      --transition-smooth: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-base);
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans TC", sans-serif;
+      min-height: 100vh;
+      line-height: 1.5;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 15% 10%, rgba(0, 240, 255, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 85% 20%, rgba(255, 0, 127, 0.07) 0%, transparent 45%),
+        radial-gradient(circle at 50% 80%, rgba(157, 78, 221, 0.06) 0%, transparent 50%),
+        linear-gradient(180deg, #090b10 0%, #0c0f17 100%);
+      background-attachment: fixed;
+    }
+
+    /* Ambient animated grid lines */
+    .bg-grid {
+      position: fixed;
+      inset: 0;
+      background-size: 40px 40px;
+      background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 32px 24px 64px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Header Section */
+    .header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      margin-bottom: 40px;
+      padding: 24px 0 16px;
+    }
+
+    .brand-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      background: rgba(0, 240, 255, 0.08);
+      border: 1px solid rgba(0, 240, 255, 0.3);
+      border-radius: 999px;
+      color: var(--accent-cyan);
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      box-shadow: 0 0 20px rgba(0, 240, 255, 0.2);
+    }
+
+    .brand-badge .dot {
+      width: 8px;
+      height: 8px;
+      background: var(--accent-cyan);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--accent-cyan);
+      animation: pulse-dot 2s infinite ease-in-out;
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 0.4; transform: scale(0.85); }
+      50% { opacity: 1; transform: scale(1.25); }
+    }
+
+    .main-title {
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      margin-bottom: 12px;
+      background: linear-gradient(135deg, #ffffff 20%, #a5b4fc 60%, var(--accent-cyan) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 4px 30px rgba(0, 240, 255, 0.15);
+    }
+
+    .sub-title {
+      font-size: 1.1rem;
+      color: var(--text-muted);
+      max-width: 680px;
+      margin: 0 auto 24px;
+      line-height: 1.6;
+    }
+
+    /* Status Bar / Stat Pills */
+    .stats-bar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .stat-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      font-size: 0.85rem;
+      color: var(--text-main);
+      backdrop-filter: blur(8px);
+    }
+
+    .stat-pill svg {
+      width: 16px;
+      height: 16px;
+      color: var(--accent-cyan);
+    }
+
+    .sound-toggle-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      color: var(--text-muted);
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+    }
+
+    .sound-toggle-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text-main);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .sound-toggle-btn.active {
+      color: var(--accent-cyan);
+      border-color: rgba(0, 240, 255, 0.4);
+      background: rgba(0, 240, 255, 0.1);
+    }
+
+    /* Control Toolbar (Search, Filter, Sort) */
+    .toolbar {
+      background: var(--bg-glass);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border-subtle);
+      border-radius: 20px;
+      padding: 16px 20px;
+      margin-bottom: 36px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    }
+
+    .filter-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .filter-btn {
+      padding: 8px 16px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .filter-btn:hover {
+      color: var(--text-main);
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .filter-btn.active {
+      background: linear-gradient(135deg, rgba(0, 240, 255, 0.15), rgba(157, 78, 221, 0.15));
+      color: #fff;
+      border-color: rgba(0, 240, 255, 0.4);
+      font-weight: 600;
+      box-shadow: 0 0 16px rgba(0, 240, 255, 0.15);
+    }
+
+    .filter-btn .badge-count {
+      padding: 1px 6px;
+      border-radius: 99px;
+      background: rgba(255, 255, 255, 0.1);
+      font-size: 0.72rem;
+    }
+
+    .search-sort-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-grow: 1;
+      max-width: 440px;
+    }
+
+    .search-box {
+      position: relative;
+      flex-grow: 1;
+    }
+
+    .search-box svg {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 16px;
+      height: 16px;
+      color: var(--text-dim);
+      pointer-events: none;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 10px 36px 10px 38px;
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      color: var(--text-main);
+      font-size: 0.9rem;
+      outline: none;
+      transition: var(--transition-smooth);
+    }
+
+    .search-input:focus {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 0 3px rgba(0, 240, 255, 0.15);
+      background: rgba(0, 0, 0, 0.55);
+    }
+
+    .search-clear {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--text-dim);
+      cursor: pointer;
+      font-size: 1rem;
+      display: none;
+      padding: 4px;
+    }
+
+    .search-clear:hover {
+      color: var(--text-main);
+    }
+
+    /* Grid Results Counter */
+    .results-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding: 0 4px;
+      font-size: 0.88rem;
+      color: var(--text-dim);
+    }
+
+    .results-info strong {
+      color: var(--accent-cyan);
+    }
+
+    /* Games Cards Grid */
+    .game-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 28px;
+    }
+
+    /* Game Card */
+    .game-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--card-radius);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: var(--transition-smooth);
+      position: relative;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+    }
+
+    .game-card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(0, 240, 255, 0.4);
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.4), 0 0 24px rgba(0, 240, 255, 0.15);
+    }
+
+    /* Thumbnail Box */
+    .card-thumb-wrap {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: #000;
+      overflow: hidden;
+    }
+
+    .card-thumb {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+      display: block;
+    }
+
+    .game-card:hover .card-thumb {
+      transform: scale(1.06);
+    }
+
+    .thumb-gradient {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(9, 11, 16, 0.8) 100%);
+      pointer-events: none;
+    }
+
+    /* Category & Engine Badges on Thumb */
+    .thumb-badges {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      display: flex;
+      gap: 6px;
+      z-index: 2;
+    }
+
+    .card-badge {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 4px 10px;
+      border-radius: 6px;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    }
+
+    .badge-engine {
+      background: rgba(0, 0, 0, 0.65);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .thumb-category {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 4px 8px;
+      border-radius: 6px;
+      background: rgba(0, 0, 0, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: var(--text-muted);
+      backdrop-filter: blur(8px);
+      z-index: 2;
+    }
+
+    /* Hover Play Overlay Button */
+    .card-hover-play {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(3px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+      z-index: 3;
+      text-decoration: none;
+    }
+
+    .game-card:hover .card-hover-play {
+      opacity: 1;
+    }
+
+    .btn-play-hero {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      background: linear-gradient(135deg, var(--accent-cyan), #0099ff);
+      color: #000;
+      font-weight: 700;
+      font-size: 0.95rem;
+      border-radius: 99px;
+      transform: scale(0.9);
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s;
+      box-shadow: 0 0 25px rgba(0, 240, 255, 0.5);
+    }
+
+    .game-card:hover .btn-play-hero {
+      transform: scale(1);
+    }
+
+    .btn-play-hero svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+    }
+
+    /* Card Content Area */
+    .card-body {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+    }
+
+    .card-titles {
+      margin-bottom: 8px;
+    }
+
+    .card-title {
+      font-size: 1.22rem;
+      font-weight: 700;
+      color: var(--text-main);
+      line-height: 1.3;
+      margin-bottom: 3px;
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+    }
+
+    .card-subtitle {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      font-family: monospace;
+    }
+
+    .card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .card-tag {
+      font-size: 0.72rem;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-muted);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .card-desc {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+      margin-bottom: 16px;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      flex-grow: 1;
+    }
+
+    /* Keymap quick hints */
+    .card-keys {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 12px;
+      background: rgba(0, 0, 0, 0.25);
+      border-radius: 8px;
+      margin-bottom: 18px;
+      font-size: 0.78rem;
+      color: var(--text-dim);
+    }
+
+    .card-keys svg {
+      width: 14px;
+      height: 14px;
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    .card-keys-text {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Card Action Footer */
+    .card-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-top: auto;
+      padding-top: 14px;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .btn-action-primary {
+      flex: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, rgba(0, 240, 255, 0.15), rgba(0, 153, 255, 0.25));
+      border: 1px solid rgba(0, 240, 255, 0.4);
+      color: #fff;
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+    }
+
+    .btn-action-primary:hover {
+      background: linear-gradient(135deg, var(--accent-cyan), #0099ff);
+      color: #000;
+      box-shadow: 0 0 16px rgba(0, 240, 255, 0.35);
+      border-color: transparent;
+    }
+
+    .btn-action-primary svg {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+    }
+
+    .btn-action-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      cursor: pointer;
+      text-decoration: none;
+      transition: var(--transition-smooth);
+    }
+
+    .btn-action-icon:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text-main);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-action-icon svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    /* Modal for Game Details */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(12px);
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+      opacity: 1;
+    }
+
+    .modal-window {
+      background: var(--bg-surface-elevated);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 760px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6), 0 0 40px rgba(0, 240, 255, 0.1);
+      position: relative;
+      transform: scale(0.95);
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      scrollbar-width: thin;
+      scrollbar-color: rgba(0, 240, 255, 0.4) rgba(0, 0, 0, 0.2);
+    }
+
+    .modal-window::-webkit-scrollbar {
+      width: 8px;
+    }
+    .modal-window::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.25);
+      border-radius: 0 20px 20px 0;
+    }
+    .modal-window::-webkit-scrollbar-thumb {
+      background: rgba(0, 240, 255, 0.35);
+      border-radius: 4px;
+    }
+    .modal-window::-webkit-scrollbar-thumb:hover {
+      background: rgba(0, 240, 255, 0.7);
+    }
+
+    .modal-backdrop.open .modal-window {
+      transform: scale(1);
+    }
+
+    .modal-close-btn {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 10;
+      transition: var(--transition-smooth);
+    }
+
+    .modal-close-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: rotate(90deg);
+    }
+
+    .modal-thumb {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+      display: block;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .modal-content {
+      padding: 28px;
+    }
+
+    .modal-header-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      background: rgba(0, 240, 255, 0.15);
+      color: var(--accent-cyan);
+      border: 1px solid rgba(0, 240, 255, 0.3);
+      margin-bottom: 10px;
+    }
+
+    .modal-title {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 4px;
+    }
+
+    .modal-subtitle {
+      font-size: 0.85rem;
+      font-family: monospace;
+      color: var(--text-dim);
+      margin-bottom: 16px;
+    }
+
+    .modal-desc {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      line-height: 1.65;
+      margin-bottom: 24px;
+    }
+
+    .modal-section-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .modal-section-title svg {
+      width: 18px;
+      height: 18px;
+      color: var(--accent-cyan);
+    }
+
+    .modal-features-list {
+      list-style: none;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+
+    .modal-features-list li {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      background: rgba(255, 255, 255, 0.03);
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .modal-features-list li::before {
+      content: "✓";
+      color: var(--accent-green);
+      font-weight: bold;
+    }
+
+    .controls-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 28px;
+      background: rgba(0, 0, 0, 0.25);
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .controls-table th, .controls-table td {
+      padding: 10px 16px;
+      text-align: left;
+      font-size: 0.85rem;
+    }
+
+    .controls-table th {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-dim);
+      font-weight: 600;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .controls-table td {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      color: var(--text-muted);
+    }
+
+    .controls-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    kbd {
+      display: inline-block;
+      padding: 3px 8px;
+      font-family: monospace;
+      font-size: 0.78rem;
+      color: var(--accent-cyan);
+      background: rgba(0, 240, 255, 0.08);
+      border: 1px solid rgba(0, 240, 255, 0.25);
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    }
+
+    .modal-footer {
+      display: flex;
+      gap: 12px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .btn-modal-launch {
+      flex: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 14px 24px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent-cyan), #0077ff);
+      color: #000;
+      font-size: 1rem;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+      box-shadow: 0 0 25px rgba(0, 240, 255, 0.4);
+      transition: var(--transition-smooth);
+    }
+
+    .btn-modal-launch:hover {
+      box-shadow: 0 0 35px rgba(0, 240, 255, 0.7);
+      transform: translateY(-2px);
+    }
+
+    /* Empty state */
+    .empty-state {
+      display: none;
+      text-align: center;
+      padding: 64px 20px;
+      background: var(--bg-surface);
+      border-radius: var(--card-radius);
+      border: 1px dashed var(--border-subtle);
+      grid-column: 1 / -1;
+    }
+
+    .empty-state.visible {
+      display: block;
+    }
+
+    .empty-icon {
+      font-size: 3rem;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+
+    .empty-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .empty-desc {
+      color: var(--text-dim);
+      font-size: 0.9rem;
+      margin-bottom: 20px;
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      margin-top: 64px;
+      padding-top: 32px;
+      border-top: 1px solid var(--border-subtle);
+      color: var(--text-dim);
+      font-size: 0.85rem;
+    }
+
+    .footer a {
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .footer a:hover {
+      color: var(--accent-cyan);
+    }
+
+    @media (max-width: 768px) {
+      .game-grid {
+        grid-template-columns: 1fr;
+      }
+      .toolbar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .search-sort-group {
+        max-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-grid"></div>
+
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <div class="brand-badge">
+        <span class="dot"></span>
+        Harness Arcade Engine Hub
+      </div>
+      <h1 class="main-title">8-BIT & 3D ARCADE UNIVERSE</h1>
+      <p class="sub-title">精選 9 款自製與經典重製網頁遊戲，涵蓋 3D WebGL 物理冒險、街機空戰射擊、16-Bit 平台闖關與復古 JRPG，全數具備零依賴極速載入與沉浸式遊玩體驗。</p>
+      
+      <div class="stats-bar">
+        <div class="stat-pill">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"></rect><circle cx="6" cy="12" r="1"></circle><circle cx="18" cy="12" r="1"></circle><path d="M10 12h4"></path><path d="M12 10v4"></path></svg>
+          <span>9 款精選遊戲</span>
+        </div>
+        <div class="stat-pill">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
+          <span>純原生 WebGL / Canvas</span>
+        </div>
+        <div class="stat-pill">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+          <span>Web Audio 音效合成</span>
+        </div>
+        <button class="sound-toggle-btn active" id="soundToggle" title="點擊切換介面復古音效">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+          <span id="soundStatusText">音效：開啟</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Toolbar: Category filter + Search -->
+    <section class="toolbar">
+      <div class="filter-tabs" id="categoryFilters">
+        <button class="filter-btn active" data-filter="all">
+          <span>全部遊戲</span>
+          <span class="badge-count" id="countAll">9</span>
+        </button>
+        <button class="filter-btn" data-filter="3d">
+          <span>3D WebGL</span>
+          <span class="badge-count" id="count3D">4</span>
+        </button>
+        <button class="filter-btn" data-filter="action">
+          <span>街機射擊</span>
+          <span class="badge-count" id="countAction">2</span>
+        </button>
+        <button class="filter-btn" data-filter="platformer">
+          <span>經典平台</span>
+          <span class="badge-count" id="countPlatformer">2</span>
+        </button>
+        <button class="filter-btn" data-filter="puzzle-rpg">
+          <span>益智與冒險</span>
+          <span class="badge-count" id="countPuzzleRpg">2</span>
+        </button>
+      </div>
+
+      <div class="search-sort-group">
+        <div class="search-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <input type="text" id="searchInput" class="search-input" placeholder="搜尋遊戲名稱、技術或特色... (按 / 聚焦)">
+          <button class="search-clear" id="searchClear">✕</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Info counter -->
+    <div class="results-info">
+      <div>顯示 <strong id="visibleCount">9</strong> 款遊戲</div>
+      <div>點擊卡片或「開始遊玩」直接啟動</div>
+    </div>
+
+    <!-- Games Grid -->
+    <main class="game-grid" id="gameGrid">
+      <!-- Cards rendered via JavaScript -->
+    </main>
+
+    <!-- Empty State -->
+    <div class="empty-state" id="emptyState">
+      <div class="empty-icon">👾</div>
+      <div class="empty-title">找不到相符的遊戲</div>
+      <div class="empty-desc">請嘗試其他關鍵字，或清除分類篩選條件。</div>
+      <button class="filter-btn" id="btnResetSearch" style="display:inline-flex;">重設搜尋條件</button>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p>Tracker Game Arcade Hub • Powered by WebGL & HTML5 Canvas</p>
+      <p style="margin-top: 6px;">目錄位置：<code>/opt/tracker/html/game/</code> • 本機即點即玩</p>
+    </footer>
+  </div>
+
+  <!-- Detail Modal Dialog -->
+  <div class="modal-backdrop" id="gameModal" role="dialog" aria-modal="true">
+    <div class="modal-window">
+      <button class="modal-close-btn" id="modalClose" aria-label="關閉視窗">✕</button>
+      <img src="" alt="遊戲畫面" class="modal-thumb" id="modalThumb">
+      <div class="modal-content">
+        <div class="modal-header-badge" id="modalEngineBadge">ENGINE</div>
+        <h2 class="modal-title" id="modalTitle">遊戲標題</h2>
+        <div class="modal-subtitle" id="modalSubtitle">GAME SUBTITLE</div>
+        <p class="modal-desc" id="modalDesc">遊戲詳細介紹</p>
+
+        <div class="modal-section-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+          核心特色與機制
+        </div>
+        <ul class="modal-features-list" id="modalFeatures"></ul>
+
+        <div class="modal-section-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M8 12h.01M12 12h.01M16 12h.01M7 16h10"></path></svg>
+          操作控制指南
+        </div>
+        <table class="controls-table">
+          <thead>
+            <tr>
+              <th style="width: 38%;">按鍵 / 輸入</th>
+              <th>動作功能</th>
+            </tr>
+          </thead>
+          <tbody id="modalControlsTable"></tbody>
+        </table>
+
+        <div class="modal-footer">
+          <a href="#" class="btn-modal-launch" id="modalLaunchBtn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+            <span>立即啟動遊戲 (Launch Game)</span>
+          </a>
+          <a href="#" class="btn-action-icon" id="modalNewTabBtn" target="_blank" title="在新分頁開啟" style="width: 52px; height: 52px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* =========================================================
+       GAMES DATABASE
+       ========================================================= */
+    const GAMES_DATA = [
+      {
+        id: "mario-3d",
+        folder: "mario-3d",
+        title: "超級瑪利歐 3D 豪華版",
+        subtitle: "SUPER MARIO 3D HD REMASTER",
+        categories: ["3d", "platformer"],
+        categoryLabel: "3D 動作冒險",
+        engineBadge: "Three.js WebGL",
+        badgeColor: "#00f0ff",
+        image: "mario-3d/preview.png",
+        description: "全 3D 自由視角立體瑪利歐冒險！探索碧姬城堡庭院、多層次立體地圖關卡，施展連續跳躍、火球術與強力下砸粉碎障礙。具備完整的開場救援序幕、魔王庫巴激戰過場、拯救碧姬公主劇情動畫與 5 槽存檔功能。",
+        features: [
+          "Three.js 3D WebGL 引擎與動態光影渲染",
+          "流暢自由軌道視角旋轉與追隨運鏡",
+          "火球術、空中重力下砸與衝刺連續跳躍",
+          "碧姬城堡、多階段地圖與完整劇情過場",
+          "5 槽即時進度存檔與讀取系統"
+        ],
+        controlsSummary: "WASD 移動 • 滑鼠旋轉 • 空白鍵跳躍 • F 火球 • C 下砸",
+        controls: [
+          { key: "W / A / S / D", action: "八向角色立體移動" },
+          { key: "滑鼠右鍵 / 拖曳", action: "360° 自由環繞旋轉視角" },
+          { key: "Space 空白鍵", action: "起跳 / 連續跳躍" },
+          { key: "Shift 鍵", action: "衝刺加速跑" },
+          { key: "F 鍵", action: "發射彈跳火球" },
+          { key: "C 鍵", action: "空中重力下砸" }
+        ],
+        tags: ["3D WebGL", "經典重製", "故事過場", "存檔系統", "Three.js"]
+      },
+      {
+        id: "contra-3d",
+        folder: "contra-3d",
+        title: "魂斗羅 3D：加魯加突襲",
+        subtitle: "CONTRA 3D: GALUGA ALIEN INCURSION",
+        categories: ["3d", "action"],
+        categoryLabel: "3D 動作射擊",
+        engineBadge: "3D Director Cam",
+        badgeColor: "#ff0055",
+        image: "contra-3d/preview.png",
+        description: "熱血硬派經典射擊遊戲魂斗羅震撼立體化！體驗 1987 年經典 8 大關卡冒險歷程，首創 2.5D 橫向戰鬥與 3D 走廊越肩射擊雙視角切換。收錄普通彈、機槍 M、散彈 S、雷射 L、烈焰 F 與防護罩 B 全套武器庫，支援科樂美 30 命經典秘技。",
+        features: [
+          "2.5D 橫向與 3D 越肩走廊雙視角流暢轉換",
+          "經典 8 大關卡加魯加群島劇情歷程",
+          "散彈 S、雷射 L、機槍 M 完整重裝武裝",
+          "八方向精準瞄準與高低差跳躍射擊",
+          "相容 Konami 30 命經典密技 (↑↑↓↓←→←→BA)"
+        ],
+        controlsSummary: "WASD 移動與 8 向射擊 • J 射擊 • K 跳躍 • C 切換視角",
+        controls: [
+          { key: "W / A / S / D", action: "移動角色與 8 方向射擊瞄準" },
+          { key: "J 鍵", action: "主武器連射攻擊" },
+          { key: "K 鍵", action: "跳躍翻滾迴避" },
+          { key: "C 鍵", action: "切換導演運鏡 (橫向 / 3D 越肩走廊)" },
+          { key: "Konami Code", action: "↑↑↓↓←→←→BA 解鎖 30 命" }
+        ],
+        tags: ["3D 射擊", "雙模式視角", "全武裝庫", "Konami秘技", "街機經典"]
+      },
+      {
+        id: "bomberman",
+        folder: "bomberman",
+        title: "炸彈超人 3D：競技場大逃殺",
+        subtitle: "BOMBERMAN 3D: ARENA BATTLE ROYALE",
+        categories: ["3d", "action"],
+        categoryLabel: "3D 競技大逃殺",
+        engineBadge: "Three.js 4-Player AI",
+        badgeColor: "#ffbe0b",
+        image: "bomberman/preview.png",
+        description: "4 人立體競技場炸彈超人大亂鬥！內建智慧型熱區危險避障 AI、震撼的十字連鎖火花爆炸特效、完整技能強化道具庫（炸彈數、火焰範圍、溜冰加速、踢炸彈、心之護盾、遙控引信）。進入賽局尾聲更會觸發螺旋縮圈突然死亡機制與子彈時間慢動作勝利特寫！",
+        features: [
+          "4 名炸彈人同場競技與智慧熱圖避險 AI",
+          "動態十字粒子爆炸與多重連鎖引爆",
+          "踢炸彈、加速溜冰、遙控引信全套強化道具",
+          "突然死亡 (Sudden Death) 螺旋內縮縮圈機制",
+          "多視角切換：經典俯瞰、2.5D 等角、追隨與動態導演"
+        ],
+        controlsSummary: "WASD 移動 • 空白鍵放炸彈 • E 遙控引爆 • V 切換視角",
+        controls: [
+          { key: "W / A / S / D", action: "競技場四向走動移動" },
+          { key: "Space 空白鍵", action: "放置定時十字爆彈" },
+          { key: "E 鍵", action: "手動遙控引爆 (取得遙控道具時)" },
+          { key: "V 鍵", action: "切換視角 (鳥瞰 / 等角 / 第三人稱)" },
+          { key: "Esc / P", action: "暫停遊戲選單" }
+        ],
+        tags: ["3D WebGL", "4人AI對決", "大逃殺縮圈", "玻態HUD", "連鎖爆炸"]
+      },
+      {
+        id: "flight-combat",
+        folder: "flight-combat",
+        title: "王牌空戰：空空矢量 2026",
+        subtitle: "ACE COMBAT VECTOR 2026",
+        categories: ["3d", "action"],
+        categoryLabel: "3D 空戰模擬",
+        engineBadge: "6-DoF Flight Engine",
+        badgeColor: "#06d6a0",
+        image: "flight-combat/preview.png",
+        description: "超流暢純 HTML5 Canvas 3D 噴射戰鬥機模擬與空中狗鬥！搭載逼真六自由度 (6-DoF) 空氣動力學姿態模型，提供戰鬥機綠光 HUD 航電抬頭顯示、360 度俯仰滾轉、雷達威脅追蹤、20mm 火神機砲、AIM-9 響尾蛇熱追蹤飛彈與防空熱誘餌彈，體驗高空纏鬥獵殺樂趣。",
+        features: [
+          "純 Canvas 高效能 6-DoF 六自由度空氣動力學飛行物理",
+          "軍規現代戰機 HUD 航電抬頭儀表顯示",
+          "雷達動態追蹤、敵機威脅預警與目標鎖定",
+          "20mm 火神機砲連續射擊與響尾蛇空對空飛彈",
+          "熱誘餌彈防禦干擾與高 G 力機動戰術翻滾"
+        ],
+        controlsSummary: "W/S 俯仰 • A/D 橫滾 • Q/E 偏航 • 空白鍵機砲 • F 飛彈 • X 熱誘餌",
+        controls: [
+          { key: "W / S 鍵", action: "俯仰控制 (Pitch Down / Up)" },
+          { key: "A / D 鍵", action: "橫滾旋轉 (Roll Left / Right)" },
+          { key: "Q / E 鍵", action: "方向舵偏航 (Yaw Left / Right)" },
+          { key: "Shift / Ctrl", action: "後燃器推力加速 / 空氣煞車減速" },
+          { key: "Space 空白鍵", action: "20mm 火神機砲高速連射" },
+          { key: "F 鍵 / X 鍵", action: "發射空對空飛彈 / 釋放熱誘餌防禦彈" }
+        ],
+        tags: ["3D 模擬", "空戰狗鬥", "6-DoF物理", "HUD航電", "追蹤飛彈"]
+      },
+      {
+        id: "salamander",
+        folder: "salamander",
+        title: "沙羅曼蛇：生命之光",
+        subtitle: "SALAMANDER: LIFE FORCE REMAKE",
+        categories: ["action"],
+        categoryLabel: "經典街機射擊",
+        engineBadge: "Retina Canvas STG",
+        badgeColor: "#a855f7",
+        image: "salamander/preview.png",
+        description: "科樂美街機宇宙傳奇射擊神作再現！完美收錄 6 大橫向與縱向滾卷交替關卡（生物細胞、小行星碎石帶、烈焰地獄、骨骸墓場、摩艾巨石陣、澤洛斯機械要塞）。駕駛 Vic Viper 或 Lord British，配備波紋雷射、導向飛彈與 4 連子機 Options，展開巨怪討伐與爆破逃脫！",
+        features: [
+          "6 大橫縱雙向滾卷交替經典關卡完整收錄",
+          "雙戰機選拔 (Vic Viper / Lord British)",
+          "波紋雷射、導向飛彈、4 聯裝子機 Options、力場護盾",
+          "生命之光心臟巨怪決戰與緊迫爆破倒數逃脫",
+          "Web Audio 專屬 FM 晶片模擬音效庫"
+        ],
+        controlsSummary: "WASD 移動 • J 射擊 • K 飛彈 • L 護盾 • 支援 Konami 秘技",
+        controls: [
+          { key: "WASD 或 方向鍵", action: "戰機全向穿梭飛行" },
+          { key: "J 鍵", action: "主武器雷射連續射擊" },
+          { key: "K 鍵", action: "投射對地飛彈" },
+          { key: "L 鍵", action: "開啟能量力場防護罩 Force Field" },
+          { key: "Konami Code", action: "支援經典秘技解鎖 30 機" }
+        ],
+        tags: ["街機STG", "橫縱卷軸", "波紋雷射", "FM晶片音效", "宇宙空戰"]
+      },
+      {
+        id: "mario-pipe",
+        folder: "mario-pipe",
+        title: "超級瑪利歐：水管工秘境",
+        subtitle: "SUPER MARIO: WARP PIPE ENGINE",
+        categories: ["platformer"],
+        categoryLabel: "經典平台冒險",
+        engineBadge: "HD Pipe Physics",
+        badgeColor: "#2ec4b6",
+        image: "mario-pipe/preview.png",
+        description: "極致考究經典超級瑪利歐水管傳送機制的精美高畫質重製！真實還原下蹲垂直進入水管、橫向水管滑行、探頭鑽出動畫、地下金幣藏寶密室與 1-2 經典 Warp Zone 跨關跳關水管通道。並具備動態食人花出沒生態與接近抑制安全機制，視覺採用斜角金屬質感管身。",
+        features: [
+          "垂直下蹲入管、橫向滑入與探頭鑽出完整過渡動畫",
+          "1-1 地表水管群與 1-2 地下 Warp Zone 跨關跳躍通道",
+          "食人花動態出沒與玩家貼近安全抑制 AI",
+          "金屬倒角質感管身高解析度精緻貼圖",
+          "純正紅白機 NES 水管傳送琶音音效"
+        ],
+        controlsSummary: "A/D 移動 • S 下蹲進管 • W / 空白鍵跳躍 • Shift 衝刺",
+        controls: [
+          { key: "A / D 或 ← / →", action: "左右移動跑動" },
+          { key: "S 鍵 / ↓ 鍵", action: "下蹲姿勢 / 於水管上方時垂直入管" },
+          { key: "W / Space 空白鍵", action: "彈跳跳躍 (按壓時間決定高度)" },
+          { key: "Shift 鍵", action: "衝刺加速跑" }
+        ],
+        tags: ["橫向平台", "水管傳送", "Warp Zone", "食人花生態", "懷舊復刻"]
+      },
+      {
+        id: "mario",
+        folder: "mario",
+        title: "超級瑪利歐兄弟 HD：全明星",
+        subtitle: "SUPER MARIO BROS 16-BIT ALL-STARS",
+        categories: ["platformer"],
+        categoryLabel: "16-Bit 復古平台",
+        engineBadge: "16-Bit Engine",
+        badgeColor: "#e71d36",
+        image: "mario/preview.png",
+        description: "以超任 (Super Famicom) 全明星經典風貌重現的 2D 橫向卷軸冒險！完整涵蓋 4 大主題世界：碧綠草原 1-1、神秘地下穴道 1-2、高聳樹頂空中運動 1-3、以及岩漿翻騰的庫巴城堡 1-4。收錄變大蘑菇、火焰花狀態變換、踢飛龜殼連鎖彈射與斧頭斷橋決戰庫巴！",
+        features: [
+          "四大經典主題世界：綠意地面、地下洞窟、高空樹頂、庫巴城堡",
+          "小瑪利歐 / 超級瑪利歐 / 火球瑪利歐形態變換",
+          "龜殼踢擊彈射連鎖反彈擊倒敵人物理",
+          "庫巴 Boss 決戰：噴射火球與斬斷吊橋斧頭 switch",
+          "精緻 16-Bit 精靈瓦片像素與合成音效庫"
+        ],
+        controlsSummary: "A/D 移動 • W / 空白鍵跳躍 • S 下蹲 • J / Shift 火球與加速",
+        controls: [
+          { key: "A / D 或 ← / →", action: "左右移動跑動" },
+          { key: "W 鍵 / Space", action: "躍起跳躍 / 踩踏敵人" },
+          { key: "S 鍵 / ↓ 鍵", action: "蹲下閃避障礙" },
+          { key: "J 鍵 / Shift", action: "衝刺加速 / 火球狀態下發射彈跳火球" }
+        ],
+        tags: ["16-Bit復刻", "全明星風格", "庫巴決戰", "經典闖關", "瓦斯熔岩"]
+      },
+      {
+        id: "tetris",
+        folder: "tetris",
+        title: "賽博俄羅斯方塊 2026",
+        subtitle: "CYBER TETRIS 2026 MODERN ENGINE",
+        categories: ["puzzle-rpg"],
+        categoryLabel: "現代競技益智",
+        engineBadge: "Guideline SRS Engine",
+        badgeColor: "#3a86ff",
+        image: "tetris/preview.png",
+        description: "融合賽博龐克霓虹視覺的頂級現代規格俄羅斯方塊！全面導入競技規範標準機制：SRS 超級旋轉踢牆系統、7-Bag 公正發牌隨機袋、暫存 Hold 欄位、幽靈方塊即時落點投影、鎖定延遲微調與 Back-to-Back 連擊計分，帶來極致節奏感與指尖操作快感。",
+        features: [
+          "標準競技級 SRS 踢牆與旋轉機制",
+          "7-Bag 隨機袋均勻發牌演算法",
+          "Hold 暫存與即時幽靈方塊投影",
+          "動態下落加速、連擊乘數與消行特效",
+          "賽博龐克霓虹 UI 與純 Web Audio 合成音"
+        ],
+        controlsSummary: "方向鍵移動/旋轉 • 空白鍵硬降 • C / Shift 暫存 • P 暫停",
+        controls: [
+          { key: "← / → 箭頭", action: "方塊水平左右移動" },
+          { key: "↑ 鍵 / X 鍵", action: "方塊順時針 90° 旋轉" },
+          { key: "Z 鍵 / Ctrl", action: "方塊逆時針 90° 旋轉" },
+          { key: "↓ 鍵", action: "軟降加速落下 (Soft Drop)" },
+          { key: "Space 空白鍵", action: "硬降直接落地鎖定 (Hard Drop)" },
+          { key: "C 鍵 / Shift", action: "方塊暫存交換 (Hold Piece)" }
+        ],
+        tags: ["競技益智", "SRS踢牆", "賽博龐克", "連擊消行", "Web Audio"]
+      },
+      {
+        id: "dragon-quest",
+        folder: "dragon-quest",
+        title: "勇者鬥惡龍：勇者領域",
+        subtitle: "DRAGON QUEST JS: REALM OF THE BRAVE",
+        categories: ["puzzle-rpg"],
+        categoryLabel: "復古角色扮演",
+        engineBadge: "Retro Tile JRPG",
+        badgeColor: "#9d4edd",
+        image: "dragon-quest/preview.png",
+        description: "純粹懷舊的日系傳奇像素 JRPG 體驗！以 24x16 經典地圖瓦片架構重現羅德勇者世界。覲見國王領受討伐魔物神聖任務、在城鎮與 NPC 對話採購、在大地圖草地與丘陵隨機遇敵，展開經典回合制指令戰鬥，對抗史萊姆、骷髏戰士與暗黑巨龍 Boss，施展霍伊米與萊丁咒文！",
+        features: [
+          "經典 24x16 瓦片地圖、國王謁見與城鎮 NPC 互動",
+          "野外隨機遇敵與經典分鏡回合制戰鬥系統",
+          "戰鬥指令：攻擊、咒文、道具、逃跑",
+          "霍伊米治療咒文與美拉、萊丁雷擊攻擊魔法",
+          "打怪賺取金幣與經驗值，升級強化各項戰力數值"
+        ],
+        controlsSummary: "WASD / 方向鍵移動 • 空白鍵 / Enter 互動確認 • Esc 取消",
+        controls: [
+          { key: "WASD 或 方向鍵", action: "勇者在城堡、城鎮與野外大地圖四向走動" },
+          { key: "Space 空白鍵 / Enter", action: "對話互動 / 調查寶箱 / 選單確認鍵" },
+          { key: "Esc 鍵", action: "關閉對話視窗 / 取消選單" }
+        ],
+        tags: ["復古像素", "經典JRPG", "回合制戰鬥", "勇者鬥惡龍", "咒文系統"]
+      }
+    ];
+
+    /* =========================================================
+       AUDIO SYNTHESIZER (Pure Web Audio)
+       ========================================================= */
+    class RetroSound {
+      constructor() {
+        this.ctx = null;
+        this.enabled = true;
+      }
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          if (AudioContext) {
+            this.ctx = new AudioContext();
+          }
+        }
+      }
+      playBlip(freq = 600, duration = 0.06, type = "square") {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        try {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = type;
+          osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(freq * 1.5, this.ctx.currentTime + duration);
+          gain.gain.setValueAtTime(0.04, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + duration);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start();
+          osc.stop(this.ctx.currentTime + duration);
+        } catch (e) {}
+      }
+      playSelect() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        try {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = "triangle";
+          osc.frequency.setValueAtTime(440, this.ctx.currentTime);
+          osc.frequency.setValueAtTime(880, this.ctx.currentTime + 0.05);
+          gain.gain.setValueAtTime(0.06, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.12);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start();
+          osc.stop(this.ctx.currentTime + 0.12);
+        } catch (e) {}
+      }
+    }
+
+    const sound = new RetroSound();
+
+    /* =========================================================
+       APP LOGIC
+       ========================================================= */
+    const gameGrid = document.getElementById("gameGrid");
+    const emptyState = document.getElementById("emptyState");
+    const visibleCountEl = document.getElementById("visibleCount");
+    const searchInput = document.getElementById("searchInput");
+    const searchClear = document.getElementById("searchClear");
+    const categoryFilters = document.getElementById("categoryFilters");
+    const soundToggle = document.getElementById("soundToggle");
+    const soundStatusText = document.getElementById("soundStatusText");
+    const btnResetSearch = document.getElementById("btnResetSearch");
+
+    // Modal elements
+    const gameModal = document.getElementById("gameModal");
+    const modalClose = document.getElementById("modalClose");
+    const modalThumb = document.getElementById("modalThumb");
+    const modalEngineBadge = document.getElementById("modalEngineBadge");
+    const modalTitle = document.getElementById("modalTitle");
+    const modalSubtitle = document.getElementById("modalSubtitle");
+    const modalDesc = document.getElementById("modalDesc");
+    const modalFeatures = document.getElementById("modalFeatures");
+    const modalControlsTable = document.getElementById("modalControlsTable");
+    const modalLaunchBtn = document.getElementById("modalLaunchBtn");
+    const modalNewTabBtn = document.getElementById("modalNewTabBtn");
+
+    let currentFilter = "all";
+    let searchQuery = "";
+
+    function updateBadgeCounts() {
+      document.getElementById("countAll").textContent = GAMES_DATA.length;
+      document.getElementById("count3D").textContent = GAMES_DATA.filter(g => g.categories.includes("3d")).length;
+      document.getElementById("countAction").textContent = GAMES_DATA.filter(g => g.categories.includes("action")).length;
+      document.getElementById("countPlatformer").textContent = GAMES_DATA.filter(g => g.categories.includes("platformer")).length;
+      document.getElementById("countPuzzleRpg").textContent = GAMES_DATA.filter(g => g.categories.includes("puzzle-rpg")).length;
+    }
+
+    // Render Cards
+    function renderCards() {
+      gameGrid.innerHTML = "";
+      let visibleCount = 0;
+
+      GAMES_DATA.forEach(game => {
+        // Filter check
+        const matchCategory = (currentFilter === "all") || (game.categories.includes(currentFilter));
+        
+        // Search check
+        const searchTarget = (
+          game.title + " " + 
+          game.subtitle + " " + 
+          game.description + " " + 
+          game.tags.join(" ") + " " + 
+          game.categoryLabel
+        ).toLowerCase();
+        const matchSearch = !searchQuery || searchTarget.includes(searchQuery.toLowerCase());
+
+        if (matchCategory && matchSearch) {
+          visibleCount++;
+          const card = document.createElement("article");
+          card.className = "game-card";
+          card.dataset.gameId = game.id;
+
+          card.innerHTML = `
+            <div class="card-thumb-wrap">
+              <img src="${game.image}" alt="${game.title}" class="card-thumb" loading="lazy">
+              <div class="thumb-gradient"></div>
+              <div class="thumb-badges">
+                <span class="card-badge badge-engine">${game.engineBadge}</span>
+              </div>
+              <span class="thumb-category">${game.categoryLabel}</span>
+              <a href="./${game.folder}/" class="card-hover-play" title="立即遊玩 ${game.title}">
+                <span class="btn-play-hero">
+                  <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                  立即開始
+                </span>
+              </a>
+            </div>
+
+            <div class="card-body">
+              <div class="card-titles">
+                <h3 class="card-title">${game.title}</h3>
+                <div class="card-subtitle">${game.subtitle}</div>
+              </div>
+
+              <div class="card-tags">
+                ${game.tags.map(t => `<span class="card-tag">${t}</span>`).join("")}
+              </div>
+
+              <p class="card-desc">${game.description}</p>
+
+              <div class="card-keys" title="控制鍵捷徑指南">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M8 12h.01M12 12h.01M16 12h.01M7 16h10"></path></svg>
+                <span class="card-keys-text">${game.controlsSummary}</span>
+              </div>
+
+              <div class="card-actions">
+                <a href="./${game.folder}/" class="btn-action-primary" title="開啟遊戲">
+                  <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                  <span>開始遊玩</span>
+                </a>
+                <a href="./${game.folder}/" target="_blank" class="btn-action-icon" title="在新分頁開啟遊戲">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                </a>
+                <button type="button" class="btn-action-icon btn-detail" data-id="${game.id}" title="查看詳細機制與鍵盤鍵位">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                </button>
+              </div>
+            </div>
+          `;
+
+          // Audio feedback
+          card.addEventListener("mouseenter", () => sound.playBlip(750, 0.04));
+          const primaryBtn = card.querySelector(".btn-action-primary");
+          primaryBtn.addEventListener("click", () => sound.playSelect());
+
+          gameGrid.appendChild(card);
+        }
+      });
+
+      visibleCountEl.textContent = visibleCount;
+      if (visibleCount === 0) {
+        emptyState.classList.add("visible");
+      } else {
+        emptyState.classList.remove("visible");
+      }
+    }
+
+    // Modal Display Logic
+    function openModal(gameId) {
+      const game = GAMES_DATA.find(g => g.id === gameId);
+      if (!game) return;
+
+      modalThumb.src = game.image;
+      modalThumb.alt = game.title;
+      modalEngineBadge.textContent = game.engineBadge + " • " + game.categoryLabel;
+      modalTitle.textContent = game.title;
+      modalSubtitle.textContent = game.subtitle;
+      modalDesc.textContent = game.description;
+
+      // Features
+      modalFeatures.innerHTML = game.features.map(f => `<li>${f}</li>`).join("");
+
+      // Controls table
+      modalControlsTable.innerHTML = game.controls.map(c => `
+        <tr>
+          <td><kbd>${c.key}</kbd></td>
+          <td>${c.action}</td>
+        </tr>
+      `).join("");
+
+      modalLaunchBtn.href = `./${game.folder}/`;
+      modalNewTabBtn.href = `./${game.folder}/`;
+
+      gameModal.classList.add("open");
+      document.body.style.overflow = "hidden";
+      sound.playSelect();
+    }
+
+    function closeModal() {
+      gameModal.classList.remove("open");
+      document.body.style.overflow = "";
+      sound.playBlip(400, 0.05);
+    }
+
+    // Event Listeners
+    document.addEventListener("click", (e) => {
+      const detailBtn = e.target.closest(".btn-detail");
+      if (detailBtn) {
+        const id = detailBtn.dataset.id;
+        openModal(id);
+      }
+    });
+
+    modalClose.addEventListener("click", closeModal);
+    gameModal.addEventListener("click", (e) => {
+      if (e.target === gameModal) {
+        closeModal();
+      }
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && gameModal.classList.contains("open")) {
+        closeModal();
+      }
+      if (e.key === "/" && document.activeElement !== searchInput) {
+        e.preventDefault();
+        searchInput.focus();
+      }
+    });
+
+    // Category Tabs
+    categoryFilters.addEventListener("click", (e) => {
+      const btn = e.target.closest(".filter-btn");
+      if (!btn) return;
+      categoryFilters.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      currentFilter = btn.dataset.filter;
+      sound.playBlip(520, 0.05);
+      renderCards();
+    });
+
+    // Search Input
+    searchInput.addEventListener("input", (e) => {
+      searchQuery = e.target.value.trim();
+      searchClear.style.display = searchQuery ? "block" : "none";
+      renderCards();
+    });
+
+    searchClear.addEventListener("click", () => {
+      searchInput.value = "";
+      searchQuery = "";
+      searchClear.style.display = "none";
+      searchInput.focus();
+      sound.playBlip(480, 0.04);
+      renderCards();
+    });
+
+    btnResetSearch.addEventListener("click", () => {
+      searchInput.value = "";
+      searchQuery = "";
+      searchClear.style.display = "none";
+      currentFilter = "all";
+      categoryFilters.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+      categoryFilters.querySelector('[data-filter="all"]').classList.add("active");
+      renderCards();
+    });
+
+    // Sound toggle
+    soundToggle.addEventListener("click", () => {
+      sound.enabled = !sound.enabled;
+      if (sound.enabled) {
+        soundToggle.classList.add("active");
+        soundStatusText.textContent = "音效：開啟";
+        sound.playSelect();
+      } else {
+        soundToggle.classList.remove("active");
+        soundStatusText.textContent = "音效：靜音";
+      }
+    });
+
+    // Initial render
+    updateBadgeCounts();
+    renderCards();
+  </script>
+</body>
+</html>

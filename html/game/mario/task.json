@@ -1,0 +1,33 @@
+{
+  "id": "CASE-MARIO-001",
+  "mode": "implement",
+  "role": "writer",
+  "engine": "agy",
+  "tier": "T2",
+  "reasoning_effort": "medium",
+  "intent": "auto",
+  "root": "d:/Claude/Tool/Harness/cases/mario",
+  "prompt": "Implement a complete, zero-dependency, responsive 16-Bit HD All-Stars Super Mario Bros 2D Platformer featuring all 4 Worlds (1-1 Overworld, 1-2 Underground, 1-3 Treetop athletic, 1-4 Bowser Castle), Small/Super/Fire Mario transformations, Fireball projectile bouncing physics, Koopa Troopa shell kicking, Piranha Plants, Bowser Boss battle with lava bridge axe switch collapse, Web Audio NES sound effects, and unit regression test suite.",
+  "touch_allow": [
+    "index.html",
+    "style.css",
+    "mario.js",
+    "test_mario.py"
+  ],
+  "retry_policy": {
+    "max_retries": 2,
+    "tail_prune": true
+  },
+  "acceptance": [
+    {
+      "id": "ACC-MARIO-01",
+      "argv": [
+        "python",
+        "cases/mario/test_mario.py"
+      ],
+      "expect": "OK"
+    }
+  ],
+  "timeout_s": 300,
+  "note": "Regression benchmark test case for 2D multi-world tilemap platformer game engine."
+}

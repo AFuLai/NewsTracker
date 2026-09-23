@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>ACE COMBAT VECTOR 2026 - 3D Flight & Dogfight Simulator</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="hud-overlay-scanlines"></div>
+
+  <div class="sim-container">
+    <!-- 3D Flight Canvas -->
+    <canvas id="flightCanvas" width="1280" height="720"></canvas>
+
+    <!-- Top Status Bar -->
+    <header class="hud-top-bar">
+      <div class="hud-badge"><span class="label">MISSION:</span> <span id="missionName">OPERATION VECTOR FALCON</span></div>
+      <div class="hud-badge"><span class="label">SCORE:</span> <span id="hudScore" class="val-gold">000000</span></div>
+      <div class="hud-badge"><span class="label">KILLS:</span> <span id="hudKills" class="val-cyan">0</span></div>
+      <div class="hud-badge"><span class="label">THREAT LEVEL:</span> <span id="hudWave" class="val-red">WAVE 1</span></div>
+    </header>
+
+    <!-- Tactical Radar Display (Bottom Right) -->
+    <div class="hud-radar-panel">
+      <div class="radar-header">RADAR 360&deg; [5KM]</div>
+      <canvas id="radarCanvas" width="160" height="160"></canvas>
+      <div class="radar-legend">
+        <span class="leg-self">&Delta; SELF</span>
+        <span class="leg-enemy">&nabla; HOSTILE</span>
+        <span class="leg-missile">&bull; MISSILE</span>
+      </div>
+    </div>
+
+    <!-- Aircraft Avionics Readout (Bottom Left) -->
+    <div class="hud-avionics-panel">
+      <div class="avionics-row">
+        <span class="av-label">THROTTLE:</span>
+        <div class="gauge-bar"><div id="throttleFill" class="gauge-fill" style="width: 60%"></div></div>
+        <span id="throttleText" class="av-val">60%</span>
+      </div>
+      <div class="avionics-row">
+        <span class="av-label">AFTERBURNER:</span>
+        <span id="abStatus" class="av-badge off">OFF</span>
+      </div>
+      <div class="avionics-row">
+        <span class="av-label">G-FORCE:</span>
+        <span id="gForceText" class="av-val">1.0 G</span>
+      </div>
+      <div class="avionics-row">
+        <span class="av-label">AOA:</span>
+        <span id="aoaText" class="av-val">4.2&deg;</span>
+      </div>
+      <div class="avionics-row">
+        <span class="av-label">HULL INTEGRITY:</span>
+        <div class="gauge-bar"><div id="hullFill" class="gauge-fill val-health" style="width: 100%"></div></div>
+        <span id="hullText" class="av-val">100%</span>
+      </div>
+      <div class="avionics-row">
+        <span class="av-label">ACTIVE WEAPON:</span>
+        <span id="weaponText" class="av-weapon">20MM VULCAN</span>
+      </div>
+      <div class="avionics-row">
+        <span class="av-label">AIM-9 MISSILES:</span>
+        <span id="missileCountText" class="av-val val-cyan">4 / 4</span>
+      </div>
+      <div class="avionics-row">
+        <span class="av-label">FLARES:</span>
+        <span id="flareCountText" class="av-val val-gold">6 / 6</span>
+      </div>
+    </div>
+
+    <!-- Flight Controls Info (Top Left) -->
+    <div class="hud-controls-panel">
+      <div class="panel-header">FLIGHT AVIONICS CONTROLS</div>
+      <div class="key-item"><kbd>W</kbd> / <kbd>S</kbd> Pitch Down / Up</div>
+      <div class="key-item"><kbd>A</kbd> / <kbd>D</kbd> Roll Left / Right</div>
+      <div class="key-item"><kbd>Q</kbd> / <kbd>E</kbd> Rudder Yaw Left / Right</div>
+      <div class="key-item"><kbd>Shift</kbd> / <kbd>Ctrl</kbd> Throttle + / -</div>
+      <div class="key-item"><kbd>Tab</kbd> Toggle Afterburner</div>
+      <div class="key-item"><kbd>Space</kbd> Fire 20mm Vulcan Cannon</div>
+      <div class="key-item"><kbd>F</kbd> Launch AIM-9 Missile</div>
+      <div class="key-item"><kbd>X</kbd> Deploy Countermeasure Flares</div>
+      <div class="key-item"><kbd>C</kbd> Toggle Cockpit / Chase Camera</div>
+      <div class="key-item"><kbd>P</kbd> Pause Mission</div>
+      <div class="key-item"><kbd>M</kbd> Mute Audio</div>
+    </div>
+
+    <!-- Warnings & Lock Alerts Overlay -->
+    <div id="hudWarningBox" class="hud-warning-box hidden">
+      <div id="hudWarningText" class="warning-text">STALL WARNING</div>
+    </div>
+
+    <!-- Mission Start / Game Over Modal -->
+    <div id="simModal" class="sim-modal">
+      <div class="modal-card">
+        <h1 class="tactical-title" id="modalTitle">ACE COMBAT VECTOR</h1>
+        <div class="tactical-sub">AIR COMBAT FLIGHT SIMULATION SYSTEM</div>
+        <p class="modal-desc" id="modalDesc">
+          Defend airspace against hostile fighter squadrons. Maintain aerodynamic energy, execute high-G turns, achieve missile lock, and eliminate all bogeys.
+        </p>
+        <button id="startSimBtn" class="tactical-btn">ENGAGE COMBAT [ENTER]</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="flight.js"></script>
+</body>
+</html>

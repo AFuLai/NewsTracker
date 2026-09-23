@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>SALAMANDER: LIFE FORCE - 沙羅曼蛇 豪華經典復刻版</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="gameContainer" class="game-container">
+    <!-- Main High-Definition Game Canvas -->
+    <canvas id="salamanderCanvas"></canvas>
+
+    <!-- Retro CRT Scanline & Phosphor Overlay -->
+    <div id="scanlineOverlay" class="scanline-overlay"></div>
+
+    <!-- Letterbox Bars for Boss Warning and Stage Transitions -->
+    <div id="cinematicBars" class="cinematic-bars hidden">
+      <div class="bar top"></div>
+      <div class="bar bottom"></div>
+    </div>
+
+    <!-- Toast Notification Banner -->
+    <div id="toastBanner" class="toast-banner">KONAMI CODE ACTIVATED! 30 LIVES & FULL ARSENAL!</div>
+
+    <!-- Top Arcade HUD -->
+    <header class="hud-top">
+      <div class="hud-group">
+        <div class="hud-badge">
+          <span class="hud-label">STAGE</span>
+          <span id="hudStage" class="hud-val cyan">ST-1: BIO-CELL [H]</span>
+        </div>
+        <div class="hud-badge">
+          <span class="hud-label">SHIP</span>
+          <span id="hudShipName" class="hud-val blue">VIC VIPER</span>
+        </div>
+        <div class="hud-badge">
+          <span class="hud-label">LIVES</span>
+          <span id="hudLives" class="hud-val red">&#9829; 3</span>
+        </div>
+      </div>
+
+      <div class="hud-group">
+        <div class="hud-badge">
+          <span class="hud-label">1P SCORE</span>
+          <span id="hudScore" class="hud-val gold">000000</span>
+        </div>
+        <div class="hud-badge">
+          <span class="hud-label">HIGH SCORE</span>
+          <span id="hudHighScore" class="hud-val orange">050000</span>
+        </div>
+      </div>
+
+      <div class="hud-group">
+        <button id="btnShipSwitch" class="hud-btn" title="切換機體 (Vic Viper / Lord British)">&#128640; 機體切換</button>
+        <button id="btnBloomToggle" class="hud-btn" title="切換高動態輝光 (G)">&#10024; 輝光 ON</button>
+        <button id="btnCrtToggle" class="hud-btn" title="切換 CRT 復古掃描線 (C)">&#128250; CRT ON</button>
+        <button id="btnAudioToggle" class="hud-btn" title="音效切換 (M)">&#128266;</button>
+        <button id="btnSaveMenu" class="hud-btn" title="5筆存檔/讀檔 (P/Esc)">&#128190; 存檔</button>
+        <button id="btnHelp" class="hud-btn" title="操作說明 (H)">&#10068;</button>
+      </div>
+    </header>
+
+    <!-- Weapon Power-Up Status Gauge -->
+    <div class="hud-weapon-gauge" id="hudWeaponGauge">
+      <div class="power-slot" id="slotSpeed"><span class="slot-name">SPEED</span><span class="slot-lvl" id="lvlSpeed">LV.0</span></div>
+      <div class="power-slot" id="slotMissile"><span class="slot-name">MISSILE</span><span class="slot-lvl" id="lvlMissile">OFF</span></div>
+      <div class="power-slot" id="slotRipple"><span class="slot-name">RIPPLE</span><span class="slot-lvl" id="lvlRipple">OFF</span></div>
+      <div class="power-slot" id="slotLaser"><span class="slot-name">LASER</span><span class="slot-lvl" id="lvlLaser">OFF</span></div>
+      <div class="power-slot" id="slotOption"><span class="slot-name">OPTION</span><span class="slot-lvl" id="lvlOption">x0</span></div>
+      <div class="power-slot" id="slotShield"><span class="slot-name">FORCE FIELD</span><span class="slot-lvl" id="lvlShield">OFF</span></div>
+    </div>
+
+    <!-- Boss Battle HUD & Red Warning Banner -->
+    <div id="bossHUD" class="boss-hud hidden">
+      <div class="warning-banner" id="bossWarningBanner">
+        <span class="warning-icon">&#9888;</span>
+        <span class="warning-text">WARNING!! A HUGE BATTLESHIP IS APPROACHING RAPIDLY</span>
+        <span class="warning-icon">&#9888;</span>
+      </div>
+      <div class="boss-info">
+        <span id="bossName" class="boss-name">&#9762; BRAIN GOLEM</span>
+        <span id="bossPhase" class="boss-phase">弱點：核心巨眼</span>
+      </div>
+      <div class="boss-hp-frame">
+        <div id="bossHpBar" class="boss-hp-bar" style="width: 100%;"></div>
+      </div>
+    </div>
+
+    <!-- Stage 6 Critical Escape Timer HUD -->
+    <div id="escapeHUD" class="escape-hud hidden">
+      <div class="escape-header">&#9889; CRITICAL CORE MELTDOWN - EMERGENCY COLLAPSE ESCAPE &#9889;</div>
+      <div class="escape-timer-box">
+        <span class="escape-label">GATE COLLAPSE:</span>
+        <span id="escapeTimerVal" class="escape-timer-val">30.0s</span>
+      </div>
+    </div>
+
+    <!-- Bottom Controls Hint Bar -->
+    <footer class="controls-bar">
+      <div class="control-item"><kbd>&uarr;</kbd><kbd>&darr;</kbd><kbd>&larr;</kbd><kbd>&rarr;</kbd> / <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 8向飛行移動</div>
+      <div class="control-item"><kbd>J</kbd> / <kbd>Space</kbd> / <kbd>滑鼠左鍵</kbd> 主武器開火</div>
+      <div class="control-item"><kbd>K</kbd> / <kbd>X</kbd> 貼地爬牆飛彈</div>
+      <div class="control-item"><kbd>L</kbd> 自動連發 (AUTO-FIRE)</div>
+      <div class="control-item"><kbd>1</kbd>~<kbd>6</kbd> 關卡快速跳轉 (測試用)</div>
+      <div class="control-item"><kbd>Konami Code</kbd> (&uarr;&uarr;&darr;&darr;&larr;&rarr;&larr;&rarr;BA) 30命+滿級武裝</div>
+    </footer>
+
+    <!-- Help & Story Modal -->
+    <div id="helpModal" class="modal-overlay hidden">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h2>&#128640; 沙羅曼蛇 (SALAMANDER / LIFE FORCE) - 經典簡介與操作</h2>
+          <button id="btnCloseHelp" class="modal-close-btn">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p>西元 2026 年，格拉迪烏斯恆星系再次面臨毀滅危機！殘暴的沙羅曼蛇（Bacterion 霸克特里安特遣軍團）吞噬了拉提斯行星（Planet Latis）。玩家操控藍白超時空戰鬥機 <strong>Vic Viper</strong> 或紅白雙聯翼戰機 <strong>Lord British</strong>，穿梭於有機細胞迷宮、烈焰太陽日冕與機械要塞深處，摧毀終極核心！</p>
+          <hr>
+          <h3>&#127918; 經典 6 大關卡（橫捲與直捲交替機制）</h3>
+          <ul class="stage-list-doc">
+            <li><strong>Stage 1 (橫向捲軸) 有機細胞與生物肉壁</strong>：擊破脈動胞囊，挑戰首腦 <em>Brain Golem</em> 雙手巨眼魔。</li>
+            <li><strong>Stage 2 (縱向捲軸) 小行星隕石帶與重巡洋艦</strong>：穿梭外太空艦隊，迎戰四爪旋轉雷射戰艦 <em>Tetran</em>。</li>
+            <li><strong>Stage 3 (橫向捲軸) 普羅米修斯之火</strong>：熾熱日冕突變火浪，對決不死傳奇火龍 <em>Intruder</em>。</li>
+            <li><strong>Stage 4 (縱向捲軸) 骨骸死谷與遠古化石</strong>：避開森然巨獸肋骨通道，消滅雙頭猛獁骨獸 <em>Tusker</em>。</li>
+            <li><strong>Stage 5 (橫向捲軸) 小行星神殿與巨石要塞</strong>：防禦力場方塊與激光神殿，迎擊戰艦核心 <em>Plate Core</em>。</li>
+            <li><strong>Stage 6 (縱向捲軸) 傑洛斯機械要塞與終極生命核心</strong>：摧毀 <em>Zelos Force</em> 生命核心，並在逃生閘門緊閉前展開極限高速逃脫！</li>
+          </ul>
+          <hr>
+          <h3>&#9889; 武裝系統與能量膠囊</h3>
+          <p>摧毀紅色編隊敵機或特定精英將掉落能量膠囊（Capsule），提供：</p>
+          <ul>
+            <li><strong>SPEED UP</strong>：提昇引擎飛行推力（至多 5 級）。</li>
+            <li><strong>MISSILE</strong>：對地/對空貼壁攀爬飛彈。</li>
+            <li><strong>RIPPLE LASER</strong>：隨飛行距離不斷擴大之圓環高頻能量波。</li>
+            <li><strong>LASER</strong>：高能貫通雷射光束，可切裂多重敵機。</li>
+            <li><strong>OPTION (子機)</strong>：至多 4 顆環繞能量光球，複製本體攻擊。</li>
+            <li><strong>FORCE FIELD (能量罩)</strong>：抵擋正面敵方直擊傷害。</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5-Slot Save / Load Modal -->
+    <div id="saveModal" class="modal-overlay hidden">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h2>&#128190; 任務記憶體 (5-Slot Save / Load System)</h2>
+          <button id="btnCloseSave" class="modal-close-btn">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p class="save-hint">可於任何關卡或 BOSS 戰即時保存進度、分數、武器配裝與殘機數。</p>
+          <div class="slots-container" id="slotsContainer">
+            <!-- Dynamically populated 5 slots -->
+          </div>
+          <div class="save-actions">
+            <button id="btnExportSave" class="hud-btn">&#128228; 匯出存檔 JSON</button>
+            <button id="btnImportSave" class="hud-btn">&#128229; 匯入存檔 JSON</button>
+            <input type="file" id="fileImportInput" accept=".json" style="display:none;">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Game Over / Victory Modal -->
+    <div id="endGameModal" class="modal-overlay hidden">
+      <div class="modal-card victory-card">
+        <div class="modal-header">
+          <h2 id="endGameTitle">&#127942; MISSION ACCOMPLISHED</h2>
+        </div>
+        <div class="modal-body">
+          <p id="endGameMessage">恭喜摧毀沙羅曼蛇終極核心，成功從要塞閘門逃脫！格拉迪烏斯恆星系重獲和平！</p>
+          <div class="stat-summary">
+            <div>最終得分: <span id="endFinalScore" class="gold">0</span></div>
+            <div>通關時間: <span id="endClearTime" class="cyan">00:00</span></div>
+            <div>綜合評價: <span id="endRankBadge" class="gold">RANK S</span></div>
+          </div>
+          <button id="btnRestartGame" class="restart-btn">&#128260; 再次啟航 (PLAY AGAIN)</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Virtual Touch Gamepad -->
+    <div id="touchControls" class="touch-controls hidden">
+      <div class="touch-dpad">
+        <button class="touch-btn dpad-up" data-key="ArrowUp">&#9650;</button>
+        <button class="touch-btn dpad-left" data-key="ArrowLeft">&#9664;</button>
+        <button class="touch-btn dpad-center">&#9679;</button>
+        <button class="touch-btn dpad-right" data-key="ArrowRight">&#9654;</button>
+        <button class="touch-btn dpad-down" data-key="ArrowDown">&#9660;</button>
+      </div>
+      <div class="touch-actions">
+        <button class="touch-btn action-fire" data-key="KeyJ">FIRE</button>
+        <button class="touch-btn action-missile" data-key="KeyK">MISSILE</button>
+        <button class="touch-btn action-auto" data-key="KeyL">AUTO</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="salamander.js"></script>
+</body>
+</html>

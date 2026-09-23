@@ -1,0 +1,33 @@
+{
+  "id": "CASE-MARIO-PIPE-001",
+  "mode": "implement",
+  "role": "writer",
+  "engine": "agy",
+  "tier": "T2",
+  "reasoning_effort": "medium",
+  "intent": "auto",
+  "root": "d:/Claude/Tool/Harness/cases/mario-pipe",
+  "prompt": "Implement a complete, zero-dependency, responsive HD Super Mario Bros Web Platformer with dedicated Pipe Mechanics (vertical crouch pipe entry, horizontal pipe sliding, pipe exit rise animation, underground bonus coin room warp, and subterranean exit return), animated Piranha Plant pipe emergence AI with safety proximity suppressors, authentic World 1-1 overworld level design with 4 distinct pipe elevations, sub-level coin vault, World 1-2 underground pipe maze with Warp Zone pipes, enhanced HD procedural textures (beveled metallic pipes with specular highlights, gradient brick relief, shimmering ? blocks, high-DPI sprites), Web Audio NES pipe warps and arpeggios, and a comprehensive headless Python regression test suite.",
+  "touch_allow": [
+    "index.html",
+    "style.css",
+    "mario_pipe.js",
+    "test_mario_pipe.py"
+  ],
+  "retry_policy": {
+    "max_retries": 2,
+    "tail_prune": true
+  },
+  "acceptance": [
+    {
+      "id": "ACC-MARIO-PIPE-01",
+      "argv": [
+        "python",
+        "cases/mario-pipe/test_mario_pipe.py"
+      ],
+      "expect": "OK"
+    }
+  ],
+  "timeout_s": 300,
+  "note": "Regression benchmark test case for Web Super Mario Bros with full pipe system, warp transitions, underground bonus caverns, Piranha Plant ecology, complete level design, and enhanced HD visuals."
+}

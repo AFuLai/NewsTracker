@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>SUPER MARIO 3D HD - 超級瑪莉 3D 豪華網頁版</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Three.js 3D Library (Local bundle with resilient fallback) -->
+  <script src="three.min.js"></script>
+  <script>
+    if (typeof THREE === 'undefined') {
+      document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"><\/script>');
+    }
+  </script>
+</head>
+<body>
+  <div id="gameContainer" class="game-container">
+    <!-- 3D Render Viewport -->
+    <canvas id="marioCanvas"></canvas>
+
+    <!-- Cinematic Widescreen Letterbox Bars -->
+    <div id="cinematicBars" class="cinematic-bars hidden">
+      <div class="bar top"></div>
+      <div class="bar bottom"></div>
+    </div>
+
+    <!-- Top Status HUD -->
+    <header class="hud-top">
+      <div class="hud-stat-group">
+        <div class="hud-badge world-badge">
+          <span class="hud-label">WORLD</span>
+          <span id="hudWorld" class="hud-val">1-1</span>
+        </div>
+        <div class="hud-badge stage-name-badge">
+          <span id="hudStageTitle" class="hud-sub">EMERALD STEPPES</span>
+        </div>
+      </div>
+
+      <div class="hud-stat-group center-stats">
+        <div class="hud-badge">
+          <span class="hud-label">SCORE</span>
+          <span id="hudScore" class="hud-val gold">000000</span>
+        </div>
+        <div class="hud-badge">
+          <span class="hud-label">COINS</span>
+          <span id="hudCoins" class="hud-val yellow">&times; 00</span>
+        </div>
+        <div class="hud-badge green-star-badge">
+          <span class="hud-label">POWER STARS</span>
+          <span id="hudStars" class="hud-val green-star">&#11088; 0/15</span>
+        </div>
+        <div class="hud-badge">
+          <span class="hud-label">LIVES</span>
+          <span id="hudLives" class="hud-val red">&times; 3</span>
+        </div>
+        <div class="hud-badge hp-badge">
+          <span class="hud-label">HP</span>
+          <div id="hudHearts" class="hearts-container">
+            <span class="heart active">&hearts;</span>
+            <span class="heart active">&hearts;</span>
+            <span class="heart active">&hearts;</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="hud-stat-group right-controls">
+        <div class="hud-badge power-badge">
+          <span class="hud-label">FORM</span>
+          <span id="hudForm" class="hud-val cyan">SMALL</span>
+        </div>
+        <button id="btnCameraMode" class="hud-btn cam-btn" title="切換視角模式 (V)">&#128247; 追蹤視角</button>
+        <button id="btnAudioToggle" class="hud-btn" title="靜音 / 開啟音效 (M)">&#128266;</button>
+        <button id="btnHelp" class="hud-btn" title="操作指南 (H)">&#10068;</button>
+        <button id="btnSaveLoadMenu" class="hud-btn highlight" title="5筆存檔/讀檔 (P/Esc)">&#128190; 存檔/讀檔</button>
+      </div>
+    </header>
+
+    <!-- Bowser Boss Health Bar (World 1-5 Dynamic Battle HUD) -->
+    <div id="bossBattleHUD" class="boss-battle-hud hidden">
+      <div class="boss-header">
+        <span class="boss-icon">&#128050;</span>
+        <span class="boss-title">庫巴大魔王 (KING BOWSER)</span>
+        <span id="bossPhaseLabel" class="boss-phase-badge">PHASE 1: 烈焰噴吐</span>
+      </div>
+      <div class="boss-hp-frame">
+        <div id="bossHpFill" class="boss-hp-fill" style="width: 100%;"></div>
+      </div>
+    </div>
+
+    <!-- Bottom Controls & Hints Overlay -->
+    <div id="controlsHint" class="controls-hint-bar">
+      <span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 3D奔馳</span>
+      <span><kbd>Space</kbd> 跳躍/空中騰空</span>
+      <span><kbd>Shift</kbd> 衝刺 / <kbd>滑鼠左鍵</kbd> 火球</span>
+      <span><kbd>C</kbd> 下蹲 / 進入水管世界</span>
+      <span><kbd>V</kbd> 切換視角 (追蹤/Boss鎖定/45&deg;等角)</span>
+      <span><kbd>滑鼠拖曳</kbd> 環形視角</span>
+      <span><kbd>滾輪</kbd> 縮放</span>
+      <span><kbd>E</kbd> 對話/機關</span>
+      <span><kbd>P</kbd>/<kbd>Esc</kbd> 存檔讀檔</span>
+    </div>
+
+    <!-- Crosshair / Pointer Lock Prompt -->
+    <div id="pointerPrompt" class="pointer-prompt">點擊畫面啟用滑鼠 360&deg; 自由視角 (按 ESC 釋放)</div>
+
+    <!-- RPG Story Dialogue Box -->
+    <div id="dialogOverlay" class="dialog-overlay hidden">
+      <div class="dialog-box">
+        <div class="dialog-speaker-frame">
+          <div id="dialogAvatar" class="dialog-avatar toad"></div>
+          <span id="dialogSpeaker" class="speaker-name">奇諾比奧 (Toad)</span>
+        </div>
+        <div class="dialog-content">
+          <p id="dialogText" class="dialog-text">瑪莉歐！大事不好了！庫巴出動了空中艦隊襲擊城堡，將碧姬公主擄走到終極熔岩城堡了！請一定要救回公主！</p>
+          <div class="dialog-footer">
+            <span class="dialog-key-hint">按 <kbd>Space</kbd> / <kbd>E</kbd> 或點擊滑鼠繼續 &blacktriangleright;</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5-Slot Save / Load Modal -->
+    <div id="saveLoadModal" class="modal-backdrop hidden">
+      <div class="modal-card save-modal">
+        <div class="modal-header">
+          <h2>&#128190; 冒險紀錄金庫 (最多 5 筆進度存檔)</h2>
+          <button id="btnCloseSaveModal" class="btn-close">&times;</button>
+        </div>
+        <div class="modal-subtitle">完整紀錄世界進度、15顆綠色力量之星、金幣、總得分與瑪莉歐超能型態！</div>
+
+        <div id="slotsContainer" class="slots-container">
+          <!-- 5 slots will be generated by JS -->
+        </div>
+
+        <div class="modal-footer">
+          <button id="btnQuickSave" class="action-btn primary">&#128190; 快速存檔至第 1 槽</button>
+          <button id="btnResumeGame" class="action-btn secondary">回到冒險</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Control Guide Help Modal -->
+    <div id="helpModal" class="modal-backdrop hidden">
+      <div class="modal-card help-modal">
+        <div class="modal-header">
+          <h2>&#127918; 超級瑪莉 3D 豪華版 操作指南</h2>
+          <button id="btnCloseHelpModal" class="btn-close">&times;</button>
+        </div>
+        <div class="help-grid">
+          <div class="help-col">
+            <h3>&#9000; 鍵盤操作 (常見 3D 動作配置)</h3>
+            <ul>
+              <li><kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> 或方向鍵：360 度平面自由奔馳</li>
+              <li><kbd>Space</kbd>：跳躍；起跳後於空中再次按下可短暫騰空滯空</li>
+              <li><kbd>Shift</kbd> 或 <kbd>J</kbd>：高速衝刺 / (火焰瑪莉歐) 發射 3D 彈跳火球</li>
+              <li><kbd>C</kbd> 或 <kbd>Ctrl</kbd>：下蹲 / (空中時) 迅速向下臀部撞擊 (Ground Pound) 破壞障礙物與踩踏金幣</li>
+              <li><kbd>V</kbd>：切換 4 種視角（自由追蹤 / Boss戰對戰鎖定 / 45&deg;等角立體 / 電影特寫）</li>
+              <li><kbd>Q</kbd> / <kbd>E</kbd>：向左/向右旋轉視角相機</li>
+              <li><kbd>E</kbd> / <kbd>Enter</kbd>：觸發機關、推進劇情對話</li>
+              <li><kbd>P</kbd> / <kbd>Esc</kbd>：開啟 5 筆存檔讀檔選單</li>
+            </ul>
+          </div>
+          <div class="help-col">
+            <h3>&#128433; 滑鼠操作</h3>
+            <ul>
+              <li><strong>滑鼠移動</strong>：環繞瑪莉歐 360 度自由旋轉視角</li>
+              <li><strong>滑鼠左鍵</strong>：確認對話 / 施放火球攻擊 / 互動</li>
+              <li><strong>滑鼠右鍵拖曳</strong>：手動環形平移鏡頭視角</li>
+              <li><strong>滾輪滾動</strong>：拉近或拉遠相機距離 (Zoom In / Out)</li>
+            </ul>
+            <h3>&#11088; 5 大關卡與全破要素</h3>
+            <ul>
+              <li><strong>World 1</strong>：碧綠平原與瀑布丘陵 (Emerald Steppes)</li>
+              <li><strong>World 2</strong>：晶石地下迷宮 (Luminescent Crystal Caverns)</li>
+              <li><strong>World 3</strong>：烈日流沙與金字塔遺跡 (Sunken Pyramid & Dunes)</li>
+              <li><strong>World 4</strong>：浮雲天界與風之飛空艇 (Cumulus Clouds & Airship)</li>
+              <li><strong>World 5</strong>：庫巴熔岩堡壘與二階段決戰 (Bowser's Molten Citadel)</li>
+              <li><strong>收集要素</strong>：每關隱藏 3 顆綠色力量之星，全遊戲共 15 顆！</li>
+            </ul>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button id="btnCloseHelpBtn" class="action-btn primary">整裝出發，拯救碧姬公主！</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Victory / Ending Screen -->
+    <div id="victoryModal" class="modal-backdrop hidden">
+      <div class="modal-card victory-modal">
+        <div class="victory-crown">&#128081;</div>
+        <h1 class="victory-title">冒險大勝利！碧姬公主平安獲救！</h1>
+        <div class="ending-story-box">
+          <p id="endingText">
+            庫巴在二階段猛烈攻勢下，終被瑪莉歐切斷吊橋開關，慘摔入熾熱熔岩深淵中！<br>
+            碧姬公主成功從王座被解救，蘑菇王國重新迎來了燦爛陽光！<br>
+            「謝謝你，超級瑪莉歐！我為你烘烤了最香甜的草莓鮮奶油蛋糕，我們一起回城堡慶祝吧！」
+          </p>
+        </div>
+        <div class="ending-stats">
+          <div class="stat-pill"><span class="label">最終得分:</span> <span id="endScore" class="val">0</span></div>
+          <div class="stat-pill"><span class="label">收集金幣:</span> <span id="endCoins" class="val">0</span></div>
+          <div class="stat-pill"><span class="label">力量綠星:</span> <span id="endStars" class="val">0/15</span></div>
+          <div class="stat-pill"><span class="label">剩餘生命:</span> <span id="endLives" class="val">3</span></div>
+        </div>
+        <div class="modal-footer center">
+          <button id="btnPlayAgain" class="action-btn victory">&#127942; 再次展開冒險</button>
+          <button id="btnOpenSaveFromVictory" class="action-btn secondary">&#128190; 存檔至 5 筆紀錄槽</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Game Over Modal -->
+    <div id="gameOverModal" class="modal-backdrop hidden">
+      <div class="modal-card gameover-modal">
+        <h1 class="gameover-title">&#128128; GAME OVER</h1>
+        <p>瑪莉歐耗盡了所有的勇氣與生命……但蘑菇王國的希望之火永不熄滅！</p>
+        <div class="modal-footer center">
+          <button id="btnRetryLevel" class="action-btn primary">&#8635; 重新挑戰本關卡</button>
+          <button id="btnLoadSaveFromGameOver" class="action-btn secondary">&#128190; 讀取 5 筆進度存檔</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="mario3d.js"></script>
+</body>
+</html>

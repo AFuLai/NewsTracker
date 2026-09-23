@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>SUPER MARIO BROS HD: WARP PIPE ENGINE & ALL-STARS REMASTER</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- CRT Scanlines Overlay -->
+  <div id="crtOverlay" class="crt-scanlines"></div>
+
+  <div class="arcade-cabinet">
+    <!-- Top HUD Bar -->
+    <header class="nes-hud">
+      <div class="hud-col">
+        <span class="hud-label">MARIO</span>
+        <span class="hud-val" id="hudScore">000000</span>
+      </div>
+      <div class="hud-col">
+        <span class="hud-label">COINS</span>
+        <span class="hud-val"><span class="coin-icon">&#9679;</span>x<span id="hudCoins">00</span></span>
+      </div>
+      <div class="hud-col">
+        <span class="hud-label">WORLD</span>
+        <span class="hud-val" id="hudWorld">1-1</span>
+      </div>
+      <div class="hud-col">
+        <span class="hud-label">PIPE STATE</span>
+        <span class="hud-val val-pipe" id="hudPipeState">IDLE</span>
+      </div>
+      <div class="hud-col">
+        <span class="hud-label">POWER</span>
+        <span class="hud-val val-power" id="hudPower">SMALL</span>
+      </div>
+      <div class="hud-col">
+        <span class="hud-label">TIME</span>
+        <span class="hud-val" id="hudTime">400</span>
+      </div>
+      <div class="hud-col">
+        <span class="hud-label">LIVES</span>
+        <span class="hud-val" id="hudLives">&times; 3</span>
+      </div>
+    </header>
+
+    <!-- World Quick Select & Utility Bar -->
+    <div class="world-select-bar">
+      <span class="ws-label">STAGE:</span>
+      <button class="ws-btn active" id="btnW11">1-1 OVERWORLD</button>
+      <button class="ws-btn" id="btnW11Sub">1-1 SUB BONUS</button>
+      <button class="ws-btn" id="btnW12">1-2 UNDERGROUND</button>
+      <button class="ws-btn" id="btnW13">1-3 TREETOP</button>
+      <button class="ws-btn" id="btnW14">1-4 CASTLE</button>
+      <button class="ws-btn" id="btnSandbox">PIPE SHOWCASE</button>
+      
+      <div class="toolbar-controls">
+        <button class="tool-btn" id="btnScanline">CRT: ON</button>
+        <button class="tool-btn" id="btnAudio">AUDIO: ON</button>
+      </div>
+    </div>
+
+    <!-- Main Game Viewport Canvas -->
+    <main class="canvas-viewport">
+      <canvas id="marioCanvas" width="800" height="480"></canvas>
+
+      <!-- Overlay Screen (Title / Game Over / Stage Clear / Bowser Defeated) -->
+      <div id="marioOverlay" class="overlay">
+        <div class="overlay-box">
+          <h1 id="overlayTitle" class="retro-title">SUPER MARIO HD</h1>
+          <p id="overlaySub" class="retro-sub">WARP PIPE ENGINE & 16-BIT REMASTER</p>
+          <div class="key-guide">
+            <div><kbd>&larr;</kbd> <kbd>&rarr;</kbd> / <kbd>A</kbd> <kbd>D</kbd> : Walk / Run Sprint</div>
+            <div><kbd>Space</kbd> / <kbd>W</kbd> / <kbd>K</kbd> : Jump (Hold for high trajectory)</div>
+            <div><kbd>Shift</kbd> / <kbd>J</kbd> : Dash / Fireball (Fire Mario)</div>
+            <div><kbd>&darr;</kbd> / <kbd>S</kbd> : <span class="pipe-highlight">Crouch / Enter Warp Pipe (Down)</span></div>
+            <div><kbd>&rarr;</kbd> / <kbd>D</kbd> : <span class="pipe-highlight">Enter Side Wall Pipe (Right)</span></div>
+            <div><kbd>P</kbd> : Pause / <kbd>M</kbd> : Mute Audio</div>
+          </div>
+          <button id="startBtn" class="nes-btn">ENTER ADVENTURE</button>
+        </div>
+      </div>
+    </main>
+
+    <!-- Mobile Virtual Gamepad -->
+    <div class="mobile-controls">
+      <div class="dpad">
+        <button class="dbtn" id="mBtnLeft">&larr;</button>
+        <button class="dbtn dbtn-pipe" id="mBtnDown" title="Crouch / Enter Pipe">&darr;</button>
+        <button class="dbtn" id="mBtnRight">&rarr;</button>
+      </div>
+      <div class="actions">
+        <button class="abtn btn-b" id="mBtnRun">B (FIRE/RUN)</button>
+        <button class="abtn btn-a" id="mBtnJump">A (JUMP)</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="mario_pipe.js"></script>
+</body>
+</html>

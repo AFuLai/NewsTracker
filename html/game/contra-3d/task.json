@@ -1,0 +1,33 @@
+{
+  "id": "CASE-CONTRA3D-001",
+  "mode": "implement",
+  "role": "writer",
+  "engine": "agy",
+  "tier": "T2",
+  "reasoning_effort": "medium",
+  "intent": "auto",
+  "root": "d:/Claude/Tool/Harness/cases/contra-3d",
+  "prompt": "Implement a full 3D Web Contra Remake (Galuga Alien Incursion) featuring high-resolution procedural 3D modeling (Bill Rizer, Lance Bean, Red Falcon infantry, automated rotating turrets, defense wall core, and alien heart boss), rich procedural environment textures (jungle cliffs, animated waterfall spray, sci-fi fortress steel, and pulsating organic alien flesh), multi-angle dynamic director camera scripting (2.5D side run-and-gun, 3D over-the-shoulder base corridor, tactical isometric, and dynamic boss cinematic action cam), complete 8-stage 1987 lore storyline progression, 8-way directional aiming, full weapon arsenal (Normal, Machine Gun, Spread Gun 5-way blast, Laser beam, Flame vortex, Barrier shield), Konami 30-lives code cheat detection, 5-slot save/load progress management system, Web Audio chiptune synthesizer, and headless unit regression test suite.",
+  "touch_allow": [
+    "index.html",
+    "style.css",
+    "contra3d.js",
+    "test_contra3d.py"
+  ],
+  "retry_policy": {
+    "max_retries": 2,
+    "tail_prune": true
+  },
+  "acceptance": [
+    {
+      "id": "ACC-CONTRA3D-01",
+      "argv": [
+        "python",
+        "cases/contra-3d/test_contra3d.py"
+      ],
+      "expect": "OK"
+    }
+  ],
+  "timeout_s": 300,
+  "note": "Regression benchmark test case for 3D Web Contra Remake featuring high-res 3D modeling, rich procedural textures, multi-angle director camera system, 8-stage Galuga narrative lore, special weapons arsenal, Konami code, 5-slot save system, and headless test probes."
+}

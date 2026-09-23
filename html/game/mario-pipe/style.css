@@ -1,0 +1,387 @@
+/* Super Mario Bros HD: Pipe Engine & Level Design - 16-Bit All-Stars Remaster CSS */
+:root {
+  --nes-sky: #5c94fc;       /* Classic Overworld Sky Blue */
+  --nes-dark: #000000;
+  --nes-white: #fcfcfc;
+  --nes-gold: #fca044;
+  --nes-green: #00a800;
+  --nes-pipe-light: #58f898;
+  --nes-pipe-mid: #00a800;
+  --nes-pipe-dark: #005000;
+  --nes-red: #d82800;
+  --nes-cyan: #00f0ff;
+  --nes-blue-stone: #003888;
+  --font-retro: 'Courier New', 'Consolas', 'Courier', monospace;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+body {
+  background: radial-gradient(circle at 50% 30%, #1a1a2e 0%, #0d0d15 70%, #050508 100%);
+  color: var(--nes-white);
+  font-family: var(--font-retro);
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+/* Optional CRT Scanline and Bezel Bloom Effect */
+.crt-scanlines {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+  background-size: 100% 4px;
+  pointer-events: none;
+  z-index: 50;
+  opacity: 0.8;
+  transition: opacity 0.3s;
+}
+
+.crt-scanlines.off {
+  opacity: 0;
+}
+
+.arcade-cabinet {
+  position: relative;
+  background: #111116;
+  border: 4px solid #333344;
+  border-radius: 12px;
+  box-shadow: 0 0 50px rgba(0, 0, 0, 0.95), 0 0 20px rgba(0, 168, 0, 0.25), inset 0 0 15px rgba(255, 255, 255, 0.05);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px;
+  max-width: 860px;
+  width: 100%;
+}
+
+/* NES Top HUD Bar */
+.nes-hud {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #000000;
+  padding: 8px 16px;
+  border-bottom: 3px solid #222233;
+  font-size: 0.85rem;
+  font-weight: bold;
+  letter-spacing: 2px;
+}
+
+.hud-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.hud-label {
+  color: #888899;
+  font-size: 0.68rem;
+  margin-bottom: 2px;
+}
+
+.hud-val {
+  color: var(--nes-white);
+  font-size: 0.95rem;
+  text-shadow: 2px 2px 0 #000;
+}
+
+.val-power {
+  color: var(--nes-gold);
+}
+
+.val-pipe {
+  color: var(--nes-pipe-light);
+}
+
+.coin-icon {
+  color: var(--nes-gold);
+  margin-right: 2px;
+  display: inline-block;
+  animation: coinSpin 1.2s infinite steps(4);
+}
+
+@keyframes coinSpin {
+  0% { transform: scaleX(1); }
+  50% { transform: scaleX(0.2); }
+  100% { transform: scaleX(1); }
+}
+
+/* World Select Bar */
+.world-select-bar {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 6px;
+  background: #181822;
+  padding: 6px 12px;
+  border-bottom: 2px solid #28283a;
+  overflow-x: auto;
+}
+
+.ws-label {
+  font-size: 0.72rem;
+  color: var(--nes-gold);
+  font-weight: bold;
+  white-space: nowrap;
+  margin-right: 4px;
+}
+
+.ws-btn {
+  background: #242436;
+  border: 1px solid #44445e;
+  color: #aaaacc;
+  font-family: var(--font-retro);
+  font-size: 0.72rem;
+  padding: 4px 8px;
+  cursor: pointer;
+  border-radius: 3px;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.ws-btn:hover {
+  background: #383852;
+  color: #fff;
+  border-color: var(--nes-pipe-light);
+}
+
+.ws-btn.active {
+  background: #008822;
+  color: #fff;
+  border-color: var(--nes-pipe-light);
+  box-shadow: 0 0 8px rgba(88, 248, 152, 0.5);
+}
+
+.toolbar-controls {
+  margin-left: auto;
+  display: flex;
+  gap: 6px;
+}
+
+.tool-btn {
+  background: #222230;
+  border: 1px solid #555566;
+  color: #cccccc;
+  font-family: var(--font-retro);
+  font-size: 0.7rem;
+  padding: 4px 8px;
+  cursor: pointer;
+  border-radius: 3px;
+}
+
+.tool-btn:hover {
+  background: #444455;
+  color: #ffffff;
+}
+
+/* Canvas Viewport */
+.canvas-viewport {
+  position: relative;
+  width: 800px;
+  height: 480px;
+  background: #000;
+  overflow: hidden;
+  border: 2px solid #1a1a24;
+}
+
+#marioCanvas {
+  display: block;
+  width: 800px;
+  height: 480px;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+/* Overlay Screen */
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+  transition: opacity 0.2s ease;
+}
+
+.overlay.hidden {
+  display: none;
+}
+
+.overlay-box {
+  background: #14141e;
+  border: 4px solid var(--nes-pipe-light);
+  box-shadow: 0 0 30px rgba(0, 168, 0, 0.4);
+  padding: 24px 32px;
+  text-align: center;
+  border-radius: 8px;
+  max-width: 620px;
+  width: 90%;
+}
+
+.retro-title {
+  color: var(--nes-red);
+  font-size: 1.8rem;
+  letter-spacing: 3px;
+  text-shadow: 3px 3px 0 #000, 0 0 15px rgba(216, 40, 0, 0.6);
+  margin-bottom: 6px;
+}
+
+.retro-sub {
+  color: var(--nes-gold);
+  font-size: 0.95rem;
+  letter-spacing: 1.5px;
+  margin-bottom: 18px;
+}
+
+.key-guide {
+  text-align: left;
+  background: #0a0a10;
+  border: 1px solid #333344;
+  padding: 12px 16px;
+  border-radius: 4px;
+  font-size: 0.82rem;
+  line-height: 1.8;
+  margin-bottom: 18px;
+}
+
+.key-guide kbd {
+  background: #2a2a3c;
+  color: var(--nes-pipe-light);
+  border: 1px solid #555577;
+  border-radius: 3px;
+  padding: 2px 6px;
+  font-weight: bold;
+}
+
+.pipe-highlight {
+  color: var(--nes-pipe-light);
+  font-weight: bold;
+}
+
+.nes-btn {
+  background: var(--nes-green);
+  color: #ffffff;
+  border: 2px solid var(--nes-pipe-light);
+  padding: 10px 24px;
+  font-family: var(--font-retro);
+  font-size: 1.05rem;
+  font-weight: bold;
+  letter-spacing: 2px;
+  cursor: pointer;
+  border-radius: 4px;
+  box-shadow: 0 4px 0 #005500;
+  transition: all 0.1s ease;
+}
+
+.nes-btn:hover {
+  background: #00cc00;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 0 #005500, 0 0 15px rgba(0, 204, 0, 0.6);
+}
+
+.nes-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 #005500;
+}
+
+/* Mobile Virtual Controls */
+.mobile-controls {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  padding: 10px 16px 4px 16px;
+}
+
+.dpad {
+  display: flex;
+  gap: 8px;
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+}
+
+.dbtn, .abtn {
+  background: #20202e;
+  border: 2px solid #444460;
+  color: #ffffff;
+  font-family: var(--font-retro);
+  font-size: 1rem;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: all 0.1s;
+}
+
+.dbtn {
+  width: 50px;
+  height: 44px;
+}
+
+.dbtn-pipe {
+  background: #005522;
+  border-color: var(--nes-pipe-light);
+  color: var(--nes-pipe-light);
+}
+
+.abtn {
+  padding: 0 18px;
+  height: 44px;
+  font-size: 0.85rem;
+}
+
+.btn-b {
+  background: #882200;
+  border-color: #ff6644;
+}
+
+.btn-a {
+  background: #0066aa;
+  border-color: #44bbff;
+}
+
+.dbtn:active, .abtn:active {
+  filter: brightness(1.3);
+  transform: scale(0.95);
+}
+
+@media (max-width: 860px) {
+  .arcade-cabinet {
+    width: 100vw;
+    height: 100vh;
+    border-radius: 0;
+    border: none;
+    padding: 0;
+  }
+  .canvas-viewport {
+    width: 100%;
+    height: calc(100vw * (480 / 800));
+    max-height: 70vh;
+  }
+  #marioCanvas {
+    width: 100%;
+    height: 100%;
+  }
+}
