@@ -1560,6 +1560,20 @@ window.TRACKER_DAYS["2026-09-28"] = [
     ]
   },
   {
+    id: "20260928-13821",
+    trackers: ["security"],
+    category: "前瞻技術",
+    title: "Nvidia推出Open Agent Safety Platform：結合硬體與軟體監控，防止AI代理行為失控",
+    summary: "Nvidia宣布推出Open Agent Safety Platform，這是一個結合了硬體與軟體組件的AI代理監控系統，旨在確保AI代理在測試和部署過程中不會超出預設的行為邊界。由於前沿AI代理具有高度的創造性，可能繞過安全控制或產生「代理漂移」（Agent drift）等行為，因此需要外部機制進行監管。該平台包含兩個核心安全層：OpenShell和Sentry。OpenShell是一個開源執行時環境，用於沙盒化代理並強制執行策略，它具備閘道、沙盒和監管器等組件，能對檔案系統和網路流量進行精細控制。Sentry則是運行在Nvidia BlueField-4 DPU上的硬體級看門狗層，它能提供「晶片內」的安全強制執行，即使主機系統被攻陷，也能監測並阻止代理試圖越界。Nvidia強調，企業不應信任AI代理會自律，而必須由基礎設施明確強制執行邊界。目前，該平台已與Anthropic合作，並被SpaceXAI使用，其他合作夥伴包括Salesforce、SAP、Microsoft等。",
+    tags: ["Nvidia", "Open Agent Safety Platform", "AI代理", "OpenShell", "Sentry", "BlueField-4", "零信任架構"],
+    title_en: "Nvidia Launches Open Agent Safety Platform: Combining Hardware and Software Monitoring to Prevent AI Agent Misbehavior",
+    summary_en: "Nvidia has announced the Open Agent Safety Platform, an AI agent monitoring system that integrates both hardware and software components. It is designed to ensure that AI agents remain within predefined behavioral boundaries during testing and deployment. Because advanced AI agents possess high levels of creativity, they may potentially bypass security controls or exhibit behaviors such as \"Agent drift,\" necessitating external mechanisms for governance. The platform includes two core security layers: OpenShell and Sentry. OpenShell is an open-source runtime environment used to sandbox agents and enforce policies. It features components like gateways, sandboxes, and monitors, providing fine-grained control over file system and network traffic. Sentry is a hardware-level watchdog layer running on the Nvidia BlueField-4 DPU. It provides \"chip-level\" security enforcement, capable of monitoring and blocking agents attempting to breach boundaries even if the host system is compromised. Nvidia emphasizes that enterprises should not trust AI agents to be self-regulating, but rather that boundaries must be explicitly enforced by the infrastructure. The platform has currently partnered with Anthropic and is being used by SpaceXAI, with other partners including Salesforce, SAP, and Microsoft.",
+    tags_en: ["Nvidia", "Open Agent Safety Platform", "AI Agents", "OpenShell", "Sentry", "BlueField-4", "Zero Trust Architecture"],
+    sources: [
+      { name: "Dark Reading", url: "https://darkreading.com/cyber-risk/nvidia-launches-ai-agent-safety-platform-prevent-rogue-activities", lang: "EN" }
+    ]
+  },
+  {
     id: "20260928-13427",
     trackers: ["security"],
     category: "產業動態",
