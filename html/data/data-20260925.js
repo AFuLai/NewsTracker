@@ -212,6 +212,426 @@ window.TRACKER_DAYS["2026-09-25"] = [
     ]
   },
   {
+    id: "20260925-14202",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心修復 mptcp 模組的計數器錯誤，避免資料傳輸不匹配問題",
+    summary: "本修復針對 Linux 核心中的 mptcp 模組，修正了 `__mptcp_subflow_push_pending()` 函數可能出現的計數錯誤。當此函數發生錯誤時，原先的程式碼可能會錯誤地更新複製的位元組計數器，進而導致後續的資料推送（push call）時出現不匹配的狀態。此類計數器管理錯誤可能影響網路連線的穩定性與資料傳輸的準確性。修補的目的是確保在 `__mptcp_subflow_push_pending()` 失敗時，不會誤觸更新位元組計數器，從而維持系統資料流的完整性。建議所有使用 Linux 核心的系統管理員應留意核心更新，以確保系統運行在修復了此類計數器邏輯錯誤的最新版本。",
+    tags: ["Linux 核心", "mptcp", "CVE-2026-97522", "網路協議", "核心修復"],
+    title_en: "Linux Kernel Fixes Counter Error in mptcp Module to Prevent Data Transfer Mismatch",
+    summary_en: "This fix addresses the mptcp module within the Linux kernel, correcting a potential counter error in the `__mptcp_subflow_push_pending()` function. When this function encounters an error, the original code might incorrectly update the copied byte counter, leading to a mismatch state during subsequent data pushes (push calls). Such counter management errors can affect network connection stability and data transfer accuracy. The patch aims to ensure that when `__mptcp_subflow_push_pending()` fails, the byte counter is not erroneously updated, thereby maintaining the integrity of the system's data flow. System administrators using Linux kernels are advised to monitor kernel updates to ensure their systems are running the latest version with this counter logic error corrected.",
+    tags_en: ["Linux Kernel", "mptcp", "CVE-2026-97522", "Networking Protocol", "Kernel Fix"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-97522", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260925-14203",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心 mptcp 模組修復競態條件漏洞，防止資料傳輸失敗與計算錯誤",
+    summary: "本漏洞存在於 Linux 核心的 mptcp 模組中，涉及行程排程器（scheduler）與子流（subflow）Socket 狀態變更之間的競態條件（race condition）。當發生此競態時，選定的 Socket 進行資料傳輸可能會失敗，而後續的釋放操作（release）可能會嘗試使用 `mss_now` 將值重設為 0 進行除法運算，從而導致系統不穩定或功能異常。開發者已透過明確檢查關鍵情境來修復此問題。此修補旨在確保 mptcp 模組在處理複雜的網路狀態轉換時，能夠正確同步排程與 Socket 狀態，確保資料傳輸的可靠性。建議系統管理員應升級至修復了此漏洞的 Linux 核心版本，以避免潛在的資料傳輸失敗和計算錯誤。",
+    tags: ["Linux 核心", "mptcp", "競態條件", "Scheduler", "網路協定", "CVE-2026-97523"],
+    title_en: "Linux Kernel mptcp Module Fixes Race Condition Vulnerability, Preventing Data Transfer Failures and Calculation Errors",
+    summary_en: "This vulnerability resides in the Linux kernel's mptcp module, involving a race condition between the process scheduler and subflow Socket state changes. When this race condition occurs, data transfer on the selected Socket may fail, and subsequent release operations might attempt to use `mss_now` to reset the value to 0 for division, potentially leading to system instability or functional anomalies. Developers have fixed this issue by explicitly checking critical scenarios. This patch aims to ensure that the mptcp module correctly synchronizes scheduling and Socket state when handling complex network state transitions, thereby ensuring reliable data transfer. System administrators are advised to upgrade to a Linux kernel version that includes this fix to avoid potential data transfer failures and calculation errors.",
+    tags_en: ["Linux Kernel", "mptcp", "Race Condition", "Scheduler", "Networking Protocol", "CVE-2026-97523"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-97523", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260925-14204",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心修補：mptcp 接收路徑潛在遞迴呼叫漏洞修復",
+    summary: "本修補針對 Linux 核心中的 mptcp 模組，解決了在極端錯誤條件下，mptcp 接收路徑（receive path）可能發生遞迴呼叫（recursively call）mptcp_data_ready() 的問題。當發生這種情況時，系統可能會嘗試再次持有資料鎖（data lock），導致不必要的處理和潛在的系統不穩定性。修補內容主要包括：明確檢查異常條件以打破遞迴迴圈；新增一個旗標（flag）取代使用現有的 'closing' 旗標，以便在 subflow_state_change() 中能提前退出；並在重置（reset）時間明確清空接收佇列（RX queue）。此修補旨在避免對一個正在失效的子流（subflow）執行不必要的資料可用性檢查，例如呼叫 get_mapping_status()，從而提升系統的穩定性和效率。此為核心層面的安全與穩定性修補。",
+    tags: ["Linux 核心", "mptcp", "遞迴呼叫", "核心修補", "網路堆疊"],
+    title_en: "Linux Kernel Patch: Fix for Potential Recursive Call Vulnerability in mptcp Receive Path",
+    summary_en: "This patch addresses the mptcp module within the Linux kernel, resolving an issue where the mptcp receive path could potentially recursively call mptcp_data_ready() under extreme error conditions. When this occurs, the system might attempt to re-acquire the data lock, leading to unnecessary processing and potential system instability. The patch includes several key changes: explicitly checking for abnormal conditions to break the recursive loop; introducing a new flag to replace the existing 'closing' flag, allowing for early exit within subflow_state_change(); and explicitly clearing the receive queue (RX queue) during reset. This fix aims to prevent unnecessary data availability checks, such as calling get_mapping_status(), on a subflow that is already failing, thereby enhancing system stability and efficiency. This is a core-level security and stability patch.",
+    tags_en: ["Linux Kernel", "mptcp", "Recursive Call", "Kernel Patch", "Network Stack"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-97524", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260925-14205",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心漏洞：x86/mm/pat 分配的頁表未正確標記為核心頁表，可能導致 IOTLB 殘留資料",
+    summary: "本漏洞存在於 Linux 核心的 x86/mm/pat 模組中，當程式碼執行 `__split_large_page()` 進行分割大頁時，會直接分配 PTE（頁表項目），而沒有經過標準的頁表分配例程（如 `pte_alloc_one_kernel()`）。這導致分配的頁表無法正確呼叫頁表構造函數，也無法被標記為核心頁表（kernel page table）。更嚴重的是，由於核心頁表釋放機制（自 `5ba2f0a15564` commit 後）已經批次化，且 IOTLB 快取已在釋放時失效，因此未經標準流程釋放的頁表，可能導致 IOTLB 中存在過時（stale）的條目。修復方法是強制在分割頁表時使用標準的 PTE 分配 API，確保頁表能正確呼叫構造函數，並透過 `pagetable_free_kernel()` 進行釋放，確保頁表狀態的正確性。",
+    tags: ["Linux 核心", "x86/mm/pat", "PTE", "IOTLB", "核心漏洞", "Linux 核心"],
+    title_en: "Linux Kernel Vulnerability: PTEs Allocated by x86/mm/pat May Not Be Correctly Marked as Kernel Page Tables, Potentially Leading to IOTLB Stale Data",
+    summary_en: "This vulnerability resides in the x86/mm/pat module of the Linux kernel. When the code executes `__split_large_page()` to split large pages, it directly allocates PTEs (Page Table Entries) without going through the standard page table allocation routine (such as `pte_alloc_one_kernel()`). This results in the allocated page tables being unable to correctly call the page table constructor, and they cannot be marked as kernel page tables. More critically, because the kernel page table release mechanism has been batched (since the `5ba2f0a15564` commit) and the IOTLB cache is invalidated during release, page tables not released through the standard process may cause stale entries to persist in the IOTLB. The fix requires mandating the use of the standard PTE allocation API when splitting page tables, ensuring the page tables correctly call the constructor, and using `pagetable_free_kernel()` for release, thereby guaranteeing the correct state of the page tables.",
+    tags_en: ["Linux Kernel", "x86/mm/pat", "PTE", "IOTLB", "Kernel Vulnerability", "Linux Kernel"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-97525", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260925-14206",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心修復 s390/pai 支援 CPU 熱插拔時的 PMU 錯誤",
+    summary: "本漏洞存在於 Linux 核心的 s390/pai 支援中，當在執行使用 `perf stat -e pai_crypto/CRYPTO_ALL/ -- <command>` 等指令時，如果 CPU 在運行期間被熱插拔（hotplug），會導致核心崩潰（kernel panic）。根本原因在於，當新的 CPU 被加入系統時，缺乏為該 CPU 實作的每 CPU（per-CPU）資料結構分配機制。原本的機制僅在有任務上下文的事件發生時動態分配結構，但無法應對 CPU 在事件創建期間離線，卻在 `perf` 運行時重新上線的情況。當缺乏 CPU 熱插拔處理程序時，新的 CPU 沒有每 CPU 資料基礎設施，導致在執行 `pai_add()` 函數時，由於變數 `cpump` 的使用，會返回 NULL 指標，進而引發核心恐慌。修復方案是為 CPU 的加入和移除增加熱插拔支援，並在 CPU 離線時創建必要的每 CPU 資料結構，確保當 CPU 重新上線並執行任務時，資料結構是可用的。",
+    tags: ["Linux 核心", "s390/pai", "perf stat", "CPU 熱插拔", "kernel panic", "PMU"],
+    title_en: "Linux Kernel Fix for s390/pai Support PMU Error During CPU Hotplug",
+    summary_en: "This vulnerability exists in the s390/pai support within the Linux kernel. When executing commands such as `perf stat -e pai_crypto/CRYPTO_ALL/ -- <command>`, if the CPU is hotplugged while running, it can lead to a kernel panic. The root cause is the lack of a mechanism to allocate per-CPU data structures for a CPU when it is added to the system. The original mechanism only dynamically allocated structures when an event occurred within a task context, but it could not handle the scenario where a CPU goes offline during event creation but comes back online while `perf` is running. Without CPU hotplug handling, the new CPU lacks the per-CPU data infrastructure, causing the `pai_add()` function to return a NULL pointer due to the use of the `cpump` variable, which subsequently triggers a kernel panic. The fix involves adding hotplug support for CPU addition and removal, and creating the necessary per-CPU data structures when the CPU goes offline, ensuring that the data structures are available when the CPU comes back online and executes tasks.",
+    tags_en: ["Linux Kernel", "s390/pai", "perf stat", "CPU Hotplug", "kernel panic", "PMU"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-97526", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260925-14207",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心修補：qla2xxx 驅動程式修復 NVMe Unsolv Context 列表的競態條件漏洞",
+    summary: "本修補針對 Linux 核心中的 scsi: qla2xxx 驅動程式，解決了一個與 NVMe Unsolv Context 列表操作相關的競態條件（Race Condition）漏洞。該漏洞發生在 `fcport->unsol_ctx_head` 列表在多個不同上下文（Context）下被修改時，缺乏統一的鎖定機制。具體來說，列表的元素在 `qla2xxx_process_purls_iocb()`（在 `qpair qp_lock` 下）中被新增，但卻在 `qla2xxx_process_purls_pkt()`、`qla_nvme_xmt_ls_rsp()` 和 `qla_nvme_release_lsrsp_cmd_kref()` 等多個不同路徑中被移除。由於這些操作無法被單一的 `qpair qp_lock` 序列化，可能導致併發的新增與刪除操作，進而損壞列表的指針結構。修補方案是引入一個專用的 `per-fcport spinlock`，即 `unsol_ctx_lock`，並在所有對 `unsol_ctx_head` 進行 `list_add_tail()` 或 `list_del()` 操作時使用該鎖。這確保了鎖定順序的一致性，從而消除了資料結構的損壞風險。",
+    tags: ["Linux 核心", "qla2xxx", "NVMe", "scsi", "競態條件", "Linux 驅動程式"],
+    title_en: "Linux Kernel Patch: qla2xxx Driver Fixes Race Condition in NVMe Unsolv Context List",
+    summary_en: "This patch targets the scsi: qla2xxx driver within the Linux kernel, resolving a race condition vulnerability related to the manipulation of the NVMe Unsolv Context list. The vulnerability occurs because there is a lack of unified locking mechanism when the `fcport->unsol_ctx_head` list is modified across multiple different contexts. Specifically, list elements are added in `qla2xxx_process_purls_iocb()` (under `qpair qp_lock`), but are removed in multiple different paths, including `qla2xxx_process_purls_pkt()`, `qla_nvme_xmt_ls_rsp()`, and `qla_nvme_release_lsrsp_cmd_kref()`. Since these operations cannot be serialized by a single `qpair qp_lock`, concurrent add and delete operations may occur, potentially corrupting the list's pointer structure. The fix introduces a dedicated `per-fcport spinlock`, named `unsol_ctx_lock`, and utilizes this lock whenever `list_add_tail()` or `list_del()` operations are performed on `unsol_ctx_head`. This ensures consistent locking order, thereby eliminating the risk of data structure corruption.",
+    tags_en: ["Linux Kernel", "qla2xxx", "NVMe", "scsi", "Race Condition", "Linux Driver"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-97527", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260925-14208",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心 qla2xxx 漏洞修復：NVMe 傳輸層在 LS 拒絕錯誤路徑下釋放未連結的 uctx 節點",
+    summary: "本漏洞存在於 Linux 核心的 scsi: qla2xxx 驅動程式中。當 NVMe 傳輸層在處理 LS (Link Status) 響應的錯誤路徑時，`qla_nvme_xmt_ls_rsp()` 函數會取得一個 `uctx` 結構體，並在錯誤發生時使用 `kfree()` 釋放它，但卻沒有將其從 `fcport->unsol_ctx_head` 鏈結串列中移除。這導致一個已被釋放的節點仍然存在於鏈結串列中。後續的 `list_add_tail()` 操作會寫入這個已被釋放的節點，而隨後的 `list_del()` 操作則可能導致鏈結串列結構損壞或系統崩潰（panic）。修補建議是在錯誤路徑上，使用 `list_del()` 將 `uctx` 節點從鏈結串列中解除連結，再執行 `kfree()`，以確保與其他釋放點的行為一致。",
+    tags: ["Linux 核心", "qla2xxx", "NVMe", "scsi", "uctx", "CVE-2026-97528"],
+    title_en: "Linux Kernel qla2xxx Vulnerability Fix: Unlinked uctx Node Released in NVMe Transport Layer Under LS Error Path",
+    summary_en: "This vulnerability exists in the scsi: qla2xxx driver within the Linux kernel. When the NVMe transport layer processes an error path for the Link Status (LS) response, the `qla_nvme_xmt_ls_rsp()` function allocates a `uctx` structure and uses `kfree()` to release it upon error. However, it fails to remove the node from the `fcport->unsol_ctx_head` linked list. This results in a freed node remaining in the linked list. Subsequent `list_add_tail()` operations write to this freed node, and subsequent `list_del()` operations may cause linked list corruption or a system panic. The suggested fix is to use `list_del()` to unlink the `uctx` node from the linked list on the error path before calling `kfree()`, ensuring consistency with other release points.",
+    tags_en: ["Linux Kernel", "qla2xxx", "NVMe", "scsi", "uctx", "CVE-2026-97528"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-97528", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260925-14209",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心 qla2xxx 驅動程式修復堆疊緩衝區讀取漏洞，需檢查 request_len 驗證",
+    summary: "本漏洞存在於 Linux 核心的 scsi: qla2xxx 驅動程式中。當使用 FC BSG 傳輸時，`fc_bsg_host_dispatch()` 僅保證 `request_len` 涵蓋 `msgcode` 和 `vendor_id`，但未考慮 `vendor_cmd[]` 彈性陣列的完整長度。這導致 `qla2xxx` 在讀取命令選擇器 `vendor_cmd[0]`，以及在多個子處理程序中讀取 `vendor_cmd[1]/[2]` 或覆蓋在命令區域的結構時，未能正確驗證 `request_len`。攻擊者若持有 `CAP_SYS_RAWIO` 權限，可提交一個短的請求，使其 `vendor_id` 匹配主機，從而觸發堆疊越界讀取（可被 KASAN 偵測），進而導致命令選擇錯誤或系統崩潰。修復建議是在 `qla2x00_process_vendor_specific()` 中加入中央保護機制，限制 `qla24xx_bsg_request()` 的早期讀取，並在所有相關子處理程序（如 `qla24xx_proc_fcp_prio_cfg_cmd()` 等）中加入 `request_len` 檢查。",
+    tags: ["Linux 核心", "scsi", "qla2xxx", "CAP_SYS_RAWIO", "堆疊越界讀取"],
+    title_en: "Linux Kernel qla2xxx Driver Fixes Stack Buffer Read Vulnerability, Requires Checking request_len Validation",
+    summary_en: "This vulnerability exists in the Linux kernel's scsi: qla2xxx driver. When using FC BSG transport, `fc_bsg_host_dispatch()` only guarantees that `request_len` covers `msgcode` and `vendor_id`, but fails to account for the full length of the `vendor_cmd[]` flexible array. This leads to `qla2xxx` failing to correctly validate `request_len` when reading the command selector `vendor_cmd[0]`, and when reading `vendor_cmd[1]/[2]` or structures overlapping the command area in multiple subprocesses. An attacker with `CAP_SYS_RAWIO` privileges can submit a short request, causing its `vendor_id` to match the host, thereby triggering a stack out-of-bounds read (detectable by KASAN), which can lead to command selection errors or system crashes. The fix suggests adding a central protection mechanism in `qla2x00_process_vendor_specific()` to restrict early reads of `qla24xx_bsg_request()`, and adding `request_len` checks in all relevant subprocesses (such as `qla24xx_proc_fcp_prio_cfg_cmd()`).",
+    tags_en: ["Linux Kernel", "scsi", "qla2xxx", "CAP_SYS_RAWIO", "Stack Out-of-Bounds Read"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-97529", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260925-14210",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心修復 qla2xxx 驅動程式的軟鎖定漏洞，避免 CPU 陷入無限循環",
+    summary: "本修補針對 Linux 核心中的 scsi: qla2xxx 驅動程式，修復了一個潛在的軟鎖定（soft lockup）漏洞。當 qla27xx_copy_multiple_pkt() 和 qla27xx_copy_fpin_pkt() 函式嘗試輪詢（poll）回應（RESPONSE_PROCESSED）的 continuation IOCB 時，如果接收到的 FC frame payload 的特定位元組恰好等於 0xDEADDEAD，驅動程式會誤判為「尚未到達」。這導致程式在中斷或 DPC 上下文中進入無限循環，造成 CPU 軟鎖定。修補建議移除對 signature 的忙等（busy-wait）輪詢，並改為依賴 entry_type 檢查，同時確保 FPIN 路徑在所有 continuation IOCB 到達後再進行處理，從根本上消除 payload 偽影導致的鎖定問題。",
+    tags: ["Linux 核心", "scsi", "qla2xxx", "軟鎖定", "CVE-2026-97530"],
+    title_en: "Linux Kernel Fixes Soft Lockup Vulnerability in qla2xxx Driver, Preventing CPU Infinite Loop",
+    summary_en: "This patch addresses a potential soft lockup vulnerability in the Linux kernel's scsi: qla2xxx driver. When the qla27xx_copy_multiple_pkt() and qla27xx_copy_fpin_pkt() functions attempt to poll for the continuation IOCB of a RESPONSE_PROCESSED, if a specific byte in the received FC frame payload happens to equal 0xDEADDEAD, the driver incorrectly determines that the continuation is 'not yet arrived.' This causes the program to enter an infinite loop in interrupt or DPC context, resulting in a CPU soft lockup. The patch suggests removing the busy-wait polling on the signature and instead relying on entry_type checks, while ensuring that the FPIN path only processes after all continuation IOCBs have arrived, thereby fundamentally eliminating the lockup issue caused by payload artifacts.",
+    tags_en: ["Linux Kernel", "scsi", "qla2xxx", "Soft Lockup", "CVE-2026-97530"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-97530", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260925-14211",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心漏洞：scsi: qla2xxx 處理 vport 刪除時的報告 ID 獲取缺陷",
+    summary: "本漏洞存在於 Linux 核心的 scsi: qla2xxx 驅動程式中，涉及 vport（虛擬埠）在刪除過程中的報告 ID 獲取機制。當執行 vport 的拆除（teardown）時，雖然會將 vport 從 host_map btree 中移除，但其在 `vp_list` 中的狀態與 `host_map` 的同步存在時間窗口的缺陷。在該時間窗口內，報告 ID 獲取功能仍可能找到該 vport，並呼叫 `qla_update_host_map()`。由於此時 vport 的 d_id 已被清零，導致其被重新插入到 `host_map` 中。最終，當 `scsi_host_put()` 釋放了 vha 記憶體後，後續的 `host_map` 查找會解引用已釋放的記憶體，造成 Use-After-Free (UAF) 漏洞。修補建議是增加一個檢查，確保在獲取參考計數之前，若 vport 已被標記為 VPORT_DELETE，應跳過該 vport 的處理，以防止其被重新註冊或排程 DPC 重新註冊。",
+    tags: ["Linux 核心", "scsi", "qla2xxx", "vport", "Use-After-Free", "CVE-2026-97531"],
+    title_en: "Linux Kernel Vulnerability: Information Disclosure in scsi:qla2xxx during vport deletion",
+    summary_en: "This vulnerability resides in the scsi:qla2xxx driver within the Linux kernel, concerning the mechanism for obtaining report IDs during the deletion of a vport (virtual port). When a vport undergoes teardown, although it is removed from the host_map btree, there is a time window defect in the synchronization of its status between `vp_list` and `host_map`. Within this time window, the report ID acquisition function may still locate the vport and call `qla_update_host_map()`. Because the vport's d_id has been zeroed, it results in the vport being re-inserted into the `host_map`. Finally, when `scsi_host_put()` releases the vha memory, subsequent `host_map` lookups will dereference the freed memory, causing a Use-After-Free (UAF) vulnerability. The suggested fix is to add a check that, before acquiring a reference count, if the vport has been marked as VPORT_DELETE, the processing of that vport should be skipped to prevent it from being re-registered or scheduled for DPC re-registration.",
+    tags_en: ["Linux Kernel", "scsi", "qla2xxx", "vport", "Use-After-Free", "CVE-2026-97531"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-97531", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260925-14212",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心修復 qla2xxx 驅動程式的空指針解引用漏洞",
+    summary: "本漏洞存在於 Linux 核心的 scsi: qla2xxx 驅動程式中。當 `qla2x00_mem_alloc()` 函數在處理錯誤路徑時，會導致對已釋放的指針進行二次釋放（Double Free）。具體來說，在多個錯誤標籤中，驅動程式會釋放適配器成員，但留下了懸空指針。隨後，`qla2x00_mem_free()` 函數會再次釋放這些指針。更嚴重的是，對於 `dma_pool` 成員，在 `s_dma_pool` 已經被銷毀並設為 NULL 後，仍會呼叫 `dma_pool_free()`，導致解引用一個 NULL 的資源池。此類記憶體管理錯誤可能導致系統崩潰或被惡意利用。修復建議是修改錯誤標籤，確保在釋放每個指針（及其 DMA 句柄）後，將其清空，使後續的 `qla2x00_mem_free()` 函數能夠跳過這些已處理的資源。",
+    tags: ["Linux 核心", "qla2xxx", "scsi", "空指針解引用", "Double Free"],
+    title_en: "Linux Kernel Fixes Null Pointer Dereference Vulnerability in qla2xxx Driver",
+    summary_en: "This vulnerability exists in the scsi: qla2xxx driver within the Linux kernel. When the `qla2x00_mem_alloc()` function handles error paths, it can lead to a Double Free condition, causing a double release of an already freed pointer. Specifically, in multiple error paths, the driver releases adapter members but leaves dangling pointers. Subsequently, the `qla2x00_mem_free()` function attempts to free these pointers again. More critically, for `dma_pool` members, `dma_pool_free()` is called even after `s_dma_pool` has been destroyed and set to NULL, resulting in a null resource pool dereference. Such memory management errors can lead to system crashes or be exploited maliciously. The recommended fix involves modifying the error paths to ensure that after freeing each pointer (and its DMA handle), it is cleared, allowing the subsequent `qla2x00_mem_free()` function to skip these already processed resources.",
+    tags_en: ["Linux Kernel", "qla2xxx", "scsi", "Null Pointer Dereference", "Double Free"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-97532", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260925-14213",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心修復 Use-After-Free 漏洞：保護屬性變更與頁表崩潰的競態條件",
+    summary: "本修復針對 Linux 核心中的一個 Use-After-Free (UAF) 漏洞，該漏洞存在於頁表屬性變更（attribute changes）與頁表崩潰（CPA collapse）的並行操作之間。當系統進行頁表屬性變更時，會透過一個無鎖的頁表遍歷器（lockless page table walker）獲取 PTE 條目，但如果此時發生 CPA 崩潰，可能會釋放該 PTE，導致後續寫入時發生 UAF。修復方案是在 `__change_page_attr_set_clr()` 函數上取得 `init_mm` 的 mmap 讀取鎖，以跨越整個遍歷和 PTE 寫入操作，從而解決了此競態條件。此外，為避免死鎖，修復還調整了在 `split_large_page()` 過程中釋放 mmap 鎖，並新增了 `init_mm_read_locked` 旗標。此修復確保了在頁表分配時，即使有並行操作，系統也能保持穩定性。",
+    tags: ["Linux 核心", "Use-After-Free", "init_mm", "PTE", "CPA collapse", "x86"],
+    title_en: "Linux Kernel Fix for Use-After-Free Vulnerability: Race Condition in Page Attribute Changes and Page Table Collapse",
+    summary_en: "This fix addresses a Use-After-Free (UAF) vulnerability in the Linux kernel, which exists between concurrent operations of page table attribute changes and CPA collapse. When the system performs page table attribute changes, it obtains PTE entries via a lockless page table walker. However, if a CPA collapse occurs at this time, it might free the PTE, leading to a UAF upon subsequent writes. The fix acquires the mmap read lock of `init_mm` on the `__change_page_attr_set_clr()` function to span the entire traversal and PTE write operation, thereby resolving this race condition. Additionally, to prevent deadlocks, the fix adjusts the release of the mmap lock during the `split_large_page()` process and introduces the `init_mm_read_locked` flag. This patch ensures system stability during page table allocation, even when concurrent operations are present.",
+    tags_en: ["Linux Kernel", "Use-After-Free", "init_mm", "PTE", "CPA collapse", "x86"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-97533", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260925-14214",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux f2fs 文件系統修復：修正 free_segment_range 函式中空閒區段計數錯誤",
+    summary: "本漏洞涉及 Linux 核心的 f2fs 文件系統。問題出在 `free_segment_range()` 函式中，該函式在進行區塊分配限制時，會暫時縮減 MAIN_SECS(sbi) 的範圍。然而，`FREE_I(sbi)->free_sections` 追蹤的是整個文件系統的空閒區段總數。當進入 `free_segment_range()` 時，如果被截斷範圍內的部分區段本來就是空閒的，但程式碼未能從 `free_sections` 中扣除這些區段，就會導致文件系統高估可用空閒區段。這會造成 GC 資料遷移期間的空閒區段計數不一致，進而可能在空間緊張時觸發意外的分配失敗或斷言錯誤。修復方法是在進入 `free_segment_range()` 時，計算並扣除被截斷範圍內已空閒的區段數量，並在退出時恢復計數，以確保空閒區段的準確追蹤。",
+    tags: ["Linux 核心", "f2fs", "free_segment_range", "文件系統", "空閒區段"],
+    title_en: "Linux f2fs Filesystem Repair: Fixes Free Segment Range Function's Free Block Count Error",
+    summary_en: "This vulnerability affects the f2fs filesystem in the Linux kernel. The issue lies within the `free_segment_range()` function, which temporarily narrows the scope of MAIN_SECS(sbi) when performing block allocation limits. However, `FREE_I(sbi)->free_sections` tracks the total number of free segments across the entire filesystem. When entering `free_segment_range()`, if some segments within the truncated range were originally free, but the code fails to subtract these segments from `free_sections`, it causes the filesystem to overestimate the available free segments. This leads to an inconsistency in free segment counting during GC data migration, potentially triggering unexpected allocation failures or assertion errors during periods of low space. The fix involves calculating and subtracting the number of already free segments within the truncated range upon entering `free_segment_range()`, and restoring the count upon exit, thereby ensuring accurate tracking of free segments.",
+    tags_en: ["Linux Kernel", "f2fs", "free_segment_range", "Filesystem", "Free Segment"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-97534", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260925-14215",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心修復 scsi: qla2xxx 漏洞：防止越界寫入 VP 索引導致的記憶體損壞",
+    summary: "本漏洞存在於 Linux 核心的 scsi: qla2xxx 驅動程式中，具體為「Bound VP index against VP_CTRL IOCB bitmap size」。該漏洞允許攻擊者透過設定超出預期範圍的虛擬埠（virtual port）索引（vp_index），導致 `qla25xx_ctrlvp_iocb()` 函式計算出的索引 `map` 超出預設的 16 位元組（128 位元）陣列範圍。這會造成越界寫入（out-of-bounds write），不僅會損壞後續的 IOCB 欄位，甚至可能影響到相鄰的請求環（request-ring slot）。由於 `max_npiv_vports` 的檢查僅確保索引不超過硬體韌體報告的最大值，但未能限制其在 IOCB 位圖的有效範圍內，因此當 `vp_index` 高於 128 時，就會發生越界寫入。修復措施是在 `qla25xx_ctrlvp_iocb()` 中增加 `ARRAY_SIZE()` 防禦性檢查，並在 `qla24xx_control_vp()` 中拒絕無法在 IOCB 位圖中表示的 `vp_index`，以防止此類記憶體 corruption。",
+    tags: ["Linux 核心", "scsi", "qla2xxx", "越界寫入", "NPIV", "IOCB"],
+    title_en: "Linux Kernel Fix for scsi: qla2xxx Vulnerability: Preventing Memory Corruption Caused by Out-of-Bounds Write to VP Index",
+    summary_en: "This vulnerability resides in the Linux kernel's scsi: qla2xxx driver, specifically related to 'Bound VP index against VP_CTRL IOCB bitmap size'. The vulnerability allows an attacker to set an out-of-range virtual port (vp_index), causing the index `map` calculated by the `qla25xx_ctrlvp_iocb()` function to exceed the predefined 16-byte (128-bit) array range. This results in an out-of-bounds write, which not only corrupts subsequent IOCB fields but may also affect adjacent request-ring slots. Because the check for `max_npiv_vports` only ensures the index does not exceed the maximum reported by the hardware firmware, but fails to restrict it within the valid range of the IOCB bitmap, an out-of-bounds write occurs when `vp_index` is greater than 128. The fix involves adding an `ARRAY_SIZE()` defensive check in `qla25xx_ctrlvp_iocb()` and rejecting `vp_index` in `qla24xx_control_vp()` if it cannot be represented in the IOCB bitmap, thereby preventing this type of memory corruption.",
+    tags_en: ["Linux Kernel", "scsi", "qla2xxx", "Out-of-bounds write", "NPIV", "IOCB"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-97535", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260925-14216",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心 qla2xxx 驅動程式修復 Use-After-Free 漏洞",
+    summary: "本漏洞存在於 Linux 核心的 scsi: qla2xxx 驅動程式中，屬於 Use-After-Free 類型。當執行完整的適配器（adapter）拆除流程時，若在呼叫 `free_irq()` 釋放中斷後，仍有待處理的 `q_work` 任務在 `ha->wq` 工作佇列上排程。由於 `free_irq()` 只等待正在執行的硬體中斷處理程序，但無法取消已排程的任務，導致後續的 `qla_do_work()` 會嘗試對已釋放的 `qpair` 和回應佇列執行操作，進而造成 Use-After-Free 錯誤。修復建議是在 `qla25xx_free_rsp_que()` 函數中，於執行 `free_irq()` 釋放中斷後，但在釋放回應佇列和 `qpair` 記憶體之前，使用 `cancel_work_sync()` 來同步清空工作項目，以確保在釋放資源前，所有待處理的任務都能被處理或取消，避免操作無效記憶體。",
+    tags: ["Linux 核心", "qla2xxx", "Use-After-Free", "scsi", "驅動程式"],
+    title_en: "Linux Kernel qla2xxx Driver Fixes Use-After-Free Vulnerability",
+    summary_en: "This vulnerability resides in the scsi: qla2xxx driver within the Linux kernel and is classified as a Use-After-Free type. When executing the complete adapter removal process, if a pending `q_work` task remains scheduled on the `ha->wq` work queue after calling `free_irq()` to release the interrupt, a Use-After-Free error occurs. This is because `free_irq()` only waits for the currently executing hardware interrupt handler but cannot cancel already scheduled tasks. Consequently, subsequent calls to `qla_do_work()` attempt to operate on the already released `qpair` and response queue, leading to the Use-After-Free error. The suggested fix is to use `cancel_work_sync()` within the `qla25xx_free_rsp_que()` function. This should be done after calling `free_irq()` to release the interrupt, but before releasing the response queue and `qpair` memory. This ensures that all pending tasks are processed or canceled before resources are released, preventing operations on invalid memory.",
+    tags_en: ["Linux Kernel", "qla2xxx", "Use-After-Free", "scsi", "Driver"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-97536", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260925-14217",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心修復 scsi: qla2xxx 驅動程式的兩個漏洞，解決 NULL dma_free 與鎖定不一致問題",
+    summary: "本篇公告針對 Linux 核心中的 scsi: qla2xxx 驅動程式，修復了兩個與佇列（queue）創建與釋放相關的 Bug。第一個問題發生在佇列創建失敗的錯誤路徑中：當 dma_alloc_coherent() 失敗時，錯誤路徑會呼叫 free 函數，但此時 req->ring / rsp->ring 仍為 NULL，導致無條件的 dma_free_coherent() 呼叫了 NULL cpu_addr，造成未定義行為並可能導致系統崩潰（panic）。第二個問題是鎖定機制不一致：free 函數在 vport_lock 範圍內清除 qid_map，但 create 函數卻使用 mq_lock 保護相同的位圖。這導致缺乏互斥性。此外，在創建錯誤路徑中，釋放鎖定（mq_lock）後呼叫 free 函數，會產生一個時間窗口，讓其他執行緒可以分配相同的 que_id，並導致其 ha->req_q_map entry 被 free 函數中的無鎖 NULL 賦值覆寫。修復措施包括：在 dma_free_coherent() 處加入 NULL 檢查；在 free 函數中使用 mq_lock 來原子性地清除 map entry 和位圖位元；並移除創建錯誤路徑中冗餘的 clear_bit 區塊，因為 free 函數已能原子性處理。建議系統管理員應更新至修復了這些問題的 Linux 核心版本。",
+    tags: ["Linux 核心", "scsi", "qla2xxx", "dma_free_coherent", "NULL 指標", "核心漏洞"],
+    title_en: "Linux Kernel Fixes Two Vulnerabilities in scsi: qla2xxx Driver, Addressing NULL dma_free and Locking Inconsistency Issues",
+    summary_en: "This announcement addresses the scsi: qla2xxx driver within the Linux kernel, fixing two bugs related to queue creation and release. The first issue occurs in the error path when queue creation fails: when dma_alloc_coherent() fails, the error path calls the free function, but at this point, req->ring / rsp->ring are still NULL. This results in an unconditional call to dma_free_coherent() with a NULL cpu_addr, causing undefined behavior and potentially leading to a system panic. The second issue is an inconsistent locking mechanism: the free function clears qid_map within the vport_lock scope, but the create function uses mq_lock to protect the same bitmap. This lack of mutual exclusion is problematic. Furthermore, in the creation error path, calling the free function after releasing the lock (mq_lock) creates a time window during which other threads can allocate the same que_id, leading to the ha->req_q_map entry being overwritten with an unlocked NULL assignment within the free function. The remediation measures include: adding a NULL check before dma_free_coherent(); using mq_lock in the free function to atomically clear the map entry and bitmap bit; and removing the redundant clear_bit block in the creation error path, as the free function can handle this atomically. System administrators are advised to update to the Linux kernel version that contains these fixes.",
+    tags_en: ["Linux Kernel", "scsi", "qla2xxx", "dma_free_coherent", "NULL pointer", "Kernel Vulnerability"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-97537", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260925-14218",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心 hwmon 驅動程式發現漏洞：asus_rog_ryujin 處理 HID 報告時可能洩漏未初始化資料",
+    summary: "本漏洞存在於 Linux 核心的 hwmon 驅動程式中，具體影響為 `asus_rog_ryujin` 驅動程式。該驅動程式在解析回應標頭（response headers）和負載欄位（payload fields）時，沒有先檢查這些資料是否確實存在於接收到的 HID 報告中。如果接收到的報告過短，驅動程式可能會從 HID 傳輸緩衝區（transport buffer）中讀取未初始化（uninitialized）的位元組，並透過 sysfs 將這些未初始化資料作為感測器值暴露出來。這可能導致系統資訊洩漏。修復建議是必須在解析任何回應標頭和每個回應類型所使用的欄位之前，先進行完整的驗證，確保所有必要的資料都已正確接收。此漏洞已在 Linux 核心中得到修復。",
+    tags: ["Linux 核心", "hwmon", "asus_rog_ryujin", "HID", "sysfs", "漏洞"],
+    title_en: "Linux Kernel hwmon Driver Vulnerability Discovered: Potential Uninitialized Data Leak in asus_rog_ryujin Handling of HID Reports",
+    summary_en: "This vulnerability resides in the Linux kernel's hwmon driver, specifically affecting the `asus_rog_ryujin` driver. The driver fails to validate whether response headers and payload fields actually exist within the received HID report when parsing them. If the received report is too short, the driver may read uninitialized bytes from the HID transport buffer and expose this uninitialized data as sensor values via sysfs. This could lead to system information leakage. The recommended fix is to perform comprehensive validation before parsing any response headers and fields used by any response type, ensuring all necessary data has been correctly received. This vulnerability has been patched in the Linux kernel.",
+    tags_en: ["Linux Kernel", "hwmon", "asus_rog_ryujin", "HID", "sysfs", "vulnerability"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-97538", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260925-14219",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心修補：xusbatm 模組修復 USB 設備 ID 處理的指標算術漏洞",
+    summary: "本修補針對 Linux 核心中的 `usb: xusbatm` 模組，解決了一個與動態 USB 設備 ID 處理相關的指標算術漏洞。當設備 ID 是動態分配時，`usb_device_id` 參數在探測（probe）階段會位於堆（heap）上。原程式碼的指標算術操作在這種情況下會產生超出界限的索引，導致系統不穩定或安全問題。雖然修補了此漏洞，但由於 `xusbatm` 模組在處理動態 ID 時仍存在限制，因此開發者也設定了 `no_dynamic_id` 限制，以確保系統的穩定性與安全性。此修補屬於核心元件層面的安全更新，建議使用最新版本的 Linux 核心來修復此類底層的指標操作錯誤。",
+    tags: ["Linux 核心", "xusbatm", "USB 設備 ID", "指標算術", "CVE-2026-97539"],
+    title_en: "Linux Kernel Patch: xusbatm Module Fixes Integer Arithmetic Vulnerability in USB Device ID Handling",
+    summary_en: "This patch addresses an integer arithmetic vulnerability within the `usb: xusbatm` module in the Linux kernel, related to the handling of dynamic USB device IDs. When a device ID is dynamically assigned, the `usb_device_id` parameter resides on the heap during the probe phase. The original code's pointer arithmetic operation could generate out-of-bounds indices in this scenario, potentially leading to system instability or security issues. Although the vulnerability has been patched, developers also implemented a `no_dynamic_id` restriction because the `xusbatm` module still has limitations when handling dynamic IDs, ensuring system stability and security. This patch constitutes a core component-level security update and it is recommended to use the latest version of the Linux kernel to fix this type of low-level pointer manipulation error.",
+    tags_en: ["Linux Kernel", "xusbatm", "USB Device ID", "Integer Arithmetic", "CVE-2026-97539"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-97539", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260925-14220",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心修補：USB 設備 ID 處理漏洞，避免堆記憶體指標算術錯誤",
+    summary: "本修補針對 Linux 核心中的 USB 設備識別機制（`net: usb: pegasus`）所發現的漏洞。當系統涉及動態 ID 處理時，原程式碼在處理 `usb_device_id` 參數時，其指標算術邏輯會出現錯誤，導致索引超出預期範圍（out of bound）。這類錯誤可能導致系統不穩或被惡意利用。修補建議是，開發者應改用 `usb_device_id` 結構體中的 `driver_info` 欄位來儲存額外資訊，而非依賴副作用的指標算術。此外，動態 ID 的解析程式碼也需要更新，應直接寫入動態 ID 的保留欄位，並移除不必要的迴圈，以確保系統的穩定性和安全性。此修補屬於核心元件層面的安全加固，建議所有使用 Linux 核心的系統應及時更新。",
+    tags: ["Linux 核心", "USB 設備", "指標算術", "CVE-2026-97540", "驅動程式安全"],
+    title_en: "Linux Kernel Patch: Fixes USB Device ID Handling Vulnerability to Prevent Heap Pointer Arithmetic Errors",
+    summary_en: "This patch addresses a vulnerability found in the USB device identification mechanism (`net: usb: pegasus`) within the Linux kernel. When the system handles dynamic IDs, the original code exhibits an error in its pointer arithmetic logic when processing the `usb_device_id` parameter, leading to an out-of-bounds index. Such errors can potentially cause system instability or be exploited maliciously. The suggested fix is that developers should utilize the `driver_info` field within the `usb_device_id` structure to store additional information, rather than relying on side-effect-dependent pointer arithmetic. Furthermore, the code responsible for parsing dynamic IDs must be updated to write directly into the reserved fields of the dynamic ID, and unnecessary loops should be removed to ensure system stability and security. As this patch constitutes a security hardening at the core component level, all systems utilizing the Linux kernel are advised to update promptly.",
+    tags_en: ["Linux Kernel", "USB Device", "Pointer Arithmetic", "CVE-2026-97540", "Driver Security"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-97540", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260925-14221",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心修補：ath9k_htc 驅動程式修復 usb_device_id 儲存漏洞",
+    summary: "本漏洞存在於 Linux 核心的 wifi: ath9k_htc 驅動程式中，涉及不當儲存 `usb_device_id` 資訊。由於 `usb_device_id` 可能因為動態 ID 的存在而無法保證比 `probe` 函數存活更久，因此，該驅動程式不應儲存此類資訊。文章指出，除了 `driver_data` 之外，所有其他資訊都可以從 `usb_device` 結構體中輕鬆取得。修補建議是僅儲存 `driver_data`，以避免記憶體管理上的風險，防止潛在的資訊洩露或崩潰。此修補屬於核心元件層面的安全強化，建議所有使用相關硬體或核心版本的系統應更新到修復後的 Linux 核心版本。",
+    tags: ["Linux 核心", "ath9k_htc", "usb_device_id", "核心漏洞", "Linux 安全更新"],
+    title_en: "Linux Kernel Patch: Fixing usb_device_id Storage Vulnerability in ath9k_htc Driver",
+    summary_en: "This vulnerability resides in the `wifi: ath9k_htc` driver within the Linux kernel, involving the improper storage of `usb_device_id` information. Since `usb_device_id` might not be guaranteed to live longer than the `probe` function due to the existence of dynamic IDs, the driver should not store this type of information. The article points out that all information, except for `driver_data`, can be easily retrieved from the `usb_device` structure. The patch suggests storing only `driver_data` to avoid memory management risks, preventing potential information leakage or crashes. This patch constitutes a security enhancement at the kernel component level, and all systems using the relevant hardware or kernel versions are advised to update to the patched Linux kernel version.",
+    tags_en: ["Linux Kernel", "ath9k_htc", "usb_device_id", "Kernel Vulnerability", "Linux Security Update"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-97541", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260925-14222",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心 xfs 檔案系統修復：修復 xrep_agfl_fill 函式中的位圖錯誤處理邏輯",
+    summary: "本漏洞修復涉及 Linux 核心的 xfs 檔案系統。問題出在 xrep_agfl_fill 函式中，該函式在處理位圖錯誤時存在邏輯缺陷。原始程式碼雖然指出 xagb_bitmap_set 呼叫在 xrep_agfl_fill 中可能會失敗，但後續的程式碼卻沒有檢查 xagb_bitmap_walk 的回傳結果，導致錯誤時會靜默忽略錯誤並繼續執行，進而造成不一致的記憶體內資料（incore data）。此類行為違反了系統的資料完整性原則。修復的目的是確保在位圖操作失敗時，系統能夠正確地處理錯誤，而不是在錯誤發生時繼續使用不確定的、不一致的資料，從而提升 xfs 檔案系統的穩定性和資料可靠性。建議系統管理員應更新至包含此修復的 Linux 核心版本。",
+    tags: ["Linux 核心", "xfs", "xrep_agfl_fill", "位圖錯誤", "資料完整性"],
+    title_en: "Linux Kernel xfs Filesystem Repair: Fixing Bitmap Error Handling Logic in xrep_agfl_fill Function",
+    summary_en: "This vulnerability fix concerns the xfs filesystem within the Linux kernel. The issue resides in the xrep_agfl_fill function, which contains a logical flaw when handling bitmap errors. Although the original code noted that the xagb_bitmap_set call within xrep_agfl_fill might fail, subsequent code failed to check the return value of xagb_bitmap_walk. This resulted in the error being silently ignored and execution continuing, leading to inconsistent in-memory data (incore data). Such behavior violates the system's data integrity principles. The fix aims to ensure that when bitmap operations fail, the system correctly handles the error rather than proceeding with uncertain or inconsistent data, thereby enhancing the stability and data reliability of the xfs filesystem. System administrators are advised to update to the Linux kernel version containing this fix.",
+    tags_en: ["Linux Kernel", "xfs", "xrep_agfl_fill", "bitmap error", "data integrity"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-97542", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260925-14223",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux xfs 核心修復記憶體洩漏：在建立目錄路徑失敗時，可能未釋放 seen inode bitmap",
+    summary: "本次修復針對 Linux 核心中的 xfs 文件系統，解決了在建立目錄路徑（dirpath）時，如果附加名稱（appending the name）失敗，可能導致記憶體洩漏（memory leak）的問題。具體來說，當程式呼叫 `xchk_dirtree_create_path` 或 `xrep_dirtree_create_adoption_path` 建立目錄路徑物件時，若後續附加名稱的步驟失敗，系統未能正確釋放（tear down）所建立的（空）seen inode bitmap。這是一個相對輕微的邏輯錯誤，但修復旨在確保系統資源的完整釋放，避免潛在的邏輯炸彈。使用者應升級至修復了此漏洞的 Linux 核心版本，以確保 xfs 文件系統的穩定性和記憶體管理效率。",
+    tags: ["Linux 核心", "xfs", "記憶體洩漏", "xchk_dirtree_create_path", "xrep_dirtree_create_adoption_path"],
+    title_en: "Linux xfs Kernel Fixes Memory Leak: Potential Failure to Release Seen Inode Bitmap When Creating Directory Paths",
+    summary_en: "This fix addresses a memory leak in the Linux kernel's xfs file system. The issue occurs when creating a directory path (dirpath) and the subsequent name appending step fails. Specifically, when programs call `xchk_dirtree_create_path` or `xrep_dirtree_create_adoption_path` to create a directory path object, if the subsequent name appending step fails, the system fails to correctly tear down the newly created (empty) seen inode bitmap. While this is a relatively minor logical error, the fix ensures the complete release of system resources, preventing potential logical bombs. Users should upgrade to the patched Linux kernel version to ensure the stability and memory management efficiency of the xfs file system.",
+    tags_en: ["Linux Kernel", "xfs", "Memory Leak", "xchk_dirtree_create_path", "xrep_dirtree_create_adoption_path"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-97543", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260925-14224",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心 xfs 漏洞修復：修復 rhashtable 插入失敗時的 dqa 物件記憶體洩漏",
+    summary: "本篇公告指出 Linux 核心的 xfs 文件系統元件存在一個記憶體洩漏（Memory Leak）漏洞。該漏洞發生在 `xqcheck_mod_live_ino_dqtrx` 函式中，當執行 rhashtable 插入操作失敗時，系統未能釋放新分配的 dqa 物件。這導致在特定操作流程中，系統會持續累積未釋放的記憶體，造成資源洩漏。修復措施為確保在 rhashtable 插入失敗時，能正確地釋放（free）新分配的 dqa 物件。此類核心層級的記憶體洩漏漏洞，若未修復，可能導致系統效能下降，甚至在極端情況下影響系統穩定性。建議系統管理員應更新至修復了此問題的 Linux 核心版本，以確保系統資源的穩定使用。",
+    tags: ["Linux 核心", "xfs", "記憶體洩漏", "rhashtable", "CVE-2026-97544"],
+    title_en: "Linux Kernel xfs Vulnerability Fix: Addressing dqa Object Memory Leak on rhashtable Insertion Failure",
+    summary_en: "This announcement details a memory leak vulnerability found in the xfs file system component of the Linux kernel. The vulnerability occurs within the `xqcheck_mod_live_ino_dqtrx` function. When an rhashtable insertion operation fails, the system fails to release a newly allocated dqa object. This results in the continuous accumulation of unreleased memory during specific operational workflows, causing resource leakage. The fix ensures that the newly allocated dqa object is correctly freed when the rhashtable insertion fails. Unrepaired, core-level memory leaks like this can lead to system performance degradation and, in extreme cases, impact system stability. System administrators are advised to update to a Linux kernel version that has patched this issue to ensure stable system resource utilization.",
+    tags_en: ["Linux Kernel", "xfs", "Memory Leak", "rhashtable", "CVE-2026-97544"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-97544", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260925-14225",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux xfs 核心修復新漏洞：處理 btree 緩衝區釋放失敗的記憶體洩漏問題",
+    summary: "本漏洞位於 Linux 核心的 xfs 文件系統元件中，涉及 `xfs_btree_bload_drop_buf` 函式。當該函式嘗試將 delwri 緩衝區列表寫入磁碟時發生 I/O 錯誤時，系統無法正確釋放 `new_bp` 資源，導致鎖定的緩衝區（locked buffer）洩漏。此問題屬於記憶體管理層面的缺陷，可能導致系統資源耗盡或不穩定。開發者已修復此問題，確保在 I/O 寫入失敗時，即使無法完成操作，也能正確釋放所有佔用的緩衝區資源。修補建議是更新到修復了此缺陷的 Linux 核心版本。",
+    tags: ["Linux 核心", "xfs", "CVE-2026-97545", "記憶體洩漏", "文件系統"],
+    title_en: "Linux xfs Kernel Fixes New Vulnerability: Memory Leak in Handling btree Buffer Release Failure",
+    summary_en: "This vulnerability resides in the xfs file system component of the Linux kernel, specifically involving the `xfs_btree_bload_drop_buf` function. When this function encounters an I/O error while attempting to write the delwri buffer list to disk, the system fails to correctly release the `new_bp` resource, leading to a leak of locked buffers. This issue is a defect in the memory management layer, which could potentially cause system resource exhaustion or instability. Developers have since fixed this issue, ensuring that all allocated buffer resources are correctly released even if the I/O write fails. The patch recommends updating to the Linux kernel version that addresses this defect.",
+    tags_en: ["Linux Kernel", "xfs", "CVE-2026-97545", "Memory Leak", "File System"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-97545", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260925-14226",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心修復 xfs 檔案系統漏洞：防止處理零長度目錄條目時無限循環",
+    summary: "本漏洞存在於 Linux 核心的 xfs 檔案系統中。當 xrep_dir_recover_data 函式處理一個聲稱具有零長度的未使用目錄條目（dirent）時，可能會導致無限循環（spin forever）。此問題可能影響系統在進行檔案系統修復或資料恢復時的穩定性。修復後，系統能夠正確處理零長度條目，避免進入無限循環狀態。建議使用更新的 Linux 核心版本來修補此漏洞，以確保 xfs 檔案系統的資料完整性和系統的穩定性。",
+    tags: ["Linux 核心", "xfs", "CVE-2026-97546", "檔案系統", "xrep_dir_recover_data"],
+    title_en: "Linux Kernel Fixes xfs Filesystem Vulnerability: Prevents Infinite Loop When Handling Zero-Length Directory Entries",
+    summary_en: "This vulnerability exists within the xfs filesystem in the Linux kernel. When the xrep_dir_recover_data function processes an unused directory entry (dirent) that claims to have zero length, it can lead to an infinite loop. This issue may affect the stability of the system during filesystem repair or data recovery. After the fix, the system can correctly handle zero-length entries, preventing the infinite loop state. It is recommended to use an updated Linux kernel version to patch this vulnerability, ensuring the data integrity of the xfs filesystem and system stability.",
+    tags_en: ["Linux Kernel", "xfs", "CVE-2026-97546", "Filesystem", "xrep_dir_recover_data"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-97546", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260925-14227",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux xfs 核心修復：修復交換範圍（exchange-range）重連結（reflink）標誌清除的資料不一致性問題",
+    summary: "本漏洞存在於 Linux 核心的 xfs 文件系統中。當執行兩個完整檔案範圍的交換（exchange-range）時，如果其中一個檔案帶有 reflink inode 標誌，該標誌可能會被移動到另一個檔案。此功能假設所有共享的區塊（shared extents）都會被交換。然而，當設定了 XFS_EXCHMAPS_INO1_WRITTEN 時，xfs_exchmaps_can_skip_mapping() 函數可能會跳過空洞或未寫入的映射，導致後續的清理操作清除 reflink 標誌。若此標誌清除發生在該 inode 仍擁有共享寫入區塊（shared written extents）的情況下，後續的寫入操作將走非 reflink 路徑，可能導致本應受 CoW（Copy-on-Write）保護的區塊發生資料損壞，造成 reflink 相關檔案間的資料不一致性。\n\n修復方法是當請求 XFS_EXCHMAPS_INO1_WRITTEN 時，禁用 reflink 標誌的交換。雖然內容交換仍可進行，但保守的做法是讓兩個 inode 都保留 reflink 標誌。之後，當 inode 不再擁有共享區塊時，正常的 reflink 標誌清理路徑可以移除額外的標誌。",
+    tags: ["Linux 核心", "xfs", "reflink", "資料損壞", "CoW", "XFS_EXCHMAPS_INO1_WRITTEN"],
+    title_en: "Linux xfs Kernel Fix: Addressing Data Inconsistency Issue When Clearing Exchange-Range (reflink) Flags",
+    summary_en: "This vulnerability exists in the xfs file system within the Linux kernel. When performing an exchange operation across two full file ranges, if one of the files has a reflink inode flag, that flag might be moved to the other file. This functionality assumes that all shared extents will be exchanged. However, when XFS_EXCHMAPS_INO1_WRITTEN is set, the xfs_exchmaps_can_skip_mapping() function might skip holes or unwritten mappings, leading subsequent cleanup operations to clear the reflink flag. If this flag clearing occurs while the inode still possesses shared written extents, subsequent write operations will follow the non-reflink path, potentially causing data corruption in blocks that should be protected by CoW (Copy-on-Write), resulting in data inconsistency between reflink-related files.\n\nThe fix is to disable the exchange of the reflink flag when XFS_EXCHMAPS_INO1_WRITTEN is requested. While content exchange can still proceed, the conservative approach is to allow both inodes to retain the reflink flag. Subsequently, when the inode no longer possesses shared blocks, the normal reflink flag cleanup path can remove the additional flag.",
+    tags_en: ["Linux Kernel", "xfs", "reflink", "data corruption", "CoW", "XFS_EXCHMAPS_INO1_WRITTEN"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-97547", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260925-14228",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心 xfs 修正 rtree 相關計算錯誤，防止超出 btree 游標範圍的記憶體存取",
+    summary: "本更新針對 Linux 核心中的 xfs 文件系統，修復了 `rtrmap` 和 `rtrefcount` 函數在計算 in-memory btree 游標大小時的邏輯錯誤。原問題是這些函數在計算時遺漏了對 inode root 的考慮，導致當 btree 尺寸足夠大時，系統可能會嘗試存取超出游標實際範圍的記憶體區域。此漏洞屬於記憶體越界（Out-of-bounds）問題，可能導致系統不穩定或被惡意利用。修補內容已在核心層面修復，建議所有使用 xfs 文件系統的系統應立即更新至包含此修補的 Linux 核心版本，以確保數據結構計算的準確性與系統的記憶體安全。",
+    tags: ["Linux 核心", "xfs", "rtrmap", "rtrefcount", "CVE-2026-97548", "記憶體越界"],
+    title_en: "Linux Kernel xfs Fixes rtree Calculation Error, Preventing Out-of-Bounds Memory Access",
+    summary_en: "This update addresses the xfs file system within the Linux kernel, fixing a logical error in the `rtrmap` and `rtrefcount` functions when calculating the size of in-memory btree cursors. The original issue was that these functions failed to account for the inode root during calculation, potentially causing the system to attempt accessing memory regions outside the actual cursor range when the btree size was sufficiently large. This vulnerability is an Out-of-bounds memory issue, which could lead to system instability or malicious exploitation. The fix has been implemented at the kernel level, and all systems using the xfs file system are advised to immediately update to the Linux kernel version containing this patch to ensure accurate data structure calculation and system memory safety.",
+    tags_en: ["Linux Kernel", "xfs", "rtrmap", "rtrefcount", "CVE-2026-97548", "Out-of-bounds"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-97548", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260925-14229",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux XFS 文件系統修復區塊預留不足問題，避免檔案系統崩潰",
+    summary: "本篇技術公告指出 XFS 文件系統在執行檔案系統修復（xfs_scrub）或目錄操作時，可能因區塊預留計算錯誤而導致斷言失敗（Assertion failed），進而造成檔案系統不穩定甚至崩潰。問題根源在於 XFS 內部邏輯在計算目錄區塊（directory block）的總預留空間時，錯誤地將 `args->total` 設置為 1，而非應根據文件系統區塊大小（fsbcount）計算的正確值。這導致系統在嘗試擴展目錄節點（inode）時，預留的空間不足以覆蓋實際所需的區塊數量。修復建議是修改相關的邏輯，特別是使用 `xfs_dabuf_nfsb` 輔助函數來正確計算目錄和擴展屬性（xattr）所需的區塊數量，確保預留空間的準確性。這類修復屬於核心層面的文件系統穩定性改進，建議使用包含此修補的 XFS 版本。",
+    tags: ["Linux 核心", "XFS", "文件系統", "xfs_scrub", "CVE-2026-97549"],
+    title_en: "Linux XFS Filesystem Insufficient Block Allocation During Repair, Preventing Filesystem Crash",
+    summary_en: "This technical advisory points out that the XFS filesystem may encounter assertion failures, leading to filesystem instability or even a crash, when performing filesystem repairs (xfs_scrub) or directory operations. The root cause lies in XFS's internal logic incorrectly setting `args->total` to 1 when calculating the total reserved space for directory blocks, instead of using the correct value derived from the filesystem block count (fsbcount). This results in the system having insufficient reserved space to cover the actual required block count when attempting to expand directory inodes. The recommended fix is to modify the relevant logic, specifically by utilizing the `xfs_dabuf_nfsb` helper function to accurately calculate the block count required for directories and extended attributes (xattr), thereby ensuring the precision of reserved space. This type of fix constitutes a core-level filesystem stability improvement, and users are advised to use an XFS version containing this patch.",
+    tags_en: ["Linux Kernel", "XFS", "Filesystem", "xfs_scrub", "CVE-2026-97549"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-97549", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260925-14230",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心 xfs 修正單位轉換錯誤，修復 per_binval 計算邏輯",
+    summary: "本更新針對 Linux 核心中的 xfs 文件系統元件，修復了 `per_binval` 計算過程中的單位轉換錯誤。開發者發現，在 `xfs_buf_inval_log_space` 函數的第二個參數本應以位元組（bytes）為單位，但 `max_binval` 卻是以文件系統區塊（fsblocks）為單位。原先的單位轉換方向是錯誤的，修補後將正確地將單位從文件系統區塊（FSB）轉換為位元組（B），確保計算的準確性。此修補屬於核心元件的邏輯修正，旨在提高 xfs 文件系統的穩定性和數據處理的正確性。建議使用已修補的 Linux 核心版本以避免潛在的計算錯誤。",
+    tags: ["Linux 核心", "xfs", "per_binval", "單位轉換", "文件系統"],
+    title_en: "Linux Kernel xfs Fixes Unit Conversion Error in per_binval Calculation",
+    summary_en: "This update addresses the xfs file system component within the Linux kernel, fixing a unit conversion error during the `per_binval` calculation process. Developers discovered that the second parameter in the `xfs_buf_inval_log_space` function should be in bytes, but `max_binval` was incorrectly using file system blocks (fsblocks). The original unit conversion direction was flawed; the patch correctly converts the unit from file system blocks (FSB) to bytes (B), ensuring calculation accuracy. This fix is a core component logic correction aimed at improving the stability and data processing accuracy of the xfs file system. Users are advised to use the patched Linux kernel version to prevent potential calculation errors.",
+    tags_en: ["Linux Kernel", "xfs", "per_binval", "unit conversion", "file system"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-97550", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260925-14231",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux xfs 檔案系統修復漏洞：初始化參數錯誤導致檔案系統分配失敗",
+    summary: "本漏洞存在於 Linux 核心的 xfs 檔案系統中，涉及 `xfs_parent_da_args_init()` 函數。當該函數使用零初始化（`kmem_cache_zalloc`）創建 `xfs_parent_args` 時，`args->total` 欄位會被設為 0。然而，`xfs_da_grow_inode_int()` 函數將此欄位誤判為可用的區塊預留量並進行減法操作。由於 `xfs_extlen_t` 定義為 `uint32_t`，第一次屬性分叉（attr-fork growth）會導致該值環繞（wrap）至接近 0。這使得 `xfs_alloc_space_available()` 中的可用空間檢查失效。當此情況發生在可用區塊恰好為零的 AG 上時，分配操作會被限制為最大長度 0，並返回 `-ENOSPC`，最終被 `xfs_defer_finish_noroll()` 升級為檔案系統關機。修補建議是在執行可成長的分叉（add and replace paths）時，應像日誌恢復路徑（`xfs_attri_recover_work()`）一樣，正確設定 `args->total` 欄位，以確保與不改變此欄位的移除和查詢操作保持一致性。",
+    tags: ["Linux 核心", "xfs", "CVE-2026-97551", "檔案系統", "xfs_parent_args"],
+    title_en: "Linux xfs Filesystem Recovery Vulnerability: Incorrect Initialization Parameter Causes Filesystem Allocation Failure",
+    summary_en: "This vulnerability exists in the xfs filesystem within the Linux kernel, specifically involving the `xfs_parent_da_args_init()` function. When this function uses zero initialization (`kmem_cache_zalloc`) to create `xfs_parent_args`, the `args->total` field is set to 0. However, the `xfs_da_grow_inode_int()` function incorrectly interprets this field as available block reservation and performs a subtraction operation. Because `xfs_extlen_t` is defined as `uint32_t`, the first attribute fork growth causes this value to wrap around to a value close to 0. This invalidates the available space check within `xfs_alloc_space_available()`. When this situation occurs on an Allocation Group (AG) with exactly zero available blocks, the allocation operation is limited to a maximum length of 0, returning `-ENOSPC`, which is ultimately escalated by `xfs_defer_finish_noroll()` to a filesystem shutdown. The patch suggests that when performing a growable fork (add and replace paths), the `args->total` field should be correctly set, similar to how the log recovery path (`xfs_attri_recover_work()`) does, to ensure consistency with removal and query operations that do not modify this field.",
+    tags_en: ["Linux Kernel", "xfs", "CVE-2026-97551", "Filesystem", "xfs_parent_args"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-97551", lang: "EN" }
+    ]
+  },
+  {
     id: "20260925-13342",
     trackers: ["os", "security"],
     category: "法規與標準",

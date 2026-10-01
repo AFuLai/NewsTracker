@@ -1647,6 +1647,20 @@ window.TRACKER_DAYS["2026-09-29"] = [
     ]
   },
   {
+    id: "20260929-14232",
+    trackers: ["os", "security"],
+    category: "Android",
+    title: "Google Chrome Android 瀏覽器存在 ANGLE 緩衝區溢位漏洞，可能允許遠端執行任意程式碼",
+    summary: "Google Chrome 在 Android 平台上的瀏覽器核心，其 ANGLE 組件存在緩衝區溢位（Buffer overflow）漏洞。此漏洞影響版本為 154.0.8037.92 之前的版本。攻擊者若能透過精心設計的 HTML 頁面，可利用此漏洞在沙盒（sandbox）外部執行任意程式碼。這被評定為 Chromium 安全嚴重等級：Critical。建議使用者應立即更新至修補此漏洞的 Chrome 版本，以防止遠端攻擊者利用此漏洞造成系統安全風險。",
+    tags: ["Google Chrome", "Android", "ANGLE", "Buffer overflow", "CVE-2026-102331", "Chromium"],
+    title_en: "Google Chrome Android Browser Vulnerable to ANGLE Buffer Overflow, Potentially Allowing Remote Code Execution",
+    summary_en: "The ANGLE component within the Google Chrome browser core on the Android platform contains a buffer overflow vulnerability. This vulnerability affects versions prior to 154.0.8037.92. An attacker could exploit this flaw using a specially crafted HTML page to execute arbitrary code outside the sandbox. This has been rated as a Critical Chromium security severity. Users are advised to immediately update to the patched Chrome version to prevent remote attackers from exploiting this vulnerability and causing system security risks.",
+    tags_en: ["Google Chrome", "Android", "ANGLE", "Buffer overflow", "CVE-2026-102331", "Chromium"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-102331", lang: "EN" }
+    ]
+  },
+  {
     id: "20260929-13303",
     trackers: ["security"],
     category: "前瞻技術",

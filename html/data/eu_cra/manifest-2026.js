@@ -2,8 +2,9 @@
 window.TRACKER_YEAR = window.TRACKER_YEAR || {};
 window.TRACKER_YEAR["eu_cra"] = window.TRACKER_YEAR["eu_cra"] || {};
 window.TRACKER_YEAR["eu_cra"]["2026"] = {
-  months: ["2026-09", "2026-08", "2026-07", "2026-06", "2026-05", "2026-04", "2026-03", "2026-02", "2026-01"],
+  months: ["2026-10", "2026-09", "2026-08", "2026-07", "2026-06", "2026-05", "2026-04", "2026-03", "2026-02", "2026-01"],
   monthFiles: {
+    "2026-10": "manifest-202610.js",
     "2026-09": "manifest-202609.js",
     "2026-08": "manifest-202608.js",
     "2026-07": "manifest-202607.js",
@@ -14,5 +15,5 @@ window.TRACKER_YEAR["eu_cra"]["2026"] = {
     "2026-02": "manifest-202602.js",
     "2026-01": "manifest-202601.js"
   },
-  lastUpdated: "2026-09-30"
+  lastUpdated: "2026-10-01"
 };
