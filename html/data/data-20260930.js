@@ -268,6 +268,132 @@ window.TRACKER_DAYS["2026-09-30"] = [
     ]
   },
   {
+    id: "20260930-14419",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "NVIDIA Linux顯示驅動程式存在核心層級漏洞，可能導致程式碼執行與權限提升",
+    summary: "NVIDIA 的 GPU 顯示驅動程式針對 Linux 系統，在核心模式層級（kernel mode layer）存在一項安全漏洞。此漏洞的本質在於，系統對於唯讀記憶體（read-only memory）的權限保護機制可能無法得到正確維護。若攻擊者成功利用此漏洞，可能導致嚴重的安全後果，包括但不限於程式碼執行（code execution）、服務拒絕（denial of service）、權限提升（escalation of privileges）、資訊洩露（information disclosure）以及資料篡改（data tampering）。由於此漏洞位於核心層級，其影響範圍廣泛，可能危害到運行在該系統上的所有應用程式和資料。建議使用者應密切關注 NVIDIA 官方的安全公告，並儘速更新到修補了此漏洞的驅動程式版本，以降低被攻擊的風險。",
+    tags: ["NVIDIA", "Linux", "GPU", "顯示驅動程式", "核心模式", "CVE"],
+    title_en: "NVIDIA Linux Display Driver Contains Kernel-Level Vulnerability, Potentially Leading to Code Execution and Privilege Escalation",
+    summary_en: "A security vulnerability has been found in NVIDIA's GPU display driver for Linux systems, residing at the kernel mode layer. The core issue lies in the system's potential failure to correctly maintain read-only memory permission protection. If an attacker successfully exploits this vulnerability, it could lead to severe security consequences, including but not limited to code execution, denial of service, escalation of privileges, information disclosure, and data tampering. Because this vulnerability is located at the kernel level, its impact is widespread, potentially compromising all applications and data running on the system. Users are advised to closely monitor official NVIDIA security announcements and promptly update to a patched driver version to mitigate the risk of attack.",
+    tags_en: ["NVIDIA", "Linux", "GPU", "Display Driver", "Kernel Mode", "CVE"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-47489", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260930-14420",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "NVIDIA Linux顯示驅動程式存在核心層級漏洞，可能導致程式碼執行與權限提升",
+    summary: "NVIDIA GPU 顯示驅動程式的 Linux 核心模式層（kernel mode layer）包含一個安全漏洞。此漏洞允許未授權使用者（unprivileged user）觸發不當的記憶體資源釋放，導致底層記憶體被重用後，仍可存取到記憶體映射（mapping）的狀態。若成功利用此漏洞，攻擊者可能導致程式碼執行（code execution）、拒絕服務（denial of service）、權限提升（escalation of privileges）、資訊洩露（information disclosure）以及資料篡改等嚴重後果。建議使用者應留意 NVIDIA 官方發布的修補程式或更新，以修復此核心層級的記憶體管理缺陷，防止潛在的系統安全風險。",
+    tags: ["NVIDIA", "Linux", "GPU", "顯示驅動程式", "核心層級", "記憶體管理", "CVE"],
+    title_en: "NVIDIA Linux Display Driver Contains Kernel-Level Vulnerability, Potentially Leading to Code Execution and Privilege Escalation",
+    summary_en: "A security vulnerability has been found in the kernel mode layer of the NVIDIA GPU display driver for Linux. This vulnerability allows an unprivileged user to trigger improper memory resource deallocation, which, after the underlying memory is reused, still allows access to the memory mapping. Successful exploitation of this flaw could lead to severe consequences, including code execution, denial of service, privilege escalation, information disclosure, and data tampering. Users are advised to monitor for official patches or updates released by NVIDIA to fix this kernel-level memory management defect and prevent potential system security risks.",
+    tags_en: ["NVIDIA", "Linux", "GPU", "Display Driver", "Kernel-Level", "Memory Management", "CVE"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-47491", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260930-14426",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "NVIDIA Linux顯示驅動程式存在核心模式漏洞，可能導致程式碼執行與權限提升",
+    summary: "NVIDIA 的 GPU 顯示驅動程式在 Linux 核心模式層面存在一個安全漏洞。此漏洞允許使用者透過提供不匹配的記憶體緩衝區（mismatched memory buffers）來觸發「超出界限寫入」（out-of-bounds write）。若成功利用此漏洞，攻擊者可能導致程式碼執行（code execution）、服務拒絕（denial of service）、權限提升（escalation of privileges）、資訊洩露（information disclosure）以及資料篡改等嚴重後果。建議使用者應留意 NVIDIA 官方的安全公告，並儘快更新至修補後的驅動程式版本，以降低系統被惡意利用的風險。由於原文未提供具體 CVE 編號或修補版本，建議系統管理員應以官方公告為依據，及時進行升級。",
+    tags: ["NVIDIA", "Linux", "GPU", "顯示驅動程式", "核心模式", "Out-of-bounds write"],
+    title_en: "NVIDIA Linux Display Driver Contains Kernel Mode Vulnerability, Potentially Leading to Code Execution and Privilege Escalation",
+    summary_en: "A security vulnerability exists in NVIDIA's GPU display driver at the Linux kernel mode level. This vulnerability allows an attacker to trigger an 'out-of-bounds write' by providing mismatched memory buffers. Successful exploitation could lead to severe consequences, including code execution, denial of service, privilege escalation, information disclosure, and data tampering. Users are advised to monitor official NVIDIA security announcements and update to a patched driver version as soon as possible to mitigate the risk of malicious exploitation. Since the original text did not provide a specific CVE ID or patched version, system administrators are advised to rely on official announcements and perform timely upgrades.",
+    tags_en: ["NVIDIA", "Linux", "GPU", "Display Driver", "Kernel Mode", "Out-of-bounds write"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-47501", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260930-14427",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "NVIDIA vGPU Virtual GPU Manager 存在核心層級漏洞：可能導致記憶體損壞與權限提升",
+    summary: "NVIDIA 的 vGPU Virtual GPU Manager，無論是在 Windows 或 Linux 環境下運行，其核心模式層級（kernel mode layer）存在一個安全漏洞。該漏洞的本質是允許訪客使用者（guest user）觸發一個整數溢位（integer overflow）的狀況，進而導致系統記憶體發生損壞。若攻擊者成功利用此漏洞，可能導致程式碼執行（code execution）、服務拒絕（denial of service）、權限提升（escalation of privileges）、資訊洩露（information disclosure）以及資料篡改等嚴重後果。建議使用者應留意 NVIDIA 的安全公告，並盡快更新 vGPU Virtual GPU Manager 的版本，以修補此類核心層級的漏洞，降低系統被惡意利用的風險。",
+    tags: ["NVIDIA", "vGPU", "Virtual GPU Manager", "Kernel Mode", "整數溢位", "CVE"],
+    title_en: "NVIDIA vGPU Virtual GPU Manager contains core-level vulnerability: Potential for memory corruption and privilege escalation",
+    summary_en: "The vGPU Virtual GPU Manager from NVIDIA, whether running in Windows or Linux environments, contains a security vulnerability at the kernel mode layer. The vulnerability essentially allows a guest user to trigger an integer overflow condition, which can subsequently lead to system memory corruption. If an attacker successfully exploits this vulnerability, it could result in severe consequences such as code execution, denial of service, privilege escalation, information disclosure, and data tampering. Users are advised to monitor NVIDIA's security announcements and update the vGPU Virtual GPU Manager version promptly to patch this kernel-level vulnerability, thereby reducing the risk of malicious exploitation of the system.",
+    tags_en: ["NVIDIA", "vGPU", "Virtual GPU Manager", "Kernel Mode", "Integer Overflow", "CVE"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-47502", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260930-14437",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "NVIDIA Linux顯示驅動程式存在核心模式漏洞，本地使用者可透過 ioctl 觸發空指標解引用",
+    summary: "NVIDIA 為 Linux 平台提供的 GPU 顯示驅動程式，其核心模式驅動程式中存在一漏洞。該漏洞允許本地使用者透過提交精心構造的 ioctl 呼叫，觸發空指標解引用（null pointer dereference）。若成功利用此漏洞，攻擊者可能導致系統服務無法正常運作（denial of service）。本漏洞的影響範圍限於本地使用者，攻擊向量為本地。文章未提供 CVSS 分數、受影響版本或修補建議，建議使用者應關注 NVIDIA 官方發布的驅動程式安全更新，並儘快進行修補。",
+    tags: ["NVIDIA", "Linux", "GPU", "ioctl", "空指標解引用", "核心模式驅動程式"],
+    title_en: "NVIDIA Linux Display Driver Contains Kernel Mode Vulnerability, Local User Can Trigger Null Pointer Dereference via ioctl",
+    summary_en: "A vulnerability exists in the kernel-mode driver for NVIDIA's GPU display drivers on Linux platforms. This vulnerability allows a local user to trigger a null pointer dereference by submitting a specially crafted ioctl call. Successful exploitation of this flaw could potentially lead to a denial of service for system services. The impact of this vulnerability is limited to local users, and the attack vector is local. As the article does not provide a CVSS score, affected versions, or patch recommendations, users are advised to monitor official NVIDIA driver security updates and apply patches promptly.",
+    tags_en: ["NVIDIA", "Linux", "GPU", "ioctl", "Null Pointer Dereference", "Kernel Mode Driver"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-47517", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260930-14438",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "NVIDIA vGPU Virtual GPU Manager for Linux 存在核心層級漏洞，可能導致程式碼執行與權限提升",
+    summary: "NVIDIA vGPU Virtual GPU Manager for Linux 包含一個核心模式層級的漏洞。攻擊者若成功利用此漏洞，可能導致「越界讀取」（out-of-bounds read）的狀況。此漏洞的實務影響極為嚴重，成功利用後可能導致程式碼執行、服務拒絕、權限提升、資訊洩露，甚至資料篡改。本漏洞主要影響運行在 Linux 環境下的 vGPU 虛擬化管理工具。建議使用者應留意 NVIDIA 官方的修補或更新公告，以確保系統的安全性。",
+    tags: ["NVIDIA", "vGPU", "Linux", "CVE-2026-47519", "核心漏洞", "越界讀取"],
+    title_en: "NVIDIA vGPU Virtual GPU Manager for Linux contains kernel-level vulnerability, potentially leading to code execution and privilege escalation",
+    summary_en: "The NVIDIA vGPU Virtual GPU Manager for Linux contains a kernel-level vulnerability. If an attacker successfully exploits this flaw, it could lead to an out-of-bounds read condition. The practical impact of this vulnerability is extremely severe, potentially allowing for code execution, denial of service, privilege escalation, information leakage, and even data tampering. This vulnerability primarily affects vGPU virtualization management tools running in a Linux environment. Users are advised to monitor official NVIDIA patches or updates to ensure system security.",
+    tags_en: ["NVIDIA", "vGPU", "Linux", "CVE-2026-47519", "Kernel Vulnerability", "Out-of-bounds Read"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-47519", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260930-14439",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "NVIDIA vGPU Virtual GPU Manager for Linux 存在核心模式漏洞，可能導致程式碼執行與權限提升",
+    summary: "NVIDIA vGPU Virtual GPU Manager for Linux 內建的核心模式層（kernel mode layer）存在一個安全漏洞。此漏洞允許攻擊者執行越界讀取（out-of-bounds read）操作。若成功利用此漏洞，攻擊者可能導致程式碼執行（code execution）、服務拒絕（denial of service）、權限提升（escalation of privileges）、資訊洩露（information disclosure）以及資料篡改等嚴重後果。本漏洞的修補建議是更新到修復了此問題的 NVIDIA vGPU Virtual GPU Manager 版本，以消除核心模式層的風險。",
+    tags: ["NVIDIA", "vGPU", "Linux", "CVE-2026-47520", "核心模式", "越界讀取"],
+    title_en: "NVIDIA vGPU Virtual GPU Manager for Linux has kernel mode vulnerability, potentially leading to code execution and privilege escalation",
+    summary_en: "A security vulnerability exists in the kernel mode layer of NVIDIA vGPU Virtual GPU Manager for Linux. This vulnerability allows an attacker to perform an out-of-bounds read operation. Successful exploitation could lead to severe consequences, including code execution, denial of service, privilege escalation, information disclosure, and data tampering. The recommended fix for this vulnerability is to update to an NVIDIA vGPU Virtual GPU Manager version that addresses this issue, thereby eliminating the risk in the kernel mode layer.",
+    tags_en: ["NVIDIA", "vGPU", "Linux", "CVE-2026-47520", "Kernel Mode", "Out-of-bounds Read"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-47520", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260930-14440",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "NVIDIA vGPU Virtual GPU Manager 存在核心層級漏洞，可能導致程式碼執行與權限提升",
+    summary: "NVIDIA 的 vGPU Virtual GPU Manager 針對 Linux 系統，其核心模式層級（kernel mode layer）包含一個安全漏洞。攻擊者若成功利用此漏洞，可能觸發「越界讀取」（out-of-bounds read）的行為。此漏洞的實務影響極為嚴重，成功利用後可能導致程式碼執行（code execution）、拒絕服務（denial of service）、權限提升（escalation of privileges）、資訊洩露（information disclosure）以及資料篡改（data tampering）。建議使用者應密切關注 NVIDIA 官方的修補公告，並儘快更新 vGPU Virtual GPU Manager 至修復版本，以降低系統被惡意利用的風險。",
+    tags: ["NVIDIA", "vGPU", "Virtual GPU Manager", "Linux", "CVE-2026-47521", "越界讀取"],
+    title_en: "NVIDIA vGPU Virtual GPU Manager contains core-level vulnerability, potentially leading to code execution and privilege escalation",
+    summary_en: "A security vulnerability has been found in NVIDIA's vGPU Virtual GPU Manager for Linux systems, specifically within its kernel mode layer. If an attacker successfully exploits this vulnerability, it could trigger an out-of-bounds read. The practical impact of this vulnerability is extremely severe, potentially leading to code execution, denial of service, escalation of privileges, information disclosure, and data tampering. Users are advised to closely monitor official NVIDIA patch announcements and update the vGPU Virtual GPU Manager to the patched version as soon as possible to mitigate the risk of malicious exploitation.",
+    tags_en: ["NVIDIA", "vGPU", "Virtual GPU Manager", "Linux", "CVE-2026-47521", "Out-of-bounds read"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-47521", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260930-14445",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "NVIDIA GPU Linux 顯示驅動程式存在核心層級漏洞，可能導致程式碼執行與權限提升",
+    summary: "NVIDIA 的 GPU 顯示驅動程式針對 Linux 系統，在核心模式層級存在一個安全漏洞。此漏洞允許攻擊者執行「超出界限寫入」（out-of-bounds write）操作。若成功利用此漏洞，攻擊者可能導致程式碼執行、服務拒絕、權限提升、資訊洩露，甚至資料篡改等嚴重後果。本漏洞的修補建議是更新至修復後的 NVIDIA 顯示驅動程式版本，以消除核心模式層級的風險。",
+    tags: ["NVIDIA", "Linux", "GPU", "顯示驅動程式", "核心模式", "out-of-bounds write"],
+    title_en: "NVIDIA GPU Linux Display Driver Contains Kernel-Level Vulnerability, Potentially Leading to Code Execution and Privilege Escalation",
+    summary_en: "A security vulnerability exists in NVIDIA's GPU display driver for Linux systems, residing at the kernel mode level. This vulnerability allows an attacker to perform an 'out-of-bounds write' operation. Successful exploitation could lead to severe consequences, including code execution, denial of service, privilege escalation, information leakage, and even data tampering. The recommended mitigation is to update to a patched version of the NVIDIA display driver to eliminate the kernel-level risk.",
+    tags_en: ["NVIDIA", "Linux", "GPU", "Display Driver", "Kernel Mode", "out-of-bounds write"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-47529", lang: "EN" }
+    ]
+  },
+  {
     id: "20260930-13837",
     trackers: ["security"],
     category: "法規與標準",
@@ -363,6 +489,202 @@ window.TRACKER_DAYS["2026-09-30"] = [
     tags_en: ["Windows 11", "Assisted Setup", "OOBE", "Microsoft", "Windows 24H2", "Application Installation"],
     sources: [
       { name: "Windows Latest", url: "https://windowslatest.com/2026/09/30/windows-11-setup-now-offers-to-install-tiktok-and-netflix-on-your-new-pc", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260930-14421",
+    trackers: ["os", "security"],
+    category: "Windows",
+    title: "NVIDIA GPU 顯示驅動程式存在核心層級漏洞，可能導致存取控制不當與服務拒絕",
+    summary: "NVIDIA 的 GPU 顯示驅動程式，無論是在 Windows 還是 Linux 系統上，都包含一個核心模式層級的漏洞。此漏洞允許攻擊者造成不當的存取控制（improper access control）。若成功利用此漏洞，最直接的影響是可能導致系統服務拒絕（denial of service）。本漏洞屬於核心層級的缺陷，影響範圍涵蓋使用 NVIDIA 顯示卡作為顯示驅動程式的系統。建議使用者應留意 NVIDIA 官方發布的安全公告，並儘速更新到修補了此核心模式漏洞的驅動程式版本，以降低被攻擊的風險。",
+    tags: ["NVIDIA", "GPU", "顯示驅動程式", "核心模式", "存取控制", "CVE-2026-47492"],
+    title_en: "NVIDIA GPU Display Driver Contains Kernel-Level Vulnerability, Potentially Leading to Improper Access Control and Denial of Service",
+    summary_en: "NVIDIA's GPU display driver contains a kernel-level vulnerability, applicable on both Windows and Linux operating systems. This vulnerability allows an attacker to achieve improper access control. If successfully exploited, the most direct impact is a potential denial of service (DoS) to system services. As a kernel-level flaw, the vulnerability affects systems utilizing NVIDIA graphics cards as display drivers. Users are advised to monitor official NVIDIA security advisories and promptly update to a patched driver version to mitigate the risk of attack.",
+    tags_en: ["NVIDIA", "GPU", "Display Driver", "Kernel Mode", "Access Control", "CVE-2026-47492"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-47492", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260930-14425",
+    trackers: ["os", "security"],
+    category: "Windows",
+    title: "NVIDIA GPU顯示驅動程式存在Use-After-Free漏洞，可能導致程式碼執行與權限提升",
+    summary: "NVIDIA的GPU顯示驅動程式，無論是針對Windows還是Linux系統，在核心模式層（kernel mode layer）存在一項安全漏洞。此漏洞的根源在於錯誤路徑（error paths）中，參考計數（reference counts）清理不當，可能導致「使用後釋放」（use-after-free）的狀況。若攻擊者成功利用此漏洞，可能導致程式碼執行、服務拒絕、權限提升、資訊洩露，甚至資料篡改等嚴重後果。建議使用者應留意NVIDIA官方發布的修補程式或安全更新，以修復此核心驅動程式的缺陷，避免潛在的系統安全風險。",
+    tags: ["NVIDIA", "GPU", "顯示驅動程式", "Use-After-Free", "核心模式", "CVE-2026-47500"],
+    title_en: "NVIDIA GPU Display Driver Contains Use-After-Free Vulnerability, Potentially Leading to Code Execution and Privilege Escalation",
+    summary_en: "A security vulnerability exists in NVIDIA's GPU display driver, affecting both Windows and Linux systems, within the kernel mode layer. The root cause of this vulnerability is improper reference count cleanup in error paths, which can lead to a 'use-after-free' condition. If an attacker successfully exploits this vulnerability, it could result in severe consequences such as code execution, denial of service, privilege escalation, information leakage, and even data tampering. Users are advised to monitor for official patches or security updates released by NVIDIA to fix this core driver flaw and prevent potential system security risks.",
+    tags_en: ["NVIDIA", "GPU", "Display Driver", "Use-After-Free", "Kernel Mode", "CVE-2026-47500"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-47500", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260930-14428",
+    trackers: ["os", "security"],
+    category: "Windows",
+    title: "NVIDIA GPU 顯示驅動程式存在核心模式漏洞，可能導致程式碼執行與權限提升",
+    summary: "NVIDIA 的 GPU 顯示驅動程式，無論是針對 Windows 還是 Linux 系統，其核心模式層（kernel mode layer）包含一個安全漏洞。此漏洞允許使用者執行越界陣列存取（out-of-bounds array access）。若成功利用此漏洞，攻擊者可能導致程式碼執行、服務拒絕（Denial of Service, DoS）、權限提升（escalation of privileges）、資訊洩露，甚至資料篡改。由於此漏洞位於核心模式，其潛在的實務影響極為嚴重，可能危害作業系統的穩定性與安全性。建議使用者及系統管理員應密切關注 NVIDIA 官方的修補公告，並儘快更新至修復了此漏洞的驅動程式版本，以降低被攻擊的風險。",
+    tags: ["NVIDIA", "GPU", "顯示驅動程式", "核心模式", "CVE-2026-47507", "Windows", "Linux"],
+    title_en: "NVIDIA GPU Display Driver Contains Kernel Mode Vulnerability, Potentially Leading to Code Execution and Privilege Escalation",
+    summary_en: "A security vulnerability has been found in the kernel mode layer of NVIDIA's GPU display drivers, affecting both Windows and Linux operating systems. This vulnerability allows users to perform out-of-bounds array access. Successful exploitation could enable an attacker to achieve code execution, Denial of Service (DoS), privilege escalation, information leakage, or even data tampering. Because this vulnerability resides in kernel mode, its potential practical impact is extremely severe, potentially compromising the stability and security of the operating system. Users and system administrators are advised to closely monitor official NVIDIA patch announcements and update to a patched driver version as soon as possible to mitigate the risk of attack.",
+    tags_en: ["NVIDIA", "GPU", "Display Driver", "Kernel Mode", "CVE-2026-47507", "Windows", "Linux"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-47507", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260930-14429",
+    trackers: ["os", "security"],
+    category: "Windows",
+    title: "NVIDIA GPU 顯示驅動程式存在核心層級漏洞，可能導致程式碼執行與權限提升",
+    summary: "NVIDIA 的 GPU 顯示驅動程式（適用於 Windows 和 Linux）在核心模式層級包含一個安全漏洞。此漏洞允許使用者透過引起數值類型轉換錯誤，成功利用後可能導致程式碼執行、服務拒絕、權限提升、資訊洩露以及資料篡改等嚴重後果。由於此漏洞位於核心層級，攻擊的潛在影響極大，可能影響系統的穩定性和安全性。建議使用者應留意 NVIDIA 官方發布的修補程式或安全更新，以確保驅動程式能夠修復此數值類型轉換的錯誤，避免遭受潛在的惡意攻擊。",
+    tags: ["NVIDIA", "GPU 驅動程式", "核心層級", "CVE-2026-47508", "Windows", "Linux"],
+    title_en: "NVIDIA GPU Display Driver Contains Kernel-Level Vulnerability, Potentially Leading to Code Execution and Privilege Escalation",
+    summary_en: "NVIDIA's GPU display driver (for Windows and Linux) contains a security vulnerability at the kernel mode level. This vulnerability allows an attacker to successfully exploit it by triggering a numeric type conversion error, which could lead to severe consequences such as code execution, denial of service, privilege escalation, information leakage, and data tampering. Because this vulnerability resides at the kernel level, the potential impact of an attack is significant, potentially affecting system stability and security. Users are advised to monitor official NVIDIA releases for patches or security updates to ensure the driver corrects this numeric type conversion error and avoids potential malicious attacks.",
+    tags_en: ["NVIDIA", "GPU Driver", "Kernel-Level", "CVE-2026-47508", "Windows", "Linux"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-47508", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260930-14430",
+    trackers: ["os", "security"],
+    category: "Windows",
+    title: "NVIDIA GPU 顯示驅動程式存在核心層級漏洞，可能導致程式碼執行與權限提升",
+    summary: "NVIDIA 的 GPU 顯示驅動程式（適用於 Windows 和 Linux）在核心模式層級存在一項漏洞。此漏洞允許使用者執行越界寫入（out-of-bounds write）操作。若成功利用此漏洞，攻擊者可能導致程式碼執行、服務拒絕、權限提升、資訊洩露，甚至資料篡改。這是一個嚴重的核心層級漏洞，影響範圍涵蓋使用 NVIDIA 顯示卡的系統。建議使用者應留意 NVIDIA 官方發布的修補程式或更新，以修復此核心模式的安全性缺陷，避免潛在的系統安全風險。",
+    tags: ["NVIDIA", "GPU", "顯示驅動程式", "核心模式", "越界寫入", "CVE-2026-47509"],
+    title_en: "NVIDIA GPU Display Driver Contains Kernel-Level Vulnerability, Potentially Leading to Code Execution and Privilege Escalation",
+    summary_en: "A vulnerability exists in NVIDIA's GPU display driver (applicable to Windows and Linux) at the kernel mode level. This vulnerability allows users to perform an out-of-bounds write operation. If successfully exploited, an attacker could potentially achieve code execution, denial of service, privilege escalation, information leakage, or even data tampering. This is a critical kernel-level vulnerability affecting systems that utilize NVIDIA graphics cards. Users are advised to monitor NVIDIA's official releases for patches or updates to remediate this kernel-mode security flaw and prevent potential system security risks.",
+    tags_en: ["NVIDIA", "GPU", "Display Driver", "Kernel Mode", "Out-of-bounds Write", "CVE-2026-47509"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-47509", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260930-14431",
+    trackers: ["os", "security"],
+    category: "Windows",
+    title: "NVIDIA GPU 顯示驅動程式存在核心層級漏洞，可能導致程式碼執行與權限提升",
+    summary: "NVIDIA 的 GPU 顯示驅動程式，無論是在 Windows 或 Linux 作業系統上運行，其核心模式層級（kernel mode layer）存在一項安全漏洞。此漏洞允許使用者觸發整數溢位（integer overflow），進而導致對 GPU 記憶體發生越界寫入（out-of-bounds write）。若成功利用此漏洞，攻擊者可能達成程式碼執行（code execution）、拒絕服務（denial of service）、權限提升（escalation of privileges）、資訊洩露（information disclosure）以及資料篡改等嚴重後果。由於此漏洞影響核心驅動程式，建議使用者應密切關注 NVIDIA 官方的修補更新，以確保系統的安全性。",
+    tags: ["NVIDIA", "GPU", "顯示驅動程式", "kernel mode", "integer overflow", "CVE-2026-47510"],
+    title_en: "NVIDIA GPU Display Driver Contains Kernel-Level Vulnerability, Potentially Leading to Code Execution and Privilege Escalation",
+    summary_en: "A security vulnerability exists within NVIDIA's GPU display drivers, affecting both Windows and Linux operating systems, specifically within the kernel mode layer. This vulnerability allows an attacker to trigger an integer overflow, which in turn can lead to an out-of-bounds write to GPU memory. Successful exploitation of this flaw could result in severe consequences, including code execution, denial of service, privilege escalation, information disclosure, and data tampering. Because this vulnerability impacts the core driver, users are advised to closely monitor official NVIDIA patches and updates to ensure system security.",
+    tags_en: ["NVIDIA", "GPU", "Display Driver", "kernel mode", "integer overflow", "CVE-2026-47510"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-47510", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260930-14433",
+    trackers: ["os", "security"],
+    category: "Windows",
+    title: "NVIDIA GPU 顯示驅動程式存在核心層漏洞，可能導致資訊洩露與權限提升",
+    summary: "NVIDIA 的 GPU 顯示驅動程式，無論是針對 Windows 還是 Linux 系統，其核心模式層（kernel mode layer）都存在一項漏洞。此漏洞允許使用者觸發「越界讀取」（out-of-bounds read），進而導致核心層的資訊洩露。若成功利用此漏洞，攻擊者可能面臨更嚴重的後果，包括執行任意程式碼、服務拒絕、權限提升，以及資料篡改等。建議使用者應留意 NVIDIA 官方的安全公告，並儘快更新到修補了此漏洞的驅動程式版本，以降低系統被惡意利用的風險。",
+    tags: ["NVIDIA", "GPU", "顯示驅動程式", "Kernel Mode", "資訊洩露", "CVE-2026-47512"],
+    title_en: "NVIDIA GPU Display Driver Contains Kernel-Level Vulnerability, Potentially Leading to Information Leakage and Privilege Escalation",
+    summary_en: "A vulnerability exists in the kernel mode layer of NVIDIA's GPU display drivers, affecting both Windows and Linux operating systems. This flaw allows an attacker to trigger an 'out-of-bounds read,' potentially leading to kernel-level information leakage. Successful exploitation of this vulnerability could result in more severe consequences, including arbitrary code execution, denial of service, privilege escalation, and data tampering. Users are advised to monitor official NVIDIA security announcements and promptly update to a patched driver version to mitigate the risk of malicious exploitation.",
+    tags_en: ["NVIDIA", "GPU", "Display Driver", "Kernel Mode", "Information Leakage", "CVE-2026-47512"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-47512", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260930-14434",
+    trackers: ["os", "security"],
+    category: "Windows",
+    title: "NVIDIA GPU 顯示驅動程式存在核心層級漏洞，可能導致程式碼執行與權限提升",
+    summary: "NVIDIA 的 GPU 顯示驅動程式（適用於 Windows 和 Linux）在核心模式層級包含一個安全漏洞。此漏洞允許使用者執行超出界限的讀取操作（out-of-bounds read）於核心堆記憶體（kernel heap memory）。若成功利用此漏洞，攻擊者可能導致程式碼執行、服務拒絕、權限提升、資訊洩露，甚至資料篡改。由於這是一個核心層級的漏洞，其潛在的實務影響極為嚴重，可能危及作業系統的穩定性和安全性。建議使用者應密切關注 NVIDIA 官方發布的修補程式或安全更新，並儘快更新到修復此漏洞的驅動程式版本，以降低被攻擊的風險。",
+    tags: ["NVIDIA", "GPU", "顯示驅動程式", "核心層級", "Out-of-bounds read", "CVE-2026-47513"],
+    title_en: "NVIDIA GPU Display Driver Contains Kernel-Level Vulnerability, Potentially Leading to Code Execution and Privilege Escalation",
+    summary_en: "A security vulnerability exists in NVIDIA's GPU display driver (applicable to Windows and Linux) at the kernel mode level. This vulnerability allows a user to perform an out-of-bounds read operation on kernel heap memory. Successful exploitation could allow an attacker to achieve code execution, denial of service, privilege escalation, information leakage, or even data tampering. Due to its kernel-level nature, the potential practical impact is extremely severe, potentially compromising the stability and security of the operating system. Users are advised to closely monitor official NVIDIA patches or security updates and update to the patched driver version as soon as possible to mitigate the risk of attack.",
+    tags_en: ["NVIDIA", "GPU", "Display Driver", "Kernel-Level", "Out-of-bounds read", "CVE-2026-47513"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-47513", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260930-14435",
+    trackers: ["os", "security"],
+    category: "Windows",
+    title: "NVIDIA GPU 顯示驅動程式存在核心模式漏洞，可能導致程式碼執行與權限提升",
+    summary: "NVIDIA 的 GPU 顯示驅動程式在 Windows 和 Linux 系統上，其核心模式層（kernel mode layer）包含一個安全漏洞。此漏洞允許使用者造成核心堆疊內容的洩露，包括回傳位址（return addresses）和指標（pointers）。若成功利用此漏洞，攻擊者可能導致程式碼執行（code execution）、服務拒絕（denial of service）、權限提升（escalation of privileges）、資訊洩露（information disclosure）以及資料篡改等嚴重後果。建議使用者應留意 NVIDIA 官方的修補更新，以修復此核心層的漏洞，避免潛在的系統安全風險。",
+    tags: ["NVIDIA", "GPU", "顯示驅動程式", "核心模式", "Windows", "Linux", "CVE-2026-47514"],
+    title_en: "NVIDIA GPU Display Driver Contains Kernel Mode Vulnerability, Potentially Leading to Code Execution and Privilege Escalation",
+    summary_en: "A security vulnerability has been found in the kernel mode layer of NVIDIA's GPU display drivers on both Windows and Linux operating systems. This vulnerability allows an attacker to cause the leakage of kernel stack contents, including return addresses and pointers. Successful exploitation could lead to severe consequences such as code execution, denial of service, privilege escalation, information disclosure, and data tampering. Users are advised to monitor for official NVIDIA patches to fix this kernel-level vulnerability and prevent potential system security risks.",
+    tags_en: ["NVIDIA", "GPU", "Display Driver", "Kernel Mode", "Windows", "Linux", "CVE-2026-47514"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-47514", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260930-14436",
+    trackers: ["os", "security"],
+    category: "Windows",
+    title: "NVIDIA GPU 顯示驅動程式存在核心層級漏洞，可能導致程式碼執行與權限提升",
+    summary: "NVIDIA 的 GPU 顯示驅動程式，無論是針對 Windows 還是 Linux 系統，其核心模式（kernel mode）層級包含一個安全漏洞。此漏洞的本質是使用者可以透過一個無界限的字串操作（unbounded string operation），觸發一個越界讀取（out-of-bounds read）的行為。若此漏洞成功被利用，攻擊者可能導致程式碼執行、服務拒絕、權限提升、資訊洩露，甚至資料篡改等多重嚴重後果。建議使用者應留意 NVIDIA 官方發布的修補程式或安全更新，以修復此核心層級的缺陷，避免潛在的系統安全風險。",
+    tags: ["NVIDIA", "GPU", "顯示驅動程式", "核心漏洞", "CVE-2026-47515", "Windows", "Linux"],
+    title_en: "NVIDIA GPU Display Driver Contains Kernel-Level Vulnerability, Potentially Leading to Code Execution and Privilege Escalation",
+    summary_en: "A security vulnerability exists within the kernel mode of NVIDIA's GPU display drivers, affecting both Windows and Linux operating systems. The vulnerability stems from an unbounded string operation that allows a user to trigger an out-of-bounds read. If successfully exploited, the vulnerability could lead to multiple severe consequences, including code execution, denial of service, privilege escalation, information leakage, and even data tampering. Users are advised to monitor for official patches or security updates released by NVIDIA to fix this kernel-level flaw and prevent potential system security risks.",
+    tags_en: ["NVIDIA", "GPU", "Display Driver", "Kernel Vulnerability", "CVE-2026-47515", "Windows", "Linux"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-47515", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260930-14441",
+    trackers: ["os", "security"],
+    category: "Windows",
+    title: "NVIDIA GPU 顯示驅動程式存在核心層級漏洞，可能導致程式碼執行與權限提升",
+    summary: "NVIDIA 的 GPU 顯示驅動程式，無論是在 Windows 或 Linux 系統上運行，其核心模式層級（kernel mode layer）存在一個輸入驗證不當的漏洞。攻擊者若成功利用此漏洞，可能導致嚴重的系統安全問題，包括程式碼執行（code execution）、服務拒絕（denial of service）、權限提升（escalation of privileges）、資訊洩露（information disclosure）以及資料篡改（data tampering）。由於此漏洞位於核心層級，其潛在的實務影響極為嚴重，可能影響作業系統的穩定性與核心安全。建議使用者應密切關注 NVIDIA 官方的安全公告，並儘快更新至修補了此漏洞的驅動程式版本，以降低被惡意利用的風險。",
+    tags: ["NVIDIA", "GPU", "顯示驅動程式", "核心層級", "Windows", "Linux", "CVE-2026-47522"],
+    title_en: "NVIDIA GPU Display Driver Contains Kernel-Level Vulnerability, Potentially Leading to Code Execution and Privilege Escalation",
+    summary_en: "A vulnerability exists in NVIDIA's GPU display drivers, running on both Windows and Linux systems, within the kernel mode layer due to improper input validation. If an attacker successfully exploits this vulnerability, it could lead to severe system security issues, including code execution, denial of service, escalation of privileges, information disclosure, and data tampering. Because this vulnerability resides at the kernel level, its potential practical impact is extremely severe, potentially affecting operating system stability and core security. Users are advised to closely monitor official NVIDIA security announcements and update to a patched driver version as soon as possible to mitigate the risk of malicious exploitation.",
+    tags_en: ["NVIDIA", "GPU", "Display Driver", "Kernel-Level", "Windows", "Linux", "CVE-2026-47522"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-47522", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260930-14442",
+    trackers: ["os", "security"],
+    category: "Windows",
+    title: "NVIDIA GPU 顯示驅動程式存在核心層級漏洞，可能導致程式碼執行與權限提升",
+    summary: "NVIDIA 的 GPU 顯示驅動程式，無論是在 Windows 還是 Linux 系統上，其核心模式層（kernel mode layer）都存在一個安全漏洞。攻擊者若成功利用此漏洞，可能觸發「越界寫入」（out-of-bounds write）的行為。此漏洞的實務影響極為嚴重，成功利用後可能導致程式碼執行（code execution）、服務拒絕（denial of service）、權限提升（escalation of privileges）、資訊洩露（information disclosure）以及資料篡改（data tampering）。建議使用者應儘快更新至修補後的驅動程式版本，以消除此核心層級的威脅。",
+    tags: ["NVIDIA", "GPU", "顯示驅動程式", "Windows", "Linux", "越界寫入", "核心模式"],
+    title_en: "NVIDIA GPU Display Driver Contains Kernel-Level Vulnerability, Potentially Leading to Code Execution and Privilege Escalation",
+    summary_en: "A security vulnerability exists in the kernel mode layer of NVIDIA's GPU display drivers, affecting both Windows and Linux operating systems. If successfully exploited, an attacker could trigger an out-of-bounds write condition. The practical impact of this vulnerability is extremely severe, potentially leading to code execution, denial of service, privilege escalation, information disclosure, and data tampering. Users are advised to update to a patched driver version as soon as possible to eliminate this kernel-level threat.",
+    tags_en: ["NVIDIA", "GPU", "Display Driver", "Windows", "Linux", "Out-of-bounds Write", "Kernel Mode"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-47523", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260930-14443",
+    trackers: ["os", "security"],
+    category: "Windows",
+    title: "NVIDIA GPU顯示驅動程式存在核心層級漏洞，可能導致程式碼執行與權限提升",
+    summary: "NVIDIA 的 GPU 顯示驅動程式，無論是在 Windows 還是 Linux 系統上，其核心模式層級（kernel mode layer）包含一個安全漏洞。此漏洞允許攻擊者執行「越界讀取」（out-of-bounds read）操作。若成功利用此漏洞，攻擊者可能導致程式碼執行、服務拒絕（denial of service）、權限提升、資訊洩露，甚至資料篡改。由於此漏洞存在於核心層級，其潛在的實務影響極為嚴重，可能危害作業系統的穩定性與安全性。建議使用者應儘快更新至修補了此漏洞的 NVIDIA 顯示驅動程式版本，以降低被攻擊的風險。",
+    tags: ["NVIDIA", "GPU", "顯示驅動程式", "核心模式", "out-of-bounds read", "CVE-2026-47524"],
+    title_en: "NVIDIA GPU Display Driver Contains Kernel-Level Vulnerability, Potentially Leading to Code Execution and Privilege Escalation",
+    summary_en: "A security vulnerability exists within the kernel mode layer of NVIDIA's GPU display drivers, applicable on both Windows and Linux operating systems. This vulnerability allows attackers to perform an 'out-of-bounds read' operation. Successful exploitation could enable code execution, denial of service, privilege escalation, information leakage, and even data tampering. Due to its existence at the kernel level, the potential practical impact of this vulnerability is extremely severe, potentially compromising the stability and security of the operating system. Users are advised to update to the patched NVIDIA display driver version as soon as possible to mitigate the risk of attack.",
+    tags_en: ["NVIDIA", "GPU", "Display Driver", "Kernel Mode", "out-of-bounds read", "CVE-2026-47524"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-47524", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260930-14444",
+    trackers: ["os", "security"],
+    category: "Windows",
+    title: "NVIDIA GPU 顯示驅動程式存在核心層級漏洞，可能導致程式碼執行與權限提升",
+    summary: "NVIDIA 的 GPU 顯示驅動程式，無論是在 Windows 或 Linux 系統上運行，其核心模式層（kernel mode layer）包含一個安全漏洞。此漏洞的本質是攻擊者可以利用不當的陣列索引驗證（improper validation of an array index）。若成功利用此漏洞，攻擊者可能導致程式碼執行（code execution）、服務拒絕（denial of service）、權限提升（escalation of privileges）、資訊洩露（information disclosure）以及資料篡改等嚴重後果。由於此漏洞屬於核心層級，其影響範圍極廣，可能威脅作業系統的穩定性和安全性。建議使用者應密切關注 NVIDIA 官方的修補程式公告，並儘快更新至修復了此類核心元件漏洞的最新驅動版本，以降低被惡意利用的風險。",
+    tags: ["NVIDIA", "GPU", "顯示驅動程式", "核心層級", "Windows", "Linux"],
+    title_en: "NVIDIA GPU Display Driver Contains Kernel-Level Vulnerability, Potentially Leading to Code Execution and Privilege Escalation",
+    summary_en: "A security vulnerability exists within the kernel mode layer of NVIDIA's GPU display drivers, regardless of whether the system is running Windows or Linux. The vulnerability stems from improper validation of an array index. Successful exploitation could lead to severe consequences, including code execution, denial of service, privilege escalation, information disclosure, and data tampering. Because this vulnerability resides at the kernel level, its impact is extremely broad, potentially threatening the stability and security of the operating system. Users are advised to closely monitor official NVIDIA patch announcements and update to the latest driver version that addresses this kernel component vulnerability as soon as possible to mitigate the risk of malicious exploitation.",
+    tags_en: ["NVIDIA", "GPU", "Display Driver", "Kernel-Level", "Windows", "Linux"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-47525", lang: "EN" }
     ]
   },
   {
@@ -2020,6 +2342,90 @@ window.TRACKER_DAYS["2026-09-30"] = [
     tags_en: ["OpenAI", "OpenClaw", "OpenClaw Enterprise (OCE)", "AI Agent", "LLM", "Enterprise Security", "Governance"],
     sources: [
       { name: "The Register", url: "https://theregister.com/ai-and-ml/2026/09/30/openclaw-slips-on-a-suit-to-evade-widespread-business-bans/5299962", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260930-14409",
+    trackers: ["os"],
+    category: "重點關注",
+    title: "Azure 混合雲服務遭遇中斷：ExpressRoute 與 VPN Gateway 服務受影響",
+    summary: "微軟（Microsoft）宣布，其 Azure 雲端服務的混合雲基礎設施遭遇了網路連線中斷與管理操作故障。此次事件影響了 ExpressRoute Gateway、Azure VPN Gateway 以及 Azure VMware Service 的部分功能。ExpressRoute Gateway 用於連接本地端（on-prem）網路與 Azure 虛擬網路，是混合雲的關鍵組成部分；Azure VPN Gateway 則負責建立本地端與 Azure 之間的安全隧道。微軟指出，此次故障與基礎設施作業系統服務活動有關，導致部分受影響區域的 VPN Gateway 經歷了冗餘度降低，而非完全斷線。目前微軟的工程團隊正在使用備用健康實例恢復受影響的網路管理元件，並持續監控恢復狀況。此次事件影響了包括 West US、North Europe、Japan West 等多個 Azure 區域，但微軟尚未明確說明故障的根本原因，並持續進行調查。",
+    tags: ["Microsoft", "Azure", "ExpressRoute Gateway", "VPN Gateway", "混合雲", "雲端基礎設施"],
+    title_en: "Azure Hybrid Cloud Services Experience Outages: ExpressRoute and VPN Gateway Services Affected",
+    summary_en: "Microsoft announced network connectivity disruptions and management operation failures within its Azure cloud hybrid infrastructure. The incident affected partial functionality of ExpressRoute Gateway, Azure VPN Gateway, and Azure VMware Service. ExpressRoute Gateway is a critical component of hybrid cloud, used to connect on-premises networks with Azure virtual networks, while Azure VPN Gateway is responsible for establishing secure tunnels between on-premises locations and Azure. Microsoft stated that the failure was related to infrastructure operating system service activity, causing a reduction in redundancy for the VPN Gateway in some affected regions, rather than a complete outage. Microsoft's engineering teams are currently using backup healthy instances to restore the affected network management components and are continuously monitoring the recovery status. The incident impacted multiple Azure regions, including West US, North Europe, and Japan West, but Microsoft has not yet specified the root cause of the failure and is continuing its investigation.",
+    tags_en: ["Microsoft", "Azure", "ExpressRoute Gateway", "VPN Gateway", "Hybrid Cloud", "Cloud Infrastructure"],
+    sources: [
+      { name: "The Register", url: "https://theregister.com/off-prem/2026/10/01/azure-maintenance-mess-disrupted-hybrid-clouds-vpns-cloudy-vmware-services/5300333", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260930-14410",
+    trackers: ["os"],
+    category: "重點關注",
+    title: "前NCA職員Paul Chowles竊取沒收的Bitcoin，法院下令其償還超過180萬英鎊",
+    summary: "本案涉及前英國國家犯罪局（NCA）職員Paul Chowles，他利用職務信任地位，竊取了在調查Silk Road 2.0相關犯罪時沒收的Bitcoin。Chowles在2017年從被定罪的Silk Road 2.0管理員Thomas White的「退休錢包」中轉移了50枚Bitcoin。這些Bitcoin隨後透過Bitcoin Fog等混幣服務進行洗錢，以掩蓋交易蹤跡。儘管Bitcoin的價值隨著時間增長，但英國皇家檢察處（CPS）最終根據其犯罪所得和Chowles的「可支配資產」評估，下令他償還超過£1,800,000英鎊。Chowles因竊盜、轉移和隱藏犯罪財產等罪名被判刑，並被解僱。此案凸顯了執法機構內部人員濫用職權、竊取已沒收資產的嚴重問題，並強調了司法系統透過沒收令（Confiscation orders）追回犯罪所得的強大作用。",
+    tags: ["Paul Chowles", "NCA", "Bitcoin", "Silk Road 2.0", "CPS", "沒收令"],
+    title_en: "Former NCA Officer Paul Chowles Accused of Stealing Seized Bitcoin Ordered to Repay Over £1.8 Million",
+    summary_en: "The case involves Paul Chowles, a former employee of the UK's National Crime Agency (NCA), who exploited his position of trust to steal Bitcoin seized during an investigation into Silk Road 2.0 related crimes. In 2017, Chowles transferred 50 Bitcoin from the 'retirement wallet' of Thomas White, a convicted Silk Road 2.0 administrator. These Bitcoin were subsequently laundered using mixing services like Bitcoin Fog to obscure the transaction trail. Despite the increase in Bitcoin's value over time, the Crown Prosecution Service (CPS) ultimately ordered him to repay over £1,800,000, based on his criminal proceeds and an assessment of Chowles' 'disposable assets.' Chowles was convicted and dismissed for charges including theft, transfer, and concealment of criminal property. This case highlights the serious issue of internal abuse of power and theft of seized assets by law enforcement personnel, and emphasizes the powerful role of the judicial system in recovering criminal proceeds through Confiscation orders.",
+    tags_en: ["Paul Chowles", "NCA", "Bitcoin", "Silk Road 2.0", "CPS", "Confiscation Order"],
+    sources: [
+      { name: "The Register", url: "https://theregister.com/cyber-crime/2026/09/30/ex-nca-officer-ordered-to-surrender-18m-for-stealing-seized-bitcoin/5300179", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260930-14422",
+    trackers: ["os", "security"],
+    category: "重點關注",
+    title: "NVIDIA vGPU 驅動程式存在核心漏洞：客戶端可能越權存取主機 GPU 資源",
+    summary: "NVIDIA 的 vGPU 軟體，無論運行在 Windows 或 Linux 環境下，其 GPU 核心驅動程式中存在一項安全漏洞。此漏洞允許虛擬客戶端（guest）越權存取本應受限的、具有特權的主機 GPU 資源。若此漏洞成功被利用，攻擊者可能導致程式碼執行、權限提升、資料篡改、服務拒絕，甚至資訊洩露。本漏洞的利用可能對運行在 NVIDIA vGPU 環境的系統構成重大安全風險，建議使用者應留意 NVIDIA 官方的安全公告，並儘快更新至修補後的驅動程式版本，以防止潛在的攻擊。由於原文未提供具體 CVE 編號或修補版本，使用者應以官方發布的補丁為準。",
+    tags: ["NVIDIA", "vGPU", "GPU 驅動程式", "Windows", "Linux", "越權存取", "核心漏洞"],
+    title_en: "NVIDIA vGPU Driver Contains Critical Vulnerability: Client May Over-access Host GPU Resources",
+    summary_en: "A security vulnerability has been found in the GPU core driver of NVIDIA's vGPU software, regardless of whether it operates in a Windows or Linux environment. This vulnerability allows a virtual client (guest) to over-access restricted, privileged host GPU resources. If successfully exploited, the vulnerability could allow an attacker to achieve remote code execution, privilege escalation, data tampering, denial of service, or even information leakage. Exploitation of this vulnerability poses a significant security risk to systems running in the NVIDIA vGPU environment. Users are advised to monitor official NVIDIA security announcements and update to the patched driver version as soon as possible to prevent potential attacks. Since the original text did not provide a specific CVE ID or patched version, users should rely on officially released patches.",
+    tags_en: ["NVIDIA", "vGPU", "GPU Driver", "Windows", "Linux", "Over-access", "Critical Vulnerability"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-47493", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260930-14423",
+    trackers: ["os", "security"],
+    category: "重點關注",
+    title: "NVIDIA vGPU Virtual GPU Manager 存在核心模式漏洞，可能導致程式碼執行與權限提升",
+    summary: "NVIDIA 的 vGPU Virtual GPU Manager，無論是在 Windows 或 Linux 環境下運行的核心模式層，存在一個「越界寫入」（out-of-bounds write）的漏洞。攻擊者若成功利用此漏洞，可能導致最嚴重的後果，包括執行任意程式碼、服務拒絕、權限提升、資訊洩露，甚至資料篡改。本漏洞的具體影響範圍和修補版本資訊未在原文中提供，但由於其位於核心模式層，建議使用者應立即關注 NVIDIA 官方的安全公告，並儘快更新到修補後的 vGPU Virtual GPU Manager 版本，以降低被惡意利用的風險。",
+    tags: ["NVIDIA", "vGPU", "Virtual GPU Manager", "Out-of-bounds write", "核心模式", "Windows", "Linux"],
+    title_en: "NVIDIA vGPU Virtual GPU Manager has Kernel Mode Vulnerability, Potentially Leading to Code Execution and Privilege Escalation",
+    summary_en: "The vGPU Virtual GPU Manager from NVIDIA, which operates at the kernel mode layer in both Windows and Linux environments, contains an 'out-of-bounds write' vulnerability. If an attacker successfully exploits this vulnerability, it could lead to severe consequences, including arbitrary code execution, denial of service, privilege escalation, information leakage, and even data tampering. While the specific scope of impact and patched versions are not provided in the original text, because the vulnerability resides in the kernel mode layer, users are advised to immediately monitor official NVIDIA security announcements and update to a patched vGPU Virtual GPU Manager version as soon as possible to mitigate the risk of malicious exploitation.",
+    tags_en: ["NVIDIA", "vGPU", "Virtual GPU Manager", "Out-of-bounds write", "Kernel Mode", "Windows", "Linux"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-47495", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260930-14424",
+    trackers: ["os", "security"],
+    category: "重點關注",
+    title: "NVIDIA vGPU Virtual GPU Manager 存在核心層級漏洞，可能導致程式碼執行與權限提升",
+    summary: "NVIDIA 的 vGPU Virtual GPU Manager，無論是在 Windows 或 Linux 環境下運行，其核心模式層級（kernel mode layer）包含一個安全漏洞。此漏洞允許虛擬機中的訪客（guest）執行一個越界讀取（out-of-bounds read）操作。若成功利用此漏洞，攻擊者可能導致程式碼執行、服務拒絕（denial of service）、權限提升、資訊洩露，甚至資料篡改等嚴重後果。建議使用者應留意 NVIDIA 官方的安全公告，並儘快更新 vGPU Virtual GPU Manager 至修補版本，以消除此潛在的攻擊風險。",
+    tags: ["NVIDIA", "vGPU", "Virtual GPU Manager", "CVE-2026-47499", "核心層級", "越界讀取"],
+    title_en: "NVIDIA vGPU Virtual GPU Manager contains core-level vulnerability, potentially leading to code execution and privilege escalation",
+    summary_en: "NVIDIA's vGPU Virtual GPU Manager contains a security vulnerability within its kernel mode layer, regardless of whether it runs in a Windows or Linux environment. This vulnerability allows a guest within a virtual machine to perform an out-of-bounds read operation. Successful exploitation could lead to severe consequences, including code execution, denial of service, privilege escalation, information leakage, and even data tampering. Users are advised to monitor official NVIDIA security announcements and promptly update the vGPU Virtual GPU Manager to a patched version to eliminate this potential attack risk.",
+    tags_en: ["NVIDIA", "vGPU", "Virtual GPU Manager", "CVE-2026-47499", "kernel mode", "out-of-bounds read"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-47499", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260930-14432",
+    trackers: ["os", "security"],
+    category: "重點關注",
+    title: "NVIDIA GPU 顯示驅動程式存在核心模式漏洞，可能導致程式碼執行與權限提升",
+    summary: "NVIDIA 的 GPU 顯示驅動程式，無論是針對 Windows 還是 Linux 系統，在其核心模式層（kernel mode layer）內存在一個安全漏洞。此漏洞允許使用者執行越界寫入（out-of-bounds write）操作。若此漏洞成功被利用，攻擊者可能導致程式碼執行、服務拒絕（denial of service）、權限提升（escalation of privileges）、資訊洩露，甚至資料篡改等嚴重後果。建議使用者應留意 NVIDIA 官方發布的修補程式或安全更新，以修復此核心層的漏洞，避免潛在的系統安全風險。",
+    tags: ["NVIDIA", "GPU", "顯示驅動程式", "Windows", "Linux", "CVE-2026-47511"],
+    title_en: "NVIDIA GPU Display Driver Contains Kernel Mode Vulnerability, Potentially Leading to Code Execution and Privilege Escalation",
+    summary_en: "A security vulnerability exists within NVIDIA's GPU display drivers, affecting both Windows and Linux operating systems, specifically within the kernel mode layer. This vulnerability allows users to perform an out-of-bounds write operation. If successfully exploited, the vulnerability could lead to severe consequences, including code execution, denial of service, privilege escalation, information leakage, and even data tampering. Users are advised to monitor official NVIDIA releases for patches or security updates to remediate this kernel-level vulnerability and prevent potential system security risks.",
+    tags_en: ["NVIDIA", "GPU", "Display Driver", "Windows", "Linux", "CVE-2026-47511"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-47511", lang: "EN" }
     ]
   },
   {

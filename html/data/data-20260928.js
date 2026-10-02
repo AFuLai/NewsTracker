@@ -1574,6 +1574,20 @@ window.TRACKER_DAYS["2026-09-28"] = [
     ]
   },
   {
+    id: "20260928-14267",
+    trackers: ["security"],
+    category: "前瞻技術",
+    title: "建構 AI Agent 安全架構：Red Hat 結合 OpenShift 與 NVIDIA 打造多層防禦深度",
+    summary: "隨著企業 AI 從資訊生成轉向執行動作，AI Agent 具備呼叫 API、存取憑證、操作業務系統的能力，其安全範圍已遠超模型本身。文章強調，確保 AI Agent 安全必須將安全控制延伸至其運行的整個系統環境。這需要採用「深度防禦」（Defense in Depth）的層次化安全架構，而非單一控制點。建議的控制層面包括：模型與應用程式護欄、身分與授權、工具控制、沙盒隔離、工作負載隔離、網路策略，以及可觀察性（Observability）。實務上，Red Hat 結合 OpenShift AI、OpenShift 和 Red Hat Enterprise Linux，並整合 NVIDIA 的加速運算技術，在 Red Hat AI Factory 中建立了一個跨混合雲的層次化解決方案。此外，asago 開源社群正致力於將 AI 治理政策轉化為可測試、可執行的技術控制，並利用 NVIDIA BlueField DPU 等硬體隔離機制，將監控與強制執行功能置於 Agent 工作負載外部，以強化系統的獨立控制力。",
+    tags: ["AI Agent", "Defense in Depth", "Red Hat OpenShift AI", "NVIDIA BlueField DPU", "OpenShell", "混合雲"],
+    title_en: "Building a Secure AI Agent Architecture: Red Hat Combines OpenShift and NVIDIA for Multi-Layered Defense Depth",
+    summary_en: "As enterprise AI shifts from mere information generation to executing actions, AI Agents gain the capability to call APIs, access credentials, and operate business systems, expanding their security scope far beyond the model itself. The article emphasizes that securing AI Agents requires extending security controls across their entire operational system environment. This necessitates adopting a layered security architecture, or \"Defense in Depth,\" rather than relying on a single control point. Recommended control layers include: model and application guardrails, identity and authorization, tool control, sandbox isolation, workload isolation, network policies, and observability. In practice, Red Hat, leveraging OpenShift AI, OpenShift, and Red Hat Enterprise Linux, has integrated NVIDIA's accelerated computing technology within the Red Hat AI Factory to establish a multi-layered, cross-hybrid cloud solution. Furthermore, the asago open-source community is working to translate AI governance policies into testable, enforceable technical controls, utilizing hardware isolation mechanisms like NVIDIA BlueField DPU to place monitoring and enforcement functions outside the Agent workload, thereby strengthening the system's independent control capability.",
+    tags_en: ["AI Agent", "Defense in Depth", "Red Hat OpenShift AI", "NVIDIA BlueField DPU", "OpenShell", "Hybrid Cloud"],
+    sources: [
+      { name: "Red Hat Security Blog", url: "https://redhat.com/en/blog/securing-ai-agents-requires-securing-systems-around-them", lang: "EN" }
+    ]
+  },
+  {
     id: "20260928-13427",
     trackers: ["security"],
     category: "產業動態",

@@ -282,6 +282,34 @@ window.TRACKER_DAYS["2026-09-29"] = [
     ]
   },
   {
+    id: "20260929-14418",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心 KVM 漏洞修復：修復 x86/mmu 地址空間寫入追蹤檢查缺陷",
+    summary: "本漏洞位於 Linux 核心的 KVM (Kernel-based Virtual Machine) 組件，涉及 x86/mmu (記憶體管理單元) 的寫入追蹤邏輯。原始程式碼中，`kvm_gfn_is_write_tracked()` 函數僅檢查傳入的單一記憶體區塊 (memslot)，但實際的頁面追蹤機制是針對每個獨立的地址空間 (address-space) 進行的，且影子頁面 (shadow pages) 在所有地址空間間是共享的。這導致在 SMM (System Management Mode) 環境下，一個記憶體區塊可能在一個地址空間中被正確地標記為可寫入追蹤，但在另一個地址空間中卻被誤判為未追蹤。此缺陷可能導致 `mmu_try_to_unsync_pages()` 函數錯誤地標記上層影子頁面為未同步，進而觸發 `pte_list_remove()` 函數中的 BUG。修復措施要求在檢查傳入的記憶體區塊之後，必須額外檢查另一個地址空間的記憶體區塊，以確保所有呼叫方都能正確地遵守寫入追蹤機制，無論當前活動的地址空間為何。這屬於核心底層的記憶體管理和虛擬化安全修復。",
+    tags: ["Linux 核心", "KVM", "x86/mmu", "記憶體管理", "寫入追蹤", "SMM"],
+    title_en: "Linux Kernel KVM Vulnerability Fix: Addressing x86/MMU Address Space Write Tracking Check Flaw",
+    summary_en: "This vulnerability resides in the KVM (Kernel-based Virtual Machine) component of the Linux kernel, concerning the write tracking logic for x86/MMU (Memory Management Unit). In the original code, the `kvm_gfn_is_write_tracked()` function only checks a single passed memory block (memslot). However, the actual page tracking mechanism is designed for each independent address space, and the shadow pages are shared across all address spaces. This flaw causes a scenario where, in an SMM (System Management Mode) environment, a memory block might be correctly marked as write-tracked in one address space but incorrectly judged as untracked in another. This defect can lead to the `mmu_try_to_unsync_pages()` function erroneously marking the upper shadow pages as unsynchronized, subsequently triggering a BUG within the `pte_list_remove()` function. The fix requires that after checking the passed memory block, an additional check must be performed on the memory block of another address space. This ensures that all callers correctly adhere to the write tracking mechanism, regardless of the currently active address space. This constitutes a core-level memory management and virtualization security patch.",
+    tags_en: ["Linux Kernel", "KVM", "x86/MMU", "Memory Management", "Write Tracking", "SMM"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-98164", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260929-14447",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "U-Boot 內核存在越界寫入漏洞，物理存取可透過惡意啟動媒體攻擊",
+    summary: "U-Boot 在 2026.10-rc3 版本之前，其 `read_slotted_partition()` 函式中存在一個越界寫入（out-of-bounds write）漏洞。此漏洞的根本原因在於該函式未能正確驗證映像檔大小是否超出分區邊界。攻擊者若具備實體存取權限，可以透過提供包含超大尺寸標頭（oversized headers）的惡意啟動媒體，將寫入資料寫入到啟動載入器（bootloader）的記憶體區域，從而造成系統崩潰或執行任意程式碼。此漏洞的攻擊條件是目標設備沒有啟用 Android Verified Boot 保護機制。修補建議是升級 U-Boot 至 2026.10-rc3 或更高版本，以修復 `read_slotted_partition()` 的輸入驗證機制。",
+    tags: ["U-Boot", "CVE-2026-71974", "越界寫入", "啟動載入器", "嵌入式系統", "物理存取"],
+    title_en: "U-Boot Kernel Contains Out-of-Bounds Write Vulnerability, Physical Access Allows Attack via Malicious Boot Media",
+    summary_en: "In U-Boot versions prior to 2026.10-rc3, a read_slotted_partition() function contains an out-of-bounds write vulnerability. The root cause is that the function fails to correctly validate if the image size exceeds the partition boundary. If an attacker possesses physical access, they can supply malicious boot media containing oversized headers, writing data into the bootloader's memory region, which could cause system crashes or arbitrary code execution. This vulnerability is exploitable if the target device does not have Android Verified Boot protection enabled. The recommended fix is to upgrade U-Boot to version 2026.10-rc3 or later, which corrects the input validation mechanism of read_slotted_partition().",
+    tags_en: ["U-Boot", "CVE-2026-71974", "Out-of-bounds Write", "Bootloader", "Embedded System", "Physical Access"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-71974", lang: "EN" }
+    ]
+  },
+  {
     id: "20260929-13307",
     trackers: ["security"],
     category: "法規與標準",
@@ -1658,6 +1686,20 @@ window.TRACKER_DAYS["2026-09-29"] = [
     tags_en: ["Google Chrome", "Android", "ANGLE", "Buffer overflow", "CVE-2026-102331", "Chromium"],
     sources: [
       { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-102331", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260929-14446",
+    trackers: ["os", "security"],
+    category: "Android",
+    title: "Android 應用程式 Viidure 內嵌明文雲端憑證，危及平台核心儲存區",
+    summary: "資安研究指出，名為 Viidure 的 Android 應用程式在編譯的程式碼中，永久嵌入了明文的雲端儲存憑證。這些憑證極為敏感，提供了對平台關鍵儲存區的完全存取權限。攻擊者若取得這些憑證，可利用其讀取、修改甚至刪除操作系統韌體（firmware）和應用程式二進位檔案（application binaries）等核心運營檔案。這代表該應用程式存在嚴重的硬編碼安全缺陷，可能導致設備的資料完整性與系統穩定性受到嚴重威脅。建議使用者和開發者應警惕應用程式在程式碼中硬編碼敏感憑證的行為，並應透過安全設計流程，將憑證管理與存取權限分離，採用更安全的運行時機制進行管理。",
+    tags: ["Android", "Viidure", "明文憑證", "硬編碼", "雲端儲存", "資安缺陷"],
+    title_en: "Android Application Viidure Embeds Plaintext Cloud Credentials, Jeopardizing Platform Core Storage",
+    summary_en: "Security research has pointed out that an Android application named Viidure permanently embeds plaintext cloud credentials within its compiled code. These credentials are highly sensitive, providing full access to the platform's critical storage areas. If an attacker obtains these credentials, they can use them to read, modify, or even delete core operational files such as operating system firmware and application binaries. This indicates that the application has a severe hardcoded security flaw, potentially compromising the data integrity and system stability of the device. Users and developers are advised to be wary of applications hardcoding sensitive credentials into their code, and should instead implement secure design processes that separate credential management and access rights, utilizing safer runtime mechanisms for management.",
+    tags_en: ["Android", "Viidure", "Plaintext Credentials", "Hardcoding", "Cloud Storage", "Security Flaw"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-96587", lang: "EN" }
     ]
   },
   {

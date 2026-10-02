@@ -128,6 +128,20 @@ window.TRACKER_DAYS["2026-09-26"] = [
     ]
   },
   {
+    id: "20260926-14416",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心修復 cgroup 迭代器競態條件：避免處理參考計數歸零的終止任務",
+    summary: "本修復針對 Linux 核心中的 cgroup 任務管理機制，解決了一個潛在的競態條件（Race Condition）。問題出在任務生命週期管理上，特別是在 `cgroup_task_release()` 和 `cgroup_task_free()` 兩個階段之間。當一個任務（task）的參考計數（usage count）歸零後，它可能會被移除，但其結構體（task_struct）仍可能殘留在 `dying_tasks` 列表中。如果迭代器（iterator）在任務被釋放（free）之後嘗試訪問這些已經歸零參考計數的任務，可能會導致不正確的行為或崩潰。\n修復的重點是增加額外的檢查機制，確保迭代器在執行任何操作前，必須確認任務的參考計數不為零（`->usage != 0`），從而排除那些已經被標記為可釋放的「幽靈」任務。這防止了在任務結構體被釋放（`__put_task_struct`）之後，迭代器仍然嘗試使用它。修復透過在 `css_task_iter_next()` 中新增邏輯，跳過這些已「棄用」（de-used）的任務，確保了 cgroup 資源管理的穩定性與正確性。",
+    tags: ["Linux 核心", "cgroup", "競態條件", "task_struct", "Linux 核心修復"],
+    title_en: "Linux Kernel Fix for cgroup Iterator Race Condition: Preventing Termination of Tasks with Zero Reference Counts",
+    summary_en: "This fix addresses a potential race condition within the Linux kernel's cgroup task management mechanism. The issue resides in the task lifecycle management, specifically between the `cgroup_task_release()` and `cgroup_task_free()` stages. When a task's usage count reaches zero, it may be removed, but its structure (`task_struct`) might persist in the `dying_tasks` list. If an iterator attempts to access these tasks—which have already had their reference counts zeroed—after they have been released, it could lead to incorrect behavior or a crash. The core of the fix is the addition of an extra check mechanism to ensure that the iterator must confirm the task's reference count is non-zero (`->usage != 0`) before performing any operation. This effectively excludes 'ghost' tasks that have been marked for release. This prevents the iterator from attempting to use the structure even after it has been freed (`__put_task_struct`). By adding logic within `css_task_iter_next()`, the fix skips these de-used tasks, ensuring the stability and correctness of cgroup resource management.",
+    tags_en: ["Linux Kernel", "cgroup", "Race Condition", "task_struct", "Linux Kernel Fix"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-98163", lang: "EN" }
+    ]
+  },
+  {
     id: "20260926-13759",
     trackers: ["os"],
     category: "Windows",

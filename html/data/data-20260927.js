@@ -380,6 +380,20 @@ window.TRACKER_DAYS["2026-09-27"] = [
     ]
   },
   {
+    id: "20260927-14417",
+    trackers: ["os", "security"],
+    category: "重點關注",
+    title: "Confidential Computing 漏洞：Contrast 早期版本存在 AML 注入攻擊，可能導致任意程式碼執行",
+    summary: "本漏洞影響 Contrast 平台在 1.18.0 版本之前的版本。該漏洞屬於「BadAML」類型的攻擊，涉及在 Confidential Computing 環境中，從不受信任的主機（QEMU）傳遞給客戶端韌體（OVMF）和 Linux 核心的 ACPI 表格。攻擊者若能控制主機，可以構造包含惡意、圖靈完備 AML 字節碼的表格。當客戶端核心解析這些字節碼時，由於其具有存取完整客戶端記憶體（包括私有頁面）的權限，可能導致任意程式碼執行，進而洩露或修改機密的客戶端資料。此問題不僅限於 Contrast，而是通用於任何將 ACPI 介面暴露給主機的機密計算環境。AMD SEV-SNP 平台（Metal-QEMU-SNP 和 Metal-QEMU-SNP-GPU）受影響，但 Intel TDX 平台（Metal-QEMU-TDX）因 OVMF 會將 ACPI 表格內容測量到 RTMR 0 而不受影響。升級至 v1.18.0 版本已透過沙盒化核心 AML 解譯器來緩解此攻擊，使其無法讀寫私有記憶體頁面。",
+    tags: ["Confidential Computing", "Contrast", "CVE-2026-100839", "ACPI", "AML", "QEMU", "AMD SEV-SNP"],
+    title_en: "Confidential Computing Vulnerability: Contrast Early Versions Susceptible to AML Injection Attack Leading to Arbitrary Code Execution",
+    summary_en: "This vulnerability affects Contrast platform versions prior to 1.18.0. The flaw is classified as a \"BadAML\" type attack, involving the ACPI tables passed from an untrusted host (QEMU) to the client firmware (OVMF) and Linux kernel within a Confidential Computing environment. If an attacker can control the host, they can construct tables containing malicious, Turing-complete AML bytecode. When the client kernel parses this bytecode, due to its privilege to access the client's entire memory (including private pages), it could lead to arbitrary code execution, potentially leaking or modifying sensitive client data. This issue is not limited to Contrast but is general to any confidential computing environment that exposes the ACPI interface to the host. AMD SEV-SNP platforms (Metal-QEMU-SNP and Metal-QEMU-SNP-GPU) are affected, but Intel TDX platforms (Metal-QEMU-TDX) are unaffected because OVMF measures the ACPI table content into RTMR 0. Upgrading to v1.18.0 mitigates this attack by using a sandboxed core AML interpreter, preventing it from reading or writing private memory pages.",
+    tags_en: ["Confidential Computing", "Contrast", "CVE-2026-100839", "ACPI", "AML", "QEMU", "AMD SEV-SNP"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-100839", lang: "EN" }
+    ]
+  },
+  {
     id: "20260927-13436",
     trackers: ["eu_cra"],
     category: "產業動態",
