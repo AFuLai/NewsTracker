@@ -226,6 +226,62 @@ window.TRACKER_DAYS["2026-10-01"] = [
     ]
   },
   {
+    id: "20261001-14598",
+    trackers: ["os"],
+    category: "Linux",
+    title: "Debian 發布安全公告 DSA-6537-1：修補核心元件，加強系統安全性",
+    summary: "Debian 發布了安全公告 DSA-6537-1，針對核心系統元件進行修補，以增強系統的整體安全性。雖然原文未提供詳細的漏洞描述或CVSS分數，但此公告屬於 Debian Security Announcement (DSA) 系列，通常涉及修補作業系統核心或關鍵函式庫的潛在漏洞。受影響的用戶應留意 Debian 官方的更新通知，並及時執行系統升級。修補建議是透過標準的 Debian 套件管理工具（如 apt）更新系統，確保所有核心元件和相關套件都已更新至最新、安全的版本。這類安全更新對於維護伺服器和工作站的穩定性與安全性至關重要。",
+    tags: ["Debian", "DSA-6537-1", "Linux 核心", "安全公告", "系統更新"],
+    title_en: "Debian Issues Security Advisory DSA-6537-1: Patching Core Components to Enhance System Security",
+    summary_en: "Debian has released security advisory DSA-6537-1, which patches core system components to enhance overall system security. Although the original text does not provide detailed vulnerability descriptions or CVSS scores, this advisory belongs to the Debian Security Announcement (DSA) series, which typically involves patching potential vulnerabilities in the operating system kernel or critical libraries. Affected users should monitor official Debian update notifications and perform system upgrades promptly. The recommended patch method is to update the system using standard Debian package management tools (such as apt), ensuring all core components and related packages are updated to the latest, secure versions. Such security updates are crucial for maintaining the stability and security of servers and workstations.",
+    tags_en: ["Debian", "DSA-6537-1", "Linux Kernel", "Security Advisory", "System Update"],
+    sources: [
+      { name: "Debian Security", url: "https://lists.debian.org/debian-security-announce/2026/msg00450.html", lang: "EN" }
+    ]
+  },
+  {
+    id: "20261001-14599",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Debian 發布安全公告 DSA-6536-1：修補核心元件的潛在漏洞",
+    summary: "Debian 發布了安全公告 DSA-6536-1，針對核心系統元件的潛在漏洞進行修補。雖然原文僅提供了一個安全追蹤連結，但根據 Debian 安全公告的慣例，此類公告通常涉及修補作業系統核心、系統函式庫（如 glibc）或關鍵服務的漏洞。修補的目的是提升系統的整體安全性，防止攻擊者利用未知的或已知的漏洞進行未授權的存取或執行程式碼。使用者應立即參考 Debian 官方的修補說明，並執行系統更新（例如使用 `apt update` 和 `apt upgrade`）來確保系統達到最新的安全版本。由於原文未提供具體的漏洞細節、CVSS 分數或受影響版本，使用者應以 Debian 官方發布的修補說明為準，並將系統更新視為最高優先級的資安動作。",
+    tags: ["Debian", "DSA-6536-1", "安全公告", "核心元件", "Linux"],
+    title_en: "Debian Issues Security Advisory DSA-6536-1: Patching Potential Vulnerabilities in Core Components",
+    summary_en: "Debian has released security advisory DSA-6536-1 to patch potential vulnerabilities in core system components. Although the original text only provided a security tracking link, based on Debian security advisory conventions, such advisories typically involve patching vulnerabilities in the operating system kernel, system libraries (such as glibc), or critical services. The purpose of the patch is to enhance overall system security, preventing attackers from gaining unauthorized access or executing code by exploiting known or unknown vulnerabilities. Users should immediately refer to the official Debian patching instructions and perform a system update (e.g., using `apt update` and `apt upgrade`) to ensure the system reaches the latest secure version. Since the original text did not provide specific vulnerability details, CVSS scores, or affected versions, users should rely on the official Debian patch instructions and treat system updates as a top-priority security action.",
+    tags_en: ["Debian", "DSA-6536-1", "Security Advisory", "Core Components", "Linux"],
+    sources: [
+      { name: "Debian Security", url: "https://lists.debian.org/debian-security-announce/2026/msg00449.html", lang: "EN" }
+    ]
+  },
+  {
+    id: "20261001-14600",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Debian 發布安全更新：修補 OpenSSH 服務中的潛在資訊洩漏漏洞",
+    summary: "Debian 發布了安全公告 DSA-6535-1，修補了 OpenSSH 服務中的一個潛在資訊洩漏漏洞。此漏洞可能允許攻擊者在特定條件下，透過觀察服務的行為，竊取敏感的系統資訊。雖然原文未提供具體的 CVSS 分數或影響範圍，但此類漏洞通常代表著服務的配置或處理流程存在缺陷，可能導致攻擊者進行未經授權的資訊收集。修補建議是所有使用 Debian 系統並運行 OpenSSH 服務的用戶，應立即更新系統至包含此安全修補的最新版本。建議用戶應遵循 Debian 官方的更新流程，確保系統的安全性。",
+    tags: ["Debian", "OpenSSH", "DSA-6535-1", "資訊洩漏", "Linux 核心"],
+    title_en: "Debian Releases Security Update: Patching Potential Information Leak in OpenSSH Service",
+    summary_en: "Debian has issued security advisory DSA-6535-1, patching a potential information leak vulnerability in the OpenSSH service. This vulnerability could potentially allow an attacker, under specific conditions, to steal sensitive system information by observing the service's behavior. Although the original advisory does not provide a specific CVSS score or scope of impact, such vulnerabilities typically indicate flaws in service configuration or processing logic, potentially allowing unauthorized information gathering. The recommended action is for all users running OpenSSH on Debian systems to immediately update their systems to the latest version containing this security patch. Users are advised to follow the official Debian update procedures to ensure system security.",
+    tags_en: ["Debian", "OpenSSH", "DSA-6535-1", "Information Leak", "Linux Kernel"],
+    sources: [
+      { name: "Debian Security", url: "https://lists.debian.org/debian-security-announce/2026/msg00448.html", lang: "EN" }
+    ]
+  },
+  {
+    id: "20261001-14601",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Debian 發布安全公告：修補 DSA-6534-1 相關漏洞，強化系統安全性",
+    summary: "Debian 發布安全公告，修補一個與 DSA-6534-1 相關的漏洞。此漏洞可能影響系統的安全性，因此建議所有使用 Debian 系統的用戶應立即更新系統以修補此安全缺陷。雖然原文未提供具體的漏洞細節、CVSS 分數或受影響版本範圍，但此類安全更新通常涉及核心元件或關鍵服務的修補，旨在防止潛在的未授權存取或系統層級的惡意行為。用戶應遵循 Debian 官方的修補指引，執行系統更新，確保系統處於安全狀態。建議用戶在執行更新前，應先備份重要資料，以防更新過程發生意外。",
+    tags: ["Debian", "DSA-6534-1", "安全公告", "Linux 核心", "系統更新"],
+    title_en: "Debian Issues Security Advisory: Patching DSA-6534-1 Related Vulnerability to Enhance System Security",
+    summary_en: "Debian has issued a security advisory to patch a vulnerability related to DSA-6534-1. As this vulnerability may compromise system security, all users of Debian systems are advised to immediately update their systems to patch this security flaw. Although the original advisory does not provide specific vulnerability details, CVSS scores, or affected version ranges, such security updates typically involve patching core components or critical services to prevent potential unauthorized access or system-level malicious activity. Users should follow the official Debian patching guidelines and execute the system update to ensure the system remains secure. It is recommended that users back up important data before performing the update to prevent unexpected issues during the process.",
+    tags_en: ["Debian", "DSA-6534-1", "Security Advisory", "Linux Kernel", "System Update"],
+    sources: [
+      { name: "Debian Security", url: "https://lists.debian.org/debian-security-announce/2026/msg00447.html", lang: "EN" }
+    ]
+  },
+  {
     id: "20261001-14257",
     trackers: ["security"],
     category: "法規與標準",
@@ -405,20 +461,6 @@ window.TRACKER_DAYS["2026-10-01"] = [
     tags_en: ["Johnson Controls", "EasyIO Neo Series", "CVE-2026-64892", "OT/ICS", "Building Automation", "Firmware Vulnerability"],
     sources: [
       { name: "CISA KEV Catalog", url: "https://cisa.gov/news-events/ics-advisories/icsa-26-274-04", lang: "EN" }
-    ]
-  },
-  {
-    id: "20261001-14237",
-    trackers: ["security"],
-    category: "漏洞與威脅情報",
-    title: "CISA新增CVE-2026-104286：Fortinet FortiMail路徑穿越漏洞，警告高風險漏洞需優先修補",
-    summary: "美國網路安全局（CISA）宣布將一個新的漏洞，CVE-2026-104286，加入其已知被利用漏洞（Known Exploited Vulnerabilities, KEV）目錄。此漏洞為Fortinet FortiMail的路徑穿越（Path Traversal）漏洞，被視為惡意網路行為者常用的攻擊途徑，對聯邦企業級系統構成重大風險。\n\n文章提及的《具約束力的營運指令》（BOD 26-04）要求聯邦民事行政部門（FCEB）機構，必須根據風險等級，優先快速修補KEV目錄中列出的高風險漏洞。這項指令強調了漏洞管理的重要性，要求機構必須將資源集中於修補那些在被利用後能讓攻擊者獲得資產完全控制權的漏洞。\n\n雖然BOD 26-04僅適用於FCEB機構，但CISA鼓勵所有組織應採納風險導向的漏洞管理模式，並將修補KEV目錄中的漏洞列為最高優先級。若組織發現未列入KEV目錄但已被利用的漏洞，可透過CISA的提名表單提交，需提供CVE ID、利用證據和明確的緩解指引。",
-    tags: ["CISA", "KEV Catalog", "CVE-2026-104286", "Fortinet", "FortiMail", "路徑穿越"],
-    title_en: "CISA Adds CVE-2026-104286: Fortinet FortiMail Path Traversal Vulnerability Warns of High-Risk Flaw Requiring Priority Patching",
-    summary_en: "The U.S. Cybersecurity and Infrastructure Security Agency (CISA) announced the addition of a new vulnerability, CVE-2026-104286, to its Known Exploited Vulnerabilities (KEV) catalog. This vulnerability is a Path Traversal flaw in Fortinet FortiMail, which is considered a common attack vector used by malicious actors and poses a significant risk to federal enterprise systems.\n\nThe mentioned 'Binding Operational Directive' (BOD 26-04) requires Federal Civilian Executive Branch (FCEB) agencies to prioritize and rapidly patch high-risk vulnerabilities listed in the KEV catalog, based on risk level. This directive emphasizes the importance of vulnerability management, requiring agencies to focus resources on patching flaws that could grant attackers complete control over assets after exploitation.\n\nAlthough BOD 26-04 only applies to FCEB agencies, CISA encourages all organizations to adopt a risk-based vulnerability management model and treat patching vulnerabilities listed in the KEV catalog as the highest priority. If an organization discovers a vulnerability that has been exploited but is not listed in the KEV catalog, it can be submitted via CISA's nomination form, requiring the CVE ID, evidence of exploitation, and clear mitigation guidance.",
-    tags_en: ["CISA", "KEV Catalog", "CVE-2026-104286", "Fortinet", "FortiMail", "Path Traversal"],
-    sources: [
-      { name: "CISA KEV Catalog", url: "https://cisa.gov/news-events/alerts/2026/10/01/cisa-adds-one-known-exploited-vulnerability-catalog", lang: "EN" }
     ]
   },
   {
@@ -1009,6 +1051,21 @@ window.TRACKER_DAYS["2026-10-01"] = [
     tags_en: ["Apple", "Mac", "OpenHack", "CVE", "Security Bounty Program", "Vulnerability Hunting"],
     sources: [
       { name: "9to5Mac", url: "https://9to5mac.com/2026/10/01/security-bite-podcast-the-new-era-of-bug-hunting-with-openhacks-ananay-arora", lang: "EN" }
+    ]
+  },
+  {
+    id: "20261001-14496",
+    trackers: ["security"],
+    category: "漏洞與威脅情報",
+    title: "Fortinet 發出警告：FortiMail 關鍵漏洞 CVE-2026-104286 遭零日攻擊積極利用",
+    summary: "資安廠商 Fortinet 發布公告，警告客戶其 FortiMail 產品存在一項關鍵漏洞 CVE-2026-104286。此漏洞評級為高危險（CVSS 9.8），影響 FortiMail 的管理介面。該漏洞結合了「路徑穿越」（Path Traversal, CWE-22）和「NULL 字元處理不當」（CWE-158）的缺陷，可能允許未經身份驗證的攻擊者透過精心設計的 HTTP 或 HTTPS 請求，在底層系統上寫入任意檔案，執行未授權的程式或指令。\n\n該漏洞已遭零日攻擊積極利用。受影響版本包括 FortiMail 8.0.0 至 8.0.1、7.6.0 至 7.6.6、7.4.0 至 7.4.8，以及 7.2.0 至 7.2.9。Fortinet 建議客戶在修補版本發布前，應立即採取以下緩解措施：1. 禁用 IBE 功能支援（`config system encryption ibe; set status disable; end`）。2. 限制管理介面從外部網路的存取，或僅限於信任的內部網路。\n\nFortinet 已提供相關的入侵指標（IOCs）和日誌範例，協助管理員識別可能受害的設備。此外，CISA 已將此漏洞納入已知被利用漏洞目錄，要求聯邦機構在特定期限前完成鑑識處理與修復。",
+    tags: ["Fortinet", "FortiMail", "CVE-2026-104286", "零日攻擊", "Path Traversal", "資安漏洞"],
+    title_en: "Fortinet Issues Warning: Critical Vulnerability CVE-2026-104286 in FortiMail Actively Exploited in Zero-Day Attack",
+    summary_en: "Cybersecurity vendor Fortinet has issued an advisory warning customers that its FortiMail product contains a critical vulnerability, CVE-2026-104286. This vulnerability is rated as High Severity (CVSS 9.8) and affects the FortiMail management interface. The flaw combines defects related to 'Path Traversal' (CWE-22) and 'Improper NULL Character Handling' (CWE-158), potentially allowing unauthenticated attackers to write arbitrary files, execute unauthorized programs, or commands on the underlying system via carefully crafted HTTP or HTTPS requests.\n\nThis vulnerability has been actively exploited in the wild. Affected versions include FortiMail 8.0.0 through 8.0.1, 7.6.0 through 7.6.6, 7.4.0 through 7.4.8, and 7.2.0 through 7.2.9. Before the release of a patch, Fortinet advises customers to immediately implement the following mitigation measures: 1. Disable IBE feature support (`config system encryption ibe; set status disable; end`). 2. Restrict management interface access from external networks, or limit it only to trusted internal networks.\n\nFortinet has provided relevant Indicators of Compromise (IOCs) and log examples to assist administrators in identifying potentially affected devices. Furthermore, CISA has included this vulnerability in its list of known exploited vulnerabilities, requiring federal agencies to complete forensic handling and remediation by a specific deadline.",
+    tags_en: ["Fortinet", "FortiMail", "CVE-2026-104286", "Zero-Day Attack", "Path Traversal", "Vulnerability"],
+    sources: [
+      { name: "CISA KEV Catalog", url: "https://cisa.gov/news-events/alerts/2026/10/01/cisa-adds-one-known-exploited-vulnerability-catalog", lang: "EN" },
+      { name: "BleepingComputer", url: "https://bleepingcomputer.com/news/security/fortinet-warns-of-critical-fortimail-flaw-exploited-in-zero-day-attacks", lang: "EN" }
     ]
   },
   {
@@ -1794,6 +1851,20 @@ window.TRACKER_DAYS["2026-10-01"] = [
     tags_en: ["Capacitor", "WebView", "Cross-Platform", "Android", "iOS", "CVE-2026-103922"],
     sources: [
       { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-103922", lang: "EN" }
+    ]
+  },
+  {
+    id: "20261001-14490",
+    trackers: ["os", "security"],
+    category: "前瞻技術",
+    title: "微軟宣布 Windows 11 26H2 預設啟用設定備份，強化企業設備恢復能力",
+    summary: "微軟宣布，所有升級至 Windows 11 26H2 的 Microsoft Entra-joined 或 hybrid-joined 企業系統，將預設啟用 Windows 設定備份與還原功能。此功能（原名 Windows Backup for Organizations）旨在確保當設備經過重設、更換或升級時，企業用戶的 Windows 設定能夠被備份和還原。微軟指出，預設啟用有助於提高用戶在設備恢復後能成功還原設定和 Microsoft Store 應用列表的機率。此預設設定僅適用於尚未由管理員明確配置的設備，且需符合特定地理和雲端環境條件。雖然預設啟用，但管理員仍可透過 Microsoft Intune 或 Group Policy 進行控制，並可選擇禁用此政策。此外，文章強調，此工具的還原行為仍需管理員明確配置，並不會預設啟用。",
+    tags: ["Microsoft Entra", "Windows 11 26H2", "Windows 設定備份", "MDM", "企業安全", "Microsoft Intune"],
+    title_en: "Microsoft Announces Default Activation of Settings Backup in Windows 11 26H2 to Enhance Enterprise Device Recovery",
+    summary_en: "Microsoft announced that all enterprise systems upgraded to Windows 11 26H2 that are Microsoft Entra-joined or hybrid-joined will have Windows settings backup and restore functionality enabled by default. This feature (formerly known as Windows Backup for Organizations) is designed to ensure that enterprise users' Windows settings can be backed up and restored when a device undergoes reset, replacement, or upgrade. Microsoft noted that the default activation helps increase the likelihood that users can successfully restore settings and the Microsoft Store application list after device recovery. This default setting only applies to devices that have not been explicitly configured by an administrator, and it must meet specific geographical and cloud environment conditions. Although enabled by default, administrators can still control it using Microsoft Intune or Group Policy, and can choose to disable this policy. Furthermore, the article emphasizes that the restoration action of this tool still requires explicit administrator configuration and is not enabled by default.",
+    tags_en: ["Microsoft Entra", "Windows 11 26H2", "Windows Settings Backup", "MDM", "Enterprise Security", "Microsoft Intune"],
+    sources: [
+      { name: "BleepingComputer", url: "https://bleepingcomputer.com/news/microsoft/microsoft-enables-windows-settings-backup-by-default-for-orgs", lang: "EN" }
     ]
   },
   {

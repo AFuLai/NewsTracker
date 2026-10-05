@@ -688,6 +688,34 @@ window.TRACKER_DAYS["2026-09-30"] = [
     ]
   },
   {
+    id: "20260930-14667",
+    trackers: ["os", "security"],
+    category: "Windows",
+    title: "NVIDIA GPU顯示驅動程式存在核心模式漏洞，可能導致程式碼執行與權限提升",
+    summary: "NVIDIA 的 GPU 顯示驅動程式，無論是針對 Windows 還是 Linux 系統，在其核心模式層（kernel mode layer）中存在一個安全漏洞。此漏洞允許攻擊者執行「越界寫入」（out-of-bounds write）操作。若成功利用此漏洞，攻擊者可能導致程式碼執行（code execution）、服務拒絕（denial of service）、權限提升（escalation of privileges）、資訊洩露（information disclosure）以及資料篡改等嚴重後果。由於此漏洞位於核心模式，其潛在的影響範圍極為廣泛，可能危及作業系統的穩定性和安全性。建議使用者應儘快更新至包含修補的 NVIDIA 顯示驅動程式版本，以修復此核心層面的安全缺陷，降低被惡意利用的風險。",
+    tags: ["NVIDIA", "GPU", "顯示驅動程式", "核心模式", "out-of-bounds write", "Windows", "Linux"],
+    title_en: "NVIDIA GPU Display Driver Contains Kernel Mode Vulnerability, Potentially Leading to Code Execution and Privilege Escalation",
+    summary_en: "A security vulnerability exists in NVIDIA's GPU display drivers, affecting both Windows and Linux operating systems, specifically within the kernel mode layer. This vulnerability allows an attacker to perform an 'out-of-bounds write' operation. Successful exploitation could lead to severe consequences, including code execution, denial of service, privilege escalation, information disclosure, and data tampering. Because this vulnerability resides in the kernel mode, its potential impact is extremely broad, potentially compromising the stability and security of the operating system. Users are advised to promptly update to a patched NVIDIA display driver version to fix this kernel-level security flaw and mitigate the risk of malicious exploitation.",
+    tags_en: ["NVIDIA", "GPU", "Display Driver", "Kernel Mode", "out-of-bounds write", "Windows", "Linux"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-47530", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260930-14668",
+    trackers: ["os", "security"],
+    category: "Windows",
+    title: "NVIDIA GPU顯示驅動程式存在核心層級漏洞，可能導致空指針解引用及服務拒絕",
+    summary: "NVIDIA 的 GPU 顯示驅動程式，無論是在 Windows 或 Linux 系統上運行的核心模式層級，都存在一項安全漏洞。該漏洞允許攻擊者執行空指針解引用（null pointer dereference）的行為。若此漏洞成功被利用，最直接的影響是可能導致系統服務拒絕（Denial of Service, DoS）。本漏洞的具體修補建議為更新至最新的 NVIDIA 顯示驅動程式版本，以修復核心模式層級的缺陷，防止攻擊者利用此漏洞造成系統不穩定或崩潰。由於原文未提供 CVSS 分數、受影響版本範圍或修補版本號，相關資訊皆以「未公開」處理。",
+    tags: ["NVIDIA", "GPU", "顯示驅動程式", "Windows", "Linux", "空指針解引用", "CVE-2026-47531"],
+    title_en: "NVIDIA GPU Display Driver Contains Kernel-Level Vulnerability, Potentially Leading to Null Pointer Dereference and Denial of Service",
+    summary_en: "A security vulnerability exists in NVIDIA's GPU display driver, operating at the kernel-mode level on both Windows and Linux systems. This vulnerability allows an attacker to perform a null pointer dereference. If successfully exploited, the most immediate impact is a potential system Denial of Service (DoS). The specific remediation advice is to update to the latest NVIDIA display driver version to fix the kernel-mode flaw, preventing attackers from exploiting the vulnerability to cause system instability or crashes. As the original text did not provide a CVSS score, affected version range, or patch version number, this information is listed as 'Not Public'.",
+    tags_en: ["NVIDIA", "GPU", "Display Driver", "Windows", "Linux", "Null Pointer Dereference", "CVE-2026-47531"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-47531", lang: "EN" }
+    ]
+  },
+  {
     id: "20260930-13827",
     trackers: ["security"],
     category: "漏洞與威脅情報",
@@ -1037,7 +1065,8 @@ window.TRACKER_DAYS["2026-09-30"] = [
     tags_en: ["Cisco", "CVE-2026-76504", "SD-WAN Manager", "Zero-Day Vulnerability", "API Vulnerability", "Network Security"],
     sources: [
       { name: "CISA KEV Catalog", url: "https://cisa.gov/news-events/alerts/2026/09/30/cisa-adds-one-known-exploited-vulnerability-catalog", lang: "EN" },
-      { name: "The Hacker News", url: "https://thehackernews.com/2026/09/cisco-warns-of-attackers-exploiting.html", lang: "EN" }
+      { name: "The Hacker News", url: "https://thehackernews.com/2026/09/cisco-warns-of-attackers-exploiting.html", lang: "EN" },
+      { name: "BleepingComputer", url: "https://bleepingcomputer.com/news/security/cisco-warns-of-new-sd-wan-authentication-bypass-zero-day-exploited-in-attacks", lang: "EN" }
     ]
   },
   {
@@ -1600,6 +1629,20 @@ window.TRACKER_DAYS["2026-09-30"] = [
     tags_en: ["Meta", "Instagram Direct", "Jetpack Compose", "Android", "AI-native UI", "Code Refactoring"],
     sources: [
       { name: "Android Developers Blog", url: "https://android-developers.googleblog.com/2026/09/jetpack-compose-ai-native-ui-instagram-direct.html", lang: "EN" }
+    ]
+  },
+  {
+    id: "20260930-14491",
+    trackers: ["security"],
+    category: "供應鏈與開源安全",
+    title: "研究揭露 GitHub 公開儲存庫仍有大量有效憑證外洩，建議立即輪換密鑰",
+    summary: "Truffle Security 進行研究，掃描了包含 22,400 萬個儲存庫和超過 580 億個檔案的資料集，發現有超過 543,000 個獨特的憑證在 GitHub 的公開儲存庫中外洩。這些憑證的平均公開時間長達 784 天，其中約 10% 的工作憑證已超過 6.3 年，最古老者可追溯至 2009 年。研究指出，雖然 GitHub 引入了 Push Protection 等安全機制，但仍有大量憑證，特別是資料庫連線字串和 Google API key 等類別，未被預設保護。Truffle Security 強烈建議受影響的用戶必須立即輪換所有外洩的憑證，清理儲存庫歷史記錄，並為所有活躍的密鑰設定自動過期機制，以降低被攻擊的風險。",
+    tags: ["GitHub", "Truffle Security", "憑證外洩", "開源安全", "API key", "密鑰輪換"],
+    title_en: "Research Reveals Large Volume of Exposed Credentials in GitHub Public Repositories; Key Rotation Advised",
+    summary_en: "Truffle Security conducted research, scanning a dataset containing 224 million repositories and over 58 billion files, and discovered over 543,000 unique exposed credentials in GitHub's public repositories. These credentials have an average public exposure time of 784 days, with approximately 10% of work credentials exceeding 6.3 years, and the oldest dating back to 2009. The research points out that while GitHub has introduced security mechanisms like Push Protection, a large number of credentials, particularly categories such as database connection strings and Google API keys, remain unprotected by default. Truffle Security strongly advises affected users to immediately rotate all exposed credentials, clean repository history, and implement automatic expiration mechanisms for all active keys to mitigate the risk of attack.",
+    tags_en: ["GitHub", "Truffle Security", "Credential Leakage", "Open Source Security", "API key", "Key Rotation"],
+    sources: [
+      { name: "BleepingComputer", url: "https://bleepingcomputer.com/news/security/over-543-000-valid-credentials-exposed-in-public-github-repositories", lang: "EN" }
     ]
   },
   {
