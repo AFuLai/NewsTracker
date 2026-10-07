@@ -269,6 +269,20 @@ window.TRACKER_DAYS["2026-10-02"] = [
     ]
   },
   {
+    id: "20261002-15042",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "WordPress 插件 WPMobile.App 存在授權繞過漏洞，可讓未驗證攻擊者竊取管理員帳號重設連結",
+    summary: "WordPress 的 WPMobile.App 應用程式建構器外掛程式，在所有版本（包括 11.82 及更早版本）中，存在授權繞過（Authorization Bypass）漏洞。此漏洞的根本原因在於外掛程式未能正確驗證執行特定操作的使用者權限。這使得未經身份驗證的攻擊者能夠竊取任意使用者（包括管理員）的密碼重設 URL。攻擊鏈的實作需要 WPMobile.App 外掛程式的「郵件轉推」（mail-to-push）功能（設定為 `wpmobile_auto_mail=1`）被啟用。此功能會將 WordPress 的密碼重設電子郵件（包含重設 URL 和密鑰）鏡像到推播佇列中，使這些資訊對攻擊者可被存取，進而導致攻擊者能夠劫持目標帳號。",
+    tags: ["WordPress", "WPMobile.App", "授權繞過", "Android", "iOS", "CVE"],
+    title_en: "WordPress Plugin WPMobile.App Has Authorization Bypass Vulnerability, Allowing Unauthenticated Attackers to Steal Administrator Password Reset Links",
+    summary_en: "The WPMobile.App application builder plugin for WordPress contains an Authorization Bypass vulnerability in all versions (including 11.82 and earlier). The root cause of this vulnerability is that the plugin fails to properly validate the user's permissions when executing specific operations. This allows unauthenticated attackers to steal password reset URLs for any user, including administrators. Exploitation requires the WPMobile.App plugin's 'mail-to-push' feature (set to `wpmobile_auto_mail=1`) to be enabled. This feature mirrors WordPress's password reset email (containing the reset URL and key) into the push queue, making this information accessible to attackers and allowing them to hijack target accounts.",
+    tags_en: ["WordPress", "WPMobile.App", "Authorization Bypass", "Android", "iOS", "CVE"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-94541", lang: "EN" }
+    ]
+  },
+  {
     id: "20261002-14466",
     trackers: ["eu_cra", "security"],
     category: "法規與標準",
@@ -1612,6 +1626,20 @@ window.TRACKER_DAYS["2026-10-02"] = [
     tags_en: ["Microsoft", "Copilot", "Windows 11", "Chromium", "Web Application", "WinUI 3", "Operating System"],
     sources: [
       { name: "Windows Latest", url: "https://windowslatest.com/2026/10/02/nadella-has-lost-the-plot-calling-copilot-an-os-again-its-a-web-app-on-windows-11", lang: "EN" }
+    ]
+  },
+  {
+    id: "20261002-14748",
+    trackers: ["os", "security"],
+    category: "前瞻技術",
+    title: "深入解析機密運算：Intel TDX與Ubuntu如何保護雲端敏感資料",
+    summary: "機密運算（Confidential Computing）旨在解決傳統加密無法保護的數據處理階段風險。當組織需要在雲端或本地環境處理敏感資料，但又不信任基礎設施的運營商（如雲端供應商或IT管理員）時，此技術至關重要。Intel透過Intel Trust Domain Extensions (TDX)硬體技術，在虛擬機層級建立「信任域」（Trust Domain），將工作負載隔離於底層基礎設施。TDX模組與處理器協同工作，防止主機Hypervisor直接讀取或修改受保護虛擬機的記憶體。此外，導入「遠端證明」（Remote Attestation）機制，可以提供平台安全狀態的加密證據，確保只有經過驗證的環境才能接收解密金鑰。在軟體層面，Ubuntu等Guest OS需結合如dm-verity等機制，進行啟動鏈和檔案系統完整性檢查，並結合透明日誌（Transparency logs）進行審計，以確保工作負載的真實性與行為可控。此技術適用於需要保護數據主權、防止惡意內部人員存取敏感資料的場景。",
+    tags: ["Confidential Computing", "Intel TDX", "Trust Domain", "遠端證明", "Ubuntu", "虛擬機"],
+    title_en: "In-Depth Analysis of Confidential Computing: How Intel TDX and Ubuntu Protect Cloud Sensitive Data",
+    summary_en: "Confidential Computing aims to mitigate risks during the data processing stage, which traditional encryption methods cannot protect. This technology is crucial when organizations need to process sensitive data in cloud or on-premises environments but do not trust the infrastructure operator (such as the cloud provider or IT administrator). Intel utilizes Intel Trust Domain Extensions (TDX) hardware technology to establish a 'Trust Domain' at the virtual machine level, isolating the workload from the underlying infrastructure. The TDX module works with the processor to prevent the host Hypervisor from directly reading or modifying the protected virtual machine's memory. Furthermore, implementing 'Remote Attestation' provides cryptographic evidence of the platform's security state, ensuring that only verified environments can receive decryption keys. At the software layer, Guest OS like Ubuntu must combine mechanisms such as dm-verity for boot chain and file system integrity checks, and integrate Transparency logs for auditing, thereby ensuring the authenticity and controlled behavior of the workload. This technology is applicable in scenarios requiring data sovereignty protection and prevention of malicious internal access to sensitive data.",
+    tags_en: ["Confidential Computing", "Intel TDX", "Trust Domain", "Remote Attestation", "Ubuntu", "Virtual Machine"],
+    sources: [
+      { name: "Ubuntu Security Notices", url: "https://ubuntu.com//blog/confidential-computing-use-cases", lang: "EN" }
     ]
   },
   {

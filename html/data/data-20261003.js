@@ -352,6 +352,20 @@ window.TRACKER_DAYS["2026-10-03"] = [
     ]
   },
   {
+    id: "20261003-15043",
+    trackers: ["os", "security"],
+    category: "Android",
+    title: "WordPress 插件 WPMobile.App 存在儲存型 XSS 漏洞，可能允許未經認證攻擊者注入惡意腳本",
+    summary: "WordPress 的 WPMobile.App 應用程式建構器外掛，在所有版本（包括 11.84 及以下）中，因輸入清理和輸出轉義不足，存在儲存型跨站腳本攻擊（Stored Cross-Site Scripting, XSS）漏洞。攻擊點位於 'REQUEST_URI' 參數（即 `/android_json/search/` 後面的路徑段）。此漏洞允許未經認證的攻擊者注入任意網頁腳本。當任何使用者訪問包含這些惡意腳本的頁面時，腳本將會執行。成功利用此漏洞需要該應用程式的內容模式被配置為 'webview'（即 'speed' 選項未設定為 '1'），但這仍是一個支援且仍在使用的模式。修補建議是更新或修復該外掛，確保對輸入參數進行嚴格的清理和輸出轉義。",
+    tags: ["WordPress", "WPMobile.App", "XSS", "Android", "CVE-2026-103421"],
+    title_en: "WordPress Plugin WPMobile.App has Stored XSS Vulnerability, Potentially Allowing Unauthenticated Injection of Malicious Script",
+    summary_en: "The WPMobile.App application builder plugin for WordPress contains a Stored Cross-Site Scripting (XSS) vulnerability in all versions (including 11.84 and earlier). This is due to insufficient input sanitization and output escaping. The vulnerability point is located in the 'REQUEST_URI' parameter (the path segment following `/android_json/search/`). This flaw allows unauthenticated attackers to inject arbitrary web scripts. When any user visits the page containing these malicious scripts, the script will execute. Successful exploitation requires the application's content mode to be configured as 'webview' (i.e., the 'speed' option not set to '1'), but this is still a supported and actively used mode. The recommended fix is to update or patch the plugin, ensuring strict sanitization and output escaping for input parameters.",
+    tags_en: ["WordPress", "WPMobile.App", "XSS", "Android", "CVE-2026-103421"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-103421", lang: "EN" }
+    ]
+  },
+  {
     id: "20261003-14468",
     trackers: ["security"],
     category: "前瞻技術",
