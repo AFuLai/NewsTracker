@@ -1826,6 +1826,76 @@ window.TRACKER_DAYS["2026-10-06"] = [
     ]
   },
   {
+    id: "20261006-15466",
+    trackers: ["os", "security"],
+    category: "Android",
+    title: "Google Chrome Android 瀏覽器存在權限不足漏洞，可能透過惡意應用程式竊取敏感資訊",
+    summary: "Google Chrome 在 Android 平台版本 155.0.8059.39 之前的版本中，存在一個權限不足（Incorrect authorization）的漏洞。此漏洞允許本地攻擊者，透過社會工程學（social engineering）的方式，利用一個已共安裝（co-installed）的惡意應用程式，從瀏覽器中竊取敏感資訊。該漏洞的嚴重性被評定為中等（Medium）。修補建議是升級至 Google Chrome 瀏覽器版本 155.0.8059.39 或更高版本，以修復此安全缺陷，避免資料外洩風險。",
+    tags: ["Google Chrome", "Android", "權限不足", "CVE-2026-106328", "Chromium"],
+    title_en: "Google Chrome Android Browser Has Privilege Escalation Vulnerability, Potentially Allowing Theft of Sensitive Information via Malicious App",
+    summary_en: "Google Chrome on the Android platform, in versions prior to 155.0.8059.39, contains an incorrect authorization vulnerability. This flaw allows a local attacker, through social engineering, to utilize a co-installed malicious application to steal sensitive information from the browser. The vulnerability is rated as Medium severity. The recommended fix is to upgrade to Google Chrome browser version 155.0.8059.39 or later to patch this security flaw and prevent data leakage risk.",
+    tags_en: ["Google Chrome", "Android", "Incorrect authorization", "CVE-2026-106328", "Chromium"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-106328", lang: "EN" }
+    ]
+  },
+  {
+    id: "20261006-15468",
+    trackers: ["os", "security"],
+    category: "Android",
+    title: "Google Chrome Android 應用程式：Picture-in-Picture 功能存在 UI 誤導漏洞，可透過惡意網頁偽造網址列",
+    summary: "Google Chrome 在 Android 平台上的 Picture-in-Picture 功能，於版本 155.0.8059.39 之前，存在一個 UI 誤導（UI misrepresentation）的安全漏洞。此漏洞允許遠端攻擊者透過精心構造的 HTML 網頁，偽造或欺騙使用者看到瀏覽器地址列的內容。雖然此漏洞的 Chromium 安全嚴重性被評定為「低」（Low），但它仍可能導致使用者對瀏覽器當前頁面或網址的信任產生誤判，進而可能被用於進行釣魚或社會工程攻擊。受影響的產品為 Google Chrome 瀏覽器在 Android 系統上的運行環境。修補建議是使用者應升級至版本 155.0.8059.39 或更高版本，以修復此 UI 誤導問題。",
+    tags: ["Google Chrome", "Android", "Picture-in-Picture", "UI misrepresentation", "CVE-2026-106338"],
+    title_en: "Google Chrome Android App: Picture-in-Picture Feature Has UI Misrepresentation Vulnerability, Exploitable via Malicious Webpage",
+    summary_en: "The Picture-in-Picture feature in Google Chrome on the Android platform, prior to version 155.0.8059.39, contained a UI misrepresentation vulnerability. This flaw allows a remote attacker to use a carefully crafted HTML webpage to spoof or deceive the user regarding the content displayed in the browser's address bar. Although the Chromium security severity for this vulnerability is rated as 'Low,' it could still lead the user to misjudge the browser's current page or URL, potentially facilitating phishing or social engineering attacks. The affected product is the Google Chrome browser running on the Android operating system. The recommended remediation is for users to upgrade to version 155.0.8059.39 or later to fix this UI misrepresentation issue.",
+    tags_en: ["Google Chrome", "Android", "Picture-in-Picture", "UI misrepresentation", "CVE-2026-106338"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-106338", lang: "EN" }
+    ]
+  },
+  {
+    id: "20261006-15469",
+    trackers: ["os", "security"],
+    category: "Android",
+    title: "Google Chrome Android 瀏覽器存在狀態驗證缺陷，可能遭遠端攻擊者偽造 UI 元素",
+    summary: "Google Chrome 在 Android 平台上的 Autofill AI 功能，在版本 155.0.8059.39 之前的版本中，存在不當的狀態驗證（Improper state validation）缺陷。這允許遠端攻擊者透過精心構造的 HTML 頁面，偽造（spoof）瀏覽器介面上的使用者介面元素。此漏洞的嚴重性被評定為低風險（Low）。實務上，攻擊者可利用此缺陷在未受控的環境中操縱或欺騙使用者，但需注意的是，此漏洞的具體攻擊向量和影響範圍未在原文中詳細說明。建議使用者應立即更新 Google Chrome 至 155.0.8059.39 或更高版本，以修補此安全漏洞。",
+    tags: ["Google Chrome", "Android", "Autofill AI", "CVE-2026-106343", "瀏覽器安全", "狀態驗證"],
+    title_en: "Google Chrome Android Browser Has State Validation Flaw, Potentially Allowing Remote UI Element Spoofing",
+    summary_en: "Google Chrome's Autofill AI feature on the Android platform, in versions prior to 155.0.8059.39, contains an improper state validation flaw. This flaw allows remote attackers to spoof user interface elements on the browser's interface using a carefully crafted HTML page. The severity of this vulnerability is rated as Low. In practice, attackers could exploit this flaw to manipulate or deceive users in an uncontrolled environment, but it should be noted that the specific attack vector and scope of impact are not detailed in the original text. Users are advised to immediately update Google Chrome to version 155.0.8059.39 or later to patch this security vulnerability.",
+    tags_en: ["Google Chrome", "Android", "Autofill AI", "CVE-2026-106343", "Browser Security", "State Validation"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-106343", lang: "EN" }
+    ]
+  },
+  {
+    id: "20261006-15470",
+    trackers: ["os", "security"],
+    category: "Android",
+    title: "Google Chrome Android CustomTabs 存在漏洞，可繞過網頁來源策略",
+    summary: "Google Chrome 在 Android 平台上的 CustomTabs 功能，在版本低於 155.0.8059.39 的情況下，存在一個安全漏洞。此漏洞允許遠端攻擊者透過精心設計的 HTML 頁面，繞過原本應強制執行的網頁來源策略（web origin policy）。這類漏洞屬於 Chromium 安全嚴重等級為「高」的類型，實務上可能導致攻擊者在受影響的應用程式環境中執行惡意代碼或竊取敏感資料。修補建議是使用者應立即將 Google Chrome 瀏覽器更新至 155.0.8059.39 或更高版本，以修復此安全缺陷，確保瀏覽器在 Android 平台上的安全性。",
+    tags: ["Google Chrome", "Android", "CustomTabs", "Chromium", "CVE-2026-106366"],
+    title_en: "Vulnerability in Google Chrome Android CustomTabs Allows Bypass of Web Origin Policy",
+    summary_en: "The CustomTabs feature of Google Chrome on the Android platform contains a security vulnerability in versions lower than 155.0.8059.39. This vulnerability allows a remote attacker, through a specially crafted HTML page, to bypass the web origin policy that is supposed to be enforced. This type of vulnerability is classified as 'High' severity within the Chromium security severity level, and in practice, it could allow an attacker to execute malicious code or steal sensitive data within the affected application environment. The recommended remediation is for users to immediately update the Google Chrome browser to version 155.0.8059.39 or higher to fix this security flaw and ensure the browser's safety on the Android platform.",
+    tags_en: ["Google Chrome", "Android", "CustomTabs", "Chromium", "CVE-2026-106366"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-106366", lang: "EN" }
+    ]
+  },
+  {
+    id: "20261006-15471",
+    trackers: ["os", "security"],
+    category: "Android",
+    title: "Google Chrome Android 瀏覽器存在授權缺失漏洞，可能允許本地攻擊者執行任意程式碼",
+    summary: "Google Chrome 在 Android 平台版本 155.0.8059.39 之前的版本中，存在一項授權缺失（Missing authorization）的漏洞。此漏洞允許本地攻擊者透過社工工程（social engineering）的方式，利用已共同安裝的應用程式（co-installed app），在沙盒（sandbox）外部執行任意程式碼。此漏洞的嚴重性被評定為中等（Medium）。修補建議是升級至 Google Chrome 155.0.8059.39 或更高版本，以修復此授權控制缺陷，防止本地攻擊者利用此漏洞進行惡意活動。",
+    tags: ["Google Chrome", "Android", "CVE-2026-106367", "授權缺失", "本地攻擊"],
+    title_en: "Google Chrome Android Browser Has Missing Authorization Vulnerability, Potentially Allowing Local Code Execution",
+    summary_en: "Google Chrome on the Android platform, in versions prior to 155.0.8059.39, contains a missing authorization vulnerability. This flaw allows a local attacker, through social engineering, to execute arbitrary code outside the sandbox by leveraging a co-installed application. The vulnerability is rated as Medium severity. The recommended fix is to upgrade to Google Chrome 155.0.8059.39 or later to patch this authorization control defect, preventing local attackers from exploiting it for malicious activity.",
+    tags_en: ["Google Chrome", "Android", "CVE-2026-106367", "Missing Authorization", "Local Attack"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-106367", lang: "EN" }
+    ]
+  },
+  {
     id: "20261006-14677",
     trackers: ["security"],
     category: "前瞻技術",
