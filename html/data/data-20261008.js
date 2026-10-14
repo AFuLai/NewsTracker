@@ -716,6 +716,34 @@ window.TRACKER_DAYS["2026-10-08"] = [
     ]
   },
   {
+    id: "20261008-15834",
+    trackers: ["os", "security"],
+    category: "Android",
+    title: "Android 應用程式「Ticket Ryutsu Center」硬編碼憑證，資安風險警示",
+    summary: "資安研究指出，名為「Ticket Ryutsu Center」的 Android 應用程式內，存在硬編碼（hard-coded）的憑證。這類安全缺陷允許攻擊者透過逆向工程等手段，獲取應用程式所使用的 API key。一旦這些憑證被竊取，攻擊者可能利用該 API key 來執行未經授權的操作，進而造成資料洩露或服務濫用。本事件屬於應用程式層面的配置錯誤與安全實作缺陷，建議開發者應移除所有硬編碼的敏感資訊，改採用安全的憑證管理機制，例如透過環境變數、安全的金鑰庫或後端驗證流程來處理 API key，以大幅降低被惡意利用的風險。",
+    tags: ["Android", "硬編碼憑證", "API key", "資安漏洞", "應用程式安全"],
+    title_en: "Android Application 'Ticket Ryutsu Center' Hardcodes Credentials, Security Risk Alert",
+    summary_en: "Security research has pointed out the existence of hard-coded credentials within an Android application named 'Ticket Ryutsu Center'. This type of security flaw allows attackers to obtain the API key used by the application through methods such as reverse engineering. Once these credentials are stolen, attackers may use the API key to perform unauthorized operations, potentially leading to data leakage or service abuse. This incident constitutes an application-level configuration error and security implementation flaw. Developers are advised to remove all hard-coded sensitive information and adopt secure credential management mechanisms, such as using environment variables, secure key vaults, or backend validation processes, to significantly reduce the risk of malicious exploitation.",
+    tags_en: ["Android", "Hardcoded Credentials", "API key", "Security Vulnerability", "Application Security"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-92861", lang: "EN" }
+    ]
+  },
+  {
+    id: "20261008-15835",
+    trackers: ["os", "security"],
+    category: "Android",
+    title: "Android 應用程式「Ticket Ryutsu Center」處理自訂 URL 格式缺陷，可能導致任意網站存取",
+    summary: "本漏洞存在於 Android 應用程式「Ticket Ryutsu Center」。該應用程式在處理自訂 URL 格式（custom URL schemes）時存在不當處理機制，允許惡意應用程式透過構造惡意 Intent，強制導致目標設備存取任意指定的網站。這類漏洞屬於應用層的資訊洩露或強制導航問題，攻擊者可利用此缺陷在設備上執行未經授權的網路活動。修補建議是開發者應嚴格驗證和過濾所有透過 Intent 傳遞的自訂 URL 格式，確保其只導向預期的、受控的資源，並實施最小權限原則以限制應用程式的網路存取範圍。",
+    tags: ["Android", "Ticket Ryutsu Center", "Intent", "URL Schemes", "應用程式漏洞"],
+    title_en: "Android Application 'Ticket Ryutsu Center' Vulnerable to Arbitrary Website Access via Custom URL Scheme Handling Flaw",
+    summary_en: "This vulnerability exists in the Android application 'Ticket Ryutsu Center'. The application has an improper handling mechanism when processing custom URL schemes, which allows malicious applications to construct malicious Intents, forcing the target device to access any specified website. This type of vulnerability constitutes an application-layer information leakage or forced navigation issue, allowing attackers to execute unauthorized network activity on the device. The recommended remediation is for developers to strictly validate and filter all custom URL schemes passed via Intents, ensuring they only point to expected, controlled resources, and to implement the principle of least privilege to restrict the application's network access scope.",
+    tags_en: ["Android", "Ticket Ryutsu Center", "Intent", "URL Schemes", "Application Vulnerability"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-92862", lang: "EN" }
+    ]
+  },
+  {
     id: "20261008-15105",
     trackers: ["security"],
     category: "前瞻技術",

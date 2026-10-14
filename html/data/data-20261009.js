@@ -268,6 +268,146 @@ window.TRACKER_DAYS["2026-10-09"] = [
     ]
   },
   {
+    id: "20261009-15792",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心漏洞修復：xen/netfront 處理短 Ethernet 標頭的接收封包問題",
+    summary: "本漏洞存在於 Linux 核心的 xen/netfront 元件中，涉及接收（RX）封包時處理短 Ethernet 標頭的邏輯缺陷。當 `handle_incoming_queue()` 函數將部分資料拉入頭部（head）並呼叫 `eth_type_trans()` 時，缺乏對拉入長度（`pull_to`）與標準 Ethernet 標頭長度（`ETH_HLEN`）的完整檢查。如果第一個資料槽（slot）長度短於 `ETH_HLEN`，但後續仍有資料槽，`head` 的長度就會短於完整的 Ethernet 標頭，而 `skb->len` 卻被誤判為較長。這導致 `eth_type_trans()` 在 `__skb_pull()` 函數中發生錯誤（BUG），甚至可能導致讀取標頭時超出資料範圍。修復建議是強制至少拉取 `ETH_HLEN` 的資料，若失敗則丟棄封包，從而確保所有接收的封包都具備完整的 Ethernet 標頭結構。",
+    tags: ["Linux 核心", "xen/netfront", "Ethernet 標頭", "CVE-2026-98375", "網路堆疊"],
+    title_en: "Linux Kernel Vulnerability Fix: Issue in xen/netfront Handling Short Ethernet Headers on Received Packets",
+    summary_en: "This vulnerability resides in the `xen/netfront` component of the Linux kernel, concerning a logic flaw when processing short Ethernet headers during packet reception (RX). When the `handle_incoming_queue()` function pulls partial data into the head and calls `eth_type_trans()`, it fails to perform a complete check between the pulled length (`pull_to`) and the standard Ethernet header length (`ETH_HLEN`). If the first data slot length is shorter than `ETH_HLEN`, but subsequent slots still contain data, the `head` length will be shorter than a complete Ethernet header, while `skb->len` is incorrectly reported as longer. This causes `eth_type_trans()` to fail (BUG) within the `__skb_pull()` function, potentially leading to out-of-bounds read errors when reading the header. The suggested fix is to enforce pulling at least `ETH_HLEN` of data; if this fails, the packet should be dropped, thereby ensuring that all received packets possess a complete Ethernet header structure.",
+    tags_en: ["Linux Kernel", "xen/netfront", "Ethernet Header", "CVE-2026-98375", "Network Stack"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-98375", lang: "EN" }
+    ]
+  },
+  {
+    id: "20261009-15793",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心修補：修復 bpf 內核元件中，因內部 map 替換導致的越界存取漏洞",
+    summary: "本漏洞存在於 Linux 核心的 BPF (Berkeley Packet Filter) 相關元件中。當一個 percpu 陣列被用作內部 map 時，其操作結構 `percpu_array_map_ops.map_meta_equal` 指向了通用的 `bpf_map_meta_equal()` 函數。這個通用函數並未執行比較 `max_entries` 的檢查。攻擊者可以透過替換為具有較少 `max_entries` 的 map，繞過原本的檢查機制。由於 `percpu_array_map_gen_lookup()` 會將原始模板的 `index_mask` 作為 JIT immediate 內聯，因此對替換後的 map 進行查找操作時，可能會導致存取 `pptrs[]` 陣列超出界限（out of bounds）。核心開發人員已修補此問題，建議將 `percpu_array_map_ops.map_meta_equal` 指向 `array_map_meta_equal()`，該函數已強制執行 `max_entries` 的相等性檢查。此外，還新增了自檢測試來驗證替換不同大小的 percpu 內部 map 會被拒絕。",
+    tags: ["Linux 核心", "BPF", "percpu", "越界存取", "Linux 核心元件"],
+    title_en: "Linux Kernel Patch: Fix for Out-of-Bounds Access Vulnerability in BPF Kernel Component Caused by Internal Map Replacement",
+    summary_en: "This vulnerability resides in the BPF (Berkeley Packet Filter) components of the Linux kernel. When a percpu array is used as an internal map, its operation structure, `percpu_array_map_ops.map_meta_equal`, points to the generic `bpf_map_meta_equal()` function. This generic function fails to perform a check on `max_entries`. An attacker can bypass the original check mechanism by replacing the map with one having fewer `max_entries`. Because `percpu_array_map_gen_lookup()` embeds the original template's `index_mask` as a JIT immediate, performing a lookup on the replaced map may lead to an out-of-bounds access of the `pptrs[]` array. Kernel developers have patched this issue, recommending that `percpu_array_map_ops.map_meta_equal` point to `array_map_meta_equal()`, a function that enforces equality checks on `max_entries`. Additionally, self-test checks have been added to ensure that replacing the percpu internal map with a different size will be rejected.",
+    tags_en: ["Linux Kernel", "BPF", "percpu", "Out-of-Bounds Access", "Linux Kernel Component"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-98376", lang: "EN" }
+    ]
+  },
+  {
+    id: "20261009-15794",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心漏洞：vlan 標籤處理不驗證 MAC 標頭，可能導致資料洩漏",
+    summary: "本漏洞存在於 Linux 核心的 VLAN 標籤處理機制中，具體影響於 `__vlan_insert_inner_tag()` 函式。該函式僅保證有足夠的空間（head room），但並未確保 MAC 標頭的完整性。在特定的網路傳輸路徑（如 `skb_vlan_push()` 或 `validate_xmit_vlan()`）中，核心會重寫資料包開頭的 16 個位元組。當使用 IFF_TUN 設備且傳輸的資料包極小（例如僅 1 位元組的 AF_PACKET/SOCK_RAW 幀）時，後續的 VLAN 標籤推送操作會從 `skb->tail` 之後的未初始化記憶體（uninitialised slab）拉取資料，導致最終傳輸的資料包內容包含未預期的記憶體殘留位元組。修復建議要求在 VLAN 標籤處理的輔助函式中，必須驗證 MAC 標頭的完整性，以防止此類資料洩漏。",
+    tags: ["Linux 核心", "VLAN", "CVE-2026-98377", "skb", "資料洩漏"],
+    title_en: "Linux Kernel Vulnerability: VLAN Tag Handling Fails to Validate MAC Header, Potentially Leading to Data Leakage",
+    summary_en: "This vulnerability resides in the VLAN tag handling mechanism of the Linux kernel, specifically affecting the `__vlan_insert_inner_tag()` function. This function only guarantees sufficient space (head room) but does not ensure the integrity of the MAC header. In specific network transmission paths (such as `skb_vlan_push()` or `validate_xmit_vlan()`), the kernel overwrites the first 16 bytes of the packet. When using an IFF_TUN device and transmitting extremely small packets (e.g., an AF_PACKET/SOCK_RAW frame of only 1 byte), subsequent VLAN tag pushing operations pull data from uninitialized memory (uninitialized slab) after `skb->tail`. This results in the final transmitted packet containing unexpected memory residue bits. The suggested fix requires that the auxiliary function handling VLAN tags must validate the integrity of the MAC header to prevent this type of data leakage.",
+    tags_en: ["Linux Kernel", "VLAN", "CVE-2026-98377", "skb", "Data Leakage"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-98377", lang: "EN" }
+    ]
+  },
+  {
+    id: "20261009-15795",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心 bpf 鏈接迭代器存在 Use-After-Free 漏洞，可能導致系統崩潰",
+    summary: "本漏洞存在於 Linux 核心的 BPF (Berkeley Packet Filter) 相關功能中，具體影響於 `bpf_link_put` 函數。當使用 `bpf_link_prime()` 插入鏈接後，如果後續的 `anon_inode_getfile()` 失敗，創建者會直接移除 ID 並釋放該鏈接。然而，鏈接迭代器（link iterator）在處理此類 ID-zero 的未定居（unsettled）鏈接時，缺乏適當的檢查，導致迭代器持有懸空參考（dangling reference）。當迭代器執行下一個 `bpf_link_put()` 操作時，會嘗試存取已被釋放的記憶體，引發 Use-After-Free (UAF) 錯誤，最終可能導致 KASAN 偵測到錯誤並觸發 Kernel panic。修補建議是修改 `bpf_link_get_curr_or_next()`，使其像 `bpf_link_by_id()` 一樣，將 ID-zero 的條目視為過渡狀態（transient），避免對已釋放資源進行操作。",
+    tags: ["Linux 核心", "bpf", "Use-After-Free", "KASAN", "bpf_link_put"],
+    title_en: "Use-After-Free Vulnerability in Linux Kernel bpf Link Iterator",
+    summary_en: "This vulnerability resides in the BPF (Berkeley Packet Filter) functionality of the Linux kernel, specifically affecting the `bpf_link_put` function. After inserting a link using `bpf_link_prime()`, if the subsequent call to `anon_inode_getfile()` fails, the creator directly removes and releases the ID for that link. However, the link iterator lacks proper checks when handling such ID-zero unsettled links, causing the iterator to hold a dangling reference. When the iterator executes the next `bpf_link_put()` operation, it attempts to access already freed memory, triggering a Use-After-Free (UAF) error. This can ultimately lead to KASAN detecting the error and triggering a Kernel panic. The suggested fix is to modify `bpf_link_get_curr_or_next()` to treat ID-zero entries as transient, similar to `bpf_link_by_id()`, thereby preventing operations on already released resources.",
+    tags_en: ["Linux Kernel", "bpf", "Use-After-Free", "KASAN", "bpf_link_put"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-98378", lang: "EN" }
+    ]
+  },
+  {
+    id: "20261009-15796",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心漏洞：netfilter ip6t_rpfilter 允許未經授權的 NULL 指標解引用",
+    summary: "本漏洞存在於 Linux 核心的 netfilter 模組中的 ip6t_rpfilter 功能。當一個外部下一跳設備的 MTU 低於 IPV6_MIN_MTU 時，系統會解除其 inet6_dev，但 fib6_ifdown() 仍會保留使用下一跳物件的路由。這使得未經特權的用戶可以在私有用戶和網路命名空間中，利用 rtnetlink 構造出特定狀態，進而觸發 IPv6 rpfilter 查找時的 NULL 指標解引用（NULL dereference）。這可能導致系統崩潰（Kernel panic）。修補後，系統會在查找後立即拒絕沒有 inet6_dev 的路由，從而保護後續的 rt6i_idev 解引用。建議系統管理員應立即更新 Linux 核心以修補此安全漏洞。",
+    tags: ["Linux 核心", "netfilter", "ip6t_rpfilter", "CVE-2026-98379", "NULL 指標解引用", "IPv6"],
+    title_en: "Linux Kernel Vulnerability: netfilter ip6t_rpfilter Allows Unauthorized NULL Pointer Dereference",
+    summary_en: "This vulnerability resides in the ip6t_rpfilter functionality within the Linux kernel's netfilter module. When an external next-hop device's MTU is lower than IPV6_MIN_MTU, the system removes its inet6_dev, but fib6_ifdown() still retains the route using the next-hop object. This allows unprivileged users, within private user and network namespaces, to construct a specific state using rtnetlink, thereby triggering a NULL pointer dereference during IPv6 rpfilter lookup. This could lead to a system crash (Kernel panic). The patch ensures that the system immediately rejects routes lacking an inet6_dev after lookup, thereby protecting subsequent rt6i_idev dereferences. System administrators are advised to immediately update the Linux kernel to patch this security vulnerability.",
+    tags_en: ["Linux Kernel", "netfilter", "ip6t_rpfilter", "CVE-2026-98379", "NULL Pointer Dereference", "IPv6"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-98379", lang: "EN" }
+    ]
+  },
+  {
+    id: "20261009-15797",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心漏洞：net/sched 處理 IDR 錯誤指標時可能發生空指標解引用",
+    summary: "本文描述了 Linux 核心 net/sched 模組中的一個漏洞，涉及 `tcf_action_delete()` 和 `tcf_idr_delete_index()` 函數。當一個未鎖定（unlocked）的分類器（classifier）在刪除動作（action）時，如果中間發生了使用 `ERR_PTR(-EBUSY)` 重新佔用相同 IDR slot 的操作，`tcf_idr_delete_index()` 只檢查查找結果是否為 NULL，會錯誤地將該佔用視為一個有效的 `tc_action`，進而解引用 `tcfa_bindcnt`，導致空指標解引用（null-ptr-deref）。此漏洞的利用觸發了 KASAN 報告，並可能導致一般保護錯誤（general protection fault）甚至核心崩潰（Kernel panic）。修補建議是將錯誤指標視為不存在，並返回 -ENOENT 錯誤，以避免處理這些潛在的錯誤狀態。此漏洞屬於 Linux 核心層面的安全問題，影響範圍為使用相關網路排程功能的系統。",
+    tags: ["Linux 核心", "net/sched", "tcf_action_delete", "IDR", "空指標解引用", "CVE-2026-98380"],
+    title_en: "Linux Kernel Vulnerability: Null Pointer Dereference Possible in net/sched When Handling IDR Error Pointer",
+    summary_en: "This article describes a vulnerability in the Linux kernel's net/sched module, involving the `tcf_action_delete()` and `tcf_idr_delete_index()` functions. When an unlocked classifier performs a delete action, if an operation reuses the same IDR slot with `ERR_PTR(-EBUSY)` in the interim, `tcf_idr_delete_index()` only checks if the lookup result is NULL, incorrectly treating this occupation as a valid `tc_action`. This subsequently leads to dereferencing `tcfa_bindcnt`, causing a null-pointer dereference. Exploitation of this vulnerability triggers KASAN reports and may lead to a general protection fault or even a kernel panic. The suggested fix is to treat the error pointer as non-existent and return the -ENOENT error, thus avoiding processing these potential error states. This vulnerability is a kernel-level security issue in Linux, affecting systems that use related network scheduling features.",
+    tags_en: ["Linux Kernel", "net/sched", "tcf_action_delete", "IDR", "null-ptr-deref", "CVE-2026-98380"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-98380", lang: "EN" }
+    ]
+  },
+  {
+    id: "20261009-15798",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心 veth 介面 XDP 資源管理漏洞：通道調整時可能導致指標洩漏",
+    summary: "本漏洞存在於 Linux 核心的 veth 介面（virtual ethernet），涉及 XDP（eXpress Data Path）程式的資源管理問題。當呼叫 `veth_set_channels()` 移除 RX 佇列時，該函式並未清除 `rq->xdp_prog` 指標。如果此 XDP 程式隨後被分離或替換，這些佇列會保留舊的指標，即使執行了 `bpf_prog_put()`。當後續進行通道增加時，可能會重新啟用 NAPI 並執行這個已被釋放的程式，從而導致系統不穩定的記憶體操作，甚至觸發 Kernel panic。此問題的修復旨在確保在 veth 介面調整通道時，能正確清理 XDP 相關的資源指標，防止使用已釋放的程式指標，維護核心的記憶體完整性與穩定性。",
+    tags: ["Linux 核心", "veth", "XDP", "CVE-2026-98381", "Linux 核心元件"],
+    title_en: "Linux Kernel veth Interface XDP Resource Management Vulnerability: Potential Pointer Leak During Channel Adjustment",
+    summary_en: "This vulnerability resides in the Linux kernel's veth interface (virtual ethernet) and involves resource management issues related to XDP (eXpress Data Path) programs. When calling `veth_set_channels()` to remove an RX queue, the function fails to clear the `rq->xdp_prog` pointer. If this XDP program is subsequently detached or replaced, these queues retain the old pointer even after `bpf_prog_put()` is executed. When subsequent channel additions occur, NAPI might be re-enabled and execute this already released program, leading to unstable memory operations and potentially triggering a Kernel panic. The fix aims to ensure that XDP-related resource pointers are correctly cleaned up when adjusting veth channels, preventing the use of released program pointers and maintaining the kernel's memory integrity and stability.",
+    tags_en: ["Linux Kernel", "veth", "XDP", "CVE-2026-98381", "Linux Kernel Component"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-98381", lang: "EN" }
+    ]
+  },
+  {
+    id: "20261009-15799",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心漏洞 CVE-2026-98382：BPF 程式在網路設備匹配機制上的安全缺陷",
+    summary: "本漏洞位於 Linux 核心的 BPF (Berkeley Packet Filter) 相關功能，涉及 `__bpf_offload_dev_match()` 函數的邏輯缺陷。當執行「僅綁定 (bound-only)」的 BPF 程式時，若發生網路設備 (netdev) 匹配不精確，系統會回退到比較 offdev 指標。由於「僅綁定」程式通常具有 NULL 的 offdev，導致與不相關的網路設備進行了錯誤的相等比較。攻擊者若具備 CAP_BPF 和 CAP_NET_ADMIN 權限，可以利用 `bpf(BPF_LINK_CREATE)` 搭配不同的目標 ifindex，在目標驅動程式的 xdp_buff 上運行專門的元數據 kfuncs，從而導致 veth-bound 程式在 tun 設備上讀取超出其原始堆疊的 xdp_buff 範圍，造成記憶體讀寫錯誤 (null-ptr-deref) 和系統崩潰 (Kernel panic)。修補建議是將非 offloaded 程式限制為精確的 netdev 匹配，並將共享 offdev 的回退機制僅保留給真正的 offloaded 多埠程式，以提高 BPF 程式的安全性與隔離性。",
+    tags: ["Linux 核心", "BPF", "CVE-2026-98382", "netdev", "CAP_BPF", "xdp"],
+    title_en: "Linux Kernel Vulnerability CVE-2026-98382: Security Flaw in BPF Program Network Device Matching Mechanism",
+    summary_en: "This vulnerability resides in the BPF (Berkeley Packet Filter) functionality of the Linux kernel, specifically involving a logic flaw in the `__bpf_offload_dev_match()` function. When executing 'bound-only' BPF programs, if the network device (netdev) matching is imprecise, the system falls back to comparing offdev indicators. Because 'bound-only' programs typically have a NULL offdev, this leads to an incorrect equality comparison with unrelated network devices. An attacker possessing CAP_BPF and CAP_NET_ADMIN capabilities can exploit this by using `bpf(BPF_LINK_CREATE)` with different target ifindices to run specialized metadata kfuncs on the target driver's xdp_buff. This causes veth-bound programs running on tun devices to read the xdp_buff range beyond its original stack, resulting in a memory read/write error (null-ptr-deref) and a system crash (Kernel panic). The suggested patch is to restrict non-offloaded programs to precise netdev matching and reserve the fallback mechanism for shared offdev only for genuine offloaded multi-port programs, thereby enhancing the security and isolation of BPF programs.",
+    tags_en: ["Linux Kernel", "BPF", "CVE-2026-98382", "netdev", "CAP_BPF", "xdp"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-98382", lang: "EN" }
+    ]
+  },
+  {
+    id: "20261009-15800",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心修補：限制 LWT_SEG6LOCAL 程式呼叫 bpf_skb_pull_data()，防止 SRH 指標懸空問題",
+    summary: "本修補針對 Linux 核心中的一個安全漏洞，涉及 LWT_SEG6LOCAL 程式。該漏洞的攻擊路徑是，LWT_SEG6LOCAL 程式可以透過 `bpf_lwt_seg6_adjust_srh()` 函式無效化其快取 SRH，隨後呼叫 `bpf_skb_pull_data()`。後者可能會重新配置 `skb->head`，導致每個 CPU 的 SRH 指標懸空（dangling）。當後續的程式執行 SRH 驗證時，會透過這個懸空的指標寫入記憶體，造成安全風險。為了解決此問題，核心開發者決定禁止 LWT_SEG6LOCAL 程式呼叫 `bpf_skb_pull_data()`，讓驗證器（verifier）能夠拒絕這種不安全的輔助函式組合。其他 LWT 程式類型仍可透過 `lwt_out_func_proto()` 暴露此輔助函式。建議系統管理員應更新至修補後的 Linux 核心版本，以避免此類記憶體操作的潛在安全漏洞。",
+    tags: ["Linux 核心", "bpf", "LWT_SEG6LOCAL", "bpf_skb_pull_data()", "SRH", "Linux 安全更新"],
+    title_en: "Linux Kernel Patch: Restricting LWT_SEG6LOCAL Program Call to bpf_skb_pull_data() to Prevent SRH Pointer Dangling Issue",
+    summary_en: "This patch addresses a security vulnerability in the Linux kernel involving the LWT_SEG6LOCAL program. The attack path is that the LWT_SEG6LOCAL program can invalidate its cached SRH via the `bpf_lwt_seg6_adjust_srh()` function, and subsequently call `bpf_skb_pull_data()`. The latter may reconfigure `skb->head`, leading to the SRH pointer dangling on each CPU. When subsequent code performs SRH validation, it writes to memory using this dangling pointer, creating a security risk. To resolve this issue, kernel developers decided to prohibit the LWT_SEG6LOCAL program from calling `bpf_skb_pull_data()`, allowing the verifier to reject this unsafe combination of helper functions. Other LWT program types can still expose this helper function via `lwt_out_func_proto()`. System administrators are advised to update to the patched Linux kernel version to avoid this potential memory manipulation security vulnerability.",
+    tags_en: ["Linux Kernel", "bpf", "LWT_SEG6LOCAL", "bpf_skb_pull_data()", "SRH", "Linux Security Update"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-98383", lang: "EN" }
+    ]
+  },
+  {
+    id: "20261009-15801",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心修復 bpf_sock_destroy() 函數的越界讀取漏洞",
+    summary: "本修補內容針對 Linux 核心中的一個越界讀取（out-of-bounds read）漏洞，發生在 `bpf_sock_destroy()` 函數內。該漏洞的根本原因在於，當 `bpf_sock_destroy()` 接收到由 TCP 迭代器處理的 TIME_WAIT 或 NEW_SYN_RECV 類型的 socket 時，嘗試讀取 `sk->sk_protocol` 屬性。然而，這些特殊的 socket 結構並不包含 `struct sock_common` 所定義的 `sk_protocol` 欄位，導致讀取操作越界，可能導致系統崩潰或資訊洩露。修補建議是限制 `sk_protocol` 的檢查僅限於完整的 socket，並讓 `tcp_abort()` 函數負責處理 TIME_WAIT 和 NEW_SYN_RECV 類型的 socket，以確保核心的穩定性與安全性。",
+    tags: ["Linux 核心", "bpf_sock_destroy", "越界讀取", "struct sock", "TIME_WAIT", "TCP"],
+    title_en: "Linux Kernel Fix Addresses Out-of-Bounds Read in bpf_sock_destroy() Function",
+    summary_en: "This patch addresses an out-of-bounds read vulnerability within the Linux kernel, specifically in the `bpf_sock_destroy()` function. The root cause of the vulnerability is that when `bpf_sock_destroy()` receives a socket of type TIME_WAIT or NEW_SYN_RECV, which are processed by the TCP iterator, it attempts to read the `sk->sk_protocol` attribute. However, these specialized socket structures do not contain the `sk_protocol` field defined in `struct sock_common`, leading to an out-of-bounds read operation that could potentially cause system crashes or information leakage. The suggested fix is to restrict the check for `sk_protocol` only to complete sockets, and to have the `tcp_abort()` function handle TIME_WAIT and NEW_SYN_RECV types, thereby ensuring the kernel's stability and security.",
+    tags_en: ["Linux Kernel", "bpf_sock_destroy", "Out-of-bounds read", "struct sock", "TIME_WAIT", "TCP"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-98384", lang: "EN" }
+    ]
+  },
+  {
     id: "20261009-15120",
     trackers: ["eu_cra", "security"],
     category: "法規與標準",

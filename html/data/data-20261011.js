@@ -268,6 +268,20 @@ window.TRACKER_DAYS["2026-10-11"] = [
     ]
   },
   {
+    id: "20261011-15836",
+    trackers: ["os", "security"],
+    category: "Android",
+    title: "Android 應用程式 Lippu Docx Reader 存在路徑遍歷漏洞，遠端可利用",
+    summary: "資安研究發現 Android 應用程式 Lippu Docx Reader Office Viewer App 版本 1.4.5 及更早版本存在一個路徑遍歷（Path Traversal）漏洞。此漏洞影響 `word.office.docxviewer.document.docx.reader.ViewTxt` 函式。攻擊者可透過操縱 `_display_name` 參數，導致應用程式執行路徑遍歷攻擊。該漏洞具有遠端攻擊向量，意味著攻擊者無需本地存取權限即可發動攻擊。為修復此問題，建議使用者應升級 Lippu Docx Reader Office Viewer App 至最新版本，或尋求開發商的官方修補程式。由於原文未提供 CVSS 分數或詳細的修補版本，建議使用者保持警惕，並留意官方的安全公告。",
+    tags: ["Lippu Docx Reader", "Android", "CVE-2026-108544", "路徑遍歷", "Office Viewer"],
+    title_en: "Path Traversal Vulnerability Found in Android Application Lippu Docx Reader, Remotely Exploitable",
+    summary_en: "Security researchers have discovered a Path Traversal vulnerability in the Lippu Docx Reader Office Viewer App, specifically affecting version 1.4.5 and earlier. This vulnerability impacts the `word.office.docxviewer.document.docx.reader.ViewTxt` function. An attacker can exploit this flaw by manipulating the `_display_name` parameter, leading to a path traversal attack. The vulnerability possesses a remote attack vector, meaning an attacker can launch the attack without requiring local access. To remediate this issue, users are advised to upgrade the Lippu Docx Reader Office Viewer App to the latest version or seek an official patch from the developer. Since the original text did not provide a CVSS score or detailed patch version, users are advised to remain vigilant and monitor official security announcements.",
+    tags_en: ["Lippu Docx Reader", "Android", "CVE-2026-108544", "Path Traversal", "Office Viewer"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-108544", lang: "EN" }
+    ]
+  },
+  {
     id: "20261011-15213",
     trackers: ["os"],
     category: "重點關注",
