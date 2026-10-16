@@ -1529,6 +1529,20 @@ window.TRACKER_DAYS["2026-10-13"] = [
     ]
   },
   {
+    id: "20261013-15892",
+    trackers: ["os", "security"],
+    category: "漏洞與威脅情報",
+    title: "Lightwell發現JAXB核心Java框架新型零日漏洞CVE-2026-92877，強調資安需從上游開源源頭修補",
+    summary: "本文討論了企業級IT基礎程式碼（如JAXB）的資安風險，指出這些老舊、核心的元件往往被忽略，但一旦出現漏洞，可能導致嚴重的操作後果，包括權限提升、繞過存取控制或執行任意程式碼。Lightwell公司透過發現JAXB中的新型漏洞CVE-2026-92877，展示了其在開源生態系統中的核心價值。他們強調，真正的資安保護必須是「上游資安」，即直接在原始開源專案源頭進行修補，並為無法進行立即升級的舊版系統進行補丁回溯（backporting）。這不僅保護了下游的企業運行環境，也確保了關鍵基礎設施的長期穩定性與韌性。修補建議是應採取持續、主動的資安工程，將修補工作貢獻回上游開源社群，並為過時的系統提供安全補丁。",
+    tags: ["JAXB", "CVE-2026-92877", "Java", "開源安全", "零日漏洞", "上游資安"],
+    title_en: "Lightwell Discovers New Zero-Day Vulnerability in JAXB Core Java Framework, Emphasizing the Need for Upstream Open-Source Remediation",
+    summary_en: "This article discusses the security risks inherent in enterprise-grade foundational code (such as JAXB). It points out that these older, core components are often overlooked, but when vulnerabilities appear, they can lead to severe operational consequences, including privilege escalation, bypassing access controls, or executing arbitrary code. Lightwell demonstrated its core value within the open-source ecosystem by discovering a new vulnerability in JAXB, CVE-2026-92877. They emphasize that true security protection must be 'upstream security'—meaning remediation must occur directly at the original open-source project source. Furthermore, they advocate for backporting patches for legacy systems that cannot be immediately upgraded. This not only protects downstream enterprise operating environments but also ensures the long-term stability and resilience of critical infrastructure. The recommended remediation approach is to adopt continuous, proactive security engineering, contributing fixes back to the upstream open-source community, and providing security patches for outdated systems.",
+    tags_en: ["JAXB", "CVE-2026-92877", "Java", "Open-Source Security", "Zero-Day Vulnerability", "Upstream Security"],
+    sources: [
+      { name: "Red Hat Security Blog", url: "https://redhat.com/en/blog/whats-old-new-lightwell-discovers-novel-zero-day-vulnerability-core-java-framework", lang: "EN" }
+    ]
+  },
+  {
     id: "20261013-15502",
     trackers: ["security"],
     category: "供應鏈與開源安全",

@@ -296,6 +296,20 @@ window.TRACKER_DAYS["2026-10-12"] = [
     ]
   },
   {
+    id: "20261012-15935",
+    trackers: ["security"],
+    category: "重大事件",
+    title: "零售巨頭 Ahold Delhaize 遭遇網路安全事件，部分系統被迫離線營運",
+    summary: "全球大型食品零售連鎖企業 Ahold Delhaize 確認發生「網路安全事件」，為保護基礎設施，公司被迫將部分系統離線。該公司在歐洲、美國和印尼經營超過 9,400 家門市，服務數千萬顧客。雖然公司發布聲明強調門市仍對顧客開放，但實際影響已體現在多個業務環節：美國 Stop & Shop 區域超市員工無法存取排班表和薪資單；荷蘭的 Albert Heijn、Etos 和 Gall & Gall 門市，以及比利時的 Delhaize 門市，顧客無法使用網站、App 及客服平台。這已是 Ahold Delhaize 近年第二次重大的網路安全事件，此前曾遭受 ransomware 群組 INC Ransom 的攻擊，導致超過 220 萬個體個人、財務和健康資訊外洩。公司目前正努力減輕這次事件的影響，但業務系統的運營中斷已造成實質不便。",
+    tags: ["Ahold Delhaize", "網路安全事件", "系統離線", "零售業", "Ransomware", "Stop & Shop"],
+    title_en: "Retail Giant Ahold Delhaize Experiences Cybersecurity Incident, Forcing Partial System Offline Operations",
+    summary_en: "Global large-scale food retail chain Ahold Delhaize confirmed a \"cybersecurity incident,\" forcing the company to take certain systems offline to protect its infrastructure. The company operates over 9,400 stores across Europe, the US, and Indonesia, serving tens of millions of customers. Although the company issued a statement emphasizing that stores remain open to customers, the actual impact is evident across multiple business areas: Stop & Shop regional supermarkets in the US employees cannot access schedules or payroll slips; in the Netherlands, customers at Albert Heijn, Etos, and Gall & Gall stores, and at Delhaize stores in Belgium, cannot use the website, app, or customer service platforms. This marks the second major cybersecurity incident for Ahold Delhaize in recent years, following a previous attack by the ransomware group INC Ransom, which led to the leakage of over 2.2 million individual personal, financial, and health records. The company is currently working to mitigate the impact of this incident, but the operational disruption of its business systems has caused significant inconvenience.",
+    tags_en: ["Ahold Delhaize", "Cybersecurity Incident", "System Offline", "Retail Industry", "Ransomware", "Stop & Shop"],
+    sources: [
+      { name: "BleepingComputer", url: "https://bleepingcomputer.com/news/security/retail-giant-ahold-delhaize-takes-systems-offline-after-cyberattack", lang: "EN" }
+    ]
+  },
+  {
     id: "20261012-15769",
     trackers: ["os"],
     category: "Windows",

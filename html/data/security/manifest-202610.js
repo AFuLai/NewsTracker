@@ -3,9 +3,10 @@ window.TRACKER_MONTH = window.TRACKER_MONTH || {};
 window.TRACKER_MONTH["security"] = window.TRACKER_MONTH["security"] || {};
 window.TRACKER_MONTH["security"]["2026-10"] = {
   dates: [
-    { date: "2026-10-14", file: "../data-20261014.js", count: 31 },
-    { date: "2026-10-13", file: "../data-20261013.js", count: 96 },
-    { date: "2026-10-12", file: "../data-20261012.js", count: 30 },
+    { date: "2026-10-15", file: "../data-20261015.js", count: 68 },
+    { date: "2026-10-14", file: "../data-20261014.js", count: 89 },
+    { date: "2026-10-13", file: "../data-20261013.js", count: 97 },
+    { date: "2026-10-12", file: "../data-20261012.js", count: 31 },
     { date: "2026-10-11", file: "../data-20261011.js", count: 5 },
     { date: "2026-10-10", file: "../data-20261010.js", count: 18 },
     { date: "2026-10-09", file: "../data-20261009.js", count: 47 },
@@ -18,6 +19,6 @@ window.TRACKER_MONTH["security"]["2026-10"] = {
     { date: "2026-10-02", file: "../data-20261002.js", count: 50 },
     { date: "2026-10-01", file: "../data-20261001.js", count: 65 }
   ],
-  totalArticles: 583,
-  lastUpdated: "2026-10-14"
+  totalArticles: 711,
+  lastUpdated: "2026-10-16"
 };
