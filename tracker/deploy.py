@@ -1,7 +1,7 @@
 """Publish the generated site to Firebase Hosting (project afu-news).
 
 The deploy directory is the workarea's /opt/tracker/web: firebase.json,
-.firebaserc and a `public -> /opt/tracker/repo/html` symlink. It is
+.firebaserc and `public/`, the site itself (DEFAULT_OUT renders into it). It is
 project-specific, machine-local and never committed; the site itself is
 rendered from db/ and is not tracked either.
 

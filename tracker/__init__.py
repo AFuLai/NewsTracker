@@ -20,7 +20,9 @@ PROJECT_ROOT = Path("/mnt/d/Claude/Tool/NewsTracker")
 # writes than drvfs(/mnt/d) and none of the cross-write pitfalls (drvfs speed
 # tax, 777/CRLF git noise, AV locking, ADS streams). The tarball stays on /mnt/d
 # for Windows-side distribution.
-DEFAULT_OUT = ROOT / "html"
+# Rendered straight into the Firebase deploy dir (was repo/html behind a
+# web/public symlink until 2026-10-19).
+DEFAULT_OUT = ROOT.parent / "web" / "public"
 DEFAULT_TARBALL = PROJECT_ROOT / "tarball"
 DEFAULT_DB = ROOT / "db" / "articles.sqlite"
 OLLAMA_URL = "http://localhost:11434"

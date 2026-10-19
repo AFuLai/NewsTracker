@@ -19,14 +19,14 @@ wsl -e bash -lc 'cd /opt/tracker/repo && git status'
 需要用 Windows 端工具讀寫該 repo 時，路徑為 `\\wsl.localhost\Ubuntu\opt\tracker\repo\...`。
 
 WSL 工作區 `/opt/tracker`（LAYOUT-11）：`repo/` 是 git checkout；`web/` 是 Firebase Hosting 部署目錄
-（`public -> /opt/tracker/repo/html`），屬本專案專屬、只在本機、不進 git。`repo/` 內的 `db/`、`logs/`、
+（`public/` 就是產生的靜態站本體，2026-10-19 前為指向 `repo/html` 的 symlink），屬本專案專屬、只在本機、不進 git。`repo/` 內的 `db/`、`logs/`、
 `endpoints.json` 已 gitignore，並登記於 `refs/registry/conventions.json` 的 `local_stores`。
 
 repo 放 ext4 而非 `/mnt/d` 是刻意的：檔案數多、常跑 `git status` 的 repo 放 9p 掛載會有極高逐檔延遲。
 
 ## 產出與版控
 
-- `/opt/tracker/repo/html/` 是產生的靜態站（`index.html` ＋ `data/data-YYYYMMDD.js`），**不進版控**（2026-10-19 起；2026-08-05～10-18 曾納入）。
+- `/opt/tracker/web/public/` 是產生的靜態站（`index.html` ＋ `data/data-YYYYMMDD.js`），**不進版控**（2026-10-19 起；2026-08-05～10-18 曾納入）。
   發布走 Firebase Hosting（專案 `afu-news`，由 `/opt/tracker/web` 部署），**只在 afu-delta 發布**。
   站台內容的正本是 `db/articles.sqlite`（本機、不進 git），由 render 重新產生。
 - `tracker pack` 只 `git add` `VERSION` 與 `ChangeLog.html`，發行 zip 由 `git archive` 產生、只含引擎。

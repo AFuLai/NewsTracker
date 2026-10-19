@@ -4,7 +4,7 @@ Self-driving security / regulation news tracker. Runs entirely on WSL with a
 local Ollama model (`gemma4:e4b`) — **no external API**. Claude Code triggers it
 with one command and reads one line back; everything else (fetch, relevance
 gating, summarize, self-review, write, cleanup) happens locally. Outputs a static
-HTML site to `/opt/tracker/repo/html/`.
+HTML site to `/opt/tracker/web/public/`.
 
 **Trackers** (top-level topics, switchable in the UI; each has its own
 `searchinfo/searchinfo_*.md`, categories, and manifest tree):

@@ -24,5 +24,5 @@ html/*.bak.*
 # machine-local ollama endpoint list, edited by the dashboard
 /endpoints.json
 # Generated static site: rendered from db/ by tracker/render.py, published to
-# Firebase Hosting from /opt/tracker/web (public -> html/); not tracked since 2026-10-19.
+# Legacy output dir: the site now renders to /opt/tracker/web/public (2026-10-19); kept ignored.
 /html/

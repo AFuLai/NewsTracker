@@ -46,7 +46,7 @@ the `runs` table in `db/articles.sqlite`).
 
 `html/` is not tracked; it is published to Firebase Hosting project `afu-news`
 from the workarea's `/opt/tracker/web` (machine-local, never committed:
-`firebase.json`, `.firebaserc`, `public -> /opt/tracker/repo/html`).
+`firebase.json`, `.firebaserc`, `public/`, the rendered site itself).
 Only **afu-delta** publishes; `tracker deploy` refuses on any other machine.
 
 ```bash
