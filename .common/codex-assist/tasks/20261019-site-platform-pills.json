@@ -1,0 +1,51 @@
+{
+  "id": "20261019-site-platform-pills",
+  "engine": "agy",
+  "pin_engine": true,
+  "mode": "implement",
+  "root": "/opt/tracker/repo",
+  "prompt_file": ".common/codex-assist/tasks/20261019-site-platform-pills.prompt.md",
+  "inputs_glob": "ui/index.html",
+  "touch_allow": [
+    "ui/index.html"
+  ],
+  "markers_may_change": [
+    "ui/index.html"
+  ],
+  "acceptance": [
+    {
+      "id": "tests",
+      "argv": [
+        "/opt/venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "tests"
+      ],
+      "expect": "passed"
+    },
+    {
+      "id": "js-syntax",
+      "argv": [
+        "python3",
+        "-c",
+        "import re,subprocess,os,tempfile; s=open(\"/opt/tracker/repo/ui/index.html\",encoding=\"utf-8\").read(); js=chr(10).join(re.findall(r\"<script>(.*?)</script>\", s, re.S)); f=tempfile.NamedTemporaryFile(\"w\",suffix=\".js\",delete=False,encoding=\"utf-8\"); f.write(js); f.close(); r=subprocess.run([\"node\",\"--check\",f.name]); os.unlink(f.name); print(\"js-ok\" if r.returncode==0 else \"js-bad\"); raise SystemExit(r.returncode)"
+      ],
+      "expect": "js-ok"
+    },
+    {
+      "id": "core-fns",
+      "argv": [
+        "python3",
+        "-c",
+        "s=open('/opt/tracker/repo/ui/index.html',encoding='utf-8').read(); assert all(k in s for k in ('function effectiveCat','function buildCatPills','function refreshCatPills','const CAT_MAP')); print('fns-ok')"
+      ],
+      "expect": "fns-ok"
+    }
+  ],
+  "timeout_s": 2400,
+  "note": "User 2026-10-19: 採用選項 A（第二排平台 pill，OR，寫在 UI 常數），接受舊 c=漏洞與威脅情報 連結範圍變窄。Plan run 20261019-site-categories-plan. markers_may_change: the CAT_MAP explanatory comment may be updated to the new behaviour. New behaviour checked by the session in a browser after the run.",
+  "model": "claude-sonnet-5-5-medium"
+}
