@@ -1,0 +1,29 @@
+I'll start by reading the README and the mockups, then look at the existing code.
+Now the English strings (line shifted by 8).
+The 我的關注 hub is built in [ui/index.html](file:///opt/tracker/repo/ui/index.html), and it is the only tracked file I changed. The rest of `git status` is the dispatch's own `.common/codex-assist/` files, which were already untracked.
+
+I tested it in jsdom with synthetic data in `/tmp`, and all 44 checks passed. There is no browser here, so I have not checked 375px layout or looks. I removed the scratch files.
+
+The jsdom run covered:
+- **Entry and exit:** pill order, hub mode, the `hub=1&hv=&hw=` hash, and leaving through a tracker pill.
+- **分區:** section totals matching `buildHubModel` after de-duplication, tag and platform filters, 全部 ›, and card/list.
+- **儀表:** 14-bar sparklines with the last 3 bright, tile counts matching the model, and the drill-down.
+- **Remembered settings:** `tracker_watch_hub` is saved and restored, and a bad-JSON value is ignored.
+- **Seen set and `pv=1`:** `tracker_watch_seen` is not written on load or via the hash, is written on leaving and after 10 seconds, and nothing is written under `pv=1`.
+- **Brief and language:** the "新增 5 篇關注" count comes from the seen ids, and the zh/en switch works.
+
+Decisions for you:
+- **Name clash:** the file already had a layout-preset `renderHub()`, so mine is `renderWatchHub()`. I left a comment explaining the difference.
+- **`state.currentTracker` is null in the hub:** this keeps `buildCard`, `buildRiverRow` and the ★ badges consistent with the hub's own watch counts. It is a comment-recorded invariant.
+- **Edits to other code paths:** `renderArticles` returns early while the hub is open, so a late tracker load can't draw over it. `watchChanged` re-renders the hub. `selectTracker` and `selectLibrary` call `leaveHub()`.
+- **Phone header:** the extra pill would widen the page at 375px, so I added a rule that lets `#tracker-pills` wrap below 600px. It changes nothing when the pills already fit.
+- **全部 ›:** it expands a section to at most 100 articles, with a note when it is truncated. It is shown disabled when there is nothing more.
+- **First visit:** with no seen set, 你的簡報 says it is a first visit instead of counting everything as new.
+- **Seen-set limitation:** if the reader saves at a 7-day window and later opens 30 days, older hits show as new, because they were never stored.
+- **Tiles:** types with no articles in the window get no tile.
+
+I did not use any of the real published data under `/opt/tracker/web`, since it is outside the working root.
+
+verified: 44  assumed: 3  gaps: 0  findings: 0
+
+The three assumptions are the 375px layout (no horizontal scroll), the palette-token look of the dashboard, and the CSS `color-mix()` on older browsers.

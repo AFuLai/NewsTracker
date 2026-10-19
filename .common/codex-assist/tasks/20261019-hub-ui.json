@@ -1,0 +1,57 @@
+{
+  "id": "20261019-hub-ui",
+  "engine": "agy",
+  "pin_engine": true,
+  "mode": "implement",
+  "root": "/opt/tracker/repo",
+  "prompt_file": ".common/codex-assist/tasks/20261019-hub-ui.prompt.md",
+  "inputs_glob": "ui/index.html refs/plans/20261019-ux-mockups/README.md refs/plans/20261019-ux-mockups/HubSections.dc.html refs/plans/20261019-ux-mockups/HubTiles.dc.html",
+  "touch_allow": [
+    "ui/index.html"
+  ],
+  "acceptance": [
+    {
+      "id": "tests",
+      "argv": [
+        "/opt/venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "tests"
+      ],
+      "expect": "passed"
+    },
+    {
+      "id": "no-test-sniffing",
+      "argv": [
+        "python3",
+        "-c",
+        "import subprocess,re\nd=subprocess.run([\"git\",\"-C\",\"/opt/tracker/repo\",\"diff\",\"HEAD\",\"--\",\"ui\",\"tracker\"],capture_output=True,text=True).stdout\nbad=[l for l in d.splitlines() if l.startswith(\"+\") and re.search(r\"webdriver|__test|node_env|process\\.env|_getframe|PYTEST_CURRENT_TEST\",l,re.I)]\nprint(\"cheat-bad\" if bad else \"cheat-ok\")"
+      ],
+      "expect": "cheat-ok"
+    },
+    {
+      "id": "js-syntax",
+      "argv": [
+        "python3",
+        "-c",
+        "import re,subprocess,os,tempfile\ns=open(\"/opt/tracker/repo/ui/index.html\",encoding=\"utf-8\").read()\njs=\"\\n\".join(re.findall(r\"<script>(.*?)</script>\", s, re.S))\nf=tempfile.NamedTemporaryFile(\"w\",suffix=\".js\",delete=False,encoding=\"utf-8\"); f.write(js); f.close()\nr=subprocess.run([\"node\",\"--check\",f.name]); os.unlink(f.name)\nprint(\"js-ok\" if r.returncode==0 else \"js-bad\"); raise SystemExit(r.returncode)"
+      ],
+      "expect": "js-ok"
+    },
+    {
+      "id": "core-fns",
+      "argv": [
+        "python3",
+        "-c",
+        "import re\ns=open(\"/opt/tracker/repo/ui/index.html\",encoding=\"utf-8\").read()\nneed=[\"effectiveCat\",\"buildCatPills\",\"refreshCatPills\",\"renderArticles\",\"buildCard\",\"openOverlay\",\"syncHash\",\"applyHashRestore\",\"selectTracker\",\"buildClusterPills\",\"renderLibrary\",\"toggleSkin\",\"applyLang\",\"parseView\",\"resolvePreset\",\"parseWatch\",\"watchMatches\",\"buildRiverRow\"]\nmiss=[n for n in need if not re.search(r\"function \"+n+r\"\\b\",s)]\nprint(\"fns-ok\" if not miss and \"const CAT_MAP\" in s and \"const PRESETS\" in s and \"const WATCH_RULES\" in s else \"fns-miss \"+str(miss))"
+      ],
+      "expect": "fns-ok"
+    }
+  ],
+  "timeout_s": 2400,
+  "model": "claude-sonnet-5-5-medium",
+  "note": "User 2026-10-19: watch hub UI (sections default, tiles dashboard). Checked by the session in the browser."
+}

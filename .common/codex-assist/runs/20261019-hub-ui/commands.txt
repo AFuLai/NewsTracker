@@ -1,0 +1,41 @@
+cat refs/plans/20261019-ux-mockups/README.md; wc -c refs/plans/20261019-ux-mockups/*; wc -l ui/index.html; git status --short | head
+grep -n "__hub\|selectLibrary\|__cra\|libraryActive\|data-mode\|function syncHash\|function applyHashRestore\|function applyLang\|watch-panel\|tracker-pills\|function buildCard\|function buildRiverRow\|pv=1\|pv'" ui/index.html | head -150
+grep -n "libActive\|restoring\b" ui/index.html | head -60; grep -n "^const state\|^let state\|^var state" ui/index.html
+grep -n "I18N\|function t(\|function L(\|function renderArticles\|function showMsg\|function setActivePill\|function hideDateList\|function escHtml\|watchBadge\|function trackerLabel\|function runSearch\|function clearSearch\|function refreshSearchView\|function closeNav\|function toggleNav\|data-palette\|--warn\|--primary:\|--bg:\|--surface\|--border\|--muted\|--text" ui/index.html | head -120
+grep -n "function effectiveCat" -A14 ui/index.html; grep -n "function currentManifest\|function itemBelongsToTracker\|function getTrackers" -A6 ui/index.html | head -50; grep -n "\.watch-badge\|\.card.watched\|\.river-row.watched" ui/index.html | head; grep -n "@media" ui/index.html
+cd /opt/tracker/repo; ls; which node chromium chromium-browser google-chrome firefox 2>/dev/null; node -v; ls node_modules 2>/dev/null | head; npm ls -g --depth=0 2>/dev/null | head -20; grep -c "pal-card" ui/index.html; grep -n "pal-dim" ui/index.html | wc -l; ls ui ui/data 2>/dev/null | head -30; git log --oneline | head -3
+cd /opt/tracker/repo; grep -n -i "ui/\|index.html\|audit" CLAUDE.md | head -30; head -30 ui/audit.js; ls tests | grep -i "ui\|site\|hub\|palette" 
+cd /opt/tracker/repo; sed -n 736,800p ui/index.html | grep -n "palette=\|color-scheme\|--pal-bg\|pal-warn:" | cut -c1-200; grep -n "^\.cards-grid\|^#main-content" -A9 ui/index.html | head -40; grep -n "dataset.theme\|data-theme" ui/index.html | head
+grep -n "watchRemove:" ui/index.html
+cd /opt/tracker/repo; git show HEAD:ui/index.html | python3 -c "
+import sys
+b=sys.stdin.buffer.read(); print('orig crlf',b.count(b'\r\n'),'bareLF',b.count(b'\n')-b.count(b'\r\n'))"
+python3 - <<'EOF'
+p='/opt/tracker/repo/ui/index.html'
+b=open(p,'rb').read()
+print('now crlf',b.count(b'\r\n'),'bareLF',b.count(b'\n')-b.count(b'\r\n'))
+b=b.replace(b'\r\n',b'\n').replace(b'\n',b'\r\n')
+open(p,'wb').write(b)
+print('after bareLF',b.count(b'\n')-b.count(b'\r\n'))
+EOF
+git diff --stat
+cd /opt/tracker/repo; python3 - <<'EOF'
+p='/opt/tracker/repo/ui/index.html'
+b=open(p,'rb').read()
+b=b.replace(b'\r\n',b'\n')
+open(p,'wb').write(b)
+print('crlf',b.count(b'\r\n'),'lf',b.count(b'\n'))
+EOF
+git diff --stat; git diff | grep '^-' | grep -v '^---'
+mkdir -p /tmp/hubt && cd /tmp/hubt && python3 - <<'EOF'
+import re
+s=open('/opt/tracker/repo/ui/index.html',encoding='utf8').read()
+m=re.findall(r'<script>\n(.*?)</script>',s,re.S)
+print(len(m),[len(x) for x in m])
+open('/tmp/hubt/main.js','w',encoding='utf8').write(m[-1])
+EOF
+node --check main.js && echo SYNTAX_OK; (timeout 60 npm i jsdom --no-audit --no-fund 2>&1 | tail -3)
+cd /tmp/hubt && timeout 90 npm i jsdom --no-audit --no-fund --cache /tmp/npmc --logs-dir /tmp/npml 2>&1 | tail -5; ls node_modules 2>/dev/null | head -3
+cd /opt/tracker/repo; grep -n "function injectScript" -A12 ui/index.html | head -30; grep -n "function loadDayFile\|function loadMonthManifest\|function loadYearManifest\|manifest.js\|<script src" ui/index.html | head; find / -name "manifest.js" -not -path "*/node_modules/*" 2>/dev/null | head
+cd /tmp/hubt && node test.js 2>&1 | tail -70
+rm -rf /tmp/hubt /tmp/npmc /tmp/npml; cd /opt/tracker/repo; git status --short; git diff --stat | tail -1; grep -n "const state = {" ui/index.html | head -2; grep -c "hubActive" ui/index.html

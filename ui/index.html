@@ -1212,6 +1212,151 @@ html[data-mode="lib"] .lib-sort { display: flex; }
   }
 }
 
+/* ── 我的關注 (watch hub) ─────────────────────────────────
+   html[data-mode="hub"] hides the date sidebar the way data-mode="lib" does. Every
+   other selector here is prefixed .wh, so no other view is touched. The 儀表 panel
+   (.wh-dash) uses the deep-sea colours of HubTiles.dc.html as its defaults; with a
+   palette active (html[data-palette]) it takes that palette's --pal-* tokens instead. */
+html[data-mode="hub"] #sidebar,
+html[data-mode="hub"] #sidebar-scrim,
+html[data-mode="hub"] #drawer-toggle,
+html[data-mode="hub"] .hd-row2 { display: none !important; }
+.wh { display: flex; flex-direction: column; gap: 1rem; padding-top: 1rem; min-width: 0; }
+.wh { --wh-hit: #B4460C; }
+html[data-theme="dark"] .wh { --wh-hit: #FFB547; }
+html[data-palette] .wh { --wh-hit: var(--pal-warn); }
+.wh-head { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.9rem; min-width: 0; }
+.wh-head h2 { font-size: 18px; font-weight: 600; color: var(--on-surface); }
+.wh-sub { color: var(--on-surface-variant); font-size: 13px; }
+.wh-spacer { flex: 1 1 auto; }
+.wh-ctl { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 13px; color: var(--on-surface-variant); }
+.wh-seg { display: inline-flex; border: 1px solid var(--outline); border-radius: var(--shape-full); overflow: hidden; }
+.wh-seg button, .wh-btn, .wh-select {
+  font: inherit; font-size: 14px; min-height: 36px; padding: 0.3rem 0.8rem;
+  background: none; color: var(--on-surface); border: 0; cursor: pointer;
+}
+.wh-seg button[aria-pressed="true"] { background: var(--primary); color: var(--on-primary); font-weight: 600; }
+.wh-btn { border: 1px solid var(--outline); border-radius: var(--shape-full); }
+.wh-select { border: 1px solid var(--outline); border-radius: var(--shape-full); background: var(--surface-container); }
+.wh-select option { background: var(--surface-container); color: var(--on-surface); }
+.wh-brief {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.3rem 1rem;
+  padding: 0.6rem 0.9rem; min-width: 0;
+  background: var(--surface-container); border: 1px solid var(--outline-variant); border-radius: var(--shape-m);
+}
+.wh-brief .wh-num { font-weight: 700; color: var(--wh-hit); }
+.wh-plat { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem; min-width: 0; }
+.wh-plat-label { font-size: 12px; color: var(--on-surface-variant); }
+.wh-chip {
+  font: inherit; font-size: 12px; min-height: 32px; padding: 0.2rem 0.7rem; cursor: pointer;
+  background: transparent; color: var(--on-surface-variant);
+  border: 1px solid var(--outline); border-radius: var(--shape-full);
+}
+.wh-chip[aria-pressed="true"] { background: var(--primary); color: var(--on-primary); border-color: transparent; font-weight: 600; }
+.wh-sec { display: flex; flex-direction: column; gap: 0.6rem; min-width: 0; }
+.wh-sec-head {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.3rem 0.9rem;
+  border-bottom: 2px solid var(--on-surface); padding-bottom: 0.3rem;
+}
+.wh-sec-head h3 { font-size: 17px; font-weight: 600; color: var(--on-surface); }
+.wh-total { color: var(--on-surface-variant); }
+.wh-hits { color: var(--wh-hit); font-size: 12px; }
+.wh-more {
+  margin-left: auto; font: inherit; font-size: 13px; cursor: pointer; padding: 0.2rem 0.3rem;
+  background: none; border: 0; color: var(--primary);
+}
+.wh-more:hover { text-decoration: underline; }
+.wh-tags { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+.wh-note { color: var(--on-surface-variant); padding: 1.5rem 0; text-align: center; }
+html[data-mode="hub"] .river-list { display: flex; flex-direction: column; margin-bottom: 0.4rem; min-width: 0; }
+html[data-mode="hub"] .river-row { padding: 0.35rem 0.5rem; border-bottom: 1px solid var(--outline-variant); cursor: pointer; min-width: 0; }
+html[data-mode="hub"] .river-row:hover { background: var(--surface-container-high); }
+html[data-mode="hub"] .river-row:focus-visible { outline: 2px solid var(--primary); outline-offset: -2px; }
+html[data-mode="hub"] .river-row .card-title { margin: 0; overflow-wrap: anywhere; }
+html[data-mode="hub"] .river-row .card-meta {
+  font-size: 12px; color: var(--on-surface-variant);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+html[data-mode="hub"] .wh .card { min-width: 0; }
+html[data-mode="hub"] .wh .card-title { overflow-wrap: anywhere; }
+/* 儀表 */
+.wh-dash {
+  --wh-bg: #070B12; --wh-card: rgba(13,20,32,0.92); --wh-text: #DCE6F2; --wh-muted: #7F93AD;
+  --wh-line: #1C2A3D; --wh-accent: #5FE1FF; --wh-dim: #2A6F8A; --wh-warn: #FFB547; --wh-warn-text: #070B12;
+  --wh-sel: #0F2A3A; --wh-grid: rgba(95,225,255,0.05);
+  display: flex; flex-direction: column; gap: 0.8rem; min-width: 0;
+  padding: 0.8rem; border: 1px solid var(--wh-line); border-radius: var(--shape-m);
+  color: var(--wh-text); background-color: var(--wh-bg);
+  background-image: linear-gradient(var(--wh-grid) 1px, transparent 1px), linear-gradient(90deg, var(--wh-grid) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+html[data-palette] .wh-dash {
+  --wh-bg: var(--pal-bg); --wh-card: var(--pal-card); --wh-text: var(--pal-text); --wh-muted: var(--pal-muted);
+  --wh-line: var(--pal-line); --wh-accent: var(--pal-accent); --wh-dim: var(--pal-dim);
+  --wh-warn: var(--pal-warn); --wh-warn-text: var(--pal-warn-text);
+  --wh-sel: color-mix(in srgb, var(--pal-bg), var(--pal-accent) 14%);
+  --wh-grid: color-mix(in srgb, var(--pal-accent) 7%, transparent);
+}
+.wh-dash .wh-plat-label, .wh-dash .wh-legend { color: var(--wh-muted); font-family: ui-monospace, "IBM Plex Mono", monospace; }
+.wh-dash .wh-chip { color: var(--wh-muted); border-color: var(--wh-line); font-family: ui-monospace, "IBM Plex Mono", monospace; }
+.wh-dash .wh-chip[aria-pressed="true"] { background: var(--wh-sel); color: var(--wh-accent); border-color: var(--wh-accent); }
+.wh-legend { display: flex; flex-wrap: wrap; gap: 0.2rem 0.9rem; font-size: 11px; margin-left: auto; }
+.wh-legend .hit { color: var(--wh-warn); }
+.wh-legend .bar { color: var(--wh-accent); }
+.wh-tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.6rem; }
+.wh-tile {
+  font: inherit; text-align: left; cursor: pointer; min-width: 0; min-height: 180px;
+  display: flex; flex-direction: column; gap: 0.5rem; padding: 0.75rem;
+  border-radius: var(--shape-m); border: 1px solid var(--wh-line);
+  background: var(--wh-card); color: var(--wh-text);
+}
+.wh-tile.hot { border-color: color-mix(in srgb, var(--wh-warn) 35%, var(--wh-line)); }
+.wh-tile[aria-pressed="true"] {
+  border-color: var(--wh-accent); background: var(--wh-sel);
+  box-shadow: 0 0 0 1px var(--wh-accent), 0 0 18px color-mix(in srgb, var(--wh-accent) 25%, transparent);
+}
+.wh-tile:focus-visible { outline: 2px solid var(--wh-accent); outline-offset: 2px; }
+.wh-tile-top { display: flex; align-items: baseline; gap: 0.5rem; width: 100%; min-width: 0; }
+.wh-tile-name { font-size: 14px; font-weight: 600; min-width: 0; overflow-wrap: anywhere; }
+.wh-tile-n { margin-left: auto; font-family: ui-monospace, "IBM Plex Mono", monospace; font-size: 26px; font-weight: 600; line-height: 1.1; }
+.wh-spark { display: flex; align-items: flex-end; gap: 2px; height: 34px; width: 100%; }
+.wh-bar { flex: 1 1 0; background: var(--wh-dim); border-radius: 1px; }
+.wh-bar.hot { background: var(--wh-accent); }
+.wh-tile-hits, .wh-tile-tags { display: flex; flex-wrap: wrap; gap: 4px; min-width: 0; }
+.wh-tile-hits { min-height: 22px; }
+.wh-hit {
+  font-family: ui-monospace, "IBM Plex Mono", monospace; font-size: 11px;
+  background: var(--wh-warn); color: var(--wh-warn-text); border-radius: 3px; padding: 2px 6px;
+}
+.wh-tag { font-size: 11px; color: var(--wh-muted); border: 1px solid var(--wh-line); border-radius: 3px; padding: 1px 6px; }
+.wh-drill {
+  border: 1px solid var(--wh-line); border-radius: var(--shape-m); background: var(--wh-card);
+  padding: 0.6rem 0.9rem; display: flex; flex-direction: column; gap: 0.5rem; min-width: 0;
+}
+.wh-drill-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.3rem 0.7rem; }
+.wh-drill-head .k { font-family: ui-monospace, "IBM Plex Mono", monospace; font-size: 11px; letter-spacing: .1em; color: var(--wh-accent); }
+.wh-drill-head h3 { font-size: 16px; font-weight: 600; color: var(--wh-text); }
+.wh-drill-head .n { font-family: ui-monospace, "IBM Plex Mono", monospace; color: var(--wh-muted); }
+.wh-dash .river-row { border-bottom-color: var(--wh-line); }
+.wh-dash .river-row:hover { background: var(--wh-sel); }
+.wh-dash .river-row .card-title { color: var(--wh-text); }
+.wh-dash .river-row .card-meta { color: var(--wh-muted); }
+.wh-dash .river-row.watched { border-left-color: var(--wh-warn); }
+.wh-dash .watch-badge { background: var(--wh-warn); color: var(--wh-warn-text); border-color: var(--wh-warn); }
+.wh-dash a.cve-link { color: var(--wh-accent); }
+@media (max-width: 999px) { .wh-tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 599px) {
+  .wh-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .wh-tile { min-height: 0; }
+  .wh-tile-n { font-size: 22px; }
+  .wh-dash { padding: 0.5rem; }
+  .wh-legend { margin-left: 0; }
+}
+@media (max-width: 339px) { .wh-tiles { grid-template-columns: minmax(0, 1fr); } }
+/* WHY: the 我的關注 pill is a fifth pill; on a phone the row would no longer fit and would
+   widen the page sideways, so it wraps (identical to before whenever the pills already fit). */
+@media (max-width: 599px) { #tracker-pills { flex-wrap: wrap; min-width: 0; max-width: 100%; } }
+
 /* Respect prefers-reduced-motion: disable animations and transitions */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
@@ -1307,7 +1452,8 @@ const state = {
   pendingDates:  [],
   libActive:     false,       // CRA reference-library mode
   libCluster:    null,        // active cluster filter in library mode
-  libGroup:      "cluster"    // library grouping: "cluster" | "date" | "source"
+  libGroup:      "cluster",   // library grouping: "cluster" | "date" | "source"
+  hubActive:     false        // 我的關注 (watch hub) mode
 };
 try {
   const g = localStorage.getItem('tracker_lib_group');
@@ -1593,6 +1739,7 @@ function watchBadgeHtml(a) {
 function watchChanged() {
   saveWatch();
   updateWatchUI();
+  if (state.hubActive) { renderWatchHub(); return; }
   if (state.currentTracker && !state.libActive) renderArticles();
 }
 function buildWatchPanel() {
@@ -1947,6 +2094,14 @@ const I18N = {
         watchBtn:'關注', watchBadge:'★ 關注', watchOnly:'只看關注', watchRules:'關注規則',
         watchCustom:'自訂關鍵字', watchKwPh:'輸入關鍵字…', watchAdd:'新增', watchReset:'恢復預設',
         watchRemove:'移除', noWatch:'沒有符合關注規則的文章',
+        hubPill:'★ 我的關注', hubTitle:'我的關注', hubSub:'依新聞類型分區，不分來源版面',
+        hubWin:'期間', hubDays:n=>'近 '+n+' 天', hubPresent:'呈現方式', hubSections:'分區', hubTiles:'儀表',
+        hubCards:'卡片', hubList:'條列', hubRules:'規則設定', hubBriefTitle:'你的簡報',
+        hubBriefNew:(d,n,r)=>'自上次造訪（'+d+'）新增 <b class="wh-num">'+n+'</b> 篇關注 · <b class="wh-num">'+r+'</b> 條規則有新命中',
+        hubBriefFirst:n=>'首次造訪：目前有 '+n+' 篇符合關注規則，之後會顯示新增篇數',
+        hubPlat:'平台標籤', hubAllMore:'全部 ›', hubLess:'收合 ‹', hubTotal:n=>'共 '+n+' 篇', hubWatchHits:'關注',
+        hubLoading:'載入關注資料…', hubEmpty:'這段期間沒有符合的文章', hubDrill:'DRILL-DOWN', hubPick:'點選上方方塊，在此檢視該類型文章',
+        hubLegendHit:'■ 關注命中', hubLegendBar:'▮ 14 日篇數', hubTagFilter:'依標籤篩選', hubCount:n=>n+' 篇',
         paletteBtn:'配色', paletteTitle:'配色主題', paletteDefault:'預設（跟隨系統主題）', paletteApplied:'已套用配色主題',
        presets:{ default:'預設', quick:'快讀', analyst:'分析師', event:'事件追蹤', cra:'合規 CRA' },
       searchPlaceholder:'搜尋全站新聞…', searching:'搜尋中…',
@@ -1974,6 +2129,14 @@ const I18N = {
         watchBtn:'Watch', watchBadge:'★ Watch', watchOnly:'Watched only', watchRules:'Watch rules',
         watchCustom:'Custom keywords', watchKwPh:'Add a keyword…', watchAdd:'Add', watchReset:'Reset',
         watchRemove:'Remove', noWatch:'No articles match your watch rules',
+        hubPill:'★ My Watch', hubTitle:'My Watch', hubSub:'Grouped by news type, not by source page',
+        hubWin:'Window', hubDays:n=>'Last '+n+' days', hubPresent:'Presentation', hubSections:'Sections', hubTiles:'Dashboard',
+        hubCards:'Cards', hubList:'List', hubRules:'Rules', hubBriefTitle:'Your briefing',
+        hubBriefNew:(d,n,r)=>'Since your last visit ('+d+'): <b class="wh-num">'+n+'</b> new watched '+(n===1?'article':'articles')+' · <b class="wh-num">'+r+'</b> '+(r===1?'rule has':'rules have')+' new hits',
+        hubBriefFirst:n=>'First visit: '+n+' articles match your watch rules; new ones will be counted next time',
+        hubPlat:'Platforms', hubAllMore:'All ›', hubLess:'Less ‹', hubTotal:n=>n+(n===1?' article':' articles'), hubWatchHits:'Watch',
+        hubLoading:'Loading watch data…', hubEmpty:'No matching articles in this window', hubDrill:'DRILL-DOWN', hubPick:'Pick a tile above to list its articles here',
+        hubLegendHit:'■ Watch hits', hubLegendBar:'▮ 14-day count', hubTagFilter:'Filter by tag', hubCount:n=>n+(n===1?' article':' articles'),
         paletteBtn:'Theme', paletteTitle:'Colour theme', paletteDefault:'Default (follow system theme)', paletteApplied:'Colour theme applied',
        presets:{ default:'Default', quick:'Quick read', analyst:'Analyst', event:'Event tracking', cra:'Compliance CRA' },
       searchPlaceholder:'Search all news…', searching:'Searching…',
@@ -2035,6 +2198,13 @@ function applyLang() {
   updateViewUI();
   updateWatchUI();
   updatePaletteUI();
+  if (state.hubActive) {
+    buildTrackerPills(Object.keys(getTrackers()));   // re-labels the hub pill
+    document.getElementById('tracker-title').textContent = t('hubTitle');
+    setActivePill('#tracker-pills', '[data-tracker="__hub"]');
+    renderWatchHub();
+    return;
+  }
   if (state.libActive) {
     buildTrackerPills(Object.keys(getTrackers()));   // re-labels the CRA pill
     document.getElementById('tracker-title').textContent =
@@ -2153,7 +2323,7 @@ const NEWS_TYPES = [
   { id: 'industry',  zh: '產業動態',   en: 'Industry',                  categories: ['產業動態'] },
   { id: 'emerging',  zh: '前瞻技術',   en: 'Emerging Tech',             categories: ['前瞻技術'] },
   { id: 'events',    zh: '研討活動',   en: 'Events',                    categories: ['研討活動'] },
-  { id: 'other',     zh: '其他',       en: 'Other',                     categories: [] }
+  { id: 'other',     zh: '平台與其他', en: 'Platforms & other',         categories: [] }
 ];
 const HUB_PLATFORMS = ['Linux', 'Apple', 'Android', 'Windows'];
 // article → type id from its raw category; platform categories → 'platform'; unknown → 'other'.
@@ -2282,6 +2452,447 @@ function buildHubModel(days, watch) {
   return model;
 }
 window.__hub = { NEWS_TYPES, newsTypeOf, articleTags, watchRuleIds, ensureHubLoaded, buildHubModel };
+
+// ── 我的關注 (watch hub) view ─────────────────────────
+// Built on window.__hub (the data layer above). Entered from the 我的關注 pill (selectHub),
+// left through selectTracker / selectLibrary (leaveHub). NOTE: the layout-preset function
+// renderHub() further down is unrelated; this view is renderWatchHub().
+// INVARIANT: while the hub is active state.currentTracker is null. buildCard / buildRiverRow /
+// watchBadgeHtml are all keyed on state.currentTracker, so with null they show the raw category
+// and tracker-less watch badges - the same rule watchRuleIds applies to the hub's own counts.
+// Two localStorage keys, both read-only on load and never written under ?pv=1 (isPreviewMode):
+//   tracker_watch_hub  {v:1,hv:'sections'|'tiles',hw:7|30|90,hm:'cards'|'list'}  the reader's choice
+//   tracker_watch_seen {v:1,at:'<newest date seen>',ids:[<=2000 watched-hit article ids]}
+// The seen set is written only when the reader leaves the hub or after HUB_SEEN_DELAY ms in it.
+const HUB_WINDOWS = [7, 30, 90];
+const HUB_SEEN_MAX = 2000;
+const HUB_SEEN_DELAY = 10000;
+function defaultHubPrefs() { return { v: 1, hv: 'sections', hw: 30, hm: 'cards' }; }
+// string → prefs. Bad JSON / unknown v → defaults. Pure.
+function parseHubPrefs(str) {
+  const d = defaultHubPrefs();
+  let o;
+  try { o = JSON.parse(str); } catch (e) { return d; }
+  if (!o || typeof o !== 'object' || Array.isArray(o) || o.v !== 1) return d;
+  return { v: 1, hv: o.hv === 'tiles' ? 'tiles' : 'sections',
+           hw: HUB_WINDOWS.includes(o.hw) ? o.hw : 30, hm: o.hm === 'list' ? 'list' : 'cards' };
+}
+// string → {at, ids} or null when missing / malformed. Pure.
+function parseHubSeen(str) {
+  let o;
+  try { o = JSON.parse(str); } catch (e) { return null; }
+  if (!o || typeof o !== 'object' || Array.isArray(o) || o.v !== 1 || !Array.isArray(o.ids)) return null;
+  return { at: typeof o.at === 'string' ? o.at : '',
+           ids: o.ids.filter(x => typeof x === 'string').slice(0, HUB_SEEN_MAX) };
+}
+let hubPrefs = defaultHubPrefs();   // in-memory copy; stays authoritative if localStorage throws
+let hubSeen = null;                 // seen set read on entry: the baseline for 你的簡報
+let hubSnap = null;                 // {at, ids}: this window's watched hits as last rendered
+let hubLastWritten = '';
+let hubSeenDue = false;             // HUB_SEEN_DELAY has elapsed in this visit
+let hubTimer = null;
+let hubReady = false;               // the current window's day files are loaded
+let hubSeq = 0;                     // bumps on every load / leave, so a stale load is dropped
+let hubPlat = new Set();            // platform tag filter (all sections / tiles)
+let hubSecTag = {};                 // type id → tag filtering that section
+let hubOpen = new Set();            // type ids whose 全部 › is expanded
+let hubPick = null;                 // 儀表: the tile whose drill-down is shown
+// Read-only: a bad stored value is NOT overwritten until the reader changes something.
+function initHubPrefs() {
+  let raw = null;
+  try { raw = localStorage.getItem('tracker_watch_hub'); } catch (e) {}
+  hubPrefs = parseHubPrefs(raw);
+}
+function saveHubPrefs() {
+  if (isPreviewMode()) return;
+  try { localStorage.setItem('tracker_watch_hub', JSON.stringify(hubPrefs)); } catch (e) {}
+}
+function hubFlushSeen() {
+  if (isPreviewMode() || !hubSnap) return;
+  try {
+    const ids = [], have = new Set();
+    const push = (id) => { if (!have.has(id) && ids.length < HUB_SEEN_MAX) { have.add(id); ids.push(id); } };
+    hubSnap.ids.forEach(push);                       // newest first, so the cap drops the oldest
+    (hubSeen ? hubSeen.ids : []).forEach(push);
+    const at = (hubSeen && hubSeen.at > hubSnap.at) ? hubSeen.at : hubSnap.at;
+    const out = JSON.stringify({ v: 1, at: at, ids: ids });
+    if (out === hubLastWritten) return;
+    localStorage.setItem('tracker_watch_seen', out);
+    hubLastWritten = out;
+  } catch (e) {}
+}
+function hubKey(a, date) {
+  return (a.id !== undefined && a.id !== null) ? String(a.id) : date + '|' + a.title;
+}
+// Same window / de-dup rule as buildHubModel, but keeps every article (newest first).
+function hubCollect(days) {
+  const data = window.TRACKER_DAYS || {};
+  let today = '';
+  for (const d in data) if (d > today && Array.isArray(data[d]) && data[d].length) today = d;
+  const list = [];
+  if (!today) return { today: today, list: list };
+  const cutoff = hubShiftDate(today, -(days - 1));
+  const seen = new Set();
+  Object.keys(data).filter(d => d >= cutoff && d <= today).sort().forEach(date => {
+    (Array.isArray(data[date]) ? data[date] : []).forEach(a => {
+      if (!a) return;
+      const key = hubKey(a, date);
+      if (seen.has(key)) return;
+      seen.add(key);
+      list.push({ ...a, _date: date, _key: key });
+    });
+  });
+  list.sort((x, y) => (y._date < x._date ? -1 : y._date > x._date ? 1 : 0) ||
+    (String(y.id) < String(x.id) ? -1 : String(y.id) > String(x.id) ? 1 : 0));
+  return { today: today, list: list };
+}
+function hubTypeId(a) {
+  const id = newsTypeOf(a);
+  return id === 'platform' ? 'other' : id;   // as buildHubModel: platform articles count under 'other'
+}
+function hubTypeName(ty) { return state.lang === 'en' ? ty.en : ty.zh; }
+function hubRuleLabel(id) {
+  if (id.indexOf('kw:') === 0) return id.slice(3);
+  const r = WATCH_RULES.find(x => x.id === id);
+  return r ? (state.lang === 'en' ? r.en : r.zh) : id;
+}
+// hits {ruleId:n} → [{label, n}], biggest first.
+function hubHitList(hits) {
+  return Object.keys(hits || {}).map(id => ({ label: hubRuleLabel(id), n: hits[id] })).sort((x, y) => y.n - x.n);
+}
+// Same shape as a buildHubModel byType bucket, over an already filtered list (platform filter on).
+function hubStats(items, today) {
+  const s = { n: items.length, series14: new Array(14).fill(0), hits: {}, tags: [] };
+  const tg = new Map();
+  items.forEach(a => {
+    const age = Math.round((Date.parse(today) - Date.parse(a._date)) / 86400000);
+    if (age >= 0 && age < 14) s.series14[13 - age]++;
+    articleTags(a).forEach(x => tg.set(x, (tg.get(x) || 0) + 1));
+    watchRuleIds(a, watchPrefs).forEach(id => { s.hits[id] = (s.hits[id] || 0) + 1; });
+  });
+  s.tags = [...tg.entries()].sort((x, y) => y[1] - x[1]).slice(0, 7).map(e => e[0]);
+  return s;
+}
+// 你的簡報: watched hits of the window, counted BY ID against the stored seen set (never by date).
+function hubBrief(list, today) {
+  const ids = [], rules = new Set();
+  const old = hubSeen ? new Set(hubSeen.ids) : null;
+  let fresh = 0;
+  list.forEach(a => {
+    const r = watchRuleIds(a, watchPrefs);
+    if (!r.length) return;
+    ids.push(a._key);
+    if (old && !old.has(a._key)) { fresh++; r.forEach(x => rules.add(x)); }
+  });
+  hubSnap = { at: today, ids: ids.slice(0, HUB_SEEN_MAX) };
+  return { first: !old, total: ids.length, fresh: fresh, rules: rules.size };
+}
+
+function selectHub() {
+  const wasHub = state.hubActive;
+  state.hubActive = true;
+  state.libActive = false;
+  // INVARIANT: currentTracker stays null while in the hub (see the block comment above).
+  state.currentTracker = null; state.currentYear = null; state.currentMonth = null;
+  state.currentDate = null; state.currentMode = null; state.pendingDates = [];
+  state.filterCats = new Set();
+  state.searchQuery = ''; state.search = null;
+  const sb = document.getElementById('search-box'); if (sb) sb.value = '';
+  const sc = document.getElementById('search-clear'); if (sc) sc.style.display = 'none';
+  document.documentElement.dataset.mode = 'hub';   // hides the date sidebar
+  const sr = document.getElementById('search-row'); if (sr) sr.style.display = 'none';
+  setActivePill('#tracker-pills', '[data-tracker="__hub"]');
+  document.getElementById('tracker-title').textContent = t('hubTitle');
+  document.getElementById('year-pills').innerHTML = '';
+  document.getElementById('month-grid').innerHTML = '';
+  document.getElementById('cat-pills').innerHTML = '';
+  hideDateList();
+  if (!wasHub) {
+    let raw = null;
+    try { raw = localStorage.getItem('tracker_watch_seen'); } catch (e) {}
+    hubSeen = parseHubSeen(raw);
+    hubSnap = null; hubLastWritten = ''; hubSeenDue = false;
+    hubPlat = new Set(); hubSecTag = {}; hubOpen = new Set(); hubPick = null;
+    clearTimeout(hubTimer);
+    hubTimer = setTimeout(() => { hubTimer = null; hubSeenDue = true; hubFlushSeen(); }, HUB_SEEN_DELAY);
+  }
+  hubLoad();
+}
+function leaveHub() {
+  if (!state.hubActive) return;
+  hubFlushSeen();
+  clearTimeout(hubTimer); hubTimer = null; hubSeenDue = false;
+  hubSeq++;
+  state.hubActive = false;
+  hubReady = false; hubSnap = null;
+  if (document.documentElement.dataset.mode === 'hub') delete document.documentElement.dataset.mode;
+  const sr = document.getElementById('search-row'); if (sr) sr.style.display = '';
+}
+function hubLoad() {
+  const seq = ++hubSeq;
+  hubReady = false;
+  renderWatchHub();
+  let p = null;
+  try { p = ensureHubLoaded(hubPrefs.hw); } catch (e) {}
+  Promise.resolve(p).catch(() => {}).then(() => {
+    if (seq !== hubSeq || !state.hubActive) return;
+    hubReady = true;
+    renderWatchHub();
+  });
+}
+function hubSet(patch, focusFn) {
+  const reload = patch.hw !== undefined && patch.hw !== hubPrefs.hw;
+  hubPrefs = { ...hubPrefs, ...patch };
+  saveHubPrefs();
+  if (reload) hubLoad(); else renderWatchHub(focusFn);
+}
+
+function whEl(tag, cls, text) {
+  const e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (text !== undefined) e.textContent = text;
+  return e;
+}
+function whBtn(cls, text, pressed, onclick) {
+  const b = whEl('button', cls, text);
+  b.type = 'button';
+  if (pressed !== null) b.setAttribute('aria-pressed', pressed ? 'true' : 'false');
+  b.onclick = onclick;
+  return b;
+}
+function hubHeaderEl() {
+  const h = whEl('div', 'wh-head');
+  h.appendChild(whEl('h2', '', t('hubTitle')));
+  h.appendChild(whEl('span', 'wh-sub', t('hubSub')));
+  h.appendChild(whEl('span', 'wh-spacer'));
+  const wl = whEl('label', 'wh-ctl');
+  wl.appendChild(document.createTextNode(t('hubWin')));
+  const sel = whEl('select', 'wh-select');
+  sel.id = 'wh-win';
+  HUB_WINDOWS.forEach(n => {
+    const o = document.createElement('option');
+    o.value = String(n); o.textContent = t('hubDays')(n);
+    sel.appendChild(o);
+  });
+  sel.value = String(hubPrefs.hw);
+  sel.onchange = () => hubSet({ hw: +sel.value }, () => document.getElementById('wh-win'));
+  wl.appendChild(sel);
+  h.appendChild(wl);
+  const pres = whEl('div', 'wh-seg');
+  pres.setAttribute('role', 'group'); pres.setAttribute('aria-label', t('hubPresent'));
+  [['sections', 'hubSections'], ['tiles', 'hubTiles']].forEach(([v, k]) => {
+    const b = whBtn('', t(k), hubPrefs.hv === v, () => hubSet({ hv: v }, () => document.getElementById('wh-v-' + v)));
+    b.id = 'wh-v-' + v;
+    pres.appendChild(b);
+  });
+  h.appendChild(pres);
+  if (hubPrefs.hv === 'sections') {
+    const mode = whEl('div', 'wh-seg');
+    mode.setAttribute('role', 'group');
+    [['cards', 'hubCards'], ['list', 'hubList']].forEach(([v, k]) => {
+      const b = whBtn('', t(k), hubPrefs.hm === v, () => hubSet({ hm: v }, () => document.getElementById('wh-m-' + v)));
+      b.id = 'wh-m-' + v;
+      mode.appendChild(b);
+    });
+    h.appendChild(mode);
+  }
+  const rb = whBtn('wh-btn', t('hubRules'), null, (e) => {
+    e.stopPropagation();   // else the document click handler of #watch-panel closes it again at once
+    const panel = document.getElementById('watch-panel');
+    if (panel && panel.classList.contains('hidden')) openWatchPanel(); else closeWatchPanel(false);
+  });
+  rb.id = 'wh-rules';
+  h.appendChild(rb);
+  return h;
+}
+function hubBriefEl(b) {
+  const el = whEl('div', 'wh-brief');
+  el.appendChild(whEl('strong', '', t('hubBriefTitle')));
+  const sp = document.createElement('span');
+  // Only numbers and a stored date string go into the markup, and the date is escaped.
+  sp.innerHTML = b.first ? escHtml(t('hubBriefFirst')(b.total))
+    : t('hubBriefNew')(escHtml(hubSeen && hubSeen.at ? hubSeen.at : '—'), b.fresh, b.rules);
+  el.appendChild(sp);
+  return el;
+}
+function hubPlatEl(model) {
+  const row = whEl('div', 'wh-plat');
+  row.setAttribute('role', 'group'); row.setAttribute('aria-label', t('hubPlat'));
+  row.appendChild(whEl('span', 'wh-plat-label', t('hubPlat')));
+  const items = model.platforms.map(p => ({ name: p.name, n: p.n }));
+  hubPlat.forEach(nm => { if (!items.some(i => i.name === nm)) items.push({ name: nm, n: 0 }); });
+  items.forEach(p => {
+    const b = whBtn('wh-chip', p.name + ' ' + p.n, hubPlat.has(p.name), () => {
+      if (hubPlat.has(p.name)) hubPlat.delete(p.name); else hubPlat.add(p.name);
+      renderWatchHub(() => [...document.querySelectorAll('.wh-chip[data-plat]')].find(x => x.dataset.plat === p.name));
+    });
+    b.dataset.plat = p.name;
+    row.appendChild(b);
+  });
+  return row;
+}
+function hubShownNote(n) { return whEl('div', 'wh-sub', t('showing') + ' ' + n + ' ' + t('articles')); }
+function hubSectionsEl(vis, model) {
+  const box = document.createElement('div');
+  box.className = 'wh';
+  box.style.paddingTop = '0';
+  const asList = hubPrefs.hm === 'list';
+  const limit = asList ? 8 : 6, cap = 100;
+  let any = false;
+  NEWS_TYPES.forEach(ty => {
+    const all = vis.filter(a => hubTypeId(a) === ty.id);
+    if (!all.length) return;
+    any = true;
+    const tag = hubSecTag[ty.id] || null;
+    const items = tag ? all.filter(a => articleTags(a).includes(tag)) : all;
+    const sec = whEl('section', 'wh-sec');
+    const head = whEl('div', 'wh-sec-head');
+    head.appendChild(whEl('h3', '', hubTypeName(ty)));
+    head.appendChild(whEl('span', 'wh-total', t('hubTotal')(items.length)));
+    const hits = {};
+    items.forEach(a => watchRuleIds(a, watchPrefs).forEach(id => { hits[id] = (hits[id] || 0) + 1; }));
+    const hl = hubHitList(hits);
+    if (hl.length) head.appendChild(whEl('span', 'wh-hits', t('hubWatchHits') + ' ' + hl.map(h => h.label + ' ' + h.n).join(' · ')));
+    const open = hubOpen.has(ty.id);
+    const more = whBtn('wh-more', open ? t('hubLess') : t('hubAllMore'), null, () => {
+      if (hubOpen.has(ty.id)) hubOpen.delete(ty.id); else hubOpen.add(ty.id);
+      renderWatchHub(() => [...document.querySelectorAll('.wh-more')].find(x => x.dataset.sec === ty.id));
+    });
+    more.dataset.sec = ty.id;
+    more.setAttribute('aria-expanded', open ? 'true' : 'false');
+    if (items.length <= limit) more.disabled = !open;   // nothing more to show
+    head.appendChild(more);
+    sec.appendChild(head);
+    const mb = model.byType.find(b => b.type === ty.id);
+    const tags = mb ? mb.tags.slice() : [];
+    if (tag && !tags.includes(tag)) tags.unshift(tag);
+    if (tags.length) {
+      const tg = whEl('div', 'wh-tags');
+      tg.setAttribute('role', 'group'); tg.setAttribute('aria-label', t('hubTagFilter'));
+      tags.forEach(g => {
+        const b = whBtn('wh-chip', '#' + g, tag === g, () => {
+          hubSecTag[ty.id] = (hubSecTag[ty.id] === g) ? null : g;
+          renderWatchHub(() => [...document.querySelectorAll('.wh-tags .wh-chip')].find(x => x.dataset.sec === ty.id && x.dataset.tag === g));
+        });
+        b.dataset.sec = ty.id; b.dataset.tag = g;
+        tg.appendChild(b);
+      });
+      sec.appendChild(tg);
+    }
+    const shown = items.slice(0, open ? cap : limit);
+    const cont = whEl('div', asList ? 'river-list' : 'cards-grid');
+    shown.forEach(a => cont.appendChild(asList ? buildRiverRow(a) : buildCard(a)));
+    sec.appendChild(cont);
+    if (open && items.length > cap) sec.appendChild(hubShownNote(shown.length));
+    box.appendChild(sec);
+  });
+  if (!any) box.appendChild(whEl('div', 'wh-note', t('hubEmpty')));
+  return box;
+}
+function hubTilesEl(vis, model, today, list) {
+  const dash = whEl('div', 'wh-dash');
+  const top = whEl('div', 'wh-plat');
+  top.appendChild(hubPlatEl(model));
+  const lg = whEl('span', 'wh-legend');
+  lg.appendChild(whEl('span', 'hit', t('hubLegendHit')));
+  lg.appendChild(whEl('span', 'bar', t('hubLegendBar')));
+  top.appendChild(lg);
+  dash.appendChild(top);
+  const grid = whEl('div', 'wh-tiles');
+  let picked = null;
+  NEWS_TYPES.forEach(ty => {
+    const items = vis.filter(a => hubTypeId(a) === ty.id);
+    if (!items.length) return;
+    const mb = model.byType.find(b => b.type === ty.id);
+    const st = (hubPlat.size || !mb) ? hubStats(items, today) : mb;
+    const hl = hubHitList(st.hits);
+    const on = hubPick === ty.id;
+    if (on) picked = { ty: ty, items: items };
+    const tile = whBtn('wh-tile' + (hl.length ? ' hot' : ''), undefined, on, () => {
+      hubPick = (hubPick === ty.id) ? null : ty.id;
+      renderWatchHub(() => [...document.querySelectorAll('.wh-tile')].find(x => x.dataset.sec === ty.id));
+    });
+    tile.dataset.sec = ty.id;
+    const tp = whEl('span', 'wh-tile-top');
+    tp.appendChild(whEl('span', 'wh-tile-name', hubTypeName(ty)));
+    tp.appendChild(whEl('span', 'wh-tile-n', String(st.n)));
+    tile.appendChild(tp);
+    const sp = whEl('span', 'wh-spark');
+    sp.setAttribute('aria-hidden', 'true');
+    const mx = Math.max.apply(null, st.series14.concat([1]));
+    st.series14.forEach((v, i) => {
+      const bar = whEl('span', 'wh-bar' + (i >= st.series14.length - 3 ? ' hot' : ''));
+      bar.style.height = Math.max(2, Math.round(34 * v / mx)) + 'px';
+      sp.appendChild(bar);
+    });
+    tile.appendChild(sp);
+    const hw = whEl('span', 'wh-tile-hits');
+    hl.forEach(h => hw.appendChild(whEl('span', 'wh-hit', h.label + ' ' + h.n)));
+    tile.appendChild(hw);
+    const tw = whEl('span', 'wh-tile-tags');
+    st.tags.slice(0, 4).forEach(g => tw.appendChild(whEl('span', 'wh-tag', '#' + g)));
+    tile.appendChild(tw);
+    grid.appendChild(tile);
+  });
+  if (!grid.children.length) {
+    dash.appendChild(whEl('div', 'wh-note', t('hubEmpty')));
+    return dash;
+  }
+  dash.appendChild(grid);
+  const dr = whEl('div', 'wh-drill');
+  if (picked) {
+    const dh = whEl('div', 'wh-drill-head');
+    dh.appendChild(whEl('span', 'k', t('hubDrill')));
+    dh.appendChild(whEl('h3', '', hubTypeName(picked.ty)));
+    dh.appendChild(whEl('span', 'n', t('hubCount')(picked.items.length)));
+    dr.appendChild(dh);
+    const rl = whEl('div', 'river-list');
+    const shown = picked.items.slice(0, 30);
+    shown.forEach(a => rl.appendChild(buildRiverRow(a)));
+    dr.appendChild(rl);
+    if (picked.items.length > shown.length) dr.appendChild(hubShownNote(shown.length));
+  } else {
+    dr.appendChild(whEl('div', 'wh-note', t('hubPick')));
+  }
+  dash.appendChild(dr);
+  return dash;
+}
+// Rebuilds the whole view from window.TRACKER_DAYS (cheap; the day files are already loaded).
+// `focusFn` returns the control to re-focus after the rebuild.
+function renderWatchHub(focusFn) {
+  if (!state.hubActive) return;
+  const main = document.getElementById('main-content');
+  const keepTop = main.scrollTop;
+  document.getElementById('loading-msg').style.display = 'none';
+  document.getElementById('no-data').classList.add('hidden');
+  Array.from(main.children).forEach(c => {
+    if (c.id !== 'loading-msg' && c.id !== 'no-data' && c.id !== 'search-row') c.remove();
+  });
+  const root = whEl('div', 'wh');
+  root.appendChild(hubHeaderEl());
+  if (!hubReady) {
+    root.appendChild(whEl('div', 'wh-note', t('hubLoading')));
+    main.appendChild(root);
+    syncHash();
+    return;
+  }
+  const col = hubCollect(hubPrefs.hw);
+  const model = buildHubModel(hubPrefs.hw, watchPrefs);
+  root.appendChild(hubBriefEl(hubBrief(col.list, col.today)));
+  const vis = hubPlat.size ? col.list.filter(a => articleTags(a).some(g => hubPlat.has(g))) : col.list;
+  if (hubPrefs.hv === 'tiles') {
+    root.appendChild(hubTilesEl(vis, model, col.today, col.list));
+  } else {
+    if (model.platforms.length || hubPlat.size) root.appendChild(hubPlatEl(model));
+    root.appendChild(hubSectionsEl(vis, model));
+  }
+  main.appendChild(root);
+  document.getElementById('article-count').textContent = vis.length;
+  syncHash();
+  main.scrollTop = keepTop;
+  if (typeof focusFn === 'function') { const el = focusFn(); if (el) el.focus(); }
+  if (hubSeenDue) hubFlushSeen();
+}
 
 // Recompute which dates (and how many articles) match the query, honouring the
 // current tracker + category filter. This is what the date menu is rebuilt from.
@@ -2529,6 +3140,7 @@ function init() {
   initWatch();  // localStorage tracker_watch → watchPrefs
   initView();   // localStorage tracker_view → viewPrefs; the hash (below) may override it
   initPalette();   // localStorage tracker_palette → data-palette; a hash pal= (below) may override it
+  initHubPrefs();  // localStorage tracker_watch_hub → hubPrefs; a hash hv= / hw= (below) may override it
   if (!applyHashRestore()) selectTracker(presetTracker(resolvePreset(viewPrefs), all) || names[0]);   // deep-link wins over default
   applyLang();   // sync all static labels + lang button to the active language
 }
@@ -2538,6 +3150,7 @@ function selectTracker(name) {
   const all = getTrackers();
   if (!all || !all[name]) return;
   state.libActive = false;   // leaving the CRA library mode
+  leaveHub();                // leaving the 我的關注 hub (restores the search row)
   if (document.documentElement.dataset.mode === 'lib') delete document.documentElement.dataset.mode;
   const _srow = document.getElementById('search-row'); if (_srow) _srow.style.display = '';
   state.currentTracker = name;
@@ -2576,6 +3189,15 @@ function buildTrackerPills(names) {
     btn.onclick = () => selectTracker(n);
     el.appendChild(btn);
   });
+  // 我的關注 (watch hub) pill: a special mode like the CRA library, not a tracker.
+  const hb = document.createElement('button');
+  hb.className = 'pill' + (state.hubActive ? ' active' : '');
+  hb.dataset.tracker = '__hub';
+  hb.textContent = t('hubPill');
+  hb.title = t('hubTitle');
+  hb.setAttribute('aria-pressed', state.hubActive ? 'true' : 'false');
+  hb.onclick = selectHub;
+  el.appendChild(hb);
   // CRA reference-library pill (a special mode, not a real tracker). The data
   // (data/cra_library.js) loads on first click.
   const lb = document.createElement('button');
@@ -2594,6 +3216,7 @@ function loadCraLibrary(cb) {
   injectScript('data/cra_library.js', cb);
 }
 function selectLibrary() {
+  leaveHub();   // coming from the 我的關注 hub (no-op otherwise)
   state.libActive = true;
   document.documentElement.dataset.mode = 'lib';   // hides the date sidebar
   state.searchQuery = ''; state.search = null;
@@ -3026,6 +3649,7 @@ function setFilter(cat) {
 
 // ── Render ────────────────────────────────────────────
 function renderArticles(dateList) {
+  if (state.hubActive) return;   // a late tracker load must not draw over the 我的關注 hub
   if (dateList !== undefined) state.pendingDates = dateList;
   const dates = state.pendingDates;
 
@@ -3439,6 +4063,18 @@ var suppressHashChange = false;
 function syncHash() {
   if (restoring) return;
   const skinOf = () => document.documentElement.dataset.skin;
+  if (state.hubActive) {   // 我的關注 hub: hub=1, presentation, window
+    const hp = ['hub=1', 'hv=' + hubPrefs.hv, 'hw=' + hubPrefs.hw];
+    if (skinOf()) hp.push('s=' + skinOf());
+    if (palettePref) hp.push('pal=' + palettePref);
+    hp.push('p=' + encodeURIComponent(viewPrefs.preset));
+    const hh = '#' + hp.join('&');
+    if (hh !== location.hash) {
+      try { history.replaceState(null, '', hh); }
+      catch (e) { suppressHashChange = true; location.hash = hh; }
+    }
+    return;
+  }
   if (state.libActive) {   // CRA library mode has its own compact hash
     const lp = ['lib=1'];
     if (state.libCluster) lp.push('c=' + encodeURIComponent(state.libCluster));
@@ -3496,6 +4132,13 @@ function applyHashRestore() {
     state.libCluster = h.c || null;
     if (h.g === 'cluster' || h.g === 'date' || h.g === 'source') state.libGroup = h.g;
     selectLibrary();
+    return true;
+  }
+  if (h && h.hub) {            // 我的關注 deep-link (hv / hw override the stored choice, not persisted)
+    if (h.s === 'md3' || h.s === 'classic') document.documentElement.dataset.skin = h.s;
+    if (h.hv === 'sections' || h.hv === 'tiles') hubPrefs = { ...hubPrefs, hv: h.hv };
+    if (HUB_WINDOWS.includes(+h.hw)) hubPrefs = { ...hubPrefs, hw: +h.hw };
+    selectHub();
     return true;
   }
   if (!h || !h.t) {
