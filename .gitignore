@@ -30,5 +30,8 @@ html/*.bak.*
 # codex-assist (Common skill): generated run streams and machine-local readings
 .common/codex-assist/runs/*/events.jsonl
 .common/codex-assist/runs/*/stderr.txt
+.common/codex-assist/runs/*/answer.ALLOW-COMMON.txt
+.common/codex-assist/runs/*/preflight/
+.common/codex-assist/runs/*/verify/
 .common/codex-assist/quota/
 .common/codex-assist/panel/
