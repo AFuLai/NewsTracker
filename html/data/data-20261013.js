@@ -1837,6 +1837,20 @@ window.TRACKER_DAYS["2026-10-13"] = [
     ]
   },
   {
+    id: "20261013-16317",
+    trackers: ["os"],
+    category: "Android",
+    title: "Gemini 4 Argon 強化 Android 開發體驗：提供自修復建構、AGSL 著色與 CLI 代理工作流",
+    summary: "Google 宣布 Gemini 4 Argon 模型已擴展至 Android 開發流程，將開發從輔助程式碼補全提升至能執行端到端複雜任務的「代理（Agentic）」層面。開發者現在可以在 Google Antigravity、Android Studio Canary 及 Gemini API 的付費層級使用此功能。Argon 的核心優勢包括：在建構失敗時，能透過捕獲 Gradle 和 Kotlin 編譯器日誌，進行迭代診斷並自我修復建構環路；在 UI 方面，能生成支援複雜數學運算的 Jetpack Compose 程式碼，甚至直接應用 AGSL 著色器到 GPU，實現流暢的 120 FPS 動畫效果；此外，透過官方 Android CLI 外掛，開發者可以將代理工作區連接到本地 Android 工具，實現更靈活的命令列操作。使用方式包括透過 Antigravity Desktop App 或 Android Studio Canary 啟用，或直接在終端機執行 `agy plugin install android-cli-plugin`。此功能目前正在全球滾動推出，建議開發者更新工具並確認訂閱 Google AI Ultra 或 Gemini API 付費方案以使用。",
+    tags: ["Gemini 4 Argon", "Android Studio", "Google Antigravity", "Jetpack Compose", "Android CLI", "Agentic Engineering"],
+    title_en: "Gemini 4 Argon Enhances Android Development Experience: Offering Self-Healing Builds, AGSL Shaders, and CLI Agent Workflows",
+    summary_en: "Google has announced that the Gemini 4 Argon model has been expanded into the Android development workflow, elevating development from mere code completion to an 'Agentic' layer capable of executing complex end-to-end tasks. Developers can now access this feature using Google Antigravity, Android Studio Canary, and paid tiers of the Gemini API. Argon's core advantages include: the ability to perform iterative diagnosis and self-heal build cycles by capturing Gradle and Kotlin compiler logs when a build fails; for UI development, it can generate Jetpack Compose code supporting complex mathematical computations and even apply AGSL shaders directly to the GPU, achieving smooth 120 FPS animation effects; furthermore, through an official Android CLI plugin, developers can connect the agent workspace to local Android tools, enabling more flexible command-line operations. Usage involves enabling the feature via the Antigravity Desktop App or Android Studio Canary, or directly running `agy plugin install android-cli-plugin` in the terminal. This functionality is currently rolling out globally, and developers are advised to update their tools and confirm a subscription to Google AI Ultra or a paid Gemini API plan to use it.",
+    tags_en: ["Gemini 4 Argon", "Android Studio", "Google Antigravity", "Jetpack Compose", "Android CLI", "Agentic Engineering"],
+    sources: [
+      { name: "Android Developers Blog", url: "https://developer.android.com/blog/posts/bringing-gemini-4-argon-to-android-agentic-engineering-antigravity-cli", lang: "EN" }
+    ]
+  },
+  {
     id: "20261013-15504",
     trackers: ["security"],
     category: "前瞻技術",

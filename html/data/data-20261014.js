@@ -632,6 +632,20 @@ window.TRACKER_DAYS["2026-10-14"] = [
     ]
   },
   {
+    id: "20261014-16412",
+    trackers: ["os", "security"],
+    category: "Linux",
+    title: "Linux 核心漏洞：memcg 處理 root 記憶體群組時的計費不對稱性導致的記憶體洩漏",
+    summary: "本漏洞存在於 Linux 核心的 cgroup 記憶體管理機制中，具體涉及 `obj_cgroup_charge_pages()` 函數。當處理從子 cgroup 遷移到 root cgroup 的記憶體頁面時，系統在計費（charging）和釋放（uncharging）頁面時存在不對稱性。當使用 `obj_cgroup_charge_pages()` 進行計費時，root memcg 的頁面計數器會持續增加，但由於 `obj_cgroup_uncharge_pages()` 函數跳過了 root memcg 的 `refill_stock()` 步驟，導致 root 的頁面計數器無法正確減少，造成記憶體洩漏（leak）。雖然此洩漏對普通使用者不可見，但它是一個核心層面的計數錯誤。修補建議是改用 `try_charge()` 函數，該函數在遇到 root memcg 時會提前返回，從而恢復計費和釋放操作的對稱性，解決計數不一致的問題。",
+    tags: ["Linux 核心", "memcg", "cgroup", "記憶體洩漏", "obj_cgroup_charge_pages", "try_charge"],
+    title_en: "Linux Kernel Vulnerability: Memory Leak Due to Charging Asymmetry in memcg Handling of Root Memory Group",
+    summary_en: "This vulnerability resides in the cgroup memory management mechanism of the Linux kernel, specifically involving the `obj_cgroup_charge_pages()` function. An asymmetry exists in how the system charges and uncharges memory pages when transitioning from a child cgroup to the root cgroup. When using `obj_cgroup_charge_pages()` for charging, the root memcg's page counter continuously increases. However, because the `obj_cgroup_uncharge_pages()` function skips the root memcg's `refill_stock()` step, the root's page counter cannot correctly decrease, leading to a memory leak. Although this leak is invisible to regular users, it is a core-level counting error. The suggested fix is to use the `try_charge()` function, which returns early when encountering the root memcg, thereby restoring the symmetry of charging and uncharging operations and resolving the counting inconsistency.",
+    tags_en: ["Linux Kernel", "memcg", "cgroup", "Memory Leak", "obj_cgroup_charge_pages", "try_charge"],
+    sources: [
+      { name: "NVD CVE API", url: "https://nvd.nist.gov/vuln/detail/CVE-2026-98414", lang: "EN" }
+    ]
+  },
+  {
     id: "20261014-15785",
     trackers: ["os", "security"],
     category: "Windows",

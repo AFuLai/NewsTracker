@@ -1811,6 +1811,20 @@ window.TRACKER_DAYS["2026-10-15"] = [
     ]
   },
   {
+    id: "20261015-16262",
+    trackers: ["os", "security"],
+    category: "產業動態",
+    title: "微軟與醫療機構聯手，透過法院命令瓦解中國語網路犯罪市場的三大核心服務",
+    summary: "微軟（Microsoft）與醫療資訊共享組織 Health-ISAC 聯名，根據美國南佛羅里達聯邦地方法院的命令，成功扣押了三個主要用於網路犯罪的網域：YAM Store、CoGUI 和 Iron Man。這三個服務是犯罪分子販售帳號、網路釣魚工具和基礎設施的中心。微軟指出，這些服務在 1 月份之後已發送超過 10 億條惡意訊息，其中超過 7.5 億條鎖定微軟客戶，影響範圍涵蓋超過 150 個國家和 7.5 萬個機構及一般消費者。\n\n其中，YAM Store 是犯罪市場的核心，販售從微軟和 Google 等雲端服務商竊取或欺騙獲得的帳號環境。微軟威脅情報團隊發現，YAM Store 充當了竊取 Microsoft 365 和教育版 Azure 帳號的存取中介。\n\n此外，文章揭露了用於網路釣魚的工具，如 CoGUI 和 Iron Man。Iron Man 具有高度複雜性，可針對超過 139 個國家設計超過 2335 個誘餌畫面，且操作者能實時監控受害者並要求輸入一次性驗證碼。微軟已成功封鎖了與 YAM Store 相關的兩萬個帳號，並阻止了十萬個用於冒充和詐騙的網域。微軟數位犯罪應對小組總監 Steven Masada 表示，雖然這只是犯罪服務經濟的一部分，但瓦解這些基礎設施能大幅增加犯罪分子獲取帳號、工具和基礎設施的難度。",
+    tags: ["Microsoft", "Health-ISAC", "YAM Store", "CoGUI", "Iron Man", "網路釣魚", "Microsoft 365", "CVE"],
+    title_en: "Microsoft and Health-ISAC Collaborate to Dismantle Three Core Services of Chinese-Language Cybercrime Market via Court Order",
+    summary_en: "Microsoft and the healthcare information sharing organization Health-ISAC, acting on a court order from the U.S. Southern Florida Federal District Court, successfully seized three major domains used for cybercrime: YAM Store, CoGUI, and Iron Man. These three services served as central hubs for criminals selling accounts, phishing tools, and infrastructure. Microsoft noted that these services had sent over 1 billion malicious messages since January, with more than 750 million targeting Microsoft customers, impacting over 150 countries and 75,000 organizations and general consumers.\n\nSpecifically, YAM Store was identified as a core criminal market, selling accounts obtained through theft or deception from cloud service providers like Microsoft and Google. Microsoft's threat intelligence team discovered that YAM Store functioned as an intermediary for accessing stolen Microsoft 365 and educational Azure accounts.\n\nFurthermore, the article revealed phishing tools such as CoGUI and Iron Man. Iron Man is highly sophisticated, capable of designing over 2,335 lures for more than 139 countries, and allows operators to monitor victims in real-time while prompting them for one-time verification codes. Microsoft successfully blocked 20,000 accounts associated with YAM Store and prevented 100,000 domains used for impersonation and fraud. Steven Masada, Director of Microsoft Digital Crime Response, stated that while this is only part of the criminal service economy, dismantling this infrastructure significantly increases the difficulty for criminals to acquire accounts, tools, and infrastructure.",
+    tags_en: ["Microsoft", "Health-ISAC", "YAM Store", "CoGUI", "Iron Man", "Phishing", "Microsoft 365", "CVE"],
+    sources: [
+      { name: "Boannews 韓國", url: "https://boannews.com/news/articleView.html?idxno=146398", lang: "EN" }
+    ]
+  },
+  {
     id: "20261015-15946",
     trackers: ["security"],
     category: "研討活動",
