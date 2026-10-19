@@ -39,29 +39,15 @@ def _git(*args: str) -> str:
                                    errors="replace")
 
 
-def commit_site(summary: str) -> str | None:
-    """Stage and commit html/ (the generated site). Returns the short commit
-    hash, or None when the tree already matched HEAD.
-
-    Exists because writing the site and landing it were two separate acts and
-    only the first ever happened: every day file since html/ became tracked
-    (2026-08-05) sat untracked for two weeks. The pipeline now lands what it
-    wrote, right after a successful run.
-    """
-    _git("add", "--", "html")
-    if not _git("status", "--porcelain", "--", "html").strip():
-        return None
-    _git("commit", "-m", f"Site update: {summary}")
-    return _git("rev-parse", "--short", "HEAD").strip()
-
-
 def pack(*, major: bool = False, keep: bool = False,
          tarball_dir: Path = DEFAULT_TARBALL) -> dict[str, str | int]:
     m, n = next_version(major=major, keep=keep)
     version = f"{m}.{n}"
     section = append_release(version)
     write_version(m, n)
-    _git("add", "-A")
+    # Only the release bookkeeping: `add -A` once swept stray files (an NTFS
+    # alternate-data-stream file, a side project under html/) into a release.
+    _git("add", "--", "VERSION", "ChangeLog.html")
     try:
         _git("commit", "-m", f"Release Tracker-{version}")
     except subprocess.CalledProcessError:

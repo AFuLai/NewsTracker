@@ -26,9 +26,11 @@ repo 放 ext4 而非 `/mnt/d` 是刻意的：檔案數多、常跑 `git status` 
 
 ## 產出與版控
 
-- `/opt/tracker/repo/html/` 是產生的靜態站（`index.html` ＋ `data/data-YYYYMMDD.js`），**已納入版控**（2026-08-05 起）。
-- 同時在 `.gitattributes` 標了 `html/ export-ignore`：`tracker pack` 用 `git archive` 出的發行 zip **只含引擎、不含產出**。少了這行 zip 會從 ~180 KB 膨脹到 ~5.3 MB。
-- `html/*.bak` 仍在 `.gitignore` 內。
+- `/opt/tracker/repo/html/` 是產生的靜態站（`index.html` ＋ `data/data-YYYYMMDD.js`），**不進版控**（2026-10-19 起；2026-08-05～10-18 曾納入）。
+  發布走 Firebase Hosting（專案 `afu-news`，由 `/opt/tracker/web` 部署），**只在 afu-delta 發布**。
+  站台內容的正本是 `db/articles.sqlite`（本機、不進 git），由 render 重新產生。
+- `tracker pack` 只 `git add` `VERSION` 與 `ChangeLog.html`，發行 zip 由 `git archive` 產生、只含引擎。
+- 設計文件 `PLAN-v2..v4.md` 在 `refs/plans/`。
 - 日檔的 `id` 由 `tracker/render.py` 依文章的**穩定 DB id** 指派（`f"{day8}-{id}"`，F-DATA-1）：往舊日期插一則**不會**重編其後各項，permalink 穩定。（2026-09-02 前為排序序位 `f"{day}-{i:03d}"`，插舊日期會整天重編——已改；改動當下需全站 rebuild 一次，之後永久穩定。）
 
 ## 本檔怎麼跨機（憲法附錄 A.3）

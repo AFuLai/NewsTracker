@@ -38,3 +38,6 @@ include = ["tracker*"]
 
 [tool.setuptools.package-data]
 tracker = ["prompts/*.txt", "templates/*.j2"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
