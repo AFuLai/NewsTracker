@@ -710,6 +710,171 @@ html[data-mode="lib"] #drawer-toggle { display: none !important; }
 }
 .card.watched, .river-row.watched { border-left: 4px solid var(--primary); }
 .river-row .watch-badge { margin-left: 0; margin-right: 0.4rem; }
+/* ── Palettes (配色): html[data-palette="<id>"] ──
+   INVARIANT: with no data-palette attribute NONE of these rules match, so the
+   default look (data-skin x data-theme) is untouched. A palette only sets --pal-*
+   tokens and remaps the site's existing variables; the selector carries
+   [data-skin][data-theme] so it outranks both skins' own [data-skin][data-theme]
+   token blocks. Category fill/on pairs are left alone: every use pairs a fill with
+   its own on-colour, so they stay legible on any palette background. */
+html[data-palette="deepsea"] {
+  color-scheme: dark;
+  --pal-bg: #070B12; --pal-card: rgba(13,20,32,0.92); --pal-text: #E6EEF7; --pal-muted: #8EA2BB; --pal-line: #1F2F45;
+  --pal-accent: #5FE1FF; --pal-dim: #2A6F8A; --pal-warn: #FFB547; --pal-warn-text: #070B12;
+  --pal-on-accent: #070B12;
+  --pal-pattern: linear-gradient(rgba(95,225,255,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(95,225,255,0.07) 1px, transparent 1px);
+  --pal-size: 28px 28px;
+}
+html[data-palette="terminal"] {
+  color-scheme: dark;
+  --pal-bg: #040A06; --pal-card: rgba(8,20,12,0.92); --pal-text: #DDF7E6; --pal-muted: #87B597; --pal-line: #1A3A24;
+  --pal-accent: #39FF88; --pal-dim: #1E7A46; --pal-warn: #FFD23F; --pal-warn-text: #040A06;
+  --pal-on-accent: #040A06;
+  --pal-pattern: repeating-linear-gradient(0deg, rgba(57,255,136,0.06) 0 1px, transparent 1px 4px);
+  --pal-size: auto;
+}
+html[data-palette="neon"] {
+  color-scheme: dark;
+  --pal-bg: #0C0716; --pal-card: rgba(22,12,38,0.92); --pal-text: #EFE7FF; --pal-muted: #A898C8; --pal-line: #2E2050;
+  --pal-accent: #B98CFF; --pal-dim: #5B3E99; --pal-warn: #FF6FB1; --pal-warn-text: #0C0716;
+  --pal-on-accent: #0C0716;
+  --pal-pattern: radial-gradient(rgba(185,140,255,0.22) 1px, transparent 1.5px);
+  --pal-size: 16px 16px;
+}
+html[data-palette="amber"] {
+  color-scheme: dark;
+  --pal-bg: #100C05; --pal-card: rgba(28,20,8,0.92); --pal-text: #FBF1DD; --pal-muted: #BFA77E; --pal-line: #3A2C12;
+  --pal-accent: #FFB000; --pal-dim: #7A5A10; --pal-warn: #FF5C5C; --pal-warn-text: #100C05;
+  --pal-on-accent: #100C05;
+  --pal-pattern: repeating-linear-gradient(45deg, rgba(255,176,0,0.06) 0 2px, transparent 2px 12px);
+  --pal-size: auto;
+}
+html[data-palette="steel"] {
+  color-scheme: light;
+  --pal-bg: #EEF3F8; --pal-card: rgba(255,255,255,0.9); --pal-text: #0F1A2A; --pal-muted: #4D5D73; --pal-line: #C9D5E3;
+  --pal-accent: #0B5CD5; --pal-dim: #8FB1E6; --pal-warn: #C2410C; --pal-warn-text: #FFFFFF;
+  --pal-on-accent: #FFFFFF;
+  --pal-pattern: linear-gradient(rgba(11,92,213,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(11,92,213,0.08) 1px, transparent 1px), linear-gradient(rgba(11,92,213,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(11,92,213,0.04) 1px, transparent 1px);
+  --pal-size: 64px 64px, 64px 64px, 16px 16px, 16px 16px;
+}
+html[data-palette="arctic"] {
+  color-scheme: light;
+  --pal-bg: #FAFBFC; --pal-card: #FFFFFF; --pal-text: #14181F; --pal-muted: #5B6472; --pal-line: #DFE3E9;
+  --pal-accent: #0F766E; --pal-dim: #8CC7C1; --pal-warn: #B4460C; --pal-warn-text: #FFFFFF;
+  --pal-on-accent: #FFFFFF;
+  --pal-pattern: none;
+  --pal-size: auto;
+}
+html[data-palette="paper"] {
+  color-scheme: light;
+  --pal-bg: #F4ECD8; --pal-card: rgba(251,246,234,0.92); --pal-text: #3B2F1E; --pal-muted: #6B583B; --pal-line: #E0D2B4;
+  --pal-accent: #A3541A; --pal-dim: #D9B98C; --pal-warn: #9C2F1F; --pal-warn-text: #FFFFFF;
+  --pal-on-accent: #FFFFFF;
+  --pal-pattern: repeating-linear-gradient(0deg, rgba(120,90,40,0.05) 0 1px, transparent 1px 6px);
+  --pal-size: auto;
+}
+html[data-palette="warmnight"] {
+  color-scheme: dark;
+  --pal-bg: #1A140D; --pal-card: rgba(36,27,18,0.94); --pal-text: #EBDCC3; --pal-muted: #B39E7E; --pal-line: #3A2D1E;
+  --pal-accent: #E0A458; --pal-dim: #7A5A33; --pal-warn: #E8735A; --pal-warn-text: #1A140D;
+  --pal-on-accent: #1A140D;
+  --pal-pattern: radial-gradient(rgba(224,164,88,0.10) 1px, transparent 1.5px);
+  --pal-size: 20px 20px;
+}
+html[data-palette="redlight"] {
+  color-scheme: dark;
+  --pal-bg: #120807; --pal-card: rgba(27,13,11,0.94); --pal-text: #E8BFAF; --pal-muted: #B88A7A; --pal-line: #3A1E19;
+  --pal-accent: #E06A4E; --pal-dim: #7A3428; --pal-warn: #F2B33D; --pal-warn-text: #120807;
+  --pal-on-accent: #120807;
+  --pal-pattern: none;
+  --pal-size: auto;
+}
+html[data-palette="graphite"] {
+  color-scheme: dark;
+  --pal-bg: #1C1D1F; --pal-card: rgba(35,36,39,0.95); --pal-text: #C9C6C0; --pal-muted: #9A968F; --pal-line: #34363A;
+  --pal-accent: #A8B3A0; --pal-dim: #5C6358; --pal-warn: #D49A6A; --pal-warn-text: #1C1D1F;
+  --pal-on-accent: #1C1D1F;
+  --pal-pattern: linear-gradient(rgba(200,198,192,0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(200,198,192,0.035) 1px, transparent 1px);
+  --pal-size: 32px 32px;
+}
+html[data-palette][data-skin][data-theme] {
+  --surface: var(--pal-bg);
+  --surface-container-lowest: var(--pal-bg);
+  /* opaque steps (sticky header / popovers must not show content through) */
+  --surface-container-low: color-mix(in srgb, var(--pal-bg), var(--pal-text) 4%);
+  --surface-container: color-mix(in srgb, var(--pal-bg), var(--pal-text) 6%);
+  --surface-container-high: color-mix(in srgb, var(--pal-bg), var(--pal-text) 10%);
+  --surface-container-highest: color-mix(in srgb, var(--pal-bg), var(--pal-text) 14%);
+  --on-surface: var(--pal-text);
+  --on-surface-variant: var(--pal-muted);
+  --outline: color-mix(in srgb, var(--pal-line), var(--pal-muted) 55%);
+  --outline-variant: var(--pal-line);
+  --primary: var(--pal-accent);
+  --on-primary: var(--pal-on-accent);
+  --primary-container: color-mix(in srgb, var(--pal-dim) 40%, var(--pal-bg));
+  --on-primary-container: var(--pal-text);
+  --card-bg: var(--pal-card);
+  --card-border-width: 1px;
+  --card-shadow: none;
+  --elev-1: none; --elev-2: none; --elev-3: none;
+}
+html[data-palette] body { background-image: var(--pal-pattern); background-size: var(--pal-size); }
+html[data-palette] .watch-badge { background: var(--pal-warn); color: var(--pal-warn-text); border-color: var(--pal-warn); }
+html[data-palette] .card.watched, html[data-palette] .river-row.watched { border-left-color: var(--pal-warn); }
+#theme-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+/* palette picker: modelled on #watch-panel */
+#palette-btn {
+  background: none;
+  border: 1px solid var(--outline);
+  color: var(--on-surface);
+  cursor: pointer;
+  padding: 0.3rem 0.7rem;
+  border-radius: var(--shape-full);
+  font-size: 14px;
+}
+#palette-btn[aria-expanded="true"] { background: var(--primary-container); color: var(--on-primary-container); }
+#palette-btn:focus-visible, #palette-panel button:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+#palette-panel {
+  position: fixed;
+  top: 3.5rem;
+  right: 0.75rem;
+  z-index: 110;   /* above the sticky header (z-index 100), like #watch-panel */
+  width: min(26rem, calc(100vw - 1.5rem));
+  max-height: 80vh;
+  overflow-y: auto;
+  background: var(--surface-container-high);
+  color: var(--on-surface);
+  border: 1px solid var(--outline-variant);
+  border-radius: var(--shape-m);
+  box-shadow: var(--elev-3);
+  padding: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  font-size: 14px;
+}
+#palette-panel.hidden { display: none; }
+#palette-panel h4 { font-size: 14px; margin: 0; }
+#palette-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.5rem; }
+#palette-panel button {
+  background: var(--surface-container);
+  border: 1px solid var(--outline);
+  color: var(--on-surface);
+  cursor: pointer;
+  border-radius: var(--shape-m);
+  padding: 0.45rem 0.55rem;
+  font-size: 13px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+#palette-panel button[aria-pressed="true"] { border-color: var(--primary); box-shadow: 0 0 0 2px var(--primary); }
+#palette-panel .pal-default { text-align: center; border-radius: var(--shape-full); }
+.pal-sw { display: flex; height: 1.1rem; border-radius: var(--shape-xs); overflow: hidden; border: 1px solid rgba(128,128,128,0.45); }
+.pal-sw span { flex: 1; }
+.pal-name { font-weight: 600; }
+.pal-pname { color: var(--on-surface-variant); font-size: 12px; }
 html[data-density="compact"] .cards-grid { gap: 0.5rem; margin-bottom: 0.6rem; }
 html[data-density="compact"] .card { padding: 0.6rem; gap: 0.3rem; }
 html[data-density="compact"] .date-divider { padding: 0.3rem 0 0.2rem; margin-bottom: 0.4rem; }
@@ -1071,6 +1236,7 @@ html[data-mode="lib"] .lib-sort { display: flex; }
       <button id="skin-btn" onclick="toggleSkin()" aria-label="切換外觀"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/></svg></button>
       <select id="view-select" onchange="setPreset(this.value)" aria-label="檢視模式" title="檢視模式"></select>
       <button id="watch-btn" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="watch-panel">關注</button>
+      <button id="palette-btn" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="palette-panel">配色</button>
       <button id="theme-btn" onclick="toggleTheme()" aria-label="切換主題"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" id="theme-icon-light"><path d="M12 18C8.68 18 6 15.32 6 12s2.68-6 6-6 6 2.68 6 6-2.68 6-6 6zm0-10c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zM12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" id="theme-icon-dark" style="display:none"><path d="M21.64 10.75c-.5-.3-1.19-.26-1.63.13-.87.78-2.14 1.22-3.5 1.22-2.97 0-5.38-2.41-5.38-5.38 0-1.36.44-2.63 1.22-3.5.39-.44.43-1.13.13-1.63-.3-.5-.92-.74-1.53-.74-6.14 0-11.13 5-11.13 11.13 0 6.14 5 11.13 11.13 11.13 6.14 0 11.13-5 11.13-11.13 0-.61-.24-1.23-.74-1.53z"/></svg></button>
       <button id="lang-btn" onclick="toggleLang()" title="Language / 語言" aria-label="切換語言"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H4v3h10.52C9.47 7.69 8.96 8.99 8.19 10H4v3h4.52c.7 1.43 1.72 2.81 2.97 3.85l-2.55 2.54.96.96c1.66-1.44 3.01-3.38 3.89-5.58h.11l-.04.04c.3-.45.51-.95.65-1.46.46 1.29.76 2.61.76 4v1h3v-1c0-1.13-.21-2.22-.62-3.26z"/></svg></button>
     </div>
@@ -1120,6 +1286,7 @@ html[data-mode="lib"] .lib-sort { display: flex; }
 </div>
 
 <div id="watch-panel" class="hidden" role="dialog" aria-label="關注"></div>
+<div id="palette-panel" class="hidden" role="dialog" aria-label="配色"></div>
 <script>
 // ── State ────────────────────────────────────────────
 const state = {
@@ -1526,6 +1693,7 @@ function openWatchPanel() {
   const panel = document.getElementById('watch-panel');
   const btn = document.getElementById('watch-btn');
   if (!panel || !btn) return;
+  closePalettePanel(false);
   buildWatchPanel();
   updateWatchUI();
   panel.classList.remove('hidden');
@@ -1553,6 +1721,187 @@ function closeWatchPanel(refocus) {
   });
   document.addEventListener('click', e => {
     if (!panel.classList.contains('hidden') && !panel.contains(e.target) && !btn.contains(e.target)) closeWatchPanel(false);
+  });
+})();
+
+// ── Palettes (配色) ───────────────────────────────────
+// Ten reader-selectable colour themes. localStorage `tracker_palette` = palette id.
+// INVARIANT: no palette (null) = today's look exactly (html has no data-palette).
+// Precedence: URL hash `pal=` > localStorage > none. ?pv=1 (isPreviewMode) never writes.
+// The CSS in html[data-palette="<id>"] repeats these values as --pal-* tokens.
+const PALETTES = [
+  { id: 'deepsea', name: '深海青', nameEn: 'Deep Sea Cyan', pname: '細格線', pnameEn: 'Fine grid', dark: true,
+    bg: '#070B12', card: 'rgba(13,20,32,0.92)', text: '#E6EEF7', muted: '#8EA2BB', line: '#1F2F45',
+    accent: '#5FE1FF', dim: '#2A6F8A', warn: '#FFB547', warnText: '#070B12',
+    pattern: 'linear-gradient(rgba(95,225,255,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(95,225,255,0.07) 1px, transparent 1px)',
+    size: '28px 28px' },
+  { id: 'terminal', name: '終端綠', nameEn: 'Terminal Green', pname: '掃描線', pnameEn: 'Scanlines', dark: true,
+    bg: '#040A06', card: 'rgba(8,20,12,0.92)', text: '#DDF7E6', muted: '#87B597', line: '#1A3A24',
+    accent: '#39FF88', dim: '#1E7A46', warn: '#FFD23F', warnText: '#040A06',
+    pattern: 'repeating-linear-gradient(0deg, rgba(57,255,136,0.06) 0 1px, transparent 1px 4px)',
+    size: 'auto' },
+  { id: 'neon', name: '霓虹紫', nameEn: 'Neon Violet', pname: '點陣', pnameEn: 'Dot matrix', dark: true,
+    bg: '#0C0716', card: 'rgba(22,12,38,0.92)', text: '#EFE7FF', muted: '#A898C8', line: '#2E2050',
+    accent: '#B98CFF', dim: '#5B3E99', warn: '#FF6FB1', warnText: '#0C0716',
+    pattern: 'radial-gradient(rgba(185,140,255,0.22) 1px, transparent 1.5px)',
+    size: '16px 16px' },
+  { id: 'amber', name: '琥珀警戒', nameEn: 'Amber Alert', pname: '斜紋', pnameEn: 'Diagonal stripes', dark: true,
+    bg: '#100C05', card: 'rgba(28,20,8,0.92)', text: '#FBF1DD', muted: '#BFA77E', line: '#3A2C12',
+    accent: '#FFB000', dim: '#7A5A10', warn: '#FF5C5C', warnText: '#100C05',
+    pattern: 'repeating-linear-gradient(45deg, rgba(255,176,0,0.06) 0 2px, transparent 2px 12px)',
+    size: 'auto' },
+  { id: 'steel', name: '鋼藍淺色', nameEn: 'Steel Blue Light', pname: '藍圖格', pnameEn: 'Blueprint grid', dark: false,
+    bg: '#EEF3F8', card: 'rgba(255,255,255,0.9)', text: '#0F1A2A', muted: '#4D5D73', line: '#C9D5E3',
+    accent: '#0B5CD5', dim: '#8FB1E6', warn: '#C2410C', warnText: '#FFFFFF',
+    pattern: 'linear-gradient(rgba(11,92,213,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(11,92,213,0.08) 1px, transparent 1px), linear-gradient(rgba(11,92,213,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(11,92,213,0.04) 1px, transparent 1px)',
+    size: '64px 64px, 64px 64px, 16px 16px, 16px 16px' },
+  { id: 'arctic', name: '北極白', nameEn: 'Arctic White', pname: '無圖樣', pnameEn: 'No pattern', dark: false,
+    bg: '#FAFBFC', card: '#FFFFFF', text: '#14181F', muted: '#5B6472', line: '#DFE3E9',
+    accent: '#0F766E', dim: '#8CC7C1', warn: '#B4460C', warnText: '#FFFFFF',
+    pattern: 'none',
+    size: 'auto' },
+  { id: 'paper', name: '護眼暖紙', nameEn: 'Warm Paper', pname: '抗藍光・紙紋', pnameEn: 'Low blue light · paper grain', dark: false,
+    bg: '#F4ECD8', card: 'rgba(251,246,234,0.92)', text: '#3B2F1E', muted: '#6B583B', line: '#E0D2B4',
+    accent: '#A3541A', dim: '#D9B98C', warn: '#9C2F1F', warnText: '#FFFFFF',
+    pattern: 'repeating-linear-gradient(0deg, rgba(120,90,40,0.05) 0 1px, transparent 1px 6px)',
+    size: 'auto' },
+  { id: 'warmnight', name: '暖光夜讀', nameEn: 'Warm Night Reading', pname: '抗藍光・昏暗', pnameEn: 'Low blue light · dim', dark: true,
+    bg: '#1A140D', card: 'rgba(36,27,18,0.94)', text: '#EBDCC3', muted: '#B39E7E', line: '#3A2D1E',
+    accent: '#E0A458', dim: '#7A5A33', warn: '#E8735A', warnText: '#1A140D',
+    pattern: 'radial-gradient(rgba(224,164,88,0.10) 1px, transparent 1.5px)',
+    size: '20px 20px' },
+  { id: 'redlight', name: '夜燈紅光', nameEn: 'Night-light Red', pname: '幾乎無藍光', pnameEn: 'Almost no blue light', dark: true,
+    bg: '#120807', card: 'rgba(27,13,11,0.94)', text: '#E8BFAF', muted: '#B88A7A', line: '#3A1E19',
+    accent: '#E06A4E', dim: '#7A3428', warn: '#F2B33D', warnText: '#120807',
+    pattern: 'none',
+    size: 'auto' },
+  { id: 'graphite', name: '昏暗石墨', nameEn: 'Dim Graphite', pname: '低對比・柔光', pnameEn: 'Low contrast · soft light', dark: true,
+    bg: '#1C1D1F', card: 'rgba(35,36,39,0.95)', text: '#C9C6C0', muted: '#9A968F', line: '#34363A',
+    accent: '#A8B3A0', dim: '#5C6358', warn: '#D49A6A', warnText: '#1C1D1F',
+    pattern: 'linear-gradient(rgba(200,198,192,0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(200,198,192,0.035) 1px, transparent 1px)',
+    size: '32px 32px' }
+];
+function parsePalette(str) {
+  return (typeof str === 'string' && PALETTES.some(p => p.id === str)) ? str : null;
+}
+let palettePref = null;   // the applied palette id (in-memory; authoritative if localStorage throws)
+function applyPalette(id) {
+  palettePref = parsePalette(id);
+  const root = document.documentElement;
+  if (palettePref) root.dataset.palette = palettePref; else delete root.dataset.palette;
+  updatePaletteUI();
+}
+// Reader's choice: apply + persist (default option removes the key).
+function setPalette(id) {
+  applyPalette(id);
+  if (!isPreviewMode()) {
+    try {
+      if (palettePref) localStorage.setItem('tracker_palette', palettePref);
+      else localStorage.removeItem('tracker_palette');
+    } catch (e) {}
+  }
+  syncHash();
+}
+function initPalette() {
+  let raw = null;
+  try { raw = localStorage.getItem('tracker_palette'); } catch (e) {}
+  applyPalette(parsePalette(raw));
+}
+function paletteName(p) { return state.lang === 'en' ? p.nameEn : p.name; }
+function palettePName(p) { return state.lang === 'en' ? p.pnameEn : p.pname; }
+function buildPalettePanel() {
+  const panel = document.getElementById('palette-panel');
+  if (!panel || panel.dataset.built) return;
+  panel.dataset.built = '1';
+  panel.innerHTML = '<h4 id="palette-title"></h4>' +
+    '<button type="button" class="pal-default" id="palette-default" data-pal=""></button>' +
+    '<div id="palette-grid"></div>';
+  const grid = document.getElementById('palette-grid');
+  PALETTES.forEach(p => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.dataset.pal = p.id;
+    const sw = document.createElement('span');
+    sw.className = 'pal-sw';
+    sw.setAttribute('aria-hidden', 'true');
+    [p.bg, p.accent, p.warn].forEach(c => {
+      const i = document.createElement('span');
+      i.style.background = c;
+      sw.appendChild(i);
+    });
+    const n = document.createElement('span'); n.className = 'pal-name';
+    const pn = document.createElement('span'); pn.className = 'pal-pname';
+    b.appendChild(sw); b.appendChild(n); b.appendChild(pn);
+    grid.appendChild(b);
+  });
+  panel.addEventListener('click', e => {
+    const b = e.target.closest('button[data-pal]');
+    if (b) setPalette(b.dataset.pal);
+  });
+  panel.addEventListener('keydown', e => {
+    if (e.key !== 'Tab') return;
+    const f = [...panel.querySelectorAll('button')].filter(el => el.offsetParent !== null);
+    if (!f.length) return;
+    if (e.shiftKey && document.activeElement === f[0]) { e.preventDefault(); f[f.length - 1].focus(); }
+    else if (!e.shiftKey && document.activeElement === f[f.length - 1]) { e.preventDefault(); f[0].focus(); }
+  });
+}
+// Re-sync palette labels / pressed state / theme-button lock with language and selection.
+function updatePaletteUI() {
+  const btn = document.getElementById('palette-btn');
+  if (btn) { btn.textContent = t('paletteBtn'); btn.title = t('paletteBtn'); }
+  const tb = document.getElementById('theme-btn');
+  if (tb) {
+    tb.disabled = !!palettePref;
+    if (palettePref) tb.title = t('paletteApplied'); else tb.removeAttribute('title');
+  }
+  const panel = document.getElementById('palette-panel');
+  if (!panel || !panel.dataset.built) return;
+  panel.setAttribute('aria-label', t('paletteBtn'));
+  document.getElementById('palette-title').textContent = t('paletteTitle');
+  const def = document.getElementById('palette-default');
+  def.textContent = t('paletteDefault');
+  def.setAttribute('aria-pressed', palettePref ? 'false' : 'true');
+  panel.querySelectorAll('#palette-grid button').forEach(b => {
+    const p = PALETTES.find(x => x.id === b.dataset.pal);
+    if (!p) return;
+    b.children[1].textContent = paletteName(p);
+    b.children[2].textContent = palettePName(p);
+    b.setAttribute('aria-pressed', palettePref === p.id ? 'true' : 'false');
+  });
+}
+function openPalettePanel() {
+  const panel = document.getElementById('palette-panel');
+  const btn = document.getElementById('palette-btn');
+  if (!panel || !btn) return;
+  closeWatchPanel(false);
+  buildPalettePanel();
+  updatePaletteUI();
+  panel.classList.remove('hidden');
+  btn.setAttribute('aria-expanded', 'true');
+  const cur = panel.querySelector('button[aria-pressed="true"]') || panel.querySelector('button');
+  if (cur) cur.focus();
+}
+function closePalettePanel(refocus) {
+  const panel = document.getElementById('palette-panel');
+  const btn = document.getElementById('palette-btn');
+  if (!panel || panel.classList.contains('hidden')) return false;
+  panel.classList.add('hidden');
+  if (btn) { btn.setAttribute('aria-expanded', 'false'); if (refocus) btn.focus(); }
+  return true;
+}
+(function wirePalette() {
+  const btn = document.getElementById('palette-btn');
+  const panel = document.getElementById('palette-panel');
+  if (!btn || !panel) return;
+  btn.addEventListener('click', () => {
+    if (panel.classList.contains('hidden')) openPalettePanel(); else closePalettePanel(true);
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && closePalettePanel(true)) e.stopImmediatePropagation();
+  });
+  document.addEventListener('click', e => {
+    if (!panel.classList.contains('hidden') && !panel.contains(e.target) && !btn.contains(e.target)) closePalettePanel(false);
   });
 })();
 
@@ -1587,6 +1936,7 @@ const I18N = {
         watchBtn:'關注', watchBadge:'★ 關注', watchOnly:'只看關注', watchRules:'關注規則',
         watchCustom:'自訂關鍵字', watchKwPh:'輸入關鍵字…', watchAdd:'新增', watchReset:'恢復預設',
         watchRemove:'移除', noWatch:'沒有符合關注規則的文章',
+        paletteBtn:'配色', paletteTitle:'配色主題', paletteDefault:'預設（跟隨系統主題）', paletteApplied:'已套用配色主題',
        presets:{ default:'預設', quick:'快讀', analyst:'分析師', event:'事件追蹤', cra:'合規 CRA' },
       searchPlaceholder:'搜尋全站新聞…', searching:'搜尋中…',
       scopeLabel:'範圍', scope:{title:'標題', body:'內文', tags:'標籤'},
@@ -1613,6 +1963,7 @@ const I18N = {
         watchBtn:'Watch', watchBadge:'★ Watch', watchOnly:'Watched only', watchRules:'Watch rules',
         watchCustom:'Custom keywords', watchKwPh:'Add a keyword…', watchAdd:'Add', watchReset:'Reset',
         watchRemove:'Remove', noWatch:'No articles match your watch rules',
+        paletteBtn:'Theme', paletteTitle:'Colour theme', paletteDefault:'Default (follow system theme)', paletteApplied:'Colour theme applied',
        presets:{ default:'Default', quick:'Quick read', analyst:'Analyst', event:'Event tracking', cra:'Compliance CRA' },
       searchPlaceholder:'Search all news…', searching:'Searching…',
       scopeLabel:'In', scope:{title:'Title', body:'Body', tags:'Tags'},
@@ -1672,6 +2023,7 @@ function applyLang() {
   }
   updateViewUI();
   updateWatchUI();
+  updatePaletteUI();
   if (state.libActive) {
     buildTrackerPills(Object.keys(getTrackers()));   // re-labels the CRA pill
     document.getElementById('tracker-title').textContent =
@@ -2021,6 +2373,7 @@ function init() {
   buildTrackerPills(names);
   initWatch();  // localStorage tracker_watch → watchPrefs
   initView();   // localStorage tracker_view → viewPrefs; the hash (below) may override it
+  initPalette();   // localStorage tracker_palette → data-palette; a hash pal= (below) may override it
   if (!applyHashRestore()) selectTracker(presetTracker(resolvePreset(viewPrefs), all) || names[0]);   // deep-link wins over default
   applyLang();   // sync all static labels + lang button to the active language
 }
@@ -2899,6 +3252,7 @@ function safeHref(u) {
   return /^https?:\/\//i.test(String(u || '')) ? u : '#';
 }
 function toggleTheme() {
+  if (document.documentElement.dataset.palette) return;   // a palette overrides the light/dark theme
   const isDark = document.documentElement.dataset.theme !== 'light';
   document.documentElement.dataset.theme = isDark ? 'light' : 'dark';
   // Toggle SVG icons (light ↔ dark)
@@ -2937,6 +3291,7 @@ function syncHash() {
     if (state.libCluster) lp.push('c=' + encodeURIComponent(state.libCluster));
     if (state.libGroup !== 'cluster') lp.push('g=' + state.libGroup);
     if (skinOf()) lp.push('s=' + skinOf());
+    if (palettePref) lp.push('pal=' + palettePref);
     lp.push('p=' + encodeURIComponent(viewPrefs.preset));
     const lh = '#' + lp.join('&');
     if (lh !== location.hash) {
@@ -2955,6 +3310,7 @@ function syncHash() {
   if (state.searchQuery) p.push('q=' + encodeURIComponent(state.searchQuery));
   const skin = document.documentElement.dataset.skin;
   if (skin) p.push('s=' + skin);
+  if (palettePref) p.push('pal=' + palettePref);
   p.push('p=' + encodeURIComponent(viewPrefs.preset));
   const hash = '#' + p.join('&');
   if (hash === location.hash) return;
@@ -2980,6 +3336,8 @@ function applyHashRestore() {
   // View preset from the hash wins over localStorage; it is applied without
   // being persisted (the hash is a link, not a user choice).
   const presetChanged = !!(h && h.p && isPreset(h.p)) && applyHashPreset(h.p);
+  // Palette from the hash wins over localStorage; applied without being persisted.
+  if (h && parsePalette(h.pal) && h.pal !== palettePref) applyPalette(h.pal);
   if (h && h.lib) {          // CRA library deep-link
     if (h.s === 'md3' || h.s === 'classic') document.documentElement.dataset.skin = h.s;
     state.libCluster = h.c || null;

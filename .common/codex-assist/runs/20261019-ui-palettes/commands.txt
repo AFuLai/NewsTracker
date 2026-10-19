@@ -1,0 +1,31 @@
+wc -l ui/index.html refs/plans/20261019-ux-mockups/Themes.dc.html; grep -n "TH *=\|const TH" refs/plans/20261019-ux-mockups/Themes.dc.html | head
+grep -n "^\s*:root\|data-theme\|data-skin\|--[a-z0-9-]*:" ui/index.html | head -150
+grep -n "watch-panel\|watchPanel\|tracker_view\|tracker_watch\|pv=1\|PV\b\|syncHash\|applyHashRestore\|function applyLang\|I18N\b.*=\|theme-btn\|skin-btn\|id=\"theme\|id=\"skin\|z-index\|function parseView\|function parseWatch\|body *{\|<body\|data-i18n" ui/index.html | head -150
+grep -n "var(--surface\b\|background: *#\|background: *rgba\|color: *#\|#[0-9a-fA-F]\{6\}" ui/index.html | sed -n '1,400p' | awk -F: '$1>174 && $1<1060' | grep -v "^\(5[0-9]\|[0-9]\):" | head -60; grep -n "toggleTheme\|initTheme\|theme-icon" ui/index.html | tail -8
+grep -n "cat-law\|-on)" ui/index.html | awk -F: '$1>174' | head -30; sed -n 1975,2030p ui/index.html | cut -c1-200
+grep -n "watch-badge\|\.watch\b\|watch-pill\|\.badge\b\|#[0-9a-fA-F]\{3,6\}\b" ui/index.html | awk -F: '$1>174 && $1<1058' | cut -c1-220 | head -40; sed -n 260,290p ui/index.html | cut -c1-150
+grep -n "card-border-width\|card-bg\|card-shadow" ui/index.html | cut -c1-200; sed -n 330,345p ui/index.html | cut -c1-120; grep -n "^\.card {" ui/index.html; grep -n "\.hidden" ui/index.html | head -3
+grep -n "var(--\(cat\|cra\|os\)-[a-z]*-\(on\|fill\))" ui/index.html | grep -v "background: var(--[a-z]*-[a-z]*-fill); color: var(--[a-z]*-[a-z]*-on)" | awk -F: '$1>174' | cut -c1-200; sed -n 626,640p ui/index.html | cut -c1-120; file ui/index.html; git status --short | head
+python3 /tmp/pal_patch.py && git diff --stat && git diff | grep -c '^-[^-]'
+sed -i "s/^assert '\\\\r\\\\n' in s$/assert '\\\\r' not in s/; s/^s = s.replace('\\\\r\\\\n', '\\\\n')$//; s/s.replace('\\\\n', '\\\\r\\\\n').encode/s.encode/" /tmp/pal_patch.py && sed -n 1,8p /tmp/pal_patch.py && tail -4 /tmp/pal_patch.py && python3 /tmp/pal_patch.py && git diff --stat && git diff | grep -c '^-[^-]'
+node -e '
+const fs=require("fs");const h=fs.readFileSync("ui/index.html","utf8");
+const js=h.split("<script>").pop().split("</script>")[0];
+try{new Function(js);console.log("syntax ok")}catch(e){console.log("ERR",e.message)}
+// extract PALETTES + parsePalette and compare with CSS
+const m=js.match(/const PALETTES = \[[\s\S]*?\n\];/)[0];
+const PAL=new Function(m+";return PALETTES")();
+let bad=0;
+for(const p of PAL){const b=h.match(new RegExp("html\\[data-palette=\""+p.id+"\"\\] \\{([\\s\\S]*?)\\n\\}"))[1];
+ f…
+node -e '
+const h=require("fs").readFileSync("ui/index.html","utf8");
+const js=h.split("<script>").pop().split("</script>")[0];
+const m=js.match(/const PALETTES = \[[\s\S]*?\n\];/)[0];
+const f=js.match(/function parsePalette[\s\S]*?\n}\n/)[0];
+console.log(JSON.stringify(f));
+const pp=new Function(m+"\n"+f+"\nreturn parsePalette")();
+console.log(pp("neon"),pp("x"),pp(null),pp({}),pp("__proto__"),pp("constructor"),pp("neon "));
+'
+ls /usr/lib/node_modules /opt/tracker/repo/node_modules 2>/dev/null | head; which chromium chromium-browser google-chrome firefox 2>/dev/null; python3 -c "import playwright;print('pw')" 2>&1 | tail -1
+rm -f /tmp/pal_patch.py /tmp/pal_data.json; git status --short; grep -n "const PALETTES\|function parsePalette\|^html\[data-palette\] body\|z-index: 110" ui/index.html

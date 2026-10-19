@@ -1,0 +1,38 @@
+I added the 10 palettes to [ui/index.html](file:///opt/tracker/repo/ui/index.html), and no other file changed. The diff is 358 insertions and 0 deletions. I haven't tested it in a browser, because none is installed here and there is no jsdom or Playwright.
+
+**What I checked**
+- The page script parses without syntax errors.
+- Each palette's values in `PALETTES` match its `--pal-*` values in the CSS; there are 0 mismatches across the 10.
+- `parsePalette` returns the id for `"neon"`. It returns null for `"x"`, `null`, `{}`, `"__proto__"`, `"constructor"` and `"neon "` (trailing space).
+- I computed contrast for each palette from the mockup's own colours:
+
+| Pair | Lowest ratio |
+|---|---|
+| Text on background | 9.9 |
+| Muted text on the popover/header surface | 4.6 (graphite) |
+| Accent on background | 4.6 (paper) |
+| Text on accent | 5.5 |
+| Warn text on warn | 5.2 |
+
+**What changed**
+- **Palettes:** `PALETTES` is a constant with the 10 ids, zh and English names, and a `dark` flag.
+- **Mapping:** `html[data-palette="<id>"]` rules set `--pal-*` tokens. One shared rule maps them onto the existing variables. Its selector includes `[data-skin][data-theme]` so it outranks the md3 and classic blocks.
+- **Pattern:** the pattern goes on `body` through `background-image` and `background-size`.
+- **Default look:** with no `data-palette` attribute, none of the new rules match, so the site looks as it does today.
+- **Category colours:** I left them alone. Every use pairs a fill with its own text colour, so they stay legible on any palette.
+- **Watch badge:** under a palette it uses the palette's warn colours.
+- **Picker:** a "配色" / "Theme" button opens a popover grid modelled on `#watch-panel`, at z-index 110. It has the 10 swatches (bg, accent, warn, with name and pname) and the "預設（跟隨系統主題）" option. Tab cycles inside it, Esc closes it, and opening one popover closes the other.
+- **Theme button:** while a palette is set, the light/dark button is disabled with the tooltip 已套用配色主題, and `toggleTheme` returns early.
+- **Storage:** `tracker_palette` holds the palette id, and `parsePalette(str)` returns a valid id or null. Every storage access is in try/catch, and nothing is written when the URL has `pv=1`. Choosing the default option removes the key.
+- **Hash:** `pal=<id>` is read in `applyHashRestore` without being saved, so the precedence is hash, then storage, then none. `syncHash` writes `pal=` only when a palette is active.
+- **Labels:** the new `I18N.ui` keys are refreshed through `applyLang`.
+- **Existing code:** I made three small edits to existing functions: `openWatchPanel`, `toggleTheme` and `init`. All existing functions and comments are kept.
+
+**Things to know**
+- The English palette names and pnames are mine, since you only gave the zh ones.
+- The mockup's `dim` colour is used only for the watch-chip and active-button background (`--primary-container`). It isn't a separate CSS element.
+- The shared rule also forces `--card-border-width: 1px` and `--card-shadow: none` under a palette.
+- Each palette sets `color-scheme` so scrollbars and form controls match.
+- Nothing was run in a sandbox, so no sandbox caveat applies to the checks above.
+
+verified: 5  assumed: 2  gaps: 0  findings: 0
