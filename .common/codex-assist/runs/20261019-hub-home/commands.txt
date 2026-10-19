@@ -1,0 +1,30 @@
+wc -l ui/index.html; cat refs/plans/20261019-ux-mockups/README.md | head -60; grep -n "selectHub\|hubActive\|tracker-pills\|hd-row1\|ensureHubLoaded\|function selectTracker\|function applyLang\|buildRiverRow\|id=\"search\|names\[0\]" ui/index.html | head -120
+grep -n "function matchesQuery\|function hubCollect\|hubPill\|hubLoading\|hubTitle\|searchPlaceholder\|function t(\|function trackerLabel\|function setActivePill\|function toggleScope\|searchScope\|hubTypeId\b.*function\|function hubTypeId\|function showMsg\|\.wh-note\|trackerLabel\b" /opt/tracker/repo/ui/index.html | head -50; sed -n 1185,1200p /opt/tracker/repo/ui/index.html; sed -n 1350,1360p /opt/tracker/repo/ui/index.html
+grep -n "presetTracker\|unknown hash\|function applyHashPreset" /opt/tracker/repo/ui/index.html; grep -n "presetTracker" -A12 /opt/tracker/repo/ui/index.html | sed -n 1,30p
+cd /opt/tracker/repo/ui && python3 - <<'EOF'
+import re
+p='index.html'
+s=open(p,encoding='utf-8',newline='').read()
+nl='\r\n' if '\r\n' in s else '\n'
+s=s.replace('\r\n','\n')
+def rep(old,new,cnt=1):
+    global s
+    assert s.count(old)==cnt,(old[:50],s.count(old))
+    s=s.replace(old,new)
+
+# CSS: header
+rep(""".hd-row1 {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0 1.25rem;
+  height: 50px;
+}""",""".hd-row1 {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  row-gap: 0.3rem;
+ …
+cd /opt/tracker/repo/ui && grep -n "data-mode" index.html | head; grep -n "hubLoading\|names\[0\]" index.html; which chromium chromium-browser google-chrome; python3 -c "import playwright;print(1)"; node -e "require('playwright');console.log(2)"; ls
+cd /opt/tracker/repo/ui && node -e "
+const s=require('fs').readFileSync('index.html','utf8');const m=s.match(/<script>([\s\S]*)<\/script>/);new Function(m[1]);console.log('syntax ok')"; git diff --stat; git status --short

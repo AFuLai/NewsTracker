@@ -1,0 +1,23 @@
+Now matchesQuery, hubCollect, I18N hub keys, and the 1190-1200 CSS.
+I made all six changes in [ui/index.html](file:///opt/tracker/repo/ui/index.html) and checked only that the script parses. No browser is installed here, so I did not load the page or measure any widths. Nothing below has been tested in a browser.
+
+1. **Home:** `init()` now calls `selectHub()` when the hash is missing or unknown. The hub pill is first, reads "★ 總覽" / "★ Overview", and is active on load. A saved view preset no longer picks a starting tracker on a bare visit.
+2. **Navigation:**
+   - **Menu:** the three tracker pills are replaced by one menu button, "依來源瀏覽 ▾" / "Browse by source ▾", in [`buildTrackerPills`](file:///opt/tracker/repo/ui/index.html). Picking a tracker runs `selectTracker(name)`. The CRA 庫 pill is kept.
+   - **Current tracker:** while you are in a tracker view the button shows that tracker's name.
+   - **Keyboard and popup:** the menu supports arrow keys and Esc. It is positioned from the button so it can't widen the page.
+   - **Permalinks:** I did not change `syncHash`, `parseHash` or `applyHashRestore`, so the permalinks (`#t=…`, `#lib=1`, `#c=…`, `#a=…`) should restore as before.
+3. **Hub search:** the search row now stays visible in the hub. The new pure function `hubSearch(articles, q)` reuses `matchesQuery`, so title, summary and tags match the way they do in tracker search. It covers the whole loaded hub window across all trackers. Results show as `buildRiverRow` rows with a count line instead of the sections or tiles, until the search is cleared. `runSearch` and `clearSearch` have hub branches, and the window selector still works during a search.
+   - The search box is at the top of the hub content, not inside the `.wh-head` header strip. The 標題/內文/標籤 scope pills are still shown.
+4. **Header fit:** `.hd-row1` now wraps at all widths, with `height: auto` and `min-height: 50px`. `.hd-stats` can wrap, the title can wrap, and the pills wrap. "顯示 N 篇 / 更新" moved to a small 11px line under the buttons.
+5. **Loading:** the hub shows a spinner and "載入近 N 天…" / "Loading the last N days…" while `ensureHubLoaded` runs. It also marks the loading note with `role="status"`.
+6. **Bilingual:** I added `srcMenu`, `hubSearchCount` and `hubLoading`, and changed `hubPill`, in `I18N.ui`. The menu labels are rebuilt by `applyLang`.
+
+I kept all existing functions and decision comments. The new popup, spinner and hub-search code added CSS and JS; the edits are confined to that file.
+
+**Please check in a browser:**
+- the no-horizontal-scroll requirement at 375, 820, 1280 and 1540px;
+- hub search in both languages;
+- the old permalinks.
+
+verified: 2  assumed: 4  gaps: 0  findings: 0

@@ -197,25 +197,36 @@ header {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0 1.25rem;
-  height: 50px;
+  row-gap: 0.3rem;
+  padding: 0.3rem 1.25rem;
+  flex-wrap: wrap;      /* WHY: at every width the pills + title + stats + buttons can exceed the row; wrap instead of clipping the right-hand buttons */
+  height: auto;
+  min-height: 50px;
 }
 .hd-icon { font-size: 22px; line-height: 1; display: inline-flex; }
 #tracker-title {
   font-size: 16px;
   font-weight: 500;
   color: var(--primary);
-  white-space: nowrap;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 .hd-spacer { flex: 1; }
 .hd-stats {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  min-width: 0;
   gap: 0.6rem;
+  row-gap: 0.1rem;
   font-size: 12px;
   color: var(--on-surface-variant);
   white-space: nowrap;
 }
+/* compact count / updated line, kept under the header buttons */
+.hd-meta { order: 2; flex-basis: 100%; text-align: right; font-size: 11px; line-height: 1.2; }
+.hd-meta strong { font-size: 12px; }
 .hd-stats strong { color: var(--on-surface); font-size: 14px; font-weight: 600; }
 #last-updated { font-size: 12px; }
 #theme-btn, #lang-btn {
@@ -343,9 +354,34 @@ header {
 /* year & cat pills */
 #tracker-pills {
   display: inline-flex;
+  flex-wrap: wrap;
+  min-width: 0;
+  max-width: 100%;
   gap: 4px;
   margin-right: 8px;
 }
+/* 依來源瀏覽 menu: a fixed-position popup (placed from JS) so it can never widen the page */
+.src-wrap { display: inline-flex; }
+#src-menu {
+  position: fixed;
+  z-index: 300;
+  min-width: 11rem;
+  max-width: calc(100vw - 16px);
+  background: var(--surface-container);
+  color: var(--on-surface);
+  border: 1px solid var(--outline);
+  border-radius: 12px;
+  padding: 4px;
+  box-shadow: 0 4px 16px rgba(0,0,0,.25);
+}
+#src-menu[hidden] { display: none; }
+#src-menu button {
+  display: block; width: 100%; text-align: left;
+  background: none; border: none; color: inherit; cursor: pointer;
+  padding: 0.5rem 0.8rem; border-radius: 8px; font-size: 14px;
+}
+#src-menu button:hover, #src-menu button:focus-visible { background: var(--surface-variant, rgba(128,128,128,.18)); }
+#src-menu button[aria-current="true"] { font-weight: 600; color: var(--primary); }
 #tracker-pills .pill {
   font-weight: 600;
   border-color: var(--outline);
@@ -1268,6 +1304,12 @@ html[data-palette] .wh { --wh-hit: var(--pal-warn); }
 .wh-more:hover { text-decoration: underline; }
 .wh-tags { display: flex; flex-wrap: wrap; gap: 0.35rem; }
 .wh-note { color: var(--on-surface-variant); padding: 1.5rem 0; text-align: center; }
+.wh-loading::before {   /* visible spinner while ensureHubLoaded runs */
+  content: ''; display: inline-block; width: 14px; height: 14px; margin-right: 8px; vertical-align: -2px;
+  border: 2px solid var(--outline); border-top-color: var(--primary); border-radius: 50%;
+  animation: wh-spin 0.8s linear infinite;
+}
+@keyframes wh-spin { to { transform: rotate(360deg); } }
 html[data-mode="hub"] .river-list { display: flex; flex-direction: column; margin-bottom: 0.4rem; min-width: 0; }
 html[data-mode="hub"] .river-row { padding: 0.35rem 0.5rem; border-bottom: 1px solid var(--outline-variant); cursor: pointer; min-width: 0; }
 html[data-mode="hub"] .river-row:hover { background: var(--surface-container-high); }
@@ -1377,8 +1419,8 @@ html[data-palette] .wh-dash {
     <span id="tracker-title">資安新聞追蹤</span>
     <div class="hd-spacer"></div>
     <div class="hd-stats" aria-live="polite" aria-atomic="true">
-      <span id="lbl-showing">顯示</span> <strong id="article-count">0</strong> <span id="lbl-articles">篇</span>
-      <span id="last-updated"></span>
+      <span class="hd-meta"><span id="lbl-showing">顯示</span> <strong id="article-count">0</strong> <span id="lbl-articles">篇</span>
+      <span id="last-updated"></span></span>
       <button id="skin-btn" onclick="toggleSkin()" aria-label="切換外觀"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/></svg></button>
       <select id="view-select" onchange="setPreset(this.value)" aria-label="檢視模式" title="檢視模式"></select>
       <button id="watch-btn" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="watch-panel">關注</button>
@@ -2094,13 +2136,13 @@ const I18N = {
         watchBtn:'關注', watchBadge:'★ 關注', watchOnly:'只看關注', watchRules:'關注規則',
         watchCustom:'自訂關鍵字', watchKwPh:'輸入關鍵字…', watchAdd:'新增', watchReset:'恢復預設',
         watchRemove:'移除', noWatch:'沒有符合關注規則的文章',
-        hubPill:'★ 我的關注', hubTitle:'我的關注', hubSub:'依新聞類型分區，不分來源版面',
+        hubPill:'★ 總覽', srcMenu:'依來源瀏覽 ▾', hubTitle:'我的關注', hubSub:'依新聞類型分區，不分來源版面',
         hubWin:'期間', hubDays:n=>'近 '+n+' 天', hubPresent:'呈現方式', hubSections:'分區', hubTiles:'儀表',
         hubCards:'卡片', hubList:'條列', hubRules:'規則設定', hubBriefTitle:'你的簡報',
         hubBriefNew:(d,n,r)=>'自上次造訪（'+d+'）新增 <b class="wh-num">'+n+'</b> 篇關注 · <b class="wh-num">'+r+'</b> 條規則有新命中',
         hubBriefFirst:n=>'首次造訪：目前有 '+n+' 篇符合關注規則，之後會顯示新增篇數',
         hubPlat:'平台標籤', hubAllMore:'全部 ›', hubLess:'收合 ‹', hubTotal:n=>'共 '+n+' 篇', hubWatchHits:'關注',
-        hubLoading:'載入關注資料…', hubEmpty:'這段期間沒有符合的文章', hubDrill:'DRILL-DOWN', hubPick:'點選上方方塊，在此檢視該類型文章',
+        hubLoading:n=>'載入近 '+n+' 天…', hubSearchCount:n=>'搜尋結果：'+n+' 篇（近期窗口內全部來源）', hubEmpty:'這段期間沒有符合的文章', hubDrill:'DRILL-DOWN', hubPick:'點選上方方塊，在此檢視該類型文章',
         hubLegendHit:'■ 關注命中', hubLegendBar:'▮ 14 日篇數', hubTagFilter:'依標籤篩選', hubCount:n=>n+' 篇',
         paletteBtn:'配色', paletteTitle:'配色主題', paletteDefault:'預設（跟隨系統主題）', paletteApplied:'已套用配色主題',
        presets:{ default:'預設', quick:'快讀', analyst:'分析師', event:'事件追蹤', cra:'合規 CRA' },
@@ -2129,13 +2171,13 @@ const I18N = {
         watchBtn:'Watch', watchBadge:'★ Watch', watchOnly:'Watched only', watchRules:'Watch rules',
         watchCustom:'Custom keywords', watchKwPh:'Add a keyword…', watchAdd:'Add', watchReset:'Reset',
         watchRemove:'Remove', noWatch:'No articles match your watch rules',
-        hubPill:'★ My Watch', hubTitle:'My Watch', hubSub:'Grouped by news type, not by source page',
+        hubPill:'★ Overview', srcMenu:'Browse by source ▾', hubTitle:'My Watch', hubSub:'Grouped by news type, not by source page',
         hubWin:'Window', hubDays:n=>'Last '+n+' days', hubPresent:'Presentation', hubSections:'Sections', hubTiles:'Dashboard',
         hubCards:'Cards', hubList:'List', hubRules:'Rules', hubBriefTitle:'Your briefing',
         hubBriefNew:(d,n,r)=>'Since your last visit ('+d+'): <b class="wh-num">'+n+'</b> new watched '+(n===1?'article':'articles')+' · <b class="wh-num">'+r+'</b> '+(r===1?'rule has':'rules have')+' new hits',
         hubBriefFirst:n=>'First visit: '+n+' articles match your watch rules; new ones will be counted next time',
         hubPlat:'Platforms', hubAllMore:'All ›', hubLess:'Less ‹', hubTotal:n=>n+(n===1?' article':' articles'), hubWatchHits:'Watch',
-        hubLoading:'Loading watch data…', hubEmpty:'No matching articles in this window', hubDrill:'DRILL-DOWN', hubPick:'Pick a tile above to list its articles here',
+        hubLoading:n=>'Loading the last '+n+' days…', hubSearchCount:n=>n+(n===1?' result':' results')+' across all sources in this window', hubEmpty:'No matching articles in this window', hubDrill:'DRILL-DOWN', hubPick:'Pick a tile above to list its articles here',
         hubLegendHit:'■ Watch hits', hubLegendBar:'▮ 14-day count', hubTagFilter:'Filter by tag', hubCount:n=>n+(n===1?' article':' articles'),
         paletteBtn:'Theme', paletteTitle:'Colour theme', paletteDefault:'Default (follow system theme)', paletteApplied:'Colour theme applied',
        presets:{ default:'Default', quick:'Quick read', analyst:'Analyst', event:'Event tracking', cra:'Compliance CRA' },
@@ -2546,6 +2588,11 @@ function hubCollect(days) {
     (String(y.id) < String(x.id) ? -1 : String(y.id) > String(x.id) ? 1 : 0));
   return { today: today, list: list };
 }
+// Pure: articles whose displayed title / summary / tags match q (same matcher and scope as the
+// tracker search); q empty → all. Input order is kept.
+function hubSearch(articles, q) {
+  return (articles || []).filter(a => matchesQuery(a, q));
+}
 function hubTypeId(a) {
   const id = newsTypeOf(a);
   return id === 'platform' ? 'other' : id;   // as buildHubModel: platform articles count under 'other'
@@ -2600,7 +2647,7 @@ function selectHub() {
   const sb = document.getElementById('search-box'); if (sb) sb.value = '';
   const sc = document.getElementById('search-clear'); if (sc) sc.style.display = 'none';
   document.documentElement.dataset.mode = 'hub';   // hides the date sidebar
-  const sr = document.getElementById('search-row'); if (sr) sr.style.display = 'none';
+  const sr = document.getElementById('search-row'); if (sr) sr.style.display = '';   // the hub has the search box too
   setActivePill('#tracker-pills', '[data-tracker="__hub"]');
   document.getElementById('tracker-title').textContent = t('hubTitle');
   document.getElementById('year-pills').innerHTML = '';
@@ -2871,12 +2918,31 @@ function renderWatchHub(focusFn) {
   const root = whEl('div', 'wh');
   root.appendChild(hubHeaderEl());
   if (!hubReady) {
-    root.appendChild(whEl('div', 'wh-note', t('hubLoading')));
+    const ld = whEl('div', 'wh-note wh-loading', t('hubLoading')(hubPrefs.hw));
+    ld.setAttribute('role', 'status');
+    root.appendChild(ld);
     main.appendChild(root);
     syncHash();
     return;
   }
   const col = hubCollect(hubPrefs.hw);
+  if (state.searchQuery) {   // search replaces the sections / tiles until it is cleared
+    const hits = hubSearch(col.list, state.searchQuery);
+    root.appendChild(whEl('div', 'wh-sub', t('hubSearchCount')(hits.length)));
+    if (hits.length) {
+      const rl = whEl('div', 'river-list');
+      hits.forEach(a => rl.appendChild(buildRiverRow(a)));
+      root.appendChild(rl);
+    } else {
+      root.appendChild(whEl('div', 'wh-note', t('noResults')(state.searchQuery)));
+    }
+    main.appendChild(root);
+    document.getElementById('article-count').textContent = hits.length;
+    syncHash();
+    main.scrollTop = keepTop;
+    if (typeof focusFn === 'function') { const el = focusFn(); if (el) el.focus(); }
+    return;
+  }
   const model = buildHubModel(hubPrefs.hw, watchPrefs);
   root.appendChild(hubBriefEl(hubBrief(col.list, col.today)));
   const vis = hubPlat.size ? col.list.filter(a => articleTags(a).some(g => hubPlat.has(g))) : col.list;
@@ -2924,6 +2990,7 @@ async function runSearch() {
   document.getElementById('search-clear').style.display = q ? 'inline' : 'none';
   if (!q) { clearSearch(); return; }
   state.searchQuery = q;
+  if (state.hubActive) { renderWatchHub(); return; }   // hub: search the loaded window of all trackers
   showMsg(t('searching'));
   await ensureAllLoaded();
   if (state.searchQuery !== q) return;   // superseded by a newer keystroke
@@ -2949,6 +3016,7 @@ function clearSearch() {
   const box = document.getElementById('search-box');
   if (box) box.value = '';
   document.getElementById('search-clear').style.display = 'none';
+  if (state.hubActive) { renderWatchHub(); return; }
   const mf = currentManifest();
   if (!mf) return;
   buildYearPills(mf.years || []);
@@ -3141,7 +3209,7 @@ function init() {
   initView();   // localStorage tracker_view → viewPrefs; the hash (below) may override it
   initPalette();   // localStorage tracker_palette → data-palette; a hash pal= (below) may override it
   initHubPrefs();  // localStorage tracker_watch_hub → hubPrefs; a hash hv= / hw= (below) may override it
-  if (!applyHashRestore()) selectTracker(presetTracker(resolvePreset(viewPrefs), all) || names[0]);   // deep-link wins over default
+  if (!applyHashRestore()) selectHub();   // deep-link wins; no / unknown hash → the 總覽 hub (replaces the old default tracker wall)
   applyLang();   // sync all static labels + lang button to the active language
 }
 
@@ -3178,18 +3246,7 @@ function selectTracker(name) {
 function buildTrackerPills(names) {
   const el = document.getElementById('tracker-pills');
   el.innerHTML = '';
-  names.forEach((n, i) => {
-    const btn = document.createElement('button');
-    btn.className = 'pill' + (i === 0 ? ' active' : '');
-    btn.dataset.tracker = n;
-    const title = (typeof TRACKER_TITLES !== 'undefined' && TRACKER_TITLES[n]) || n;
-    btn.textContent = trackerLabel(n);   // localized short label (資安 / Security)
-    btn.title = title;
-    btn.setAttribute('aria-pressed', i === 0 ? 'true' : 'false');
-    btn.onclick = () => selectTracker(n);
-    el.appendChild(btn);
-  });
-  // 我的關注 (watch hub) pill: a special mode like the CRA library, not a tracker.
+  // 總覽 (hub) is the first pill: the site's main view, not a tracker.
   const hb = document.createElement('button');
   hb.className = 'pill' + (state.hubActive ? ' active' : '');
   hb.dataset.tracker = '__hub';
@@ -3198,6 +3255,35 @@ function buildTrackerPills(names) {
   hb.setAttribute('aria-pressed', state.hubActive ? 'true' : 'false');
   hb.onclick = selectHub;
   el.appendChild(hb);
+  // 依來源瀏覽 menu: the manifest's trackers, each opens the old archive view (selectTracker).
+  const wrap = document.createElement('span');
+  wrap.className = 'src-wrap';
+  const sb = document.createElement('button');
+  sb.className = 'pill';
+  sb.id = 'src-btn';
+  sb.dataset.tracker = '__src';
+  sb.type = 'button';
+  sb.setAttribute('aria-haspopup', 'menu');
+  sb.setAttribute('aria-expanded', 'false');
+  sb.setAttribute('aria-controls', 'src-menu');
+  const menu = document.createElement('div');
+  menu.id = 'src-menu';
+  menu.setAttribute('role', 'menu');
+  menu.hidden = true;
+  names.forEach(n => {
+    const it = document.createElement('button');
+    it.type = 'button';
+    it.setAttribute('role', 'menuitem');
+    it.dataset.src = n;
+    it.textContent = trackerLabel(n);   // localized short label (資安 / Security)
+    it.title = (typeof TRACKER_TITLES !== 'undefined' && TRACKER_TITLES[n]) || n;
+    it.onclick = () => { closeSrcMenu(); selectTracker(n); };
+    menu.appendChild(it);
+  });
+  sb.onclick = (e) => { e.stopPropagation(); if (menu.hidden) openSrcMenu(); else closeSrcMenu(); };
+  wrap.appendChild(sb);
+  wrap.appendChild(menu);
+  el.appendChild(wrap);
   // CRA reference-library pill (a special mode, not a real tracker). The data
   // (data/cra_library.js) loads on first click.
   const lb = document.createElement('button');
@@ -3208,7 +3294,51 @@ function buildTrackerPills(names) {
   lb.setAttribute('aria-pressed', state.libActive ? 'true' : 'false');
   lb.onclick = selectLibrary;
   el.appendChild(lb);
+  syncSrcBtn();
 }
+// The menu button shows the current tracker's name (and is active) while in a tracker view.
+function syncSrcBtn() {
+  const sb = document.getElementById('src-btn');
+  if (!sb) return;
+  const inTracker = !!(state.currentTracker && !state.hubActive && !state.libActive);
+  sb.textContent = inTracker ? trackerLabel(state.currentTracker) + ' ▾' : t('srcMenu');
+  sb.classList.toggle('active', inTracker);
+  sb.setAttribute('aria-pressed', inTracker ? 'true' : 'false');
+  document.querySelectorAll('#src-menu [data-src]').forEach(b => {
+    if (inTracker && b.dataset.src === state.currentTracker) b.setAttribute('aria-current', 'true');
+    else b.removeAttribute('aria-current');
+  });
+}
+function openSrcMenu() {
+  const sb = document.getElementById('src-btn'), menu = document.getElementById('src-menu');
+  if (!sb || !menu) return;
+  menu.hidden = false;
+  const r = sb.getBoundingClientRect();
+  menu.style.top = Math.round(r.bottom + 4) + 'px';
+  menu.style.left = Math.max(8, Math.min(Math.round(r.left), window.innerWidth - menu.offsetWidth - 8)) + 'px';
+  sb.setAttribute('aria-expanded', 'true');
+  const first = menu.querySelector('button');
+  if (first) first.focus();
+}
+function closeSrcMenu(refocus) {
+  const sb = document.getElementById('src-btn'), menu = document.getElementById('src-menu');
+  if (!menu || menu.hidden) return;
+  menu.hidden = true;
+  if (sb) { sb.setAttribute('aria-expanded', 'false'); if (refocus) sb.focus(); }
+}
+document.addEventListener('click', (e) => { if (!e.target.closest || !e.target.closest('#src-menu')) closeSrcMenu(); });
+document.addEventListener('keydown', (e) => {
+  const menu = document.getElementById('src-menu');
+  if (!menu || menu.hidden) return;
+  if (e.key === 'Escape') { e.stopPropagation(); closeSrcMenu(true); return; }
+  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+    e.preventDefault();
+    const items = [...menu.querySelectorAll('button')];
+    const i = items.indexOf(document.activeElement);
+    items[(i + (e.key === 'ArrowDown' ? 1 : -1) + items.length) % items.length].focus();
+  }
+}, true);
+window.addEventListener('resize', () => closeSrcMenu());
 
 // ── CRA reference library (special mode) ──────────────────────────────
 function loadCraLibrary(cb) {
@@ -3997,6 +4127,7 @@ function setActivePill(containerSel, btnSel) {
   container.querySelectorAll('.pill').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-pressed', 'false'); });
   const btn = container.querySelector(btnSel);
   if (btn) { btn.classList.add('active'); btn.setAttribute('aria-pressed', 'true'); }
+  if (containerSel === '#tracker-pills') syncSrcBtn();   // 依來源瀏覽 button follows the current tracker
 }
 function showMsg(msg) {
   const el = document.getElementById('loading-msg');
