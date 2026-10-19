@@ -782,6 +782,36 @@ def pipeline(
     raise typer.Exit(0 if rep.ok else 1)
 
 
+def _deploy_site(rep, *, enabled: bool) -> str:
+    """Publish html/ after a successful run: "ok", "skipped: <why>" or "failed: <why>"."""
+    if not enabled:
+        return "skipped: --no-deploy"
+    if rep is None or not rep.ok:
+        return "skipped: run not ok"
+    from .deploy import DeployError, deploy
+    try:
+        last = deploy()
+    except DeployError as exc:
+        console.print(f"[red]Firebase 部署失敗：{exc}[/red]")
+        return f"failed: {exc}"
+    console.print(f"[dim]Firebase 已部署：{last}[/dim]")
+    return "ok"
+
+
+@app.command("deploy")
+def deploy_cmd(
+    channel: str = typer.Option("", "--channel",
+                                help="部署到 preview channel（例：preview）；空白＝正式站"),
+) -> None:
+    """Deploy html/ to Firebase Hosting (afu-news) from /opt/tracker/web."""
+    from .deploy import DeployError, deploy
+    try:
+        print(deploy(channel=channel or None))
+    except DeployError as exc:
+        console.print(f"[red]{exc}[/red]")
+        raise typer.Exit(1)
+
+
 def _start_dashboard(reporter, port: int):
     """Start the web dashboard, trying a few ports if the first is taken."""
     from .web_dashboard import serve
@@ -1007,6 +1037,8 @@ def _translate_backfill(*, db: Path, out: Path) -> dict:
 
 @app.command()
 def daily(
+    deploy_site: bool = typer.Option(True, "--deploy/--no-deploy",
+                                     help="成功後部署到 Firebase Hosting（只在 afu-delta）"),
     days: int = typer.Option(3, "--days", help="更新最近 N 天（含今天）"),
     trackers: str = typer.Option("all", "--tracker",
                                  help=f"{'|'.join(SEARCHINFOS)}|all (default all)"),
@@ -1096,9 +1128,13 @@ def daily(
             "(','||trackers||',') LIKE '%,'||?||',%'", (tname,)).fetchone()
         per_tracker_written[tname] = row[0]
 
-    ok = rep.ok
+    deploy_state = _deploy_site(rep, enabled=deploy_site)
+    if deploy_state.startswith("failed"):
+        errors.append(f"deploy: {deploy_state}")
+    ok = rep.ok and not deploy_state.startswith("failed")
     status = {
         "command": "daily",
+        "deploy": deploy_state,
         "timestamp": utcnow().isoformat(),
         "days": days, "since": since, "until": until, "trackers": targets,
         "ok": ok,

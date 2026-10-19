@@ -27,3 +27,10 @@ def _isolate_endpoint_config(tmp_path, monkeypatch):
 def _isolate_project_root(tmp_path, monkeypatch):
     monkeypatch.setattr(orchestrator, "PROJECT_ROOT", tmp_path)
     monkeypatch.setattr(cli, "PROJECT_ROOT", tmp_path)
+
+
+@pytest.fixture(autouse=True)
+def _never_deploy(monkeypatch):
+    """No test may publish the real site: deploy() is replaced by a no-op."""
+    import tracker.deploy as deploy_mod
+    monkeypatch.setattr(deploy_mod, "deploy", lambda **_kw: "stubbed under test")

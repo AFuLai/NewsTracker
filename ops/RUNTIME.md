@@ -41,3 +41,25 @@ test runs land here alongside the scheduled runs, and there is **no rotation** â
 the directory grows unbounded. Prune it periodically; it holds no state the
 pipeline reads back (the authoritative last-run summary is `status.json` +
 the `runs` table in `db/articles.sqlite`).
+
+## Publishing (Firebase Hosting)
+
+`html/` is not tracked; it is published to Firebase Hosting project `afu-news`
+from the workarea's `/opt/tracker/web` (machine-local, never committed:
+`firebase.json`, `.firebaserc`, `public -> /opt/tracker/repo/html`).
+Only **afu-delta** publishes; `tracker deploy` refuses on any other machine.
+
+```bash
+/opt/venv/bin/tracker deploy --channel preview   # preview URL, expires in 7 days
+/opt/venv/bin/tracker deploy                     # live site
+```
+
+`tracker daily` deploys after a successful run (`--no-deploy` to skip) and records
+`deploy: ok | skipped: ... | failed: ...` in status.json; a failed deploy makes `ok` false.
+
+firebase-tools is a machine-local install (not in Common's toolchain manifest):
+15.20.0 on nvm node v24.15.0 under `/home/afu/.nvm`, which is not on a
+non-interactive PATH. `tracker/deploy.py` resolves it as `$NEWSTRACKER_FIREBASE`,
+else the newest `~/.nvm/versions/node/*/bin/firebase`, else `firebase` on PATH.
+Login lives in `~/.config/configstore/firebase-tools.json` and never enters the repo.
+Rollback: `firebase hosting:rollback` from `/opt/tracker/web`.
