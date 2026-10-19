@@ -75,6 +75,11 @@ def deploy(*, channel: str | None = None) -> str:
         raise DeployError(f"deploy runs only on {DEPLOY_MACHINE} (this machine: {name or 'unknown'})")
     if not (WEB_DIR / "firebase.json").is_file():
         raise DeployError(f"{WEB_DIR}/firebase.json not found")
+    # The site shell is copied into public/ only by a render; without this a deploy
+    # made after a UI-only change (no pipeline run since) publishes the stale page.
+    from . import DEFAULT_OUT
+    from .render import sync_index_html
+    sync_index_html(DEFAULT_OUT)
     fb = resolve_firebase()
     if channel:
         args = ["hosting:channel:deploy", channel]
