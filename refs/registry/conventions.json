@@ -46,5 +46,15 @@
       "path": "ChangeLog.html",
       "reason": "release notes appended by tracker pack (tracker/changelog.py) and shipped in the release zip"
     }
-  ]
+  ],
+  "workarea_names": {
+    "status.json": {
+      "sync": "generated",
+      "purpose": "NewsTracker pipeline last-run summary; path fixed in tracker/cli.py:1141, orchestrator.py:1391 and tests/conftest.py (NewsTracker, 2026-10-19)"
+    },
+    "web": {
+      "sync": "local",
+      "purpose": "NewsTracker Firebase Hosting deploy dir (firebase.json, .firebaserc afu-news, public/ = the rendered site, written by tracker render); afu-delta only, long-lived; moved from /opt/web by USER 2026-10-19, compat symlink /opt/web removed after 2026-10-26 (NewsTracker, 2026-10-19)"
+    }
+  }
 }
