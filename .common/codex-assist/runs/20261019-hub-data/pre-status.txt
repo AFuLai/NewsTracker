@@ -1,0 +1,4 @@
+# git status --porcelain at dispatch (this line keeps a clean tree's file non-empty)
+?? .common/codex-assist/runs/20261019-hub-data/
+?? .common/codex-assist/tasks/20261019-hub-data.json
+?? .common/codex-assist/tasks/20261019-hub-data.prompt.md

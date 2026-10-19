@@ -1,0 +1,110 @@
+{
+  "task_id": "20261019-hub-data",
+  "mode": "implement",
+  "requested": {
+    "root": "/opt/tracker/repo",
+    "sandbox": "host-ro+root-rw",
+    "model": "claude-sonnet-5-5-medium",
+    "egress": "cloud",
+    "allow_common": false,
+    "timeout_s": 2400,
+    "inputs_glob": "ui/index.html refs/plans/20261019-ux-mockups/README.md .common/codex-assist/runs/20261019-ux-research/answer.txt"
+  },
+  "actual": {
+    "engine": "agy",
+    "codex_bin": "/home/afu/.local/bin/agy",
+    "codex_version": "1.4.2",
+    "session_id": "a4c0f74a-4241-47e0-900b-f8f898ca4e59",
+    "model": "claude-sonnet-5-5-medium",
+    "cwd": "/opt/tracker/repo",
+    "sandbox": "host-ro+root-rw",
+    "denied_actions": [],
+    "host_fence": true,
+    "provider": "antigravity",
+    "rc": 0,
+    "elapsed_s": 141.8,
+    "tokens": 77241,
+    "usage": {
+      "fresh_input": 59826,
+      "cached_input": 754797,
+      "output": 17415,
+      "reasoning": 0,
+      "raw": {
+        "input_tokens": 59826,
+        "output_tokens": 17415,
+        "thinking_tokens": 0,
+        "cache_read_tokens": 754797,
+        "total_tokens": 77241
+      }
+    },
+    "effort": null,
+    "plan_usage": {},
+    "started_at": "2026-10-19T08:16:27Z",
+    "finished_at": "2026-10-19T08:18:49Z",
+    "ephemeral": false,
+    "commands": 8,
+    "machine": "afu-delta"
+  },
+  "role_sha256": "1cc596dacabf1cbfbcb6a8c50c4b0b0bc77d1e4528093742fbd058b591fd701f",
+  "sheet_sha256": null,
+  "acceptance_sha256": "56a290d0ccafb401ee84780134116a65ef1ecab28f7985670b28df6f6e02dcb9",
+  "commands_sha256": [
+    "e83e0fa990e0255e28a858dac55f68b551fd0614226483c9f245d14e1c041635",
+    "c75370f7ade120d38d67db336dfc89bb923aeabb6f1c3339042473e64441fcbf",
+    "b2034dcde572cd2a4af2d882f0ac2d53b1cd2809658988575ab39cc3cdf4b1f7",
+    "2f674a356df5aeee1cce9f4658d9c648302c544addbfe09c1414c208fbc6ecf3",
+    "8caed86e1efe120c16dfd6ae60851ed3efea55a1883ae6c42567670c09f54bbd",
+    "d3fd34015c572cb2c39b4af5c2c86a280a2dc542de95cda23e8d8a1568c9d9ac",
+    "ef94f68ba9a170f41a3061e3f436a55854fbc46f533d70699eb46ccd56fcb4a7",
+    "e641c86027faf71b3a290a6870b19d7a3b762a66470406a536b176ca51f2b622"
+  ],
+  "answer_path": "/opt/tracker/repo/.common/codex-assist/runs/20261019-hub-data/answer.txt",
+  "answer_shape": "summary-line",
+  "quote_gate": {
+    "status": "CLEAN",
+    "findings": 0
+  },
+  "verify": {
+    "touched_files": [
+      "ui/index.html"
+    ],
+    "out_of_scope": [],
+    "markers_removed": [],
+    "probes": [
+      {
+        "id": "tests",
+        "rc": 0,
+        "pass": true,
+        "output_path": "/opt/tracker/repo/.common/codex-assist/runs/20261019-hub-data/verify/tests.out"
+      },
+      {
+        "id": "no-test-sniffing",
+        "rc": 0,
+        "pass": true,
+        "output_path": "/opt/tracker/repo/.common/codex-assist/runs/20261019-hub-data/verify/no-test-sniffing.out"
+      },
+      {
+        "id": "js-syntax",
+        "rc": 0,
+        "pass": true,
+        "output_path": "/opt/tracker/repo/.common/codex-assist/runs/20261019-hub-data/verify/js-syntax.out"
+      },
+      {
+        "id": "core-fns",
+        "rc": 0,
+        "pass": true,
+        "output_path": "/opt/tracker/repo/.common/codex-assist/runs/20261019-hub-data/verify/core-fns.out"
+      }
+    ]
+  },
+  "verdict": "SCORABLE",
+  "recorded_at": "2026-10-19T08:18:50Z",
+  "recorder": {
+    "name": "record.py",
+    "version": "0.10.0",
+    "sha256": "a95169da0c93f0338ffb624a4a972faecc040c21f105b48b4fb1869c93139156"
+  },
+  "verify_result": "OK",
+  "defects": [],
+  "defects_spec_sha256": "3326060632526913a879e96855534a9ea197c73ecd54d514f4dd6c2cde144ca4"
+}

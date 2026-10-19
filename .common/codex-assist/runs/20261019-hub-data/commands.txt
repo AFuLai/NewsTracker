@@ -1,0 +1,18 @@
+cat refs/plans/20261019-ux-mockups/README.md; grep -n "2.2" .common/codex-assist/runs/20261019-ux-research/answer.txt | head; wc -l ui/index.html
+grep -n "state.currentTracker\|loadedFiles\|function watchMatches\|function loadMonth\|function loadDay\|function load\|manifest\|window.__" ui/index.html
+grep -n "function currentManifest\|function trackerList\|__cra\|window.TRACKER_MANIFEST\|TRACKER_DATA\|TRACKER_DAY\|function itemBelongsToTracker\|function effectiveCat\|state.allArticles\|const WATCH_RULES\|window.TRACKER_[A-Z_]* *=" ui/index.html | head -50; head -c 1500 ui/manifest.js 2>/dev/null; ls ui; ls ui/data 2>/dev/null | head
+grep -n "cra_lib\|craLib\|CRA_LIB\|library" ui/index.html | head -20; grep -n "TRACKER_MANIFESTS" -r tracker/*.py | head; grep -n "\"date\"\|'date'\|\"id\"" tracker/render.py | head
+grep -n "loadYearManifest\|loadMonthManifest\|getYearManifest\|manifestDatesForMonth\|pLoadYear\|pLoadMonth" ui/index.html
+bash -c 'sed -i "s/$/\r/" /tmp/hub_block.js && sed -i "2140r /tmp/hub_block.js" ui/index.html && file ui/index.html && grep -c $'"'"'[^\r]$'"'"' ui/index.html; git diff --stat; sed -n 2138,2144p ui/index.html | cat -A | cut -c1-60'
+bash -c 'grep -c $'"'"'\r'"'"' ui/index.html; sed -i "2141,2300s/\r$//" ui/index.html; grep -c $'"'"'\r'"'"' ui/index.html; git diff --stat | tail -1; rm /tmp/hub_block.js'
+bash -c 'cat > /tmp/probe.js <<"EOF"
+const fs=require("fs");
+let html=fs.readFileSync("/opt/tracker/repo/ui/index.html","utf8");
+const m=html.match(/<script>([\s\S]*?)<\/script>\s*<\/body>/)||[];
+const scripts=[...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(x=>x[1]);
+const src=scripts.sort((a,b)=>b.length-a.length)[0];
+const chk=new Function(src); // syntax check only
+console.log("syntax ok");
+// extract functions
+const pick=(from,to)=>src.slice(src.indexOf(from),src.indexOf(to));
+const code=pick("c…

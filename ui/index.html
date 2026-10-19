@@ -1523,8 +1523,18 @@ function serializeWatch(obj) {
 // article + watch → matched labels (rule labels, then matching custom keywords).
 // `tracker` = the tracker being viewed (optional); `lang` = 'zh' | 'en' for rule labels.
 function watchMatches(a, watch, tracker, lang) {
-  if (!a || !watch) return [];
   const en = lang === 'en';
+  return watchHits(a, watch, tracker).map(h => h.rule ? (en ? h.rule.en : h.rule.zh) : h.kw);
+}
+// article + watch → matched rule ids ('kw:<keyword>' for custom keywords), same order as
+// watchMatches. Tracker is fixed to null: the hub has no "tracker being viewed", so a stale
+// state.currentTracker must never make an eu_cra rule match. Pure.
+function watchRuleIds(a, watch) {
+  return watchHits(a, watch, null).map(h => h.rule ? h.rule.id : 'kw:' + h.kw);
+}
+// Shared core of watchMatches / watchRuleIds: [{rule}] for rules, [{kw}] for keywords.
+function watchHits(a, watch, tracker) {
+  if (!a || !watch) return [];
   const trackers = (Array.isArray(a.trackers) && a.trackers.length) ? a.trackers : ['security'];
   let hay = null;
   const hasKw = (kws) => {
@@ -1538,7 +1548,7 @@ function watchMatches(a, watch, tracker, lang) {
     if (cats.includes(a.category)) return true;
     return !!tracker && cats.includes(effectiveCat(a, tracker));
   };
-  const labels = [];
+  const hits = [];
   const on = Array.isArray(watch.on) ? watch.on : [];
   WATCH_RULES.forEach(r => {
     if (!on.includes(r.id)) return;
@@ -1547,12 +1557,12 @@ function watchMatches(a, watch, tracker, lang) {
     if (m.trackers) { parts++; if (!m.trackers.some(t0 => trackers.includes(t0) || t0 === tracker)) return; }
     if (m.categories) { parts++; if (!hasCat(m.categories)) return; }
     if (m.keywords) { parts++; if (!hasKw(m.keywords)) return; }
-    if (parts) labels.push(en ? r.en : r.zh);
+    if (parts) hits.push({ rule: r });
   });
   (Array.isArray(watch.kw) ? watch.kw : []).forEach(k => {
-    if (typeof k === 'string' && k && hasKw([k])) labels.push(k);
+    if (typeof k === 'string' && k && hasKw([k])) hits.push({ kw: k });
   });
-  return labels;
+  return hits;
 }
 
 // ── Watch wiring (DOM / storage side) ─────────────────
@@ -2128,6 +2138,150 @@ async function ensureAllLoaded() {
   }
   await Promise.all([...files].map(f => pLoadDay(f)));
 }
+
+// ── Watch hub data layer (no UI yet) ──────────────────
+// News types for 我的關注, ordered; built from refs/plans/20261019-ux-mockups/README.md
+// (category → type table). Platform categories are NOT a type: newsTypeOf returns
+// 'platform' for them and the hub shows them as tag chips. 'other' is the catch-all.
+// NOTE: the ids and the `en` labels are provisional (README gives zh only).
+const NEWS_TYPES = [
+  { id: 'vuln',      zh: '漏洞威脅',   en: 'Vulnerabilities & Threats', categories: ['漏洞與威脅情報'] },
+  { id: 'incident',  zh: '重大事件',   en: 'Major Incidents',           categories: ['重大事件'] },
+  { id: 'regulation',zh: '法規標準',   en: 'Regulation & Standards',    categories: ['法規與標準', '法令更新', '合規指引', '調和標準', '亞太對應'] },
+  { id: 'supply',    zh: '供應鏈開源', en: 'Supply Chain & Open Source',categories: ['供應鏈與開源安全', '開源影響'] },
+  { id: 'focus',     zh: '焦點綜合',   en: 'Focus',                     categories: ['重點關注'] },
+  { id: 'industry',  zh: '產業動態',   en: 'Industry',                  categories: ['產業動態'] },
+  { id: 'emerging',  zh: '前瞻技術',   en: 'Emerging Tech',             categories: ['前瞻技術'] },
+  { id: 'events',    zh: '研討活動',   en: 'Events',                    categories: ['研討活動'] },
+  { id: 'other',     zh: '其他',       en: 'Other',                     categories: [] }
+];
+const HUB_PLATFORMS = ['Linux', 'Apple', 'Android', 'Windows'];
+// article → type id from its raw category; platform categories → 'platform'; unknown → 'other'.
+function newsTypeOf(a) {
+  const c = a && a.category;
+  if (HUB_PLATFORMS.includes(c)) return 'platform';
+  const t = NEWS_TYPES.find(t => t.categories.includes(c));
+  return t ? t.id : 'other';
+}
+// article → tags (trimmed, de-duplicated strings); a platform category adds its name.
+function articleTags(a) {
+  const out = [], seen = new Set();
+  const add = (x) => {
+    if (typeof x !== 'string') return;
+    const v = x.trim();
+    if (v && !seen.has(v)) { seen.add(v); out.push(v); }
+  };
+  (a && Array.isArray(a.tags) ? a.tags : []).forEach(add);
+  if (a && HUB_PLATFORMS.includes(a.category)) add(a.category);
+  return out;
+}
+
+// Load month indexes of ALL manifest trackers (the CRA library is not a tracker) for the
+// last `days` days (default 30, counted back from the newest date in the indexes), then the
+// union of their day files. Never touches state.currentTracker or the view; the loaded*
+// sets de-duplicate repeat loads.
+async function ensureHubLoaded(days, cb) {
+  const n = (days > 0) ? Math.floor(days) : 30;
+  const all = getTrackers() || {};
+  const tks = Object.keys(all).filter(k => k !== '__cra');
+  const loadYear  = (y, tk) => new Promise(r => loadYearManifest(y, r, tk));
+  const loadMonth = (m, tk) => new Promise(r => loadMonthManifest(m, r, tk));
+  const monthsOf = {};
+  for (const tk of tks) {
+    const ms = [];
+    for (const y of (all[tk].years || [])) {
+      await loadYear(y, tk);
+      const ym = getYearManifest(y, tk);
+      ((ym && ym.months) || []).forEach(m => ms.push(m));
+    }
+    monthsOf[tk] = ms.sort();
+  }
+  // newest date: from each tracker's newest month index
+  let newest = '';
+  for (const tk of tks) {
+    const ms = monthsOf[tk];
+    if (!ms.length) continue;
+    await loadMonth(ms[ms.length - 1], tk);
+    for (const d of manifestDatesForMonth(ms[ms.length - 1], tk)) if (d.date > newest) newest = d.date;
+  }
+  if (newest) {
+    const cutoff = hubShiftDate(newest, -(n - 1));
+    const files = new Set();
+    for (const tk of tks) {
+      for (const m of monthsOf[tk]) {
+        if (m < cutoff.slice(0, 7)) continue;
+        await loadMonth(m, tk);
+        for (const d of manifestDatesForMonth(m, tk)) if (d.date >= cutoff) files.add(d.file);
+      }
+    }
+    await Promise.all([...files].map(f => new Promise(r => loadDayFile(f, r))));
+  }
+  if (typeof cb === 'function') cb();
+}
+// 'YYYY-MM-DD' + n days → 'YYYY-MM-DD' (UTC arithmetic, no clock, no timezone).
+function hubShiftDate(iso, n) {
+  const t = Date.UTC(+iso.slice(0, 4), +iso.slice(5, 7) - 1, +iso.slice(8, 10)) + n * 86400000;
+  return new Date(t).toISOString().slice(0, 10);
+}
+
+// Pure aggregate over the already-loaded window.TRACKER_DAYS. "Today" = newest date present.
+// Articles de-duplicated by id. Platform articles have no other category signal, so they are
+// counted under 'other' (their platform shows up in `platforms` and in their tags).
+function buildHubModel(days, watch) {
+  const n = (days > 0) ? Math.floor(days) : 30;
+  const data = window.TRACKER_DAYS || {};
+  let today = '';
+  for (const d in data) if (d > today && Array.isArray(data[d]) && data[d].length) today = d;
+  const model = { total: 0, byType: [], platforms: [], rules: {} };
+  const buckets = {};
+  NEWS_TYPES.forEach(t => {
+    buckets[t.id] = { type: t.id, n: 0, series14: new Array(14).fill(0), hits: {}, tags: [], top: [],
+                      _tags: new Map() };
+    model.byType.push(buckets[t.id]);
+  });
+  const plat = new Map();
+  if (today) {
+    const cutoff = hubShiftDate(today, -(n - 1));
+    const seen = new Set();
+    const dates = Object.keys(data).filter(d => d >= cutoff && d <= today).sort();
+    for (const date of dates) {
+      for (const a of (Array.isArray(data[date]) ? data[date] : [])) {
+        if (!a) continue;
+        const key = (a.id !== undefined && a.id !== null) ? String(a.id) : date + '|' + a.title;
+        if (seen.has(key)) continue;
+        seen.add(key);
+        model.total++;
+        let tid = newsTypeOf(a);
+        if (tid === 'platform') {
+          plat.set(a.category, (plat.get(a.category) || 0) + 1);
+          tid = 'other';
+        }
+        const b = buckets[tid];
+        b.n++;
+        const age = Math.round((Date.parse(today) - Date.parse(date)) / 86400000);
+        if (age >= 0 && age < 14) b.series14[13 - age]++;
+        articleTags(a).forEach(t => b._tags.set(t, (b._tags.get(t) || 0) + 1));
+        const ids = watch ? watchRuleIds(a, watch) : [];
+        ids.forEach(id => {
+          b.hits[id] = (b.hits[id] || 0) + 1;
+          model.rules[id] = (model.rules[id] || 0) + 1;
+        });
+        b.top.push({ ...a, _date: date });
+      }
+    }
+  }
+  model.byType.forEach(b => {
+    b.tags = [...b._tags.entries()].sort((x, y) => y[1] - x[1]).slice(0, 7).map(e => e[0]);   // stable: ties keep first-seen order
+    delete b._tags;
+    b.top.sort((x, y) => (y._date < x._date ? -1 : y._date > x._date ? 1 : 0) ||
+      (String(y.id) < String(x.id) ? -1 : String(y.id) > String(x.id) ? 1 : 0));
+    b.top = b.top.slice(0, 6);
+  });
+  model.platforms = HUB_PLATFORMS.filter(p => plat.has(p)).map(p => ({ name: p, n: plat.get(p) }))
+    .sort((x, y) => y.n - x.n);
+  return model;
+}
+window.__hub = { NEWS_TYPES, newsTypeOf, articleTags, watchRuleIds, ensureHubLoaded, buildHubModel };
 
 // Recompute which dates (and how many articles) match the query, honouring the
 // current tracker + category filter. This is what the date menu is rebuilt from.
@@ -3152,23 +3306,23 @@ function closeOverlay() {
 }
 
 // ── Load helpers ──────────────────────────────────────
-function loadYearManifest(year, cb) {
-  const key = state.currentTracker + '/' + year;
+function loadYearManifest(year, cb, tracker = state.currentTracker) {
+  const key = tracker + '/' + year;
   if (state.loadedYears.has(key)) { cb(); return; }
-  const mf = currentManifest();
+  const mf = (getTrackers() || {})[tracker];
   const file = mf && mf.yearFiles && mf.yearFiles[year];
   if (!file) { state.loadedYears.add(key); cb(); return; }
   injectScript(file, () => { state.loadedYears.add(key); cb(); });
 }
 
-function loadMonthManifest(month, cb) {
-  const key = state.currentTracker + '/' + month;
+function loadMonthManifest(month, cb, tracker = state.currentTracker) {
+  const key = tracker + '/' + month;
   if (state.loadedMonths.has(key)) { cb(); return; }
-  const ym = getYearManifest(month.slice(0, 4));
+  const ym = getYearManifest(month.slice(0, 4), tracker);
   const monthFile = ym && ym.monthFiles && ym.monthFiles[month];
   if (!monthFile) { state.loadedMonths.add(key); cb(); return; }
   // monthFiles are relative to the year manifest's own dir (data/{tracker}/).
-  const file = 'data/' + state.currentTracker + '/' + monthFile;
+  const file = 'data/' + tracker + '/' + monthFile;
   injectScript(file, () => { state.loadedMonths.add(key); cb(); });
 }
 
@@ -3192,15 +3346,13 @@ function injectScript(src, cb) {
 }
 
 // ── Helpers ───────────────────────────────────────────
-function getYearManifest(year) {
-  const tk = state.currentTracker;
+function getYearManifest(year, tk = state.currentTracker) {
   const byTracker = (window.TRACKER_YEAR || {})[tk];
   if (byTracker && byTracker[year]) return byTracker[year];
   // Legacy single-tracker structure: TRACKER_YEAR[year]
   return (window.TRACKER_YEAR || {})[year] || null;
 }
-function manifestDatesForMonth(month) {
-  const tk = state.currentTracker;
+function manifestDatesForMonth(month, tk = state.currentTracker) {
   const byTracker = (window.TRACKER_MONTH || {})[tk];
   const mm = (byTracker && byTracker[month]) || (window.TRACKER_MONTH || {})[month];
   return mm ? (mm.dates || []) : [];

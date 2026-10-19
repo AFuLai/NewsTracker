@@ -1,0 +1,42 @@
+Now the tail of the core.
+Now a node probe with stubs.
+The watch hub data layer is in [ui/index.html](file:///opt/tracker/repo/ui/index.html), with no UI. I only ran a Node probe on stubbed data. I did not run the real loaders in a browser, so `ensureHubLoaded` is unexercised against real `manifest.js` data. I did not run the app to check the existing badge, the watched-only filter or the views.
+
+The probe pulled the new code out of the file and ran it against fake articles. It showed:
+- `buildHubModel` gives a sensible model: counts, `series14`, per-type `hits`, `tags`, `top` and `platforms`.
+- A duplicate article id counts once, and an article outside the window is excluded.
+- `watchMatches` returns the same label as before for an eu_cra case.
+- `watchRuleIds` returns `[]` for an article that is not in `eu_cra` when the tracker is null.
+
+- **`NEWS_TYPES`, `newsTypeOf`, `articleTags`:** the types follow the README table, in README order, ending with `other`. `newsTypeOf` returns `platform` for Linux, Apple, Android and Windows. `articleTags` trims and de-duplicates the tags, then adds the platform name when the category is a platform.
+- **`watchRuleIds`:** `watchMatches` is now a thin wrapper over a new shared `watchHits`, which holds the original matching logic unchanged. `watchRuleIds` calls `watchHits` with the tracker fixed to null and returns rule ids plus `kw:<keyword>`.
+- **Loaders:** `loadYearManifest`, `loadMonthManifest`, `getYearManifest` and `manifestDatesForMonth` take an optional tracker that defaults to `state.currentTracker`. Existing callers pass nothing, so they behave as before. `loadYearManifest` now reads the manifest by tracker name instead of `currentManifest()`.
+- **`ensureHubLoaded(days, cb)`:**
+  - It loads the year and month indexes of every tracker in the manifest, skipping `__cra`.
+  - It finds the newest date in the indexes, then loads the day files for the last `days` days.
+  - It reuses the existing de-duplication and never touches `state.currentTracker`.
+  - The CRA library is not in `TRACKER_MANIFESTS`, so no manifest tracker is actually excluded.
+- **`buildHubModel`:** it follows your spec, with "today" taken from the newest date in `TRACKER_DAYS`. Platform articles are counted under `other`, and the platform is counted in `platforms`.
+- **`window.__hub`:** exposes `NEWS_TYPES`, `newsTypeOf`, `articleTags`, `watchRuleIds`, `ensureHubLoaded` and `buildHubModel`.
+
+```
+CODEX-ASSIST-GAP
+  kind: bilingual
+  question: Type ids and the `en` labels in NEWS_TYPES (the README gives only zh)
+  blocked-by: no authoritative English names or ids in the README
+  needed: approved ids and English labels; mine are provisional and marked in a code comment
+```
+```
+CODEX-ASSIST-GAP
+  kind: context
+  question: "Counted under their real type when possible" for platform articles
+  blocked-by: an article's category is the only type signal, and for these it is the platform
+  needed: a rule for the real type (for example a field or a CAT_MAP use); until then they go to `other`
+```
+
+verified: 6  assumed: 3  gaps: 2  findings: 0
+
+The three assumptions:
+- Month keys sort as `YYYY-MM` strings.
+- Injected month scripts populate `TRACKER_MONTH[tracker][month]`, as the existing code expects.
+- Day files carry `id`, `category` and `tags`, as the existing code expects.
