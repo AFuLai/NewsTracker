@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>控制台營運板</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=Noto+Sans+TC:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F4F5F7}
+a{color:#1E4FD0}a:hover{color:#163C9E}
+button{font:inherit;cursor:pointer}
+</style>
+</helmet>
+<div style="font-family: 'IBM Plex Sans','Noto Sans TC',sans-serif; color: #15181D; font-size: 13px; background: #F4F5F7; min-height: 820px; box-sizing: border-box;">
+  <header style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; padding: 10px 20px; background: #15181D; color: #F4F5F7;">
+    <strong style="font-size: 14px; letter-spacing: .02em;">NewsTracker 控制台</strong>
+    <span style="display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border: 1px solid #3A414D; border-radius: 999px; font-size: 12px;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #8B95A5;"></span>閒置</span>
+    <span style="color: #AEB6C2;">上次執行 [日期 時間] · [結果]</span>
+    <span style="flex-grow: 1;"></span>
+    <span style="font-family: 'IBM Plex Mono',monospace; color: #AEB6C2;">⏱ —  ETA —</span>
+    <button style="background: #1E4FD0; color: #fff; border: 0; border-radius: 6px; padding: 8px 16px; min-height: 36px;">開始執行</button>
+  </header>
+
+  <main style="max-width: 1440px; margin: 0 auto; padding: 12px 20px; display: flex; flex-wrap: wrap; gap: 12px;">
+    <section style="flex: 7 1 560px; min-width: 0; background: #fff; border: 1px solid #DADEE5; border-radius: 8px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px;">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <h2 style="margin: 0; font-size: 12px; font-weight: 600; letter-spacing: .06em; color: #4A5260;">執行</h2>
+        <span style="flex-grow: 1;"></span>
+        <button style="background: none; border: 1px solid #DADEE5; border-radius: 6px; padding: 4px 10px; min-height: 32px;">設定 ▾</button>
+      </div>
+      <div style="display: grid; grid-template-columns: 110px minmax(0,1fr) 72px; gap: 6px 10px; align-items: center;">
+        <span>○ 抓取</span><div style="height: 6px; background: #EEF0F3; border-radius: 3px;"></div><span style="font-family: 'IBM Plex Mono',monospace; color: #5B6472; text-align: right;">—</span>
+        <span>○ 篩選</span><div style="height: 6px; background: #EEF0F3; border-radius: 3px;"></div><span style="font-family: 'IBM Plex Mono',monospace; color: #5B6472; text-align: right;">—</span>
+        <span>○ 摘要</span><div style="height: 6px; background: #EEF0F3; border-radius: 3px;"></div><span style="font-family: 'IBM Plex Mono',monospace; color: #5B6472; text-align: right;">—</span>
+        <span>○ 翻譯</span><div style="height: 6px; background: #EEF0F3; border-radius: 3px;"></div><span style="font-family: 'IBM Plex Mono',monospace; color: #5B6472; text-align: right;">—</span>
+        <span>○ 寫入</span><div style="height: 6px; background: #EEF0F3; border-radius: 3px;"></div><span style="font-family: 'IBM Plex Mono',monospace; color: #5B6472; text-align: right;">—</span>
+      </div>
+      <div style="border-top: 1px solid #EEF0F3; padding-top: 8px; color: #5B6472;">提示列：[目前階段的單行訊息]</div>
+      <div style="display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 8px; border-top: 1px solid #EEF0F3; padding-top: 8px;">
+        <div><div style="color: #5B6472; font-size: 11px;">新抓取</div><div style="font-size: 18px; font-weight: 600;">[n]</div></div>
+        <div><div style="color: #5B6472; font-size: 11px;">已摘要</div><div style="font-size: 18px; font-weight: 600;">[n]</div></div>
+        <div><div style="color: #5B6472; font-size: 11px;">已寫入</div><div style="font-size: 18px; font-weight: 600;">[n]</div></div>
+        <div><div style="color: #5B6472; font-size: 11px;">失敗</div><div style="font-size: 18px; font-weight: 600;">[n]</div></div>
+      </div>
+    </section>
+
+    <div style="flex: 5 1 400px; min-width: 0; display: flex; flex-direction: column; gap: 12px;">
+      <section style="background: #fff; border: 1px solid #DADEE5; border-radius: 8px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px;">
+        <h2 style="margin: 0; font-size: 12px; font-weight: 600; letter-spacing: .06em; color: #4A5260;">發布</h2>
+        <div style="display: flex; flex-wrap: wrap; gap: 6px 16px; color: #5B6472;"><span>狀態 閒置</span><span>頻道 —</span><span>完成時間 —</span></div>
+        <div style="display: flex; gap: 8px;">
+          <button style="background: #fff; border: 1px solid #DADEE5; border-radius: 6px; padding: 6px 12px; min-height: 36px;">預覽頻道發布</button>
+          <button style="background: #15181D; color: #fff; border: 0; border-radius: 6px; padding: 6px 12px; min-height: 36px;">正式發布</button>
+        </div>
+      </section>
+      <section style="background: #fff; border: 1px solid #DADEE5; border-radius: 8px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px;">
+        <h2 style="margin: 0; font-size: 12px; font-weight: 600; letter-spacing: .06em; color: #4A5260;">LLM 端點</h2>
+        <div style="display: flex; gap: 8px; align-items: center;">
+          <span style="width: 8px; height: 8px; border-radius: 50%; background: #1E7F4F;"></span>
+          <span style="font-family: 'IBM Plex Mono',monospace;">[端點名稱]</span>
+          <span style="flex-grow: 1;"></span>
+          <button style="background: none; border: 1px solid #DADEE5; border-radius: 6px; padding: 4px 10px; min-height: 32px;">切換 ▾</button>
+        </div>
+        <div style="display: flex; gap: 8px; align-items: center; color: #5B6472;">遠端時段 [__:__–__:__] · 並發 [n] <button style="margin-left: auto; background: none; border: 1px solid #DADEE5; border-radius: 6px; padding: 4px 10px; min-height: 32px;">套用</button></div>
+      </section>
+      <section style="background: #fff; border: 1px solid #DADEE5; border-radius: 8px; padding: 12px 14px; display: flex; align-items: center; gap: 8px;">
+        <h2 style="margin: 0; font-size: 12px; font-weight: 600; letter-spacing: .06em; color: #4A5260;">CRA 庫</h2>
+        <span style="color: #5B6472;">[n] 個主題 · 上次更新 [日期]</span>
+        <button style="margin-left: auto; background: none; border: 1px solid #DADEE5; border-radius: 6px; padding: 4px 10px; min-height: 32px;">更新</button>
+      </section>
+    </div>
+
+    <section style="flex: 1 1 100%; background: #fff; border: 1px solid #DADEE5; border-radius: 8px; padding: 10px 14px; display: flex; flex-direction: column; gap: 8px;">
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px;">
+        <h2 style="margin: 0; font-size: 12px; font-weight: 600; letter-spacing: .06em; color: #4A5260;">▾ 網站預覽</h2>
+        <label style="display: inline-flex; gap: 4px; align-items: center;">情境 <select style="font: inherit; min-height: 32px;"><option>預設</option><option>快讀</option><option>事件追蹤</option></select></label>
+        <label style="display: inline-flex; gap: 4px; align-items: center;">寬度 <select style="font: inherit; min-height: 32px;"><option>桌面</option><option>820</option><option>390</option></select></label>
+        <button style="background: #1E4FD0; color: #fff; border: 0; border-radius: 6px; padding: 6px 12px; min-height: 32px;">本機預覽</button>
+        <a href="#">新分頁開啟</a>
+        <button style="margin-left: auto; background: none; border: 1px solid #DADEE5; border-radius: 6px; padding: 4px 10px; min-height: 32px;">全螢幕</button>
+      </div>
+      <div style="height: 260px; border: 1px dashed #C3C9D3; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #5B6472;">[網站預覽框・展開時佔 45% 視窗高]</div>
+    </section>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":820}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

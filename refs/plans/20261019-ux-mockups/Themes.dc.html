@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>配色與圖樣</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;family=Noto+Sans+TC:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#E9ECF1}
+button{font:inherit;cursor:pointer}
+</style>
+</helmet>
+<div style="font-family: 'IBM Plex Sans','Noto Sans TC',sans-serif; color: #15181D; font-size: 14px; background: #E9ECF1; min-height: 1400px; padding: 20px 24px; box-sizing: border-box; display: flex; flex-direction: column; gap: 16px;">
+  <div style="display: flex; flex-wrap: wrap; align-items: baseline; gap: 12px;">
+    <h1 style="margin: 0; font-size: 20px;">配色與圖樣</h1>
+    <span style="color: #4A5260;">點一款放大預覽；每款＝底色＋主色（數據）＋警示色（關注命中）＋背景圖樣</span>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px;">
+    <sc-for list="{{ themes }}" as="t" hint-placeholder-count="6">
+      <button onClick="{{ t.pick }}" style="text-align: left; padding: 0; border-radius: 10px; overflow: hidden; border: 2px solid {{ t.ring }}; background: #fff; display: flex; flex-direction: column;">
+        <span style="display: block; height: 120px; background-color: {{ t.bg }}; background-image: {{ t.pattern }}; background-size: {{ t.size }}; padding: 12px; box-sizing: border-box;">
+          <span style="display: flex; align-items: baseline; gap: 8px;">
+            <span style="font-size: 13px; font-weight: 600; color: {{ t.text }};">漏洞威脅</span>
+            <span style="flex-grow: 1;"></span>
+            <span style="font-family: 'IBM Plex Mono',monospace; font-size: 22px; font-weight: 600; color: {{ t.text }};">579</span>
+          </span>
+          <span style="display: flex; align-items: flex-end; gap: 2px; height: 30px; margin-top: 8px;">
+            <sc-for list="{{ t.bars }}" as="b" hint-placeholder-count="14">
+              <span style="flex: 1 1 0; height: {{ b.h }}; background: {{ b.c }}; border-radius: 1px;"></span>
+            </sc-for>
+          </span>
+          <span style="display: flex; gap: 4px; margin-top: 8px;">
+            <span style="font-family: 'IBM Plex Mono',monospace; font-size: 11px; background: {{ t.warn }}; color: {{ t.warnText }}; border-radius: 3px; padding: 2px 6px;">KEV 55</span>
+            <span style="font-size: 11px; color: {{ t.muted }}; border: 1px solid {{ t.line }}; border-radius: 3px; padding: 1px 6px;">#CISA</span>
+            <span style="font-size: 11px; color: {{ t.muted }}; border: 1px solid {{ t.line }}; border-radius: 3px; padding: 1px 6px;">#RCE</span>
+          </span>
+        </span>
+        <span style="display: flex; align-items: center; gap: 8px; padding: 10px 12px;">
+          <span style="font-weight: 600;">{{ t.name }}</span>
+          <span style="color: #5B6472; font-size: 12px;">{{ t.pname }}</span>
+          <span style="flex-grow: 1;"></span>
+          <span style="width: 14px; height: 14px; border-radius: 3px; background: {{ t.bg }}; border: 1px solid #C3C9D3;"></span>
+          <span style="width: 14px; height: 14px; border-radius: 3px; background: {{ t.accent }};"></span>
+          <span style="width: 14px; height: 14px; border-radius: 3px; background: {{ t.warn }};"></span>
+        </span>
+      </button>
+    </sc-for>
+  </div>
+
+  <section style="border-radius: 10px; overflow: hidden; background-color: {{ sel.bg }}; background-image: {{ sel.pattern }}; background-size: {{ sel.size }}; color: {{ sel.text }}; padding: 16px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px;">
+      <span style="width: 8px; height: 8px; border-radius: 50%; background: {{ sel.accent }};"></span>
+      <strong style="font-size: 16px;">我的關注 / 情勢儀表</strong>
+      <span style="font-family: 'IBM Plex Mono',monospace; font-size: 12px; color: {{ sel.muted }};">預覽：{{ sel.name }} · {{ sel.pname }}</span>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px;">
+      <sc-for list="{{ sel.tiles }}" as="x" hint-placeholder-count="4">
+        <div style="border: 1px solid {{ sel.line }}; border-radius: 8px; background: {{ sel.card }}; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+          <div style="display: flex; align-items: baseline; gap: 8px;">
+            <span style="font-weight: 600;">{{ x.name }}</span>
+            <span style="flex-grow: 1;"></span>
+            <span style="font-family: 'IBM Plex Mono',monospace; font-size: 24px; font-weight: 600;">{{ x.n }}</span>
+          </div>
+          <div style="display: flex; align-items: flex-end; gap: 2px; height: 30px;">
+            <sc-for list="{{ x.bars }}" as="b" hint-placeholder-count="14">
+              <span style="flex: 1 1 0; height: {{ b.h }}; background: {{ b.c }}; border-radius: 1px;"></span>
+            </sc-for>
+          </div>
+          <div style="display: flex; flex-wrap: wrap; gap: 4px; min-height: 20px;">
+            <sc-for list="{{ x.hits }}" as="h" hint-placeholder-count="1">
+              <span style="font-family: 'IBM Plex Mono',monospace; font-size: 11px; background: {{ sel.warn }}; color: {{ sel.warnText }}; border-radius: 3px; padding: 2px 6px;">{{ h }}</span>
+            </sc-for>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1400}}'>
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { picked: 0 }; }
+  renderVals() {
+    const grid = (c) => 'linear-gradient(' + c + ' 1px, transparent 1px), linear-gradient(90deg, ' + c + ' 1px, transparent 1px)';
+    const TH = [
+      { name: '深海青', pname: '細格線', bg: '#070B12', card: 'rgba(13,20,32,0.92)', text: '#E6EEF7', muted: '#8EA2BB', line: '#1F2F45', accent: '#5FE1FF', dim: '#2A6F8A', warn: '#FFB547', warnText: '#070B12', pattern: grid('rgba(95,225,255,0.07)'), size: '28px 28px' },
+      { name: '終端綠', pname: '掃描線', bg: '#040A06', card: 'rgba(8,20,12,0.92)', text: '#DDF7E6', muted: '#87B597', line: '#1A3A24', accent: '#39FF88', dim: '#1E7A46', warn: '#FFD23F', warnText: '#040A06', pattern: 'repeating-linear-gradient(0deg, rgba(57,255,136,0.06) 0 1px, transparent 1px 4px)', size: 'auto' },
+      { name: '霓虹紫', pname: '點陣', bg: '#0C0716', card: 'rgba(22,12,38,0.92)', text: '#EFE7FF', muted: '#A898C8', line: '#2E2050', accent: '#B98CFF', dim: '#5B3E99', warn: '#FF6FB1', warnText: '#0C0716', pattern: 'radial-gradient(rgba(185,140,255,0.22) 1px, transparent 1.5px)', size: '16px 16px' },
+      { name: '琥珀警戒', pname: '斜紋', bg: '#100C05', card: 'rgba(28,20,8,0.92)', text: '#FBF1DD', muted: '#BFA77E', line: '#3A2C12', accent: '#FFB000', dim: '#7A5A10', warn: '#FF5C5C', warnText: '#100C05', pattern: 'repeating-linear-gradient(45deg, rgba(255,176,0,0.06) 0 2px, transparent 2px 12px)', size: 'auto' },
+      { name: '鋼藍淺色', pname: '藍圖格', bg: '#EEF3F8', card: 'rgba(255,255,255,0.9)', text: '#0F1A2A', muted: '#4D5D73', line: '#C9D5E3', accent: '#0B5CD5', dim: '#8FB1E6', warn: '#C2410C', warnText: '#FFFFFF', pattern: grid('rgba(11,92,213,0.08)') + ', ' + grid('rgba(11,92,213,0.04)'), size: '64px 64px, 64px 64px, 16px 16px, 16px 16px' },
+      { name: '北極白', pname: '無圖樣', bg: '#FAFBFC', card: '#FFFFFF', text: '#14181F', muted: '#5B6472', line: '#DFE3E9', accent: '#0F766E', dim: '#8CC7C1', warn: '#B4460C', warnText: '#FFFFFF', pattern: 'none', size: 'auto' },
+      { name: '護眼暖紙', pname: '抗藍光・紙紋', bg: '#F4ECD8', card: 'rgba(251,246,234,0.92)', text: '#3B2F1E', muted: '#6B583B', line: '#E0D2B4', accent: '#A3541A', dim: '#D9B98C', warn: '#9C2F1F', warnText: '#FFFFFF', pattern: 'repeating-linear-gradient(0deg, rgba(120,90,40,0.05) 0 1px, transparent 1px 6px)', size: 'auto' },
+      { name: '暖光夜讀', pname: '抗藍光・昏暗', bg: '#1A140D', card: 'rgba(36,27,18,0.94)', text: '#EBDCC3', muted: '#B39E7E', line: '#3A2D1E', accent: '#E0A458', dim: '#7A5A33', warn: '#E8735A', warnText: '#1A140D', pattern: 'radial-gradient(rgba(224,164,88,0.10) 1px, transparent 1.5px)', size: '20px 20px' },
+      { name: '夜燈紅光', pname: '幾乎無藍光', bg: '#120807', card: 'rgba(27,13,11,0.94)', text: '#E8BFAF', muted: '#B88A7A', line: '#3A1E19', accent: '#E06A4E', dim: '#7A3428', warn: '#F2B33D', warnText: '#120807', pattern: 'none', size: 'auto' },
+      { name: '昏暗石墨', pname: '低對比・柔光', bg: '#1C1D1F', card: 'rgba(35,36,39,0.95)', text: '#C9C6C0', muted: '#9A968F', line: '#34363A', accent: '#A8B3A0', dim: '#5C6358', warn: '#D49A6A', warnText: '#1C1D1F', pattern: grid('rgba(200,198,192,0.035)'), size: '32px 32px' }
+    ];
+    const S = [24,26,18,21,10,2,10,34,38,43,25,1,3,6];
+    const bars = (t, s) => { const mx = Math.max(...s); return s.map((v, i) => ({ h: Math.max(2, Math.round(30 * v / mx)) + 'px', c: i >= s.length - 3 ? t.accent : t.dim })); };
+    const themes = TH.map((t, i) => ({ ...t, bars: bars(t, S), ring: this.state.picked === i ? '#15181D' : 'transparent', pick: () => this.setState({ picked: i }) }));
+    const t = TH[this.state.picked];
+    const tiles = [
+      ['漏洞威脅', '579', S, ['KEV 55', '勒索 26']],
+      ['重大事件', '82', [6,1,4,4,1,1,7,6,5,5,4,0,1,1], ['勒索 16']],
+      ['法規標準', '44', [3,0,1,2,0,0,1,3,1,1,1,0,0,2], ['CRA 法規 8']],
+      ['前瞻技術', '118', [4,7,2,2,2,0,0,4,5,6,7,0,1,1], []]
+    ].map(([name, n, s, hits]) => ({ name, n, hits, bars: bars(t, s) }));
+    return { themes, sel: { ...t, tiles } };
+  }
+}
+</script>
+</body>
+</html>

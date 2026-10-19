@@ -1,0 +1,12 @@
+{
+  "id": "20261019-ux-research",
+  "engine": "agy",
+  "pin_engine": true,
+  "mode": "plan",
+  "root": "/opt/tracker/repo",
+  "prompt_file": ".common/codex-assist/tasks/20261019-ux-research.prompt.md",
+  "inputs_glob": "tracker/web_dashboard.py ui/index.html refs/plans/20261019-watch-and-frame-decisions.md",
+  "timeout_s": 1800,
+  "model": "claude-sonnet-5-5-high",
+  "note": "User 2026-10-19 /agy-assist: console too loose (Canva business templates); watch should integrate the four views with card/list/map presentations. User has no UX proposal; agy proposes, session builds mockups for the user to pick."
+}

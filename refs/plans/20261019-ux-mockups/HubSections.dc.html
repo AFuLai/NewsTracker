@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>我的關注・分區</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=Noto+Sans+TC:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F4F5F7}
+a{color:#1E4FD0}a:hover{color:#163C9E}
+button{font:inherit;cursor:pointer}
+</style>
+</helmet>
+<div style="font-family: 'IBM Plex Sans','Noto Sans TC',sans-serif; color: #15181D; font-size: 14px; background: #F4F5F7; min-height: 980px;">
+  <header style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; padding: 12px 24px; background: #fff; border-bottom: 1px solid #DADEE5;">
+    <strong style="font-size: 18px;">我的關注</strong>
+    <span style="color: #5B6472;">依新聞類型分區，不分來源版面 · 近 30 天</span>
+    <span style="flex-grow: 1;"></span>
+    <nav aria-label="呈現方式" style="display: flex; border: 1px solid #DADEE5; border-radius: 8px; overflow: hidden;">
+      <a href="HubSections.dc.html" style="padding: 8px 14px; background: #15181D; color: #fff; text-decoration: none;">分區</a>
+      <a href="HubTiles.dc.html" style="padding: 8px 14px; text-decoration: none; color: #15181D;">儀表</a>
+    </nav>
+    <div style="display: flex; border: 1px solid #DADEE5; border-radius: 8px; overflow: hidden;">
+      <button onClick="{{ setCards }}" style="border: 0; padding: 8px 12px; min-height: 36px; background: {{ cardBg }}; color: {{ cardFg }};">卡片</button>
+      <button onClick="{{ setList }}" style="border: 0; padding: 8px 12px; min-height: 36px; background: {{ listBg }}; color: {{ listFg }};">條列</button>
+    </div>
+    <button style="background: none; border: 1px solid #DADEE5; border-radius: 8px; padding: 8px 12px; min-height: 36px;">規則設定</button>
+  </header>
+
+  <div style="max-width: 1240px; margin: 0 auto; padding: 16px 24px; display: flex; flex-direction: column; gap: 20px;">
+    <div style="display: flex; flex-wrap: wrap; gap: 8px 20px; align-items: baseline; padding: 12px 16px; background: #fff; border: 1px solid #DADEE5; border-radius: 8px;">
+      <strong>你的簡報</strong>
+      <span>自上次造訪（[日期]）新增 <strong style="color: #B4460C;">[n]</strong> 篇 · [n] 條規則有新內容</span>
+    </div>
+
+    <sc-for list="{{ sections }}" as="s" hint-placeholder-count="3">
+      <section style="display: flex; flex-direction: column; gap: 10px;">
+        <div style="display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; border-bottom: 2px solid #15181D; padding-bottom: 6px;">
+          <h2 style="margin: 0; font-size: 17px;">{{ s.name }}</h2>
+          <span style="color: #B4460C; font-weight: 600;">新 [n]</span>
+          <span style="color: #5B6472;">共 {{ s.total }} 篇</span>
+          <span style="color: #B4460C; font-size: 12px;">{{ s.split }}</span>
+          <a href="#" style="margin-left: auto;">全部 ›</a>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+          <sc-for list="{{ s.tags }}" as="g" hint-placeholder-count="4">
+            <button style="font-size: 12px; background: #fff; border: 1px solid #DADEE5; border-radius: 999px; padding: 4px 10px; min-height: 30px; color: #4A5260;">#{{ g }}</button>
+          </sc-for>
+        </div>
+        <sc-if value="{{ cards }}" hint-placeholder-val="{{ true }}">
+          <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px;">
+            <sc-for list="{{ s.items }}" as="it" hint-placeholder-count="3">
+              <article style="background: #fff; border: 1px solid #DADEE5; border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+                <span style="font-size: 12px; color: #5B6472;">{{ it.date }}</span>
+                <h3 style="margin: 0; font-size: 15px; line-height: 1.45;">{{ it.title }}</h3>
+                <span style="font-size: 12px; color: #5B6472; margin-top: auto;">{{ it.source }}</span>
+              </article>
+            </sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{ list }}" hint-placeholder-val="{{ false }}">
+          <ol style="list-style: none; margin: 0; padding: 0; background: #fff; border: 1px solid #DADEE5; border-radius: 8px;">
+            <sc-for list="{{ s.items }}" as="it" hint-placeholder-count="3">
+              <li style="display: flex; gap: 12px; padding: 8px 12px; border-bottom: 1px solid #EEF0F3;">
+                <span style="font-family: 'IBM Plex Mono',monospace; font-size: 12px; color: #5B6472; flex: 0 0 84px;">{{ it.date }}</span>
+                <span style="flex: 1 1 auto; min-width: 0;">{{ it.title }}</span>
+                <span style="font-size: 12px; color: #5B6472;">{{ it.source }}</span>
+              </li>
+            </sc-for>
+          </ol>
+        </sc-if>
+      </section>
+    </sc-for>
+
+    <section style="display: flex; flex-direction: column; gap: 10px;">
+      <div style="display: flex; align-items: baseline; gap: 14px; border-bottom: 2px solid #15181D; padding-bottom: 6px;">
+        <h2 style="margin: 0; font-size: 17px;">CRA 庫近期更新</h2>
+        <span style="color: #5B6472;">NEW / UPDATED 主題（待裁示是否納入）</span>
+      </div>
+      <div style="padding: 12px; background: #fff; border: 1px dashed #C3C9D3; border-radius: 8px; color: #5B6472;">[CRA 庫新增或更新的主題列]</div>
+    </section>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":980}}'>
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { mode: 'cards' }; }
+  renderVals() {
+    const cards = this.state.mode === 'cards';
+    const sections = [
+      { name: '漏洞威脅', total: 579, split: '關注 KEV 55 · 勒索 26 · 零時差 8', tags: ['CISA', 'RCE', 'KEV', '零日漏洞', 'Linux', 'Windows'], items: [
+        { tracker: '資安', date: '2026-10-19', source: 'iThome', title: 'CISA更新KEV名單警告BeyondTrust漏洞CVE-2026-102764遭利用，籲用戶立即修補並限制外部存取' },
+        { tracker: '資安', date: '2026-10-19', source: 'iThome', title: 'CISA警告：Fortinet與BeyondTrust兩大漏洞已遭積極利用，要求聯邦機構緊急修補' },
+        { tracker: '資安', date: '2026-10-16', source: 'CISA KEV Catalog', title: 'CISA警告：BeyondTrust Remote Support面臨嚴重認證繞過漏洞CVE-2026-102764，已列入已知利用漏洞清單' } ] },
+      { name: '法規標準', total: 44, split: '關注 CRA 法規 8 · CRA 標準 4 · 指引 4', tags: ['CRA', 'SBOM', 'KISA', 'OpenSSF', 'ETSI'], items: [
+        { tracker: 'EU CRA', date: '2026-10-09', source: 'Red Hat Security Blog', title: '歐盟《網路韌性法案》衝擊開源軟體：企業需掌握供應鏈風險與安全設計原則' },
+        { tracker: 'EU CRA', date: '2026-10-06', source: 'OpenSSF Blog', title: 'OpenSSF 宣布擴大成員及資源，強化應對 EU CRA 法規與開源安全' },
+        { tracker: 'EU CRA', date: '2026-10-02', source: 'Red Hat Security Blog', title: '歐盟《網路韌性法案》要求企業強化軟體供應鏈風險管理與開源元件支持' } ] },
+      { name: '重大事件', total: 82, split: '關注 勒索 16', tags: ['資料外洩', '勒索軟體', '網路攻擊', 'FBI'], items: [
+        { tracker: '資安', date: '2026-10-19', source: 'iThome', title: '日本漢堡王App會員資訊遭駭：千萬筆個人資料外洩，包含姓名至訂單紀錄' },
+        { tracker: '資安', date: '2026-10-18', source: 'The Hacker News', title: 'ConnectWise 宣布停用多個應用程式身份，調查遭惡意取得權限入侵 Microsoft 365 環境' },
+        { tracker: '資安', date: '2026-10-16', source: 'iThome', title: '英國法律援助機構（LAA）遭網路攻擊，外洩資料可追溯至1978年，涉及大量歷史個人資料' } ] }
+    ];
+    return {
+      sections, cards, list: !cards,
+      cardBg: cards ? '#1E4FD0' : '#fff', cardFg: cards ? '#fff' : '#15181D',
+      listBg: cards ? '#fff' : '#1E4FD0', listFg: cards ? '#15181D' : '#fff',
+      setCards: () => this.setState({ mode: 'cards' }),
+      setList: () => this.setState({ mode: 'list' })
+    };
+  }
+}
+</script>
+</body>
+</html>

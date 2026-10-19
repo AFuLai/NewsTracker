@@ -1,0 +1,70 @@
+wc -l /opt/tracker/repo/tracker/web_dashboard.py /opt/tracker/repo/ui/index.html /opt/tracker/repo/refs/plans/20261019-watch-and-frame-decisions.md; grep -n "<div class=\"card\|<h2\|<section\|<iframe\|^def \|^_HTML\|^class " /opt/tracker/repo/tracker/web_dashboard.py | head -150
+grep -n "WATCH_RULES\|tracker_watch\|PRESETS\|view-select\|function \(render\|apply\|set\|load\|save\|watch\|matches\|build\|init\|draw\|layout\|filter\|visible\|card\|read\)[A-Za-z]*\|only-watch\|onlyWatch\|watchOnly\|LAYOUTS\|const VIEWS\|data-view\|currentView\|state\.view" /opt/tracker/repo/ui/index.html | head -200
+cd /home/afu/.gemini/antigravity-cli/brain/f7b63519-7470-494c-897f-1c1689752090/.system_generated/steps; for n in 16 17 18 19 20; do echo "=== $n"; wc -c $n/content.md; head -c 2500 $n/content.md | tr -s '\n' | head -60; done
+ls /opt/tracker/repo/ui /opt/tracker/repo/ui/data | head -40; grep -n "TRACKER_MANIFESTS" -r /opt/tracker/repo --include=*.py --include=*.js -l | head
+cd /opt/tracker/repo/tracker; grep -n "TRACKER_MANIFESTS\|TRACKER_DAYS\|TRACKER_YEAR\|TRACKER_MONTH\|data-\|trackers" render.py | head -70; grep -n "_HTML\|/site/\|pv=1\|def do_GET\|ui/index" web_dashboard.py | head -30
+cd /opt/tracker/repo; ls; ls docs 2>/dev/null | head; find . -name "data-2026*.js" -not -path "./.git/*" | head -3; find . -name "manifest*" -not -path "./.git/*" | head
+cd /opt/tracker/repo/tracker/templates; cat manifest_root.js.j2 | head -40; echo ----; cat manifest_month.js.j2 | head -20; echo; sed -n 850,913p ../web_dashboard.py
+cd /home/afu/.gemini/antigravity-cli/brain/f7b63519-7470-494c-897f-1c1689752090/.system_generated/steps; head -c 3000 16/content.md; echo; echo =====; python3 - <<'E'
+import re
+for n,name in [(16,'verge'),(17,'ithome'),(18,'technews'),(19,'bbc'),(20,'feedly')]:
+    s=open(f'{n}/content.md',encoding='utf-8',errors='replace').read()
+    print('=====',name,len(s))
+    t=re.sub(r'<script.*?</script>|<style.*?</style>','',s,flags=re.S)
+    t=re.sub(r'<[^>]+>','\n',t)
+    t=re.sub(r'\n\s*\n+','\n',t)
+    lines=[l…
+cd /home/afu/.gemini/antigravity-cli/brain/f7b63519-7470-494c-897f-1c1689752090/.system_generated/steps; python3 - <<'E'
+import re,html
+def clean(s):
+    s=re.sub(r'<script.*?</script>|<style.*?</style>|<!--.*?-->','',s,flags=re.S)
+    return s
+for n,name in [(16,'verge'),(17,'ithome'),(18,'technews'),(19,'bbc')]:
+    s=clean(open(f'{n}/content.md',encoding='utf-8',errors='replace').read())
+    print('=====',name,len(s))
+    hs=re.findall(r'<h([1-4])[^>]*>(.*?)</h\1>',s,flags=re.S)
+    out=[]
+    for lv,h i…
+cd /home/afu/.gemini/antigravity-cli/brain/f7b63519-7470-494c-897f-1c1689752090/.system_generated/steps; python3 - <<'E'
+import re,html
+for n,name in [(16,'verge'),(19,'bbc'),(17,'ithome'),(18,'technews')]:
+    s=open(f'{n}/content.md',encoding='utf-8',errors='replace').read()
+    s=re.sub(r'<script.*?</script>|<style.*?</style>|<!--.*?-->','',s,flags=re.S)
+    t=html.unescape(re.sub(r'<[^>]+>','\n',s))
+    L=[re.sub(r'\s+',' ',x).strip() for x in t.split('\n')]
+    L=[x for x in L if 3<len(x)<80]
+    print…
+cd /home/afu/.gemini/antigravity-cli/brain/f7b63519-7470-494c-897f-1c1689752090/.system_generated/steps; python3 - <<'E'
+import re,html
+for n,name in [(16,'verge'),(19,'bbc'),(45,'gnews'),(46,'inoreader')]:
+    s=open(f'{n}/content.md',encoding='utf-8',errors='replace').read()
+    s=re.sub(r'<script.*?</script>|<style.*?</style>|<!--.*?-->','',s,flags=re.S)
+    t=html.unescape(re.sub(r'<[^>]+>','\n',s))
+    L=[re.sub(r'\s+',' ',x).strip() for x in t.split('\n')]
+    L=[x for x in L if 3<len(x)<90 and not x.…
+cd /home/afu/.gemini/antigravity-cli/brain/f7b63519-7470-494c-897f-1c1689752090/.system_generated/steps; python3 - <<'E'
+import re,html
+def txt(n):
+    s=open(f'{n}/content.md',encoding='utf-8',errors='replace').read()
+    s=re.sub(r'<script.*?</script>|<style.*?</style>|<!--.*?-->','',s,flags=re.S)
+    t=html.unescape(re.sub(r'<[^>]+>','\n',s))
+    return [re.sub(r'\s+',' ',x).strip() for x in t.split('\n') if x.strip()]
+g=txt(45)
+for i,l in enumerate(g):
+    if l in ('For you','Following','Local','Your br…
+cd /opt/tracker/repo/ui; grep -n "^header\|^  header\|\.hd-row1\s*{\|\.hd-row2\s*{\|\.cards-grid\s*{\|\.river-row\s*{\|\.watch-badge\|\.watch-pill\|#watch-panel\s*{\|--\(radius\|gap\)" index.html | head -30; grep -n "\"os\"\|'os'" index.html | head -5; grep -n "tracker_lastvisit\|lastVisit\|last_visit" index.html | head; grep -c "" /opt/tracker/repo/tests/*.py 2>/dev/null | head -0; ls /opt/tracker/repo/tests | head -30
+cd /opt/tracker/repo; ls tests | sed -n 30,80p; grep -ln "watch\|index.html" tests/*.py | head; sed -n 186,200p ui/index.html; sed -n 240,255p ui/index.html; sed -n 606,625p ui/index.html; sed -n 645,660p ui/index.html; grep -n "TRACKER_DAYS" ui/index.html tracker/templates/data_day.js.j2 | head -5; cat tracker/templates/data_day.js.j2 | head -12
+cd /opt/tracker/repo; grep -n "index.html\|node\|watch" tests/test_sync_index.py | head -12; echo ---; grep -n "_HTML\|pvFrame\|sec-\|id=" tests/test_web_dashboard.py | head -20; echo ---; grep -n "playwright\|selenium\|chromium" tests/test_browser.py | head -3; echo ---; awk 'NR>=321 && NR<=604' tracker/web_dashboard.py | grep -ci "log"; grep -n "Content-Security\|<script src\|cdn" ui/index.html | head; grep -n "t('watchRules')\|watchRules:'" ui/index.html | head -3; grep -c "count" tracker/templates/manif…
+cd /opt/tracker/repo; grep -rln "watchMatches\|parseWatch\|tracker_watch" tests ui ops refs 2>/dev/null; sed -n 1,25p ui/audit.js | head -30; ls ops | head
+python3 - <<'E'
+W='/opt/tracker/repo/tracker/web_dashboard.py'; I='/opt/tracker/repo/ui/index.html'; R='/opt/tracker/repo/tracker/render.py'
+P='/opt/tracker/repo/refs/plans/20261019-watch-and-frame-decisions.md'
+MR='/opt/tracker/repo/tracker/templates/manifest_root.js.j2'; MM='/opt/tracker/repo/tracker/templates/manifest_month.js.j2'
+C=[
+(W,326,'--bg:#f5f6fa; --card:#ffffff;'),(W,341,'.topbar { position:sticky;'),(W,352,'max-width:1080px'),(W,354,'padding:32px 36px; margin-bottom:32px;'),
+(W,359,'.hero .sta…
+which node; node -v; python3 - <<'E'
+I='/opt/tracker/repo/ui/index.html'; R='/opt/tracker/repo/tracker/render.py'; P='/opt/tracker/repo/refs/plans/20261019-watch-and-frame-decisions.md'
+L=open(I).read().split('\n'); r=open(R).read().split('\n'); p=open(P).read().split('\n')
+for f,n,q in [(L,2849,'const tk = state.currentTracker;'),(L,2071,'// CRA reference-library pill'),(r,115,'rest of the day'),(p,15,'涉及對象 / Who · 影響地區 / Where'),(L,1587,"watchOnly:'只看關注'"),(L,2088,'function selectLibrary() {')]:
+    print…

@@ -1,0 +1,107 @@
+{
+  "task_id": "20261019-ux-research",
+  "mode": "plan",
+  "requested": {
+    "root": "/opt/tracker/repo",
+    "sandbox": "host-ro+root-ro",
+    "model": "claude-sonnet-5-5-high",
+    "egress": "cloud",
+    "allow_common": false,
+    "timeout_s": 1800,
+    "inputs_glob": "tracker/web_dashboard.py ui/index.html refs/plans/20261019-watch-and-frame-decisions.md"
+  },
+  "actual": {
+    "engine": "agy",
+    "codex_bin": "/home/afu/.local/bin/agy",
+    "codex_version": "1.4.2",
+    "session_id": "f7b63519-7470-494c-897f-1c1689752090",
+    "model": "claude-sonnet-5-5-high",
+    "cwd": "/opt/tracker/repo",
+    "sandbox": "host-ro+root-ro",
+    "denied_actions": [],
+    "host_fence": true,
+    "provider": "antigravity",
+    "rc": 0,
+    "elapsed_s": 377.7,
+    "tokens": 192154,
+    "usage": {
+      "fresh_input": 146201,
+      "cached_input": 1895959,
+      "output": 45953,
+      "reasoning": 0,
+      "raw": {
+        "input_tokens": 146201,
+        "output_tokens": 45953,
+        "thinking_tokens": 0,
+        "cache_read_tokens": 1895959,
+        "total_tokens": 192154
+      }
+    },
+    "effort": null,
+    "plan_usage": {},
+    "started_at": "2026-10-19T07:37:45Z",
+    "finished_at": "2026-10-19T07:44:03Z",
+    "ephemeral": false,
+    "commands": 18,
+    "machine": "afu-delta"
+  },
+  "role_sha256": "1cc596dacabf1cbfbcb6a8c50c4b0b0bc77d1e4528093742fbd058b591fd701f",
+  "sheet_sha256": null,
+  "acceptance_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "commands_sha256": [
+    "cbc39d452b0029886bc69f4c5449ee070fe4ffe89c64359ab6392ccf92f290d6",
+    "4e876c283704bd074664fc8e87264c31c95adc6f06572fd2b65ea834915f9f05",
+    "2ad7830b4ec09fcbef5c3db19f51eba7c307d605aacee237810d40ba1be672c9",
+    "1d172445e63204cf67e265cc3917ae924178f7dd3a481eba075a34b5617c32d6",
+    "f6b0a480fba3c146caa4d609c61e9d1471a63c60e824037b2aedbfd83b618baa",
+    "fd37280be35671570043cdc625226da3d668c26a45ef8ae0c2e973a89607b87d",
+    "5cec16e173e572551ffeecf23119852fbdb737a200912c8782b85c7237394a05",
+    "d7354773c3ef0e80c722ed047f08767091a98423637cbe0c1d28cd69d2119ee4",
+    "797f7a4d62a83e7ad8a710c7e0be832a5a6249cbbd59fd0a08b7ba1a42d33823",
+    "23127b7ced6c7cc9da8a1681697b3a0b59d049ea9440de25bdac6c4f892f1064",
+    "7cb21e1a7412cca791cecc9e0a2d48aef4844de8859125b2de8090386a8d467d",
+    "ee81f3515aac126aa1fcd27f3013ea8ccd041a881a9fb3f23af0e5bee53c38bc",
+    "f668fd8f009d9cbc252e2c49fa70421762906f32ff754b3d2c884e63e18d4413",
+    "4cad20d41efb2c53858d851692983f166419d94bfbb14804b9ffedcc61b8c2c8",
+    "508aa1fbddf390349409d7fdcf813086adfb5f8fe1a1d1176928328a3e6a78aa",
+    "e7bfa0306fbd2d85654c190859a3cbc01f69ff75bb0ead2e59178b7ad6e7f209",
+    "dd77294e837b5c1e57899996ab1bff3248bcca16a541b821ab5a3e4b7cd5211f",
+    "870eac698a9cbb6592b885c1e3c23e11bb194d6bbf70765ea166106eae29f7b3"
+  ],
+  "answer_path": "/opt/tracker/repo/.common/codex-assist/runs/20261019-ux-research/answer.txt",
+  "answer_shape": "summary-line",
+  "quote_gate": {
+    "status": "CLEAN",
+    "findings": 0
+  },
+  "verify": {
+    "reader_violation": false,
+    "reader_delta": [],
+    "ro_fence": true,
+    "unattributed_delta": [],
+    "backstop_unavailable": null,
+    "citations": {
+      "checked": 61,
+      "verified": 61,
+      "missed": [],
+      "short": 0,
+      "line_off": [],
+      "format": []
+    },
+    "probe_check": {
+      "judged": 0,
+      "unrunnable": [],
+      "unparsed": 0
+    }
+  },
+  "verdict": "SCORABLE",
+  "recorded_at": "2026-10-19T07:44:04Z",
+  "recorder": {
+    "name": "record.py",
+    "version": "0.10.0",
+    "sha256": "a95169da0c93f0338ffb624a4a972faecc040c21f105b48b4fb1869c93139156"
+  },
+  "verify_result": "OK",
+  "defects": [],
+  "defects_spec_sha256": "3326060632526913a879e96855534a9ea197c73ecd54d514f4dd6c2cde144ca4"
+}

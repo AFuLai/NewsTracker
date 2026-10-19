@@ -1,0 +1,426 @@
+我先讀程式碼與計畫文件,再抓取外部頁面。
+Canva 回 403。我試其他 Canva 網址,並讀 `ui/index.html` 的關注相關程式。
+Reuters 回 401,Canva 回 403。接著看已抓到的頁面,並讀 `index.html` 的狀態/渲染函式。
+Output got truncated for several pages; I'll extract each separately.
+# 設計研究與提案:控制台緊湊化 + 「我的關注」整合頁
+
+我只讀取、抓取與查證,沒有改動任何程式。工作樹中的 `.common/codex-assist/...` 是派工紀錄,不是我建立的。
+
+相關檔案:[web_dashboard.py](file:///opt/tracker/repo/tracker/web_dashboard.py)、[index.html](file:///opt/tracker/repo/ui/index.html)、[render.py](file:///opt/tracker/repo/tracker/render.py)、[決策文件](file:///opt/tracker/repo/refs/plans/20261019-watch-and-frame-decisions.md)
+
+## 0. 先講兩個缺口
+
+```
+CODEX-ASSIST-GAP
+  kind: context
+  question: 第 A 項要的「3 個 Canva 商業網站範本(名稱/URL/骨架)」我無法提供。
+  blocked-by: Canva 擋掉了我的抓取。
+            https://www.canva.com/website-builder/templates/business/ → 403
+            https://www.canva.com/templates/s/website/ → 403
+            https://www.canva.com/websites/templates/business/ → 403
+            這三個網址全部 not fetched。
+            search_web 只回傳泛稱範本名(例如 "Finance Business Website in Navy Orange…"),不是我抓到的頁面,所以我不採用。
+  needed: 請派工端提供 3 個實際 Canva 範本 URL,或改用瀏覽器類工具(`/browser`)開頁後再交給我。
+  補救: 下方 §1 的「範本骨架」是通用 dashboard 原型,不是 Canva 範本。我沒有宣稱它們出自 Canva。
+```
+
+```
+CODEX-ASSIST-GAP
+  kind: acceptance
+  question: 「CRA 庫」(第 4 個 view)要不要納入關注規則?如果納入,哪些條目算「命中」?
+  blocked-by: 關注規則比對的是 tracker / category / tags / title(ui/index.html:1357 `function watchMatches(a, watch, tracker, lang) {`)。
+            CRA 庫條目沒有 trackers 或 category 欄位。
+            它有 cluster、source、source_date、status(ui/index.html:2243 `function buildLibRow(t, gen, sources) {`)。
+            這是產品語意,不是我能推斷的。
+  needed: 使用者或 session 裁示。
+  我的暫定假設(未被採納前不要當事實):
+    把庫的「NEW / UPDATED」(ui/index.html:2257 `const chip = isNew`)當第 4 個來源區塊,
+    也就是「CRA 庫近期更新」。它不經過規則引擎。
+```
+
+## 1. 控制台:兩個緊湊方向
+
+### 1.0 現況為什麼「鬆」(全部引用現有程式)
+
+| 現況 | 引用 |
+|---|---|
+| 內容寬度 1080px,留白大 | `tracker/web_dashboard.py:352` `max-width:1080px` |
+| hero 內距 32/36px、狀態字 2.6rem | `tracker/web_dashboard.py:354` `padding:32px 36px; margin-bottom:32px;`、`tracker/web_dashboard.py:359` `.hero .state { font-size:2.6rem` |
+| 卡片只有 2 欄、間距 32px | `tracker/web_dashboard.py:367` `.cards { display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:32px;` |
+| 卡片內距 24×26px、標題下 18px | `tracker/web_dashboard.py:370` `padding:24px 26px;`、`tracker/web_dashboard.py:373` `.card > h2 { margin:0 0 18px;` |
+| 每個階段列內距 12×16px | `tracker/web_dashboard.py:391` `padding:12px 16px;` |
+| 開始鈕偏大 | `tracker/web_dashboard.py:388` `#btnStart { padding:11px 28px;` |
+| 預覽 iframe 固定 560px,只佔半欄,必須捲動才看得到 | `tracker/web_dashboard.py:571` `height:560px` |
+
+### 1.1 各區塊現況與行號
+
+| 區塊 | 行號 |
+|---|---|
+| 頂部導覽 | `tracker/web_dashboard.py:477` `<a href="#sec-run">執行</a>` |
+| hero 狀態 | `tracker/web_dashboard.py:482` `<section class="hero" id="hero">` |
+| 執行卡 | `tracker/web_dashboard.py:488` `<section class="card wide" id="sec-run">` |
+| 執行前設定 | `tracker/web_dashboard.py:490` `<div class="config hidden" id="config">` |
+| 執行中控制列 | `tracker/web_dashboard.py:511` `<div class="control hidden" id="control">` |
+| 階段列 | `tracker/web_dashboard.py:535` `<div id="phases" style="margin-top:18px"></div>` |
+| 提示列 | `tracker/web_dashboard.py:536` `<div class="note" id="note"></div>` |
+| 發布卡 | `tracker/web_dashboard.py:539` `<section class="card" id="sec-publish">` |
+| 預覽卡 | `tracker/web_dashboard.py:553` `<section class="card" id="sec-preview">` |
+| LLM 端點卡 | `tracker/web_dashboard.py:573` `<section class="card" id="sec-llm">` |
+| CRA 庫卡 | `tracker/web_dashboard.py:591` `<section class="card cra wide hidden" id="cra">` |
+
+兩點觀察:
+
+- **控制台沒有 log 窗格。** 驗證指令是 `awk 'NR>=321 && NR<=604' tracker/web_dashboard.py | grep -ci "log"`,範圍 `_HTML` 的 321–604 行,命中 0。
+  - 你說的「status + actions + logs + settings」中的 logs,目前只有一條 `.note` 單行提示和 CRA 清單,沒有 log 窗格。
+  - 提案沿用這個事實,不憑空新增 log 面板。
+- **測試不涵蓋 `_HTML` 的 id 或結構。** `tests/test_web_dashboard.py` 沒有對 `_HTML` 或這些 id 的斷言,只有 `RunReport(run_id=7…` 一類。
+  - 重排 markup 時沒有測試保護,所以切片裡我加了 id 守門測試。
+
+### 方向 A:「單屏營運板」(Ops board) ← 建議
+
+**借用的骨架:** 通用「頂部狀態帶 + 左右 7:5 兩欄 + 抽屜」dashboard 原型(非 Canva 範本,見缺口)。
+
+```
+┌────────────────────────────────────────────────────────────────────────────────┐
+│ ■ NewsTracker  [執行中] run#42 · 標題…        ⏱ 3:12 ETA 1:40   [⏸][↻重來][✕]    │ ≈44px 狀態帶
+├───────────────────────────────────────────┬────────────────────────────────────┤
+│ 執行 ───────────────────────────  [設定▾]  │ 發布  ● 閒置  頻道 —   [預覽][正式]  │
+│ ✓ Fetch      ███████████░  42/50   …      │ 訊息 — · 完成時間 —                  │
+│ ▶ Gate       ████░░░░░░░░  10/50          ├────────────────────────────────────┤
+│ ○ Summarize  ░░░░░░░░░░░░                 │ LLM 端點 [● ollama@box ▾][＋][✕]     │
+│ ○ Translate  ○ Write  ○ Cleanup           │ 遠端政策 時段窗[____] 並發[2] [套用]  │
+│ note: ……………                                ├────────────────────────────────────┤
+│ (完成後)摘要:兩欄 key-value 緊湊表          │ CRA 庫 [↻更新] 94 topics · 狀態…     │
+├───────────────────────────────────────────┴────────────────────────────────────┤
+│ ▸ 網站預覽  [預設▾][100%▾][本機預覽][新分頁]   (抽屜,預設收合;展開=45vh iframe)    │
+└────────────────────────────────────────────────────────────────────────────────┘
+```
+
+**區塊對應:**
+
+| 新位置 | 取自 |
+|---|---|
+| 狀態帶 | 頂部導覽(`:474-480`)+ hero(`:482-486`)合併成一條 |
+| 左欄 | 執行卡(`:488-538`) |
+| 右欄上 | 發布卡(`:539`) |
+| 右欄中 | LLM 端點卡(`:573`) |
+| 右欄下 | CRA 庫卡(`:591`,維持 hidden 邏輯) |
+| 底部抽屜 | 預覽卡(`:553`,iframe 改 `max-height:45vh`) |
+
+**密度目標(提案值):**
+
+| 項目 | 現況 | 目標 |
+|---|---|---|
+| 內文字級 | 約 .9–.95rem | 13px |
+| 卡片標題 | 1.1rem | 12px / 600 |
+| 卡片內距 | 24×26px | 10×12px |
+| 欄間距 | 32px | 10px |
+| 階段列 | 12×16px | 6×10px,列高約 32px |
+| 狀態帶 | hero 約 190px 高 | 約 44px,狀態字 1.1rem 與標題同一行 |
+| 內容寬度 | 1080px | 1440px(≥1100px 才分兩欄,否則回單欄) |
+| 圓角 / 陰影 | 14px / 18px 模糊 | 8px / 去陰影、改 1px 邊線 |
+
+### 方向 B:「側欄 + 分頁」
+
+**借用的骨架:** 通用「左側導覽軌 + 單一工作區」admin 原型。
+
+```
+┌──────────┬───────────────────────────────────────────────────────────────────┐
+│ ■ News   │ [執行中] run#42 · 標題…     ⏱ 3:12 ETA 1:40     [⏸][↻][✕]         │ 44px 常駐狀態帶
+│ Tracker  ├───────────────────────────────────────────────────────────────────┤
+│──────────│  (只顯示被選到的一個區塊)                                           │
+│ ▶ 執行 ● │  ┌ 執行 ──────────────────────────────────────────────────────┐  │
+│   發布 ○ │  │ 階段列(同 A) / 設定 / 控制列                               │  │
+│   預覽   │  └────────────────────────────────────────────────────────────┘  │
+│   LLM  ● │                                                                   │
+│   CRA 庫 │  預覽分頁:iframe 高度 = calc(100vh - 120px),整個視窗給預覽        │
+│ 176px 軌 │                                                                   │
+└──────────┴───────────────────────────────────────────────────────────────────┘
+```
+
+- **側欄狀態點:** 取代 hero。執行中顯示旋轉圖示,發布顯示綠/紅點。
+- **密度目標:**
+  - 字級 13.5px。
+  - 卡片內距 14×16px。
+  - 間距 14px。
+  - 側欄 176px。
+  - 內容最大 1100px。
+- **區塊對應:** 同 A,但每區塊獨占一個分頁。
+
+### 1.2 建議與風險
+
+**建議 A(單屏營運板)。**
+
+- 操作員的工作流是「開始執行 → 看進度 → 發布 → 看預覽」。
+- 執行和發布要同時看得到,B 的分頁把它們拆開了。
+- 預覽仍可在 A 的抽屜展開;B 的好處(預覽全高)可以在 A 做成抽屜的「全螢幕」按鈕。
+
+**風險:**
+
+| 風險 | 說明 |
+|---|---|
+| A:窄螢幕 | 1100px 以下要自動回單欄,否則右欄被擠。 |
+| A / B:id 與 JS 耦合 | 腳本以 id 取元素(例如 `tracker/web_dashboard.py:556` `<select id="pvPreset">`、`tracker/web_dashboard.py:864` `return '/site/index.html?pv=1'`),重排 markup 時 id 一個都不能改名或消失。目前沒有測試保護,見 §4 C2。 |
+| A:狀態帶合併 | hero 的 class(run/ok/fail)由 JS 設定,合併時要保留 `#hero`、`#heroState`、`#title`、`#elapsed`、`#eta`、`#live`。 |
+| B:看不到另一區塊 | 非作用中的區塊,狀態只靠側欄小點呈現,看不到細節。 |
+| 兩者 | 我沒有跑過瀏覽器截圖,以上密度數字是設計目標,不是實測。 |
+
+## 2. 我的關注(Watch hub)
+
+### 2.0 為什麼現在的「關注」像「點關鍵字」(根因,可驗證)
+
+1. **「只看關注」只是目前這一個 tracker 的過濾條件。**
+   - 它只對 `renderArticles` 已載入的日期生效:`ui/index.html:2553` `if (watchOnly) articles = articles.filter(a => watchLabels(a).length);`。
+   - 在它之前,文章已經被 tracker 篩過:`ui/index.html:2538` `articles = articles.filter(a => itemBelongsToTracker(a, state.currentTracker));`。
+   - 結果是:你站在「資安」時,看不到 EU CRA 的關注項,跟點一個分類 pill 的效果一樣。
+2. **關注開關是 pill,不是一個頁面。**
+   - `ui/index.html:2405` `const wp = document.createElement('button');` 把它放在 `#cat-pills` 裡。
+   - 規則設定是浮動面板:`ui/index.html:1122` `<div id="watch-panel" class="hidden"`。
+3. **搜尋也是單 tracker。**
+   - `ui/index.html:1763` `const mf = currentManifest();`。
+   - `ui/index.html:1788` `if (!itemBelongsToTracker(a, state.currentTracker)) continue;`。
+4. **卡片上的標籤不能點。** `ui/index.html:2729` `<span class="card-tag">`。
+   - 我假設你說的「直接點選關鍵字」指搜尋框加分類 pill。
+   - 這個假設要請你確認。
+
+### 2.1 整合頁要能做、而點關鍵字做不到的事
+
+| 能力 | 點關鍵字 / 現況 | 關注整合頁 |
+|---|---|---|
+| 範圍 | 單一 tracker(`:1788`) | 跨 3 個 tracker + 庫(第 4 view) |
+| 計數 | 只有 `#article-count` | 每條規則 × 每個 view 的筆數 |
+| 趨勢 | 無 | 近 14 天迷你長條 |
+| 新增偵測 | 無 | 「自上次造訪新增 N 筆」(`localStorage`) |
+| 分組 | 依日期 / 分類 | 依規則分區(per-rule sections) |
+| 呈現 | grid / river / hero / hub / timeline | 分區 / 儀表 / 條列 / 地圖 |
+
+### 2.2 共同技術前提(三個方向都需要)
+
+1. **載入器綁在 `state.currentTracker`。** 要跨 tracker 載入,必須讓載入器可傳入 tracker 參數:
+   - `ui/index.html:2802` `const key = state.currentTracker + '/' + year;`
+   - `ui/index.html:2817` `const file = 'data/' + state.currentTracker + '/' + monthFile;`
+   - `ui/index.html:2842` `const tk = state.currentTracker;`
+   - `ui/index.html:2849` `const tk = state.currentTracker;`
+2. **日資料檔是共用的,但每個 tracker 的月索引只列有它條目的日子。**
+   - `tracker/render.py:150` `(shared)`:日檔放在共用目錄。
+   - `tracker/render.py:117` `"trackers": _trackers_of(r),`:每筆帶 trackers 陣列。
+   - `tracker/render.py:164` `if count == 0:`:該日該 tracker 無條目就不列入該 tracker 的月索引。
+   - 所以整合頁必須走遍 3 個 tracker 的索引取聯集,不能只走一個。
+   - `ui/index.html:2828` `if (state.loadedFiles.has(resolved)) { cb(); return; }` 會去重,重複的日檔不會載兩次。
+3. **`watchMatches` 回傳的是「顯示文字」,不是規則 id。** `ui/index.html:1382` `labels.push(en ? r.en : r.zh)`。
+   - 每條規則一區的分組需要 id。要新增一個回傳 id 的純函式,`watchMatches` 改成包它,行為不變。
+4. **傳給 `watchMatches` 的 `tracker` 必須是 null。**
+   - `ui/index.html:1379` `m.trackers.some(t0 => trackers.includes(t0) || t0 === tracker)` 中的 `|| t0 === tracker` 意思是「正在看的 tracker 一律算符合」。
+   - 在整合頁若沿用 `watchLabels`(`ui/index.html:1408` `watchMatches(a, watchPrefs, state.currentTracker, state.lang)`),而 `currentTracker` 殘留舊值,EU CRA 規則就會誤命中不屬於 eu_cra 的文章。
+   - 整合頁必須明確傳 `null`。
+5. **新入口。** 比照 CRA 庫那顆 pill:
+   - `ui/index.html:2075` `lb.dataset.tracker = '__cra';`
+   - `ui/index.html:2079` `lb.onclick = selectLibrary;`
+   - 新增 `state.hubActive`,模仿 `ui/index.html:1140` `libActive:     false,`。
+   - 進入函式模仿 `ui/index.html:2088` `function selectLibrary() {`。
+   - 隱藏日期側欄的做法模仿 `ui/index.html:2090` `document.documentElement.dataset.mode = 'lib';`。
+   - 網址 hash 比照 `ui/index.html:2983` `if (h && h.lib) {`,在 `syncHash`(`ui/index.html:2932`)與 `applyHashRestore`(`ui/index.html:2978`)新增 `hub=1`。
+6. **呈現切換可以重用現有檢視模式。**
+   - 條目渲染重用 `buildCard`(`ui/index.html:2712`)與 `buildRiverRow`(`ui/index.html:2629`),點開仍是 `openOverlay`(`ui/index.html:2760`)。
+   - 卡片 / 條列直接跟著 `resolvePreset(viewPrefs).layout`(`ui/index.html:2577`)走。
+   - 新增的只有「分區 / 儀表 / 地圖」這一層。
+7. **資料量未知。**
+   - 根目錄沒有建好的資料:`ls /opt/tracker/repo/ui` 只有 `audit.js`、`index.html`。
+   - 所以我**無法量**整個歷史載入要多少檔、多大。這是 **ESTIMATE:無數字**。
+   - 建議用時間窗(7 / 30 / 90 天)控制載入量,預設 30 天。
+   - 決策文件的量測值(per the plan):`refs/plans/20261019-watch-and-frame-decisions.md:11` `標題或標籤含「KEV」的有 210 筆`,指的是全部歷史,不是窗內。
+
+### 方向 (a):Google News「For you」式 — 每條規則一區
+
+```
+┌ 我的關注 ───────── [分區|儀表|條列|地圖]  窗 [30天▾]  [⚙規則] ────────────────┐
+│ 你的簡報:自上次造訪(10/17)新增 14 筆 · 6 條規則有新內容                      │
+├──────────────────────────────────────────────────────────────────────────────┤
+│ ★ EU CRA 標準更新            新 3 / 共 20     [資安 0 · CRA 20 · OS 0]  全部 ▸ │
+│  ┌卡片┐ ┌卡片┐ ┌卡片┐        (或 條列:日期 · 標題 · 來源)                      │
+│ ★ KEV 已遭利用漏洞           新 9 / 共 210    [資安 150 · CRA 12 · OS 48] 全部 ▸ │
+│  ┌卡片┐ ┌卡片┐ ┌卡片┐                                                          │
+│ ★ 勒索軟體 …                                                                  │
+│ 📚 CRA 庫近期更新(第 4 view,見 GAP)  UPDATED 5                              │
+└──────────────────────────────────────────────────────────────────────────────┘
+```
+
+- **規則組合:**
+  - 對 3 個 tracker 的聯集逐篇跑「規則 id 版」比對。
+  - 一篇可同時出現在多個區(例如 KEV 又是零時差)。
+  - 計數時以文章 id 去重(`tracker/render.py:113` `Stable permalink id`),總數不重複計。
+  - 每區標題列顯示 per-tracker 小計。
+- **新增偵測:**
+  - `localStorage` 新增 `tracker_watch_seen`,結構 `{v:1, ids:{ruleId:[文章id…]}}`,每規則最多 500 個 id。
+  - 用 id 集合,不用日期:`tracker/render.py:115` `rest of the day` 的註解顯示,補進較舊日期的項目是會發生的事,日期高水位會漏算。
+  - 「已看」在離開整合頁時才寫入,不要在載入時寫。
+  - 預覽 iframe 不可寫入:`ui/index.html:1220` `if (isPreviewMode()) return;`。
+- **借用的網站:**
+  - Google News 的「Your briefing / Top stories」和「See more headlines & perspectives」(已抓取)。
+  - TechNews 首頁每個主題一區、每區約 4 條標題(已抓取)。
+- **掛接的函式:**
+  - `ui/index.html:1357` `function watchMatches(a, watch, tracker, lang) {`(新增 id 版)。
+  - `ui/index.html:1415` `function watchChanged() {`。
+  - `ui/index.html:1418` `if (state.currentTracker && !state.libActive) renderArticles();` 要加上 hub 分支。
+
+### 方向 (b):儀表磚(counts + drill-down)
+
+```
+┌ 我的關注 ───────── [分區|●儀表|條列|地圖] ─────────────────────────────────────┐
+│            │  資安   │  EU CRA │  作業系統 │  CRA 庫  │  合計                   │
+│ CRA 法規   │   —     │ 73 ▁▂▅ │    —      │  ·       │  73  新3               │
+│ CRA 標準   │   —     │ 20 ▁▁▂ │    —      │  ·       │  20                    │
+│ KEV        │ 150 ▃▅▇ │ 12 ▁▁▁ │  48 ▂▃▃   │  ·       │ 210  新9               │
+│ 零時差     │  41 ▂▃▂ │  3 ▁▁▁ │  16 ▁▂▁   │  ·       │  60                    │
+│ 自訂:xz   │  …                                                                  │
+├──────────────────────────────────────────────────────────────────────────────┤
+│ ▼ 展開:「KEV × 資安」150 筆   (下方用目前檢視模式的卡片 / 條列列出)             │
+└──────────────────────────────────────────────────────────────────────────────┘
+```
+
+- **規則組合:** 列 = 規則,欄 = 4 個 view。
+  - 資安 / EU CRA / OS 三欄是 `trackers` 聯集的小計。
+  - 庫欄在 GAP 裁示前先留空。
+- **與點關鍵字的差別:** 一眼看出每條規則在每個 view 的分布、趨勢、新增數;點格子才展開。
+- **磚上的數字:**
+  - 可以先用月索引的 `count` 當每個 tracker 的總量底數:`tracker/templates/manifest_month.js.j2:7` `count: {{ d.count }}`。
+  - 每條規則的命中數仍需載入日檔後計算。
+- **借用的網站:**
+  - Feedly Threat Intelligence 頁面強調 "Real-Time Threat Graph" 與各實體計數(已抓取,但那是行銷頁,不是閱讀器 UI)。
+  - Inoreader 頁面的「filters and rules … folders」文案(已抓取,同為行銷頁)。
+- **掛接:** 同 (a) 的 hub 入口。磚的點擊回到 §2.2.6 的卡片 / 條列渲染。
+
+### 方向 (c):地圖式(Treemap / 叢集圖)
+
+```
+┌ 我的關注 ───────── [分區|儀表|條列|●地圖] 模式[樹狀圖▾|標籤叢集▾|心智圖▾] ───┐
+│ ┌──────────────────────────┬──────────────┬────────┐   ┌ 右側:點選區塊的清單 ┐│
+│ │ KEV ·資安 150            │ KEV·OS 48    │零時差  │   │ KEV × 資安 (150)    ││
+│ │ (大塊 = 筆數多)          │              │·資安41 │   │ ▸ 標題… 日期 來源    ││
+│ ├──────────────┬───────────┼──────┬───────┴────────┤   │ ▸ 標題…              ││
+│ │ CRA 法規 73  │CRA 標準 20│ ...  │ 自訂 xz …      │   └─────────────────────┘│
+│ └──────────────┴───────────┴──────┴────────────────┘   顏色=視圖  外框亮=有新增│
+└──────────────────────────────────────────────────────────────────────────────┘
+```
+
+**「地圖」在我們的資料上能誠實代表什麼**(欄位只有 trackers、category、tags、title、date、sources 與關注命中):
+
+| 選項 | 現在可做? | 依據 / 限制 |
+|---|---|---|
+| 樹狀圖 treemap(面積=命中筆數,階層=view → 規則 / 分類) | **可以,純前端** | 欄位:`tracker/render.py:117` `"trackers": _trackers_of(r),`。多歸屬文章要以 id 去重,否則面積重複計算。 |
+| 標籤共現叢集圖(節點=標籤,邊=同篇共現≥2) | **可以,純前端** | 標籤欄位來自 `tracker/render.py:121` 的 `tags`。品質取決於標籤乾淨度,我沒量,屬 **ESTIMATE**。 |
+| 主題心智圖(根=我的關注 → 規則 → 分類 → 條目,可摺疊) | **可以,最便宜** | 用巢狀 `<details>`,不需任何圖形程式碼。 |
+| CVE ↔ 受影響廠商關係圖 | **不能直接做** | CVE 編號在標籤裡(`ui/index.html:2653` `/^CVE-\d{4}-\d{4,}$/`),但**沒有廠商欄位**。要做就得自建廠商詞庫從標題抽,是啟發式,不是現成欄位。折衷:先做「CVE ↔ 規則 / tracker」二部圖。 |
+| 世界地圖 | **現在不能** | 沒有 geo 欄位。決策文件列了「影響地區 / Where」(`refs/plans/20261019-watch-and-frame-decisions.md:15` `涉及對象 / Who · 影響地區 / Where`),但 pipeline 實作另開切片(同文件 17 行),所以最早要等那個欄位存在才談。 |
+
+- **函式庫:**
+  - 全部先用原生 JS + SVG / CSS,**不需要 CDN**;`ui/index.html` 目前也沒有任何 CDN(只載入 `manifest.js`)。
+  - 樹狀圖的 squarify 約 50 行可自寫。
+  - 若之後要物理式力導向佈局,才考慮 `d3-force@3`(`https://cdn.jsdelivr.net/npm/d3-force@3.0.0/dist/d3-force.min.js`)。這個網址和版本我**沒有抓取驗證**,屬假設。
+- **與點關鍵字的差別:** 地圖是「概覽 + 導航」,看全貌後點區塊進清單。
+- **風險:** 純視覺化,不能取代清單,所以只能是第 4 種呈現,不是預設。
+
+### 2.3 新增的 localStorage 鍵
+
+| 鍵 | 用途 |
+|---|---|
+| `tracker_watch_seen` | 各規則已看過的文章 id,用於「自上次造訪新增」。 |
+| `tracker_watch_hub` | 整合頁偏好,結構 `{v:1, pres:'sections'\|'tiles'\|'list'\|'map', win:30}`。 |
+| `tracker_watch` | 沿用,結構不變(`ui/index.html:1395` `function saveWatch() {`)。 |
+
+## 3. 建議與風險
+
+### 3.1 控制台
+
+建議方向 A,理由見 §1.2。
+
+### 3.2 我的關注
+
+**建議把 (a)(b)(c) 做成同一資料模型上的三種「呈現」,預設是 (a)。**
+
+- 資料模型:`{規則 → 命中文章[] / 新增[] / 依 tracker 小計 / 依日小計}`,只算一次。
+- 切換器 = `分區(a) | 儀表(b) | 條列 | 地圖(c)`。
+- 不必三選一,因為它們吃同一份資料。
+- 預設 (a):最接近你描述的「新聞網站式整合頁」,也最直接回答「跟點關鍵字有什麼不同」(分區加新增數)。
+- (b) 和 (c) 之後以切片逐步補上,不阻塞第一版。
+
+**風險:**
+
+| 風險 | 說明 |
+|---|---|
+| 跨 tracker 載入 | 需要改 §2.2.1 的四處載入器。這是改動面最大的一步,有回歸風險。 |
+| 資料量 | 見 §2.2.7,無實測。用時間窗限制可降低風險。 |
+| 規則語意 | 只有 `cra_*` 規則綁 eu_cra。其餘是關鍵字規則,命中對象可能跨 tracker。「4 個 view」的整合主要靠規則 × view 矩陣呈現。 |
+| 庫的語意 | 見上方第二個 GAP。 |
+| 預設落地頁 | 是否在有設定規則時預設進入整合頁,是產品決策。目前啟動邏輯是 `ui/index.html:2024` `if (!applyHashRestore()) selectTracker(`,我不建議第一版改動。 |
+| 既有「只看關注」pill | 保留。它與整合頁並存可能讓人困惑,建議整合頁完成後把 pill 的行為改成「前往我的關注」,但這是裁示事項,不是我決定。 |
+| 無測試保護 | `tests/` 中沒有任何對 `watchMatches` / `parseWatch` 的測試,見下方 F6。 |
+
+## 4. 切片計畫
+
+驗證工具:`node` 可用(v22.22.1)。`ui/index.html:1295` `watchMatches are pure (no DOM, no storage).` 說明這些純函式是為了能在 node 評估而設計的。另有 `ui/audit.js` 可在瀏覽器中跑版面稽核。
+
+### 控制台
+
+| 切片 | 動到的檔案 | 驗收 |
+|---|---|---|
+| **C1** CSS 密度 pass(只改 `<style>` 的數值,§1.1 的目標) | `tracker/web_dashboard.py`(`_HTML` 的 style,約 326–471 行) | `python -m pytest tests/test_web_dashboard.py -q` 通過;1280×720 截圖中,狀態、執行、發布同時在首屏(需瀏覽器,session 自行驗證)。 |
+| **C2** markup 重排成方向 A(狀態帶、7:5 兩欄、預覽抽屜),所有 id 不變 | `tracker/web_dashboard.py`;新增 `tests/test_web_dashboard.py` 一則「`_HTML` 中的每個 `$('xxx')` id 都存在於 markup」的測試 | 測試以 regex 抽出 `$('id')` 與 `id="…"` 做集合比對;`tests/test_web_dashboard.py` 全過。 |
+| **C3** 響應式(≤1100px 單欄)+ 抽屜的全螢幕鈕 | `tracker/web_dashboard.py` | 在 390 / 820 / 100% 寬下以現有 `pvWidth` 預覽;無水平捲軸(session 驗證)。 |
+
+### 關注整合頁
+
+| 切片 | 動到的檔案 | 驗收 |
+|---|---|---|
+| **W1** 純函式:規則 id 版比對 + `buildWatchModel`,`watchMatches` 改為包裝(輸出不變) | `ui/index.html`(約 1290–1390 行區);新增 `tests/test_watch_pure.py`(用 `node -e` 抽出函式執行) | 針對 `watchMatches` 的舊輸出做回歸,與改前逐筆相同;`tracker=null` 時 `t0 === tracker` 路徑不誤判。 |
+| **W2** 載入器加 tracker 參數(預設仍 `state.currentTracker`)+ `ensureHubLoaded(days)` | `ui/index.html`(`:2802/:2817/:2842/:2849` 與 `:1762`) | 既有單 tracker 行為不變(切 tracker、搜尋仍正常);載入整合頁後 `Object.keys(window.TRACKER_DAYS)` 為 3 個 tracker 日期聯集。 |
+| **W3** 整合頁外殼:新 pill、`selectHub`、hash `hub=1`、`data-mode`、分區呈現(a),重用 `buildCard` / `buildRiverRow` | `ui/index.html` | 直連 `#hub=1` 可還原;`?pv=1` 不寫 `localStorage`;`ui/audit.js` 通過。 |
+| **W4** 新增偵測 `tracker_watch_seen` + 簡報列 | `ui/index.html` | 先看過 → 重新載入 → 新增數歸零;補一筆較舊日期文章後新增數 +1(驗證用 id 而非日期)。 |
+| **W5** 儀表磚呈現(b)+ 展開 drill-down | `ui/index.html` | 每格數字等於該格展開清單的筆數;各規則合計(去重後)等於分區頁的總數。 |
+| **W6** 地圖呈現(c):treemap + 心智圖(標籤叢集視情況) | `ui/index.html` | 區塊面積加總 = 去重後命中數;點區塊的清單與 W5 同格一致。 |
+| **W7** i18n 字串(zh / en) | `ui/index.html`(`:1587` 附近的字串表) | 切換語言後整合頁所有標籤跟著變,無殘留中文。 |
+
+## 5. 可驗證的觀察(F1–F6)
+
+每一項都是有 `file:line` 與可重跑指令的事實,不是處置裁示。
+
+| # | 觀察 | 驗證指令 |
+|---|---|---|
+| F1 | 「只看關注」只對目前 tracker 已載入的日子生效:`ui/index.html:2553` `if (watchOnly) articles = articles.filter(a => watchLabels(a).length);` | `sed -n '2538p;2553p' /opt/tracker/repo/ui/index.html` |
+| F2 | `watchMatches` 的 tracker 比對含 `|| t0 === tracker`:`ui/index.html:1379` `m.trackers.some(t0 => trackers.includes(t0) || t0 === tracker)` | `sed -n 1379p /opt/tracker/repo/ui/index.html` |
+| F3 | 載入器四處綁定 `state.currentTracker`:`ui/index.html:2802` `const key = state.currentTracker + '/' + year;` | `sed -n '2802p;2817p;2842p;2849p' /opt/tracker/repo/ui/index.html` |
+| F4 | `watchMatches` 回傳顯示文字而非規則 id:`ui/index.html:1382` `labels.push(en ? r.en : r.zh)` | `sed -n 1382p /opt/tracker/repo/ui/index.html` |
+| F5 | 控制台 `_HTML` 內沒有 log 窗格(**absence**) | `awk 'NR>=321 && NR<=604' /opt/tracker/repo/tracker/web_dashboard.py \| grep -ci "log"`,範圍 `tracker/web_dashboard.py` 321–604 行,命中 **0**。 |
+| F6 | 關注純函式沒有任何測試(**absence**) | `grep -rln "watchMatches\|parseWatch" /opt/tracker/repo/tests /opt/tracker/repo/ui`,範圍 `tests/` 與 `ui/`,只命中 `ui/index.html`(1 個檔案)。 |
+
+## 6. 研究來源狀態(第 A、B 項)
+
+| 網址 | 狀態 | 我能說的(僅限抓到的內容) |
+|---|---|---|
+| Canva 三個網址 | **not fetched**(403) | 見上方第一個 GAP。 |
+| https://news.google.com/ | fetched | 「Your briefing」「Top stories」;每個主題是「標題 + 多家媒體 + See more headlines & perspectives」的故事叢集。分頁有 For you / Following / U.S. / World / Local / Business / Technology / Entertainment / Sports / Science / Health。 |
+| https://www.ithome.com.tw/ | fetched | 首頁堆疊多個區段:熱門新聞、今日最新、專題報導、數字IT、產業聚焦、研討會(h1 / h2 標題)。 |
+| https://technews.tw/ | fetched | 頂部是大分類選單;首頁有編輯精選、財訊快報、最新文章,以及 Apple / 能源科技 / 軍事科技 等主題區,每區約 4 條標題。 |
+| https://www.theverge.com/ | fetched | 導覽為 Tech / Reviews / Science / Entertainment / Policy,每項可展開子主題(如 Amazon、Apple、Space、Security)並有「See all …」;有 Light / System / Dark 切換。 |
+| https://www.bbc.com/news | fetched | 我的解析只取得 CSS 與無法讀出標題的 SSR,**沒有版面結構可述**。只能引用 CSS:容器 1248px、間距 16px、內文 18/26px 襯線體,僅作密度參考。 |
+| https://feedly.com/ | fetched | 實際是 Feedly **Threat Intelligence 行銷頁**,不是閱讀器。有 "Real-Time Threat Graph … 300K+ CVEs, 979 threat actors"。**切換呈現的方式沒有抓到。** |
+| https://www.inoreader.com/ | fetched | 行銷頁:「filters and rules」「tags and notes」「folders」「Monitoring feeds」。**看不到閱讀器的檢視模式。** |
+| https://www.reuters.com/ | **not fetched**(401) | 無。 |
+
+**B 項缺口:**
+
+- 「各站如何切換呈現(卡片 / 條列 / 雜誌)」我只在 Google News、iThome、TechNews 看得到**版面**,沒有任何抓到的頁面顯示**切換器**。
+- 我的背景知識是 Feedly 和 Inoreader 的閱讀器都有「標題 / 雜誌 / 卡片」之類的檢視切換,但我沒有抓取驗證,請 session 以閱讀器實際畫面核對再引用。
+
+`verified: 121  assumed: 6  gaps: 2  findings: 6`
+
+- verified:115 條 `file:line` 引文,跑過程式逐一比對;修正 3 條位置後重驗 6 條,全數命中。
+- verified:另有 6 個 absence 或數量指令的結果。
+- assumed:
+  1. 「點關鍵字」的含義(§2.0.4)。
+  2. 密度數字是設計目標,未經截圖實測。
+  3. `d3-force@3.0.0` 的網址與版本未驗證。
+  4. 資料量無法量測。
+  5. Feedly / Inoreader 的檢視切換來自背景知識。
+  6. 第一個 GAP 之後的「通用原型」不是 Canva 範本。
+- 這輪沒有 sandbox 內的 gate 或測試結果可回報。

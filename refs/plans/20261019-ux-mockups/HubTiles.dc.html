@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>我的關注・儀表</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;family=Noto+Sans+TC:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#070B12}
+a{color:#5FE1FF}a:hover{color:#B5F1FF}
+button{font:inherit;cursor:pointer}
+</style>
+</helmet>
+<div style="font-family: 'IBM Plex Sans','Noto Sans TC',sans-serif; color: #DCE6F2; font-size: 14px; min-height: 900px; background-color: #070B12; background-image: linear-gradient(rgba(95,225,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(95,225,255,0.05) 1px, transparent 1px); background-size: 32px 32px;">
+  <header style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; padding: 12px 24px; border-bottom: 1px solid #1C2A3D; background: rgba(7,11,18,0.85);">
+    <span style="width: 8px; height: 8px; border-radius: 50%; background: #5FE1FF; box-shadow: 0 0 10px #5FE1FF;"></span>
+    <strong style="font-size: 17px; letter-spacing: .04em;">我的關注 / 情勢儀表</strong>
+    <span style="font-family: 'IBM Plex Mono',monospace; font-size: 12px; color: #7F93AD;">WINDOW 30D · 2,884 ARTICLES · 更新 2026-10-19</span>
+    <span style="flex-grow: 1;"></span>
+    <nav aria-label="呈現方式" style="display: flex; border: 1px solid #1C2A3D; border-radius: 6px; overflow: hidden; font-size: 13px;">
+      <a href="HubSections.dc.html" style="padding: 8px 14px; text-decoration: none; color: #9FB2C9;">分區</a>
+      <a href="HubTiles.dc.html" style="padding: 8px 14px; text-decoration: none; background: #0F2A3A; color: #5FE1FF;">儀表</a>
+    </nav>
+  </header>
+
+  <div style="max-width: 1280px; margin: 0 auto; padding: 16px 24px; display: flex; flex-direction: column; gap: 14px;">
+    <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px;">
+      <span style="font-family: 'IBM Plex Mono',monospace; font-size: 11px; color: #7F93AD; letter-spacing: .1em;">平台標籤</span>
+      <sc-for list="{{ platforms }}" as="p" hint-placeholder-count="4">
+        <button onClick="{{ p.toggle }}" style="border: 1px solid {{ p.border }}; background: {{ p.bg }}; color: {{ p.fg }}; border-radius: 999px; padding: 4px 12px; min-height: 32px; font-family: 'IBM Plex Mono',monospace; font-size: 12px;">{{ p.name }} {{ p.n }}</button>
+      </sc-for>
+      <span style="flex-grow: 1;"></span>
+      <span style="font-family: 'IBM Plex Mono',monospace; font-size: 11px; color: #FFB547;">■ 關注命中</span>
+      <span style="font-family: 'IBM Plex Mono',monospace; font-size: 11px; color: #5FE1FF;">▮ 14 日篇數</span>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px;">
+      <sc-for list="{{ tiles }}" as="t" hint-placeholder-count="8">
+        <button onClick="{{ t.pick }}" style="text-align: left; display: flex; flex-direction: column; gap: 8px; padding: 12px; min-height: 196px; border-radius: 8px; border: 1px solid {{ t.border }}; background: {{ t.bg }}; color: #DCE6F2; box-shadow: {{ t.glow }};">
+          <span style="display: flex; align-items: baseline; gap: 8px; width: 100%;">
+            <span style="font-size: 14px; font-weight: 600;">{{ t.name }}</span>
+            <span style="flex-grow: 1;"></span>
+            <span style="font-family: 'IBM Plex Mono',monospace; font-size: 26px; font-weight: 600; color: #F2F7FC;">{{ t.n }}</span>
+          </span>
+          <span style="display: flex; align-items: flex-end; gap: 2px; height: 34px; width: 100%;">
+            <sc-for list="{{ t.bars }}" as="b" hint-placeholder-count="14">
+              <span style="flex: 1 1 0; height: {{ b.h }}; background: {{ b.c }}; border-radius: 1px;"></span>
+            </sc-for>
+          </span>
+          <span style="display: flex; flex-wrap: wrap; gap: 4px; min-height: 22px;">
+            <sc-for list="{{ t.hits }}" as="h" hint-placeholder-count="2">
+              <span style="font-family: 'IBM Plex Mono',monospace; font-size: 11px; color: #070B12; background: #FFB547; border-radius: 3px; padding: 2px 6px;">{{ h }}</span>
+            </sc-for>
+          </span>
+          <span style="display: flex; flex-wrap: wrap; gap: 4px;">
+            <sc-for list="{{ t.tags }}" as="g" hint-placeholder-count="4">
+              <span style="font-size: 11px; color: #9FB2C9; border: 1px solid #22344B; border-radius: 3px; padding: 1px 6px;">#{{ g }}</span>
+            </sc-for>
+          </span>
+        </button>
+      </sc-for>
+    </div>
+
+    <section style="border: 1px solid #1C2A3D; border-radius: 8px; background: rgba(13,20,32,0.92); padding: 12px 16px; display: flex; flex-direction: column; gap: 10px;">
+      <div style="display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px;">
+        <span style="font-family: 'IBM Plex Mono',monospace; font-size: 11px; color: #5FE1FF; letter-spacing: .1em;">DRILL-DOWN</span>
+        <h2 style="margin: 0; font-size: 16px;">{{ sel.name }}</h2>
+        <span style="font-family: 'IBM Plex Mono',monospace; color: #7F93AD;">{{ sel.n }} 篇</span>
+        <span style="flex-grow: 1;"></span>
+        <span style="font-size: 12px; color: #7F93AD;">卡片 ｜ 條列</span>
+      </div>
+      <ol style="list-style: none; margin: 0; padding: 0;">
+        <sc-for list="{{ sel.top }}" as="a" hint-placeholder-count="2">
+          <li style="display: flex; gap: 12px; padding: 8px 0; border-top: 1px solid #16243A;">
+            <span style="font-family: 'IBM Plex Mono',monospace; font-size: 12px; color: #7F93AD; flex: 0 0 88px;">{{ a.d }}</span>
+            <span style="flex: 1 1 auto; min-width: 0;">{{ a.t }}</span>
+            <span style="font-size: 12px; color: #7F93AD;">{{ a.s }}</span>
+          </li>
+        </sc-for>
+      </ol>
+    </section>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":900}}'>
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { picked: '漏洞威脅', plats: {} }; }
+  renderVals() {
+    const T = [
+      ['漏洞威脅', 579, [24,26,18,21,10,2,10,34,38,43,25,1,3,6], ['KEV 55', '勒索 26', '零時差 8'], ['CISA','RCE','KEV','零日漏洞','勒索軟體'],
+        [['2026-10-19','資安業者揭露 OpenBSD 核心漏洞：可追溯至 1988 年的遠端 RCE 缺陷，PoC 取得 root 權限','iThome'],['2026-10-19','CISA更新KEV名單警告BeyondTrust漏洞CVE-2026-102764遭利用，籲用戶立即修補並限制外部存取','iThome']]],
+      ['重大事件', 82, [6,1,4,4,1,1,7,6,5,5,4,0,1,1], ['勒索 16'], ['資料外洩','勒索軟體','網路攻擊','FBI'],
+        [['2026-10-19','日本漢堡王App會員資訊遭駭：千萬筆個人資料外洩，包含姓名至訂單紀錄','iThome'],['2026-10-18','ConnectWise 宣布停用多個應用程式身份，調查遭惡意取得權限入侵 Microsoft 365 環境','The Hacker News']]],
+      ['法規標準', 44, [3,0,1,2,0,0,1,3,1,1,1,0,0,2], ['CRA 法規 8', 'CRA 標準 4', '指引 4'], ['CRA','SBOM','KISA','OpenSSF'],
+        [['2026-10-09','歐盟《網路韌性法案》衝擊開源軟體：企業需掌握供應鏈風險與安全設計原則','Red Hat Security Blog'],['2026-10-06','OpenSSF 宣布擴大成員及資源，強化應對 EU CRA 法規與開源安全','OpenSSF Blog']]],
+      ['供應鏈開源', 128, [8,4,5,9,1,0,5,9,5,5,5,4,0,1], ['勒索 2'], ['供應鏈攻擊','GitHub','npm','SBOM'],
+        [['2026-10-19','Proofpoint宣布以約63億美元併購Varonis，打造整合式資料與AI安全平臺','iThome']]],
+      ['焦點綜合', 631, [31,21,29,33,6,5,24,35,33,38,27,10,5,0], ['勒索 7'], ['Apple','OpenAI','Google','AI'],
+        [['2026-10-18','Rust 開源瀏覽器引擎 Servo 0.6 更新：新增 CSS Grid 支援與 Threadboost 效能提升','Phoronix']]],
+      ['產業動態', 125, [10,5,10,2,1,1,1,16,9,5,6,0,0,6], [], ['零信任','AI安全','金融資安','CVE'],
+        [['2026-10-19','Naver Cloud推出「安全自我診斷」服務，協助企業應對AI時代的資安檢核','Boannews 韓國']]],
+      ['前瞻技術', 118, [4,7,2,2,2,0,0,4,5,6,7,0,1,1], [], ['PQC','AI Agent','後量子密碼學','OpenAI'],
+        [['2026-10-19','SailPoint CEO談AI發展與安全平衡：強調「適應性身分」應對動態環境風險','iThome']]],
+      ['研討活動', 25, [2,0,2,1,0,0,1,2,2,6,0,0,0,0], ['NIS2 1'], ['零信任','XDR','SASE','LLM'],
+        [['2026-10-15','專家建議：提升零信任成熟度應以 XDR 整合現有資安設備，而非僅依賴 ZTNA 替代 VPN','Boannews 韓國']]]
+    ];
+    const tiles = T.map(([name, n, series, hits, tags, top]) => {
+      const mx = Math.max(...series, 1);
+      const sel = this.state.picked === name;
+      const hot = hits.length > 0;
+      return {
+        name, n: n.toLocaleString(), hits, tags,
+        bars: series.map((v, i) => ({ h: Math.max(2, Math.round(34 * v / mx)) + 'px', c: i >= series.length - 3 ? '#5FE1FF' : '#2A6F8A' })),
+        border: sel ? '#5FE1FF' : (hot ? '#4A3A1A' : '#1C2A3D'),
+        bg: sel ? 'rgba(15,42,58,0.95)' : 'rgba(13,20,32,0.92)',
+        glow: sel ? '0 0 0 1px #5FE1FF, 0 0 18px rgba(95,225,255,0.25)' : 'none',
+        pick: () => this.setState({ picked: name })
+      };
+    });
+    const s = T.find(t => t[0] === this.state.picked);
+    const P = [['Linux', 468], ['Apple', 339], ['Android', 201], ['Windows', 144]];
+    const platforms = P.map(([name, n]) => {
+      const on = !!this.state.plats[name];
+      return { name, n, border: on ? '#5FE1FF' : '#22344B', bg: on ? '#0F2A3A' : 'transparent', fg: on ? '#5FE1FF' : '#9FB2C9',
+        toggle: () => this.setState({ plats: { ...this.state.plats, [name]: !on } }) };
+    });
+    return { tiles, platforms, sel: { name: s[0], n: s[1].toLocaleString(), top: s[5].map(([d, t, src]) => ({ d, t, s: src })) } };
+  }
+}
+</script>
+</body>
+</html>
