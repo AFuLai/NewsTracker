@@ -1,0 +1,12 @@
+{
+  "id": "20261019-layout-scenarios-plan",
+  "engine": "agy",
+  "mode": "plan",
+  "root": "/opt/tracker/repo",
+  "prompt_file": ".common/codex-assist/tasks/20261019-layout-scenarios-plan.prompt.md",
+  "inputs_glob": "ui/index.html tracker/web_dashboard.py",
+  "timeout_s": 1500,
+  "pin_engine": true,
+  "model": "claude-sonnet-5-5-high",
+  "note": "User 2026-10-19 (/agy-assist): research event-map presentation, news layouts (i-web seo page), content framing, navigation presets in localStorage, console preview. Plan only; implement slices follow after user review."
+}

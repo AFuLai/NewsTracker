@@ -162,3 +162,33 @@ def test_serve_lan_bind_is_opt_in(monkeypatch):
     finally:
         httpd.shutdown()
 
+
+def test_site_preview_route(monkeypatch, tmp_path):
+    import http.client
+    import tracker.web_dashboard as wd
+    (tmp_path / "data").mkdir()
+    (tmp_path / "data" / "x.js").write_text("var x=1;", encoding="utf-8")
+    monkeypatch.setattr(wd, "DEFAULT_OUT", tmp_path)
+    httpd = serve(WebReporter(), port=8801)
+
+    def get(path):
+        c = http.client.HTTPConnection("127.0.0.1", 8801, timeout=5)
+        c.request("GET", path)
+        r = c.getresponse()
+        body = r.read()
+        c.close()
+        return r.status, r.getheader("Content-Type") or "", body
+
+    try:
+        st, _, body = get("/site/index.html?pv=1#p=quick")
+        assert st == 200
+        assert "<title>資安新聞追蹤系統</title>" in body.decode("utf-8")
+        st, ct, _ = get("/site/data/x.js")
+        assert st == 200 and "javascript" in ct
+        assert get("/site/..%2f..%2fetc/passwd")[0] in (403, 404)
+        assert get("/site/../../etc/passwd")[0] in (403, 404)
+        assert get("/site/data")[0] == 404
+        assert get("/site/nope.js")[0] == 404
+    finally:
+        httpd.shutdown()
+        httpd.server_close()

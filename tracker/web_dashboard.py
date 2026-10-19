@@ -14,12 +14,17 @@ exposed to the LAN; set TRACKER_DASHBOARD_HOST=0.0.0.0 to opt into LAN access.
 from __future__ import annotations
 
 import json
+import mimetypes
 import os
 import threading
 import time
 from dataclasses import asdict
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
+from pathlib import Path
+from urllib.parse import unquote, urlsplit
+
+from . import DEFAULT_OUT, ROOT
 from .progress import NullReporter
 
 DEFAULT_PORT = 8787
@@ -225,8 +230,53 @@ def serve(reporter: WebReporter, *, port: int = DEFAULT_PORT) -> ThreadingHTTPSe
         def log_message(self, *a):  # silence access logs
             pass
 
+        def _serve_site(self):
+            # Local preview of the public site: /site/index.html is the live
+            # ui/index.html (no render needed), everything else comes from
+            # DEFAULT_OUT. DEFAULT_OUT/ROOT are read from this module's globals
+            # at request time so tests can monkeypatch them.
+            raw = urlsplit(self.path).path
+            if raw == "/site":
+                self.send_response(302)
+                self.send_header("Location", "/site/index.html")
+                self.send_header("Cache-Control", "no-store")
+                self.end_headers()
+                return
+            rel = unquote(raw[len("/site/"):])
+            if rel in ("", "index.html"):
+                base, rel = Path(ROOT) / "ui", "index.html"
+            else:
+                base = Path(DEFAULT_OUT)
+            target = None
+            try:
+                base_r = base.resolve()
+                cand = (base_r / rel).resolve()
+                if cand.is_relative_to(base_r) and cand.is_file():
+                    target = cand
+            except (OSError, ValueError):
+                target = None
+            if target is None:
+                self.send_response(404)
+                self.send_header("Content-Type", "text/plain; charset=utf-8")
+                self.send_header("Cache-Control", "no-store")
+                self.end_headers()
+                self.wfile.write(b"not found")
+                return
+            ctype = mimetypes.guess_type(target.name)[0] or "application/octet-stream"
+            if target.suffix == ".js":
+                ctype = "text/javascript"
+            data = target.read_bytes()
+            self.send_response(200)
+            self.send_header("Content-Type", ctype)
+            self.send_header("Content-Length", str(len(data)))
+            self.send_header("Cache-Control", "no-store")
+            self.end_headers()
+            self.wfile.write(data)
+
         def do_GET(self):
-            if self.path.startswith("/state"):
+            if self.path == "/site" or self.path.startswith("/site/"):
+                self._serve_site()
+            elif self.path.startswith("/state"):
                 body = json.dumps(reporter.snapshot(), ensure_ascii=False).encode("utf-8")
                 self.send_response(200)
                 self.send_header("Content-Type", "application/json; charset=utf-8")
@@ -495,10 +545,30 @@ _HTML = r"""<!DOCTYPE html>
         <span class="k">完成時間</span><span class="v" id="depTime">—</span>
       </div>
       <div class="btnrow">
-        <button id="btnPreview">預覽發布</button>
+        <button id="btnPreview">預覽頻道發布</button>
         <button id="btnLive" class="primary">正式發布</button>
       </div>
       <div id="depErr" style="color:var(--red); margin-top:12px; min-height:1.2em;"></div>
+    </section>
+    <section class="card" id="sec-preview">
+      <h2>網站預覽</h2>
+      <div class="btnrow">
+        <select id="pvPreset">
+          <option value="">預設</option>
+          <option value="quick">快讀</option>
+          <option value="analyst">分析師</option>
+          <option value="event">事件追蹤</option>
+          <option value="cra">合規 CRA</option>
+        </select>
+        <select id="pvWidth">
+          <option value="100%">desktop (100%)</option>
+          <option value="820">820</option>
+          <option value="390">390</option>
+        </select>
+        <button id="btnLocalPreview">本機預覽</button>
+        <a id="pvOpen" target="_blank" href="/site/index.html?pv=1">新分頁開啟</a>
+      </div>
+      <iframe id="pvFrame" style="width:100%; height:560px; border:1px solid var(--line,#444); margin-top:12px; background:#fff"></iframe>
     </section>
     <section class="card" id="sec-llm">
       <h2>LLM 端點</h2>
@@ -789,6 +859,22 @@ async function deployCmd(cmd){
   }catch(e){ $('depErr').textContent = String(e); }
   poll();
 }
+function pvUrl(){
+  const p = $('pvPreset').value;
+  return '/site/index.html?pv=1' + (p ? '#p=' + p : '');
+}
+function pvWidth(){
+  const w = $('pvWidth').value;
+  $('pvFrame').style.width = (w === '100%') ? '100%' : w + 'px';
+}
+$('pvWidth').onchange = pvWidth;
+$('pvPreset').onchange = ()=>{ $('pvOpen').href = pvUrl(); };
+$('btnLocalPreview').onclick = ()=>{
+  const u = pvUrl();
+  $('pvOpen').href = u;
+  pvWidth();
+  $('pvFrame').src = u;
+};
 $('btnPreview').onclick = ()=> deployCmd({cmd:'deploy', channel:'preview'});
 $('btnLive').onclick = ()=>{
   if(!confirm('確定要發布到正式站 afu-news.web.app？')) return;

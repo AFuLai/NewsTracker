@@ -1,0 +1,32 @@
+grep -n "DEFAULT_OUT\|^import\|^from\|def do_GET\|ROOT" /opt/tracker/repo/tracker/web_dashboard.py | head -50; grep -n "DEFAULT_OUT\|^ROOT" /opt/tracker/repo/tracker/__init__.py
+grep -n "_HTML\|btnPreview\|\$(\"btnLive\|const \$ \|</script>\|iframe" tracker/web_dashboard.py; grep -n "8799\|^import\|^from\|^def \|DEFAULT" tests/test_web_dashboard.py | head -40; head -30 tests/test_dashboard_publish.py; ls /opt/tracker/repo/ui
+python3 - <<'EOF'
+p='/opt/tracker/repo/tracker/web_dashboard.py'
+s=open(p,encoding='utf-8',newline='').read()
+def R(a,b):
+    global s
+    a=a.replace('\n','\r\n'); b=b.replace('\n','\r\n')
+    assert s.count(a)==1,a
+    s=s.replace(a,b)
+R("from .progress import NullReporter\n","from pathlib import Path\nfrom urllib.parse import unquote, urlsplit\n\nfrom . import DEFAULT_OUT, ROOT\nfrom .progress import NullReporter\n")
+R("""        def do_GET(self):
+            if self.path.startswith("/state"):""","""    …
+file tracker/web_dashboard.py tests/test_web_dashboard.py; ls; ls .venv venv 2>&1 | head -3; python3 -c "import unittest" ; grep -n "pytest" -r Makefile pyproject.toml 2>/dev/null | head
+python3 - <<'EOF'
+p='/opt/tracker/repo/tracker/web_dashboard.py'
+s=open(p,encoding='utf-8',newline='').read()
+print(s.count('\r\n'), s.count('\n'))
+EOF
+ls /opt/venv/bin/python
+python3 - <<'EOF'
+p='/opt/tracker/repo/tracker/web_dashboard.py'
+s=open(p,encoding='utf-8',newline='').read()
+def R(a,b):
+    global s
+    assert s.count(a)==1,a
+    s=s.replace(a,b)
+R("from .progress import NullReporter\n","from pathlib import Path\nfrom urllib.parse import unquote, urlsplit\n\nfrom . import DEFAULT_OUT, ROOT\nfrom .progress import NullReporter\n")
+R("""        def do_GET(self):
+            if self.path.startswith("/state"):""","""        def _serve_site(self):
+            # Local preview …
+sed -i 's/assert "預覽發布" in html and/assert "預覽頻道發布" in html and/' tests/test_dashboard_publish.py && /opt/venv/bin/python -m pytest -q 2>&1 | tail -3; git status --short | grep -v common

@@ -1,0 +1,49 @@
+bash -c 'cd /opt/tracker/repo; wc -l ui/index.html tracker/web_dashboard.py; git status --short | head; ls; grep -n "localStorage" ui/index.html | head -60'
+bash -c 'cd /home/afu/.gemini/antigravity-cli/brain/54cddfe0-cc5e-40a4-ad4d-6dd4addbeae4/.system_generated/steps; for i in 3 4 5 6 7 8; do echo "=== $i"; wc -c $i/content.md; head -c 2500 $i/content.md; echo; done'
+bash -c 'cd /home/afu/.gemini/antigravity-cli/brain/54cddfe0-cc5e-40a4-ad4d-6dd4addbeae4/.system_generated/steps; for i in 3 4 5 6 7 8; do echo "=== $i $(sed -n 5p $i/content.md)"; f=$i/content.md; echo "ldjson types:"; grep -o "\"@type\":\"[A-Za-z]*\"" $f | sort | uniq -c | sort -rn | head -8; for t in h1 h2 h3 nav aside article section header footer; do echo -n "<$t: "; grep -oi "<$t[ >]" $f | wc -l; done; echo -n "breadcrumb: "; grep -ci breadcrumb $f; echo -n "canonical: "; grep -o "rel=.canonical[^>]*"…
+bash -c 'cd /home/afu/.gemini/antigravity-cli/brain/54cddfe0-cc5e-40a4-ad4d-6dd4addbeae4/.system_generated/steps; echo ---HN; sed -n 1,40p 5/content.md | cut -c1-200; echo ---BBC; sed -n 8,60p 4/content.md | cut -c1-300; echo ---BLEEP; grep -o "<h[1-6][^>]*>[^<]*" 7/content.md | head; grep -oi "class=\"[a-z_ -]*\"" 7/content.md | sort | uniq -c | sort -rn | head -25'
+bash -c 'cd /home/afu/.gemini/antigravity-cli/brain/54cddfe0-cc5e-40a4-ad4d-6dd4addbeae4/.system_generated/steps; wc -c 4/content.md 5/content.md; echo HN; grep -o "class=\"[a-z]*\"" 5/content.md | sort | uniq -c | sort -rn | head -12; grep -c "athing" 5/content.md; grep -o "class=\"morelink\"[^>]*" 5/content.md; echo BBC; grep -o "\"@type\":\"[A-Za-z]*\"" 4/content.md | sort | uniq -c; grep -o "<link rel=\"alternate\"[^>]*" 4/content.md | head -5; grep -o "data-testid=\"[a-z-]*\"" 4/content.md | sort | uni…
+bash -c 'cd /home/afu/.gemini/antigravity-cli/brain/54cddfe0-cc5e-40a4-ad4d-6dd4addbeae4/.system_generated/steps; sed -e "s/(https[^)]*)//g" 8/content.md | sed -n 9,80p | cut -c1-160; echo ======BLEEP; grep -n "bc_latest\|class=\"bc_\|<li>\|cz-\|Latest\|Popular\|Featured\|swiper-slide" 7/content.md | cut -c1-170 | sed -n 1,40p; echo === BBC cards; grep -o "\"@type\":\"WebPage\"[^}]*" 4/content.md | head -c 400; echo; grep -o "<script type=\"application/ld+json\"[^<]*" 4/content.md | head -c 900; echo; grep …
+bash -c 'cd /opt/tracker/repo; grep -n "^function \|^async function \|^const [A-Za-z_]* *= *\(function\|(\)\|^  function \|^  async function \|<script\|</script\|<style\|</style" ui/index.html | cut -c1-140'
+bash -c 'cd /opt/tracker/repo; grep -n "def \|btnPreview\|preview\|route\|@app\|BaseHTTP\|do_GET\|do_POST\|firebase\|hosting" tracker/web_dashboard.py | cut -c1-160'
+bash -c 'cd /opt/tracker/repo; ls ui | head -30; ls ui/data 2>/dev/null | head; cat firebase.json 2>/dev/null | head -30; wc -l tracker/deploy.py; grep -n "def \|ui\b\|public\|stage\|copytree\|hosting\|channel" tracker/deploy.py | cut -c1-150 | head -60'
+bash -c 'cd /opt/tracker/repo; echo "--cluster in index.html:"; grep -n "cluster" ui/index.html | cut -c1-110 | head -30; echo; echo "--hit counts a.* fields:"; grep -on "\ba\.[a-z_]*" ui/index.html | sed "s/.*://" | sort | uniq -c | sort -rn | head -30; ls tracker | head -60; ls db | head; ls ../web 2>/dev/null | head; ls ../web/public 2>/dev/null | head'
+bash -c 'cd /opt/tracker/repo; sed -n 1,30p tracker/cluster.py; echo ----; grep -n "cluster" tracker/render.py | head; grep -n "\"sources\"\|\"tags\"\|\"category\"\|\"trackers\"\|\"cve\|\"title_en\"\|\"id\"\|\"severity\|\"published\|\"entities\|\"vendor\|\"products" tracker/render.py | cut -c1-140 | head -30; echo ----; ls ../web/public/data | head; ls ../web/public/data/* | head -8'
+bash -c 'cd /opt/tracker/repo; sed -n 105,140p tracker/render.py; echo ----; ls ../web/public/data | tail -3; f=$(ls ../web/public/data/data-2026*.js | tail -1); echo $f; head -c 1800 $f; echo; echo ---- keys freq over all day files; cat ../web/public/data/data-*.js | grep -o "\"[a-z_]*\": *" | sort | uniq -c | sort -rn | head -20; echo; echo "multi-source articles (sources array >=2) sample count:"; cat ../web/public/data/data-2026*.js | grep -c "\"sources\""; ls ../web/public/data | wc -l; diff -q ui/inde…
+bash -c 'cd /opt/tracker/repo; node -e "
+const fs=require(\"fs\");const dir=\"../web/public/data/\";
+global.window={};
+const files=fs.readdirSync(dir).filter(f=>/^data-\d{8}\.js$/.test(f)).sort();
+let n=0,multi=0,cve=0,tagc=0,days=0,en=0;const cats={};const trk={};const keys={};const srcc={};let mostSrc=0;
+for(const f of files){window.TRACKER_DAYS={};try{eval(fs.readFileSync(dir+f,\"utf8\"));}catch(e){console.log(\"ERR\",f,e.message);continue}
+ days++;for(const d in window.TRACKER_DAYS)for(const a of window…
+bash -c 'cd /opt/tracker/repo; python3 - <<EOF
+import sqlite3
+c=sqlite3.connect("file:db/articles.sqlite?mode=ro",uri=True)
+for (n,s) in c.execute("select name,sql from sqlite_master where type=\"table\""): print(n, (s or "")[:600].replace("\n"," "))
+EOF'
+bash -c 'cd /opt/tracker/repo; grep -n "cards-grid\|\.card {\|\.card{\|data-skin\|data-mode\|\.app-body\|#main-content *{\|#sidebar *{\|lib-row *{\|@media" ui/index.html | cut -c1-130 | head -50; echo; grep -n "cluster" tracker/orchestrator.py tracker/render.py | head; sed -n 1097,1110p ui/index.html; grep -n "<head>\|<title>\|og:\|ld+json\|canonical\|<meta" ui/index.html | head -12'
+bash -c 'cd /opt/tracker/repo; python3 - <<EOF
+import sqlite3
+c=sqlite3.connect("file:db/articles.sqlite?mode=ro",uri=True)
+q=lambda s:c.execute(s).fetchall()
+print("status",q("select status,count(*) from articles group by status"))
+print("embedding non-null",q("select count(*) from articles where embedding is not null"))
+print("date range",q("select min(date),max(date) from articles where status=\"written\""))
+print("cra_topic",q("select count(*),count(distinct cluster) from cra_topic"))
+EOF
+sed -n 1,20p t…
+bash -c 'cd /opt/tracker/repo; grep -n "index.html\|DEFAULT_OUT\|shutil\|copy" tracker/render.py | head; grep -n "DEFAULT_OUT" tracker/*.py | head -5; ls tests | head -40; grep -ln "web_dashboard" tests/* | head; grep -n "localStorage\|try {" tests/*.py 2>/dev/null | head -3'
+bash -c 'cd /opt/tracker/repo; sed -n 1,40p tests/test_browser.py | cut -c1-140; grep -n "def test" tests/test_browser.py | wc -l; grep -n "def test" tests/test_dashboard_publish.py | head -12; sed -n 210,225p tracker/render.py'
+bash -c 'cd /opt/tracker/repo; chk(){ f=$1; n=$2; q=$3; l=$(sed -n "${n}p" $f); if [[ "$l" == *"$q"* ]]; then echo "OK   $f:$n"; else echo "MISS $f:$n  -> $(grep -nF -- "$q" $f | head -2 | cut -c1-60)"; fi; }
+chk ui/index.html 6 "<title>資安新聞追蹤系統</title>"
+chk ui/index.html 1329 "const CAT_MAP = {"
+chk ui/index.html 1626 "function libGroupKey(t, sources) {"
+chk ui/index.html 1973 "if (day) articles = articles.concat(day.map(a => ({ ...a, _date: date })));"
+chk ui/index.html 2046 "const srcName = a.sources && …
+bash -c 'cd /opt/tracker/repo; grep -nF "grid.className = '"'"'cards-grid'"'"';" ui/index.html; grep -nF "h.s === '"'"'md3'"'"' || h.s === '"'"'classic'"'"'" ui/index.html | cut -c1-90; grep -nF "onclick = ()=> deployCmd({cmd:" tracker/web_dashboard.py'
+bash -c 'python3 -c "import playwright; print(\"playwright\", playwright.__version__)" 2>&1 | tail -1; node --version; which chromium chromium-browser google-chrome 2>&1 | head -3; python3 -c "import selenium" 2>&1 | tail -1; ls /opt/tracker/repo/node_modules 2>&1 | head -2; ls /opt/tracker/repo/tests | grep -i "ui\|html\|index"'
+bash -c 'cd /opt/tracker/repo; sed -n 116,127p tracker/render.py | grep -oE "^ +\"[a-z_]+\":" | tr -d " \n"; echo; S=/home/afu/.gemini/antigravity-cli/brain/54cddfe0-cc5e-40a4-ad4d-6dd4addbeae4/.system_generated/steps; grep -c "<h3 class=\"talign_center" $S/3/content.md; sed -n 284,330p $S/3/content.md | grep -c "<li><a href"; grep -c "multi" /dev/null; python3 - <<EOF
+import sqlite3
+c=sqlite3.connect("file:db/articles.sqlite?mode=ro",uri=True)
+print(c.execute("select count(*) from articles where status=\"w…

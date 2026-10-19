@@ -1,0 +1,23 @@
+LF files. Rerun without CRLF conversion.
+S0 and S1 are implemented, and the full suite passes (`/opt/venv/bin/python -m pytest -q`: 501 passed). I ran it outside any sandbox. Only the three listed files changed.
+
+**S0 (`/site/` route in [`tracker/web_dashboard.py`](file:///opt/tracker/repo/tracker/web_dashboard.py)):**
+- `/site` redirects with a 302 to `/site/index.html`.
+- `/site/` and `/site/index.html` serve `ROOT/ui/index.html`. Any other `/site/<rel>` serves `DEFAULT_OUT/<rel>`.
+- Query strings and fragments are stripped and the path is URL-unquoted. Traversal, missing files and directories return 404.
+- Content-Type comes from `mimetypes`, with `.js` forced to `text/javascript` and `application/octet-stream` as the default. `Cache-Control: no-store` is set.
+- `/state`, `/control` and the loopback binding are unchanged.
+- To monkeypatch, use **`tracker.web_dashboard.DEFAULT_OUT`** (and `ROOT`). I imported them at the top with `from . import DEFAULT_OUT, ROOT` and the handler reads those module globals on each request. Patching `tracker.DEFAULT_OUT` instead would have no effect.
+
+**S1 (preview card in the console HTML):**
+- The `sec-preview` card sits right after the Publish card. It has `pvPreset`, `pvWidth`, `btnLocalPreview`, the `pvOpen` link and the `pvFrame` iframe.
+- The iframe and its controls are outside the areas that `poll()` and `syncDeploy` rewrite, so polling won't reset them.
+- Clicking `btnLocalPreview` sets the iframe src to `/site/index.html?pv=1` plus `#p=<preset>` when a preset is chosen. `pvOpen` points at the same URL. `pvWidth` sets the iframe width only.
+- The Publish button now reads 預覽頻道發布, with its id and handler unchanged.
+
+**Tests:**
+- [`tests/test_web_dashboard.py`](file:///opt/tracker/repo/tests/test_web_dashboard.py) has a new `test_site_preview_route` on port 8801. It checks the `<title>` text, `.js` content-type, both traversal paths, a directory and a missing file.
+- [`tests/test_dashboard_publish.py`](file:///opt/tracker/repo/tests/test_dashboard_publish.py) has a new string check for `sec-preview`, `pvFrame` and `btnLocalPreview`.
+- I also changed an existing assertion in `test_html_has_publish_card` from "預覽發布" to "預覽頻道發布". The old string is no longer in the HTML after the rename, so that test failed until I updated it.
+
+verified: 6  assumed: 0  gaps: 0  findings: 0

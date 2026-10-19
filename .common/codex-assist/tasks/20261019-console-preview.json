@@ -1,0 +1,41 @@
+{
+  "id": "20261019-console-preview",
+  "engine": "agy",
+  "pin_engine": true,
+  "mode": "implement",
+  "root": "/opt/tracker/repo",
+  "prompt_file": ".common/codex-assist/tasks/20261019-console-preview.prompt.md",
+  "inputs_glob": "tracker/web_dashboard.py tracker/__init__.py tests/test_web_dashboard.py tests/test_dashboard_publish.py",
+  "touch_allow": [
+    "tracker/web_dashboard.py",
+    "tests/test_web_dashboard.py",
+    "tests/test_dashboard_publish.py"
+  ],
+  "acceptance": [
+    {
+      "id": "tests",
+      "argv": [
+        "/opt/venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "tests"
+      ],
+      "expect": "passed"
+    },
+    {
+      "id": "no-test-sniffing",
+      "argv": [
+        "python3",
+        "-c",
+        "import subprocess,re,sys; d=subprocess.run([\"git\",\"-C\",\"/opt/tracker/repo\",\"diff\",\"HEAD\",\"--\",\"tracker\"],capture_output=True,text=True).stdout; bad=[l for l in d.splitlines() if l.startswith(\"+\") and re.search(r\"_getframe|inspect\\.stack|PYTEST_CURRENT_TEST|\bpytest\b\",l)]; print(\"cheat-bad\" if bad else \"cheat-ok\"); print(*bad,sep=chr(10))"
+      ],
+      "expect": "cheat-ok"
+    }
+  ],
+  "timeout_s": 2400,
+  "model": "claude-sonnet-5-5-medium",
+  "note": "User 2026-10-19: go ahead with S0-S1 of plan 20261019-layout-scenarios-plan. New behaviour checked by the session with its own probe outside the root after the run (B6/B7)."
+}

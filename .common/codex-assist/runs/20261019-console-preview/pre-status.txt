@@ -1,0 +1,7 @@
+# git status --porcelain at dispatch (this line keeps a clean tree's file non-empty)
+?? .common/codex-assist/runs/20261019-console-preview/
+?? .common/codex-assist/runs/20261019-layout-scenarios-plan/
+?? .common/codex-assist/tasks/20261019-console-preview.json
+?? .common/codex-assist/tasks/20261019-console-preview.prompt.md
+?? .common/codex-assist/tasks/20261019-layout-scenarios-plan.json
+?? .common/codex-assist/tasks/20261019-layout-scenarios-plan.prompt.md

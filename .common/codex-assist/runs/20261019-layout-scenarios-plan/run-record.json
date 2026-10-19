@@ -1,0 +1,122 @@
+{
+  "task_id": "20261019-layout-scenarios-plan",
+  "mode": "plan",
+  "requested": {
+    "root": "/opt/tracker/repo",
+    "sandbox": "host-ro+root-ro",
+    "model": "claude-sonnet-5-5-high",
+    "egress": "cloud",
+    "allow_common": false,
+    "timeout_s": 1500,
+    "inputs_glob": "ui/index.html tracker/web_dashboard.py"
+  },
+  "actual": {
+    "engine": "agy",
+    "codex_bin": "/home/afu/.local/bin/agy",
+    "codex_version": "1.4.2",
+    "session_id": "54cddfe0-cc5e-40a4-ad4d-6dd4addbeae4",
+    "model": "claude-sonnet-5-5-high",
+    "cwd": "/opt/tracker/repo",
+    "sandbox": "host-ro+root-ro",
+    "denied_actions": [],
+    "host_fence": true,
+    "provider": "antigravity",
+    "rc": 0,
+    "elapsed_s": 296.3,
+    "tokens": 223841,
+    "usage": {
+      "fresh_input": 190079,
+      "cached_input": 2730379,
+      "output": 33762,
+      "reasoning": 0,
+      "raw": {
+        "input_tokens": 190079,
+        "output_tokens": 33762,
+        "thinking_tokens": 0,
+        "cache_read_tokens": 2730379,
+        "total_tokens": 223841
+      }
+    },
+    "effort": null,
+    "plan_usage": {},
+    "started_at": "2026-10-19T06:23:25Z",
+    "finished_at": "2026-10-19T06:28:22Z",
+    "ephemeral": false,
+    "commands": 22,
+    "machine": "afu-delta"
+  },
+  "role_sha256": "1cc596dacabf1cbfbcb6a8c50c4b0b0bc77d1e4528093742fbd058b591fd701f",
+  "sheet_sha256": null,
+  "acceptance_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "commands_sha256": [
+    "82e3c584f87c62c8239368c52ea8d39823c841c19254a79824de7600fab4be01",
+    "aeeca6c3622b70557765a2da33138816acc742850a87ee023d803a19ea629dda",
+    "957eb04af096aa1e0a8564939b9b0dd8e5e2663c83aa970e57bc67bc7d419e44",
+    "67f5c182ddfdcb254b62f942dd1ee6a2b40df72e12cb32127a92f5bb1d2adc33",
+    "78825d324f7e2c38ac461512a406013cac87cf609ad4c3106367b849b19aacb0",
+    "490351739705425a9a33dec38a35877b3c9049e5ad3b46c762f4ef23c338cd76",
+    "f77fadc0e2a663ea3d78f0561d28ac8d83904e37f0289e400b79f3eed792bcdb",
+    "b4eb1848573fad5742064b0fe927f1c31caf5538f5fd02ab5ec4ad307a5e7f3c",
+    "b0d69c559b2dc73605124a20bbc344a1ef6a394237b44c3264abf4e1c20b6f71",
+    "4d52fcbf4e2f47f298ca67cafa38b26c5bc5d076b24dd115df3b9b0599eb12c7",
+    "1afac19787abaf67a58f45418c24c33846216f8728a25fe25102f16d9cbf4645",
+    "7358f3d0ea02a06af21f000e5c285fe078c6c8777ec18711b1c1df8446dee511",
+    "3f515408a94ff75bcae77cf35f484254d85b8d8486a1079eb82cd451b0a3219e",
+    "88686eb143fc947930ca2ad1cdbff61baa21d39303a1f83c451f528923aa0e0b",
+    "740139124bd1f061124d514e5f83118800e066b60f8997376d35e40a92c41f53",
+    "299e7da98e00b733447550665e50f6a719c44d7ac672b9f4b9dffa30678ed3d8",
+    "40b7133d43932c5bf7fefb3c41dd3300898c7a16bb7eef9d98ef03c22be82d1f",
+    "ec0753947350a7fc0f0f46a9bbe8b84a04f8a10d5c3389e27bc1993e626abb5d",
+    "2b0868a6e9467c604216280186e0b3807e789b4c7dfd1ac93195f6aa4d8ccb77",
+    "438372d1eeb296fb965c467dbb4944f0e29455796c44f37beb4feeb5ee8b10f3",
+    "6bc5aae705060ba04a4ba00b3ce8c83726ffc0d25c7f25282d5c1e8763d848f9",
+    "8f003924e3759be8b5f2a040b27e48680d404046afd1436ba7ee7f94f73e518e"
+  ],
+  "answer_path": "/opt/tracker/repo/.common/codex-assist/runs/20261019-layout-scenarios-plan/answer.txt",
+  "answer_shape": "summary-line",
+  "quote_gate": {
+    "status": "CLEAN",
+    "findings": 0
+  },
+  "verify": {
+    "reader_violation": false,
+    "reader_delta": [],
+    "ro_fence": true,
+    "unattributed_delta": [],
+    "backstop_unavailable": null,
+    "citations": {
+      "checked": 8,
+      "verified": 7,
+      "missed": [
+        "CITATION-MISS render.py:222  (file not found)"
+      ],
+      "short": 0,
+      "line_off": [],
+      "format": []
+    },
+    "probe_check": {
+      "judged": 0,
+      "unrunnable": [],
+      "unparsed": 0
+    }
+  },
+  "verdict": "CITATION-MISS",
+  "recorded_at": "2026-10-19T06:28:23Z",
+  "recorder": {
+    "name": "record.py",
+    "version": "0.10.0",
+    "sha256": "a95169da0c93f0338ffb624a4a972faecc040c21f105b48b4fb1869c93139156"
+  },
+  "verify_result": "NOT-VERIFIED",
+  "defects": [
+    {
+      "type": "CITATION-MISS",
+      "effect": "NOT-VERIFIED",
+      "count": 1,
+      "examples": [
+        "CITATION-MISS render.py:222  (file not found)"
+      ]
+    }
+  ],
+  "defects_spec_sha256": "3326060632526913a879e96855534a9ea197c73ecd54d514f4dd6c2cde144ca4"
+}

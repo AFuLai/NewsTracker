@@ -1,0 +1,243 @@
+我會先讀取程式碼，同時抓取參考網站。
+# 事件地圖、新聞框架化與導覽情境配置：研究與規劃（唯讀，未改任何檔案）
+
+**範圍聲明：**
+- 所有程式碼引用都在 `/opt/tracker/repo` 內。
+- 「多來源文章 109 / 12639」是我讀 `/opt/tracker/web/public/data/data-*.js` 得到的。該目錄在工作根之外，唯讀。
+- 驗證指令：用 `node` 載入各檔後統計 `sources.length>1`。
+
+## 1. 版面調查
+
+### 1.1 實際抓取的網址
+
+| 網址 | 狀態 | 能觀察到的內容 |
+|---|---|---|
+| https://www.i-web.com.tw/seo.html | 已抓取，完整 HTML（988 行） | 見下 |
+| https://www.bleepingcomputer.com/ | 已抓取，伺服器端 HTML | 導覽分頁 `Featured / Latest`（`#nfeatured`、`#nlatest`）、RSS。首頁 `application/ld+json` 為 0 個。 |
+| https://news.ycombinator.com/ | 已抓取，伺服器端 HTML | 30 列 `athing`，每列有 `rank / titleline / sitestr / score / hnuser / age / subline`，以 `morelink` 翻頁。 |
+| https://www.bbc.com/news | 已抓取，Next.js 外殼 | `<head>` 有 `canonical`、4 個 `hreflang`、JSON-LD（`WebPage` + `NewsMediaOrganization`）。抓到的原始碼 `<h1>/<h2>` 為 0，**版面主體看不到**。 |
+| https://www.theverge.com/ | 已抓取，Next.js 外殼 | JSON-LD 有 `NewsMediaOrganization`、`WebSite`+`SearchAction`、15 個 `Person`、19 個 `Thing`；RSS；`nav aria-label="Top Navigation"`。主體版面同樣**看不到**。 |
+| https://news.google.com/ | 已抓取，Markdown 化 | 抓到的內容明顯是舊快取（法國騷亂），只能參考結構。結構是 `Top stories` 之下每個事件一組（1 則主標加 3–4 則同事件報導，附「See more headlines & perspectives」），底部有 `For you / Following / U.S. / World / Business / Technology / Science…` 導覽。 |
+
+BBC 與 Verge 的版面主體不是由伺服器端 HTML 提供，所以我只引用它們的 SEO 結構，不推論 grid 或 hero 版型。
+
+### 1.2 i-web `seo.html` 的結構
+
+它是公司作品集頁，不是新聞頁，但它是你點名的參考。
+
+- **標題層級：** 1 個 `<h1>`，視覺隱藏（`<h1 class="pos_abs pageh1">`，L110）。`<h2>` 有 2 個。24 張卡片各有 1 個 `<h3>`（`grep -c '<h3 class="talign_center'` = 24）。
+- **麵包屑：** 有可見的 `<ol>`（L232–235），也有 `BreadcrumbList` JSON-LD（L34–43，2 個 `ListItem`）。
+- **側欄：** `<aside>` 內是「所有作品」分類導覽（L238–280）。
+- **主題樞紐：** 「熱門分類」連結清單，22 個 `<li><a>`（L284–330）。
+- **篩選列：** 公司名稱加行業別下拉選單（L409–437）。
+- **翻頁：** 靜態連結 `seo_2.html … seo_9.html`（L657），可被爬蟲抓取。
+- **卡片：** 圖加標題，整張卡片是一個絕對定位的 `<a>`。
+- 卡片本身沒有 schema，只有 BreadcrumbList。
+
+### 1.3 可重用的版型
+
+| 版型 | 來源 | 重點 | SEO 結構 |
+|---|---|---|---|
+| **Hero / 頭條** | Verge、BBC | 第一則放大 | 每頁 1 個 `h1`；`NewsMediaOrganization` |
+| **River（單欄時間流）** | HN、BleepingComputer Latest | 單欄、標題加一行中繼資料、高密度 | `<ol>` 有序清單；RSS |
+| **Grid（卡片格）** | i-web、BleepingComputer Featured | 等寬卡片，每張一個 h3 | 卡片標題用 `h3`；翻頁為真連結 |
+| **Sidebar** | i-web `<aside>` | 分類或日期導覽 | `<nav aria-label>` |
+| **Timeline / 事件群組** | Google News（主標加同事件多報導） | 一事件多來源折疊 | `NewsArticle` 該放在事件頁，不放在清單頁 |
+| **Topic hub** | i-web「熱門分類」、BleepingComputer `Featured/Latest` | 分類入口、內部連結 | `BreadcrumbList`；分類頁 `h1` |
+
+### 1.4 我們的 SPA 的 SEO 現況
+
+`ui/index.html` 完全沒有 SEO 標記：
+
+- **F1** `ui/index.html:6` `<title>資安新聞追蹤系統</title>`
+- 驗證：`grep -cE 'ld\+json|canonical|og:|name="description"' /opt/tracker/repo/ui/index.html`，整檔讀過，結果為 **0**。
+- 文章全由 `data-*.js` 在瀏覽器端渲染（L1973、L2036），初始 HTML 沒有文章。
+- **假設（未驗證）：** 在 JS 渲染的 SPA 內注入 `NewsArticle` JSON-LD 的收錄效果不確定。是否值得做，還是要由 pipeline 產生靜態事件頁，這要由 session 決定。
+- 文章沒有可分享的網址：`syncHash`（L2252）的 hash 不含文章 id，但 `render.py:116` 已有穩定 id（`"id": f"{day8}-{r['id']}"`）。
+
+## 2. 事件地圖（四個方案）
+
+### 2.1 我們已有的資料
+
+**F2** `tracker/render.py:127` `"sources": _parse_sources(r),`
+
+- 驗證：`sed -n 116,127p /opt/tracker/repo/tracker/render.py | grep -oE '^ +"[a-z_]+":'`
+- 輸出為十個欄位：`id, trackers, category, title, summary, tags, title_en, summary_en, tags_en, sources`。
+- **沒有** cluster、event、date、地理或實體欄位。日期來自檔案 key（L1973 的 `_date`）。
+- UI 對文章的 `a.cluster / a.date / a.entities / a.geo / a.severity` 引用為 **0 處**。
+- `cluster` 目前只屬於 CRA 圖書庫的主題，不屬於新聞（L1554、L1626 `function libGroupKey(t, sources) {`）。
+- 「事件群集」的實作是 `tracker/cluster.py:86` `def merge_by_title(rows`。它只在**同一天**內合併，只留下 `sources`，不持久化 event id。呼叫處在 `tracker/orchestrator.py:1172` `from .cluster import merge_by_title`。
+- 資料庫的 `articles` 表已有 `embedding BLOB`，`written` 的 12801 筆中 6754 筆有向量。這些向量**沒有輸出到前端**。
+- 量化結果：
+  - 多來源文章 109 / 12639（0.9%，最多 5 個來源）。
+  - 帶 `CVE-*` 標籤的文章 2511 / 12801（`written`，查詢條件 `tags like '%CVE-%'`）。
+  - 平均每篇 6.01 個標籤（來自前述 `data-*.js`）。
+
+### 2.2 方案
+
+| 方案 | 已有 | 缺少 | 函式庫成本（CDN、無 build） |
+|---|---|---|---|
+| **A. 依事件的時間軸**（推薦首選） | `tags` 內的 CVE、`sources`、日期 | 跨日 `event_id`。可先用 CVE 當事件 key，涵蓋約 20%。其餘要靠標題相似度或 embedding 在 pipeline 端跨日聚類。 | 0：純 DOM/CSS，沿用 `.date-divider`（L602）與 `lib-row`（L689 `buildLibRow`）樣式。 |
+| **B. 實體／關係圖** | `tags`（含廠商、產品、CVE、主題，但**沒有型別**） | 實體型別（LLM 抽取），或先用標籤共現做無型別圖 | CDN 的 d3-force、cytoscape.js 或 vis-network。我**沒有量測**大小。圖上超過數百節點時可讀性是風險。 |
+| **C. 地理地圖** | 無 | 國家或地區欄位（LLM 抽取）加座標表 | Leaflet（需外部圖磚服務）或 d3-geo + topojson。對資安新聞價值最低，建議最後做。 |
+| **D. 故事線（storyline）** | 同 A | A 的 `event_id`，加每事件的 LLM 時序摘要 | 同 A。LLM 成本在 pipeline，不在前端。 |
+
+**建議順序：** A、D、B、C。A 的第一版純前端即可做（用 CVE 分組）。要涵蓋非 CVE 事件，就要在 `render.py` 與 `data_day.js.j2` 增加 `event_id`（見第 3 節）。
+
+## 3. 新聞內容框架化
+
+### 3.1 欄位對應
+
+| 框架欄位 | 現有來源 | 需 LLM／pipeline |
+|---|---|---|
+| What（標題、摘要） | `title/summary`（L2055–2056） | 否 |
+| When（發布日） | 日檔 key（L1973） | 事件**發生日**與發布日未區分，需 LLM（例如摘要裡的「10月2日至10月7日」） |
+| 分類 | `category`，經 `effectiveCat`（L1366） | 否 |
+| 影響平台 | OS tracker 的 `category`（Linux/Windows/Apple/Android，L1360–1363） | 否（僅限 OS tracker） |
+| 識別碼 | `tags` 的 CVE 正規式（L2048） | 否 |
+| 證據與可信度 | `sources[{name,url,lang}]`、`sources.length` | 否 |
+| Who / Where / Why / How | 無 | 需要 |
+| Affected products（含版本） | `tags` 部分有，但沒型別 | 需要 |
+| Impact / severity | 無 | 需要（或查外部 CVSS，語意見 3.3 的 gap） |
+| Timeline、event_id | 無 | 需要（跨日聚類，見 2.2） |
+
+### 3.2 建議的資料形狀
+
+在日檔項目加一個**選填**的 `frame` 物件：
+
+```
+frame: { event_id, who, where, why, how, impact, products[], severity, event_date }
+```
+
+- 沿用 `data_day.js.j2` 的做法：有值才輸出（該模板對 `title_en` 就是 `{%- if item.title_en %}`），UI 缺欄位時整區不顯示。
+- 前端在 `openOverlay`（L2080）渲染框架區塊，`buildCard`（L2036）只露出 `severity` 與 `event_id`。
+- pipeline 側會多一次 LLM 呼叫，或擴充現有摘要 prompt。我**沒讀** `tracker/prompts/`，擴充方式屬假設。
+
+### 3.3 需要裁決的缺口
+
+```
+CODEX-ASSIST-GAP
+  kind: acceptance
+  question: severity／impact 的等級定義（幾級、判準，是否引用 CVSS／KEV）
+  blocked-by: 專案對「影響程度」的驗收語意；我不能憑訓練資料自訂
+  needed: 等級表與每級判準，以及是否允許外部資料源
+
+CODEX-ASSIST-GAP
+  kind: bilingual
+  question: 框架欄位（Who/Where/Why/How/Impact/Affected products…）的中英對照用語
+  blocked-by: 專案的雙語用詞權威（現有用詞表在 CAT_EN，L1028–1038，只涵蓋分類）
+  needed: 核定的欄位標籤中英對照
+```
+
+## 4. 導覽情境配置（presets）
+
+### 4.1 佈局與預設
+
+先定義佈局 id：`grid`（現狀 `.cards-grid`，L613）、`river`（單欄清單）、`hero`（首則放大加 grid）、`hub`（依分類或 cluster 分節，重用 `renderLibrary` L1575 的分組做法）、`timeline`（事件軸，等 `event_id`）。
+
+| 預設 | 佈局 | 預設篩選 | 密度 |
+|---|---|---|---|
+| 預設（現況，也是 fallback） | `grid` | 無 | comfortable |
+| 快讀 | `river` | 重大事件、漏洞與威脅情報（security tracker） | compact |
+| 分析師 | `grid` | 無；顯示標籤與來源數 | comfortable |
+| 事件追蹤 | `timeline`（無 `event_id` 時退回依 CVE 分組） | 無 | comfortable |
+| 合規 CRA | `hub`，tracker 為 `eu_cra` | 該 tracker 全部分類；可連到 CRA 庫（`selectLibrary` L1534） | comfortable |
+
+**假設：** 「快讀」要預設篩選哪些分類是產品決定，上表只是提案。
+
+### 4.2 儲存：單一 key `tracker_view`
+
+```
+{ "v": 1, "preset": "quick", "overrides": { "layout": "river", "density": "compact" } }
+```
+
+- **只存 preset id 加使用者覆寫值。** 預設的定義放在程式碼的 `PRESETS` 常數，改定義時不需要遷移資料。`v` 只管儲存格式。
+- **版本與壞資料：** `JSON.parse` 失敗、`v` 不認得、`preset` 不在 `PRESETS` 中，一律回到「預設」。不覆寫壞值，直到使用者下次改動。
+- **storage 丟例外：** 沿用現有慣例，每次存取包 `try { … } catch (e) {}`（L1019 起、L1098 等）。失敗時改用記憶體內的 `viewPrefs`，本次工作階段有效，不報錯。
+- **優先序**（與現有一致，L1473 `if (!applyHashRestore()) selectTracker(names[0]);` 與 L2308 的 skin 先例）：URL hash `p=` 勝過 localStorage，localStorage 勝過預設。
+- **與現有五個 key 的關係**（`tracker_lang/theme/skin/nav/lib_group`，各 2–3 次引用，已用 `grep -oE` 計數）：
+  - 這五個 key 都不動。
+  - theme 與 skin 是獨立軸（L11–13 的註解），不納入 preset。
+  - preset 的導覽預設值只在 `tracker_nav` 未設定時才生效，使用者明確設定過的 `tracker_nav` 優先。
+- **預覽模式：** `pv=1`（見第 5 節）時不寫入 localStorage。
+
+### 4.3 掛接點（`ui/index.html`）
+
+| 位置 | 用途 |
+|---|---|
+| `init` L1423（在 L1473 之前） | 載入並套用 `tracker_view` |
+| `selectTracker` L1478 | L1489 會 `state.filterCats = new Set()`，預設篩選必須在這之後套用 |
+| `buildCatPills` L1836 與 `refreshCatPills` L1873 | 預設篩選後同步 pills |
+| `renderArticles` L1961 | 佈局分派，取代 L2028–2030 的 `cards-grid` 建立 |
+| `buildCard` L2036 | 密度與 hero 變體 |
+| `openOverlay` L2080 | 渲染 `frame` 區塊；可選 JSON-LD |
+| `syncHash` L2252 與 `applyHashRestore` L2296 | 加入 `p=` |
+| `toggleSkin` L2234 | 切換加儲存的現成範本 |
+| `applyLang` L1097 與 `I18N.ui`（L1044、L1064） | preset 與佈局名稱的雙語標籤 |
+| header L949 的 `skin-btn` 旁 | 放 preset 切換按鈕 |
+| CSS | 用 `html[data-layout]` 與 `html[data-density]`，仿 `[data-skin]`（L111）與 `html[data-mode="lib"]`（L472） |
+
+偏好邏輯請寫成**純函式**（`parseView`、`resolvePreset`、`serializeView`），這樣可以用 `node` 單獨測試（見第 6 節）。
+
+## 5. Console 本機預覽
+
+### 5.1 現況
+
+- `tracker/web_dashboard.py:228` `def do_GET(self):` 對 `/state` 以外的所有路徑一律回傳內嵌的 `_HTML`（L236–241，L237 `body = _HTML.encode("utf-8")`）。
+- 「預覽發布」按鈕（L498）呼叫 `deployCmd({cmd:'deploy', channel:'preview'})`（L792）。
+- 這會走 `tracker/deploy.py:80` `args = ["hosting:channel:deploy", channel]`，是遠端 Firebase 預覽頻道，timeout 900 秒（L86），而且只能在 `afu-delta` 執行。
+- 網站輸出目錄是 `tracker/__init__.py:25` `DEFAULT_OUT = ROOT.parent / "web" / "public"`。
+- `ui/index.html` 只在 render 時才複製過去（`render.py:222` `shutil.copyfile(src, dst)`）。
+
+### 5.2 最小設計
+
+1. **伺服器：** 在 `do_GET` 的 `else` 前新增 `/site/…` 分支。
+   - 對應到 `DEFAULT_OUT / 相對路徑`。
+   - 去掉 query 與 hash 後做 `resolve()`，並檢查 `is_relative_to(DEFAULT_OUT.resolve())`，防路徑穿越。
+   - 以 `mimetypes` 決定 Content-Type，加 `Cache-Control: no-store`，找不到就回 404。
+   - 只做 GET、只讀，不碰 `/control`。
+   - `/site/index.html` 直接讀 `ROOT/ui/index.html`，這樣改 UI 不必先 render 就能預覽。
+   - 綁定位址維持預設 loopback（L264）。
+2. **頁面：** 在 Publish 卡（L489–502）之後新增 `<section class="card" id="sec-preview">`。內容為：
+   - preset 下拉（含「預設」）。
+   - 寬度下拉（桌面／平板 820／手機 390，只改 iframe 寬度）。
+   - 「本機預覽」按鈕：把 iframe 的 `src` 設成 `/site/index.html?pv=1#p=<preset>`。
+   - 「新分頁開啟」連結。
+3. **獨立於輪詢：** `poll()` 每 800 毫秒跑一次（L826），`syncDeploy`（L804）只改文字，所以放在獨立 section 的 iframe 不會被重置。
+4. **命名：** 現有「預覽發布」（L498）容易與本機預覽混淆，建議改成「預覽頻道發布」。措辭由你決定。
+5. **測試：**
+   - 仿 `tests/test_web_dashboard.py:48`（`test_http_server_serves_state_and_html`）測 `/site/index.html` 回 200，並用 monkeypatch 換掉 `DEFAULT_OUT`。
+   - 測 `/site/..%2f..%2fetc/passwd` 回 404 或 403。
+   - 仿 `tests/test_dashboard_publish.py:87`（`test_html_has_publish_card`）加字串檢查 `id="sec-preview"`。
+
+## 6. 實作切片
+
+**環境事實：**
+- 我檢查過沒有 playwright、selenium 或 node_modules，`node` 是 v22.22.1。
+- 因此 UI 的驗收以「純函式加 `node` 測試」為主，加手動探測。
+- 若要用 pytest 呼叫 `node`，需要從 `ui/index.html` 擷取純函式，這個做法**尚未驗證可行**。
+
+| # | 切片 | 動到的檔案 | 驗收檢查 |
+|---|---|---|---|
+| S0 | `/site/` 本機預覽路由 | `tracker/web_dashboard.py`、`tests/test_web_dashboard.py` | `pytest tests/test_web_dashboard.py -q`；`curl -sI localhost:8787/site/index.html` 為 200；穿越路徑為 404/403 |
+| S1 | 預覽卡（select、iframe、寬度） | `tracker/web_dashboard.py`、`tests/test_dashboard_publish.py` | 字串測試通過；手動確認 800 毫秒輪詢不重置 iframe |
+| S2 | `tracker_view` 純函式加 `PRESETS`，只有「預設」與密度（`data-density`） | `ui/index.html` | `node` 測 `parseView`：壞 JSON、未知版本、未知 preset 都回預設；devtools 令 `Storage.prototype.setItem` 丟例外，頁面仍可用；`grep -c tracker_view ui/index.html` > 0 |
+| S3 | `p=` hash 與 `pv=1` | `ui/index.html` | 開 `#p=quick` 套用且不寫 storage；`pv=1` 時 storage 不變 |
+| S4 | 佈局分派 `river` 與 `hero` | `ui/index.html` | 同一份資料切換佈局，`article-count`（L1993）不變；`grid` 的 DOM 與現況一致 |
+| S5 | preset 切換 UI 加雙語標籤 | `ui/index.html` | 切語言後標籤同步；`Esc` 與鍵盤可操作 |
+| S6 | 預設篩選（快讀、合規 CRA） | `ui/index.html` | 在 `selectTracker` 之後套用，pill 與結果一致；hash 帶 `c=` 時以 hash 為準 |
+| S7 | 事件 v0：依 CVE 分組的 `timeline` | `ui/index.html` | 同一 CVE 跨日聚成一組；無 CVE 的項目不出現在事件軸而留在清單 |
+| S8 | `event_id` 與 `frame` 輸出（需先解決第 3.3 節缺口） | `tracker/render.py`、`tracker/templates/data_day.js.j2`、pipeline | 日檔含選填欄位，舊檔仍可渲染（`data_day.js.j2` 的 if 模式） |
+| S9 | `openOverlay` 渲染 `frame` 與文章 hash 網址 `a=` | `ui/index.html` | 開 `#a=<id>` 直接顯示該文章 |
+
+S0–S6 都只動 `ui/index.html` 與 `web_dashboard.py`，不需要動 pipeline。S7 是不依賴 LLM 的事件地圖最小版本，S8–S9 才進 pipeline。
+
+## 7. 假設與未驗證項
+
+- BBC、Verge 的版面主體看不到，只引用它們的 SEO 結構。
+- Google News 抓到的內容是舊快取，只參考結構。
+- JS 注入 JSON-LD 的收錄效果、LLM 額外成本、圖形函式庫大小，都**沒有量測**。
+- 「快讀」的預設分類是提案，不是已定決策。
+- 我用 `ls` 與 `grep` 檢查過沒有 UI 的瀏覽器測試工具，但沒有逐一讀完 `tests/`。
+
+verified: 38  assumed: 6  gaps: 2  findings: 2

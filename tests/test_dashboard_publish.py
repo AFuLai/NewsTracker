@@ -88,4 +88,9 @@ def test_html_has_publish_card():
     html = wd._HTML
     assert "發布" in html
     assert 'id="sec-publish"' in html
-    assert "預覽發布" in html and "正式發布" in html
+    assert "預覽頻道發布" in html and "正式發布" in html
+
+
+def test_console_html_has_preview_card():
+    for needle in ('id="sec-preview"', 'id="pvFrame"', 'id="btnLocalPreview"'):
+        assert needle in wd._HTML
