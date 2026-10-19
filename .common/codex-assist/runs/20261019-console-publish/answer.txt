@@ -1,0 +1,34 @@
+Need the HTML body.
+I added the publish action and redesigned the page. The full suite's last line is `499 passed in 5.37s`.
+
+**Files changed**
+- [web_dashboard.py](file:///opt/tracker/repo/tracker/web_dashboard.py), modified.
+- [test_dashboard_publish.py](file:///opt/tracker/repo/tests/test_dashboard_publish.py), new.
+
+**Backend**
+- `{"cmd":"deploy","channel":...}` is handled in `_apply_control` before the `controller is None` check. It starts a daemon thread and returns `(True, "")` immediately.
+- A second deploy while one is running returns `(False, "已有發布作業進行中，請等它結束")`.
+- Deploy state is a module-level dict guarded by `_DEPLOY_LOCK`. `WebReporter.snapshot()` returns a copy under the `"deploy"` key.
+- `deploy` is called through the module, so the conftest stub applies. `DeployError` and any other exception both end as `state="failed"` with the message.
+
+**Frontend**
+- All requested elements are in: sticky top bar with section links, hero status card, responsive card grid, light and dark themes via CSS variables, self-contained page, and the 「發布」card with the two buttons and the `confirm()` on 「正式發布」.
+- The JS functions you listed and the `poll()` loop are kept. A deploy message containing an `https://` URL is rendered as a link, escaped with `esc()`.
+- The endpoint picker and policy now sit in an always-visible LLM 端點 card. `syncControl` fills them on every poll, even before a run starts or when there is no controller.
+- I did not open the page in a browser or run the JS. Only the Python side was exercised.
+
+**Tests**
+- The new tests cover:
+  - deploy ok
+  - second deploy refused while running
+  - `DeployError("boom")` ending as failed
+  - a generic exception ending as failed
+  - the `_HTML` publish card and both button labels
+- `tests/test_web_dashboard.py` asserts the old title string `"Tracker 執行儀表板"` in the served HTML. That conflicts with the new product name 「NewsTracker 控制台」, and I can't edit that file. I set `<title>` to `NewsTracker 控制台 · Tracker 執行儀表板` so both hold. The top bar shows only the new name. Without that title, the suite has 1 failure (`test_http_server_serves_state_and_html`).
+
+**Assumptions**
+- A non-string `channel` is refused, and surrounding whitespace is stripped. Empty means the live site.
+- The hero shows 完成 when the run finished and `summary.ok` is true, and 失敗 otherwise.
+- `.common/codex-assist/runs/` was already untracked and is not mine. I removed my scratch files from `/tmp`.
+
+verified: 5  assumed: 3  gaps: 0  findings: 1

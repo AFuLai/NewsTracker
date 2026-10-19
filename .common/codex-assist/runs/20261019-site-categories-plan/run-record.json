@@ -1,0 +1,95 @@
+{
+  "task_id": "20261019-site-categories-plan",
+  "mode": "plan",
+  "requested": {
+    "root": "/opt/tracker/repo",
+    "sandbox": "host-ro+root-ro",
+    "model": "claude-sonnet-5-5-high",
+    "egress": "cloud",
+    "allow_common": false,
+    "timeout_s": 1200,
+    "inputs_glob": "ui/index.html searchinfo/*.md"
+  },
+  "actual": {
+    "engine": "agy",
+    "codex_bin": "/home/afu/.local/bin/agy",
+    "codex_version": "1.4.2",
+    "session_id": "9cac307e-5a15-4893-a1d6-aacc8e189430",
+    "model": "claude-sonnet-5-5-high",
+    "cwd": "/opt/tracker/repo",
+    "sandbox": "host-ro+root-ro",
+    "denied_actions": [],
+    "host_fence": true,
+    "provider": "antigravity",
+    "rc": 0,
+    "elapsed_s": 134.5,
+    "tokens": 68220,
+    "usage": {
+      "fresh_input": 51084,
+      "cached_input": 219769,
+      "output": 17136,
+      "reasoning": 0,
+      "raw": {
+        "input_tokens": 51084,
+        "output_tokens": 17136,
+        "thinking_tokens": 0,
+        "cache_read_tokens": 219769,
+        "total_tokens": 68220
+      }
+    },
+    "effort": null,
+    "plan_usage": {},
+    "started_at": "2026-10-19T03:59:09Z",
+    "finished_at": "2026-10-19T04:01:23Z",
+    "ephemeral": false,
+    "commands": 6,
+    "machine": "afu-delta"
+  },
+  "role_sha256": "1cc596dacabf1cbfbcb6a8c50c4b0b0bc77d1e4528093742fbd058b591fd701f",
+  "sheet_sha256": null,
+  "acceptance_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "commands_sha256": [
+    "b6719f8f5f08bcca0daabce06ab46fcad04cbdbba0e3e9d8cac0fdec0ca6841f",
+    "085fd261d433477549913f49f10c9c9bee9b479f6ec154723ab69586a67bcaed",
+    "1313c91a12f7b45540f937e1cea1d5b7aa24977a5ce07f4caed87be13d39cb46",
+    "ec2cc7c5fcb05f7d0b4cb9d8670816508c83597a624321eeacac90eeef6dfb01",
+    "f9c45805a10a6ec46a169393919a9ba08df3328fb96696ce3502645d3822f106",
+    "67384ae1f2a90999c0790d96fe5595633ad9e10ae98e4604c57ef5b27695e02a"
+  ],
+  "answer_path": "/opt/tracker/repo/.common/codex-assist/runs/20261019-site-categories-plan/answer.txt",
+  "answer_shape": "summary-line",
+  "quote_gate": {
+    "status": "CLEAN",
+    "findings": 0
+  },
+  "verify": {
+    "reader_violation": false,
+    "reader_delta": [],
+    "ro_fence": true,
+    "unattributed_delta": [],
+    "backstop_unavailable": null,
+    "citations": {
+      "checked": 20,
+      "verified": 20,
+      "missed": [],
+      "short": 0,
+      "line_off": [],
+      "format": []
+    },
+    "probe_check": {
+      "judged": 0,
+      "unrunnable": [],
+      "unparsed": 0
+    }
+  },
+  "verdict": "SCORABLE",
+  "recorded_at": "2026-10-19T04:01:24Z",
+  "recorder": {
+    "name": "record.py",
+    "version": "0.10.0",
+    "sha256": "a95169da0c93f0338ffb624a4a972faecc040c21f105b48b4fb1869c93139156"
+  },
+  "verify_result": "OK",
+  "defects": [],
+  "defects_spec_sha256": "3326060632526913a879e96855534a9ea197c73ecd54d514f4dd6c2cde144ca4"
+}

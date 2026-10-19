@@ -1,0 +1,107 @@
+{
+  "task_id": "20261019-console-publish",
+  "mode": "implement",
+  "requested": {
+    "root": "/opt/tracker/repo",
+    "sandbox": "host-ro+root-rw",
+    "model": "claude-sonnet-5-5-medium",
+    "egress": "cloud",
+    "allow_common": false,
+    "timeout_s": 2400,
+    "inputs_glob": "tracker/web_dashboard.py tracker/deploy.py tests/conftest.py tests/test_web_dashboard.py"
+  },
+  "actual": {
+    "engine": "agy",
+    "codex_bin": "/home/afu/.local/bin/agy",
+    "codex_version": "1.4.2",
+    "session_id": "3e7a731b-774d-4e48-bc56-52745c844626",
+    "model": "claude-sonnet-5-5-medium",
+    "cwd": "/opt/tracker/repo",
+    "sandbox": "host-ro+root-rw",
+    "denied_actions": [],
+    "host_fence": true,
+    "provider": "antigravity",
+    "rc": 0,
+    "elapsed_s": 125.5,
+    "tokens": 86385,
+    "usage": {
+      "fresh_input": 69072,
+      "cached_input": 488293,
+      "output": 17313,
+      "reasoning": 0,
+      "raw": {
+        "input_tokens": 69072,
+        "output_tokens": 17313,
+        "thinking_tokens": 0,
+        "cache_read_tokens": 488293,
+        "total_tokens": 86385
+      }
+    },
+    "effort": null,
+    "plan_usage": {},
+    "started_at": "2026-10-19T03:56:39Z",
+    "finished_at": "2026-10-19T03:58:45Z",
+    "ephemeral": false,
+    "commands": 10,
+    "machine": "afu-delta"
+  },
+  "role_sha256": "1cc596dacabf1cbfbcb6a8c50c4b0b0bc77d1e4528093742fbd058b591fd701f",
+  "sheet_sha256": null,
+  "acceptance_sha256": "a86c936de2cbaaef87273624e0cd2fdea847aa9d7af17fc552f0f97ca2fec5be",
+  "commands_sha256": [
+    "d81fb2deb0b32bae46f2f5d65aaa79a4c72b4725c525026daa83edabd00d3006",
+    "42cecc326e253f7b5214f661e50d197188df914092a7bcf707f995b772ce5cdc",
+    "a3a2f18cae8855bc165b67bcb8e5378484c37b61aa78afd4a534fea6245d38a6",
+    "69d5fa77ddce031e62b91b106581009f69e50e4578e193f78f54800bb6a642bf",
+    "8e198ff965b62b103b5fe37cc1098be3a92c2be07ce4003120b3adb32060cf1a",
+    "b34c47ce5966502a8d5da9e1d891f61688bbcb2f57042ac146e0d06f9f91f1e3",
+    "7a31265e8722a434e0a157ff72af8e806484786ec1ae6bc9f53003c185c3c0f4",
+    "e279ab4bd1ddef615fbbe05a57a6a73e55f002d473c04796b9f486dfdc73ad3a",
+    "7efb7a1e53219dff44c4bee93e93cb77f7e494db2de426f76afe1ab92c52043b",
+    "8ac52fc5c27322851d290ff2a78e3b303b2fe40cd3571ade234acadfba84d2b2"
+  ],
+  "answer_path": "/opt/tracker/repo/.common/codex-assist/runs/20261019-console-publish/answer.txt",
+  "answer_shape": "summary-line",
+  "quote_gate": {
+    "status": "CLEAN",
+    "findings": 0
+  },
+  "verify": {
+    "touched_files": [
+      "tests/test_dashboard_publish.py",
+      "tracker/web_dashboard.py"
+    ],
+    "out_of_scope": [],
+    "markers_removed": [],
+    "probes": [
+      {
+        "id": "tests",
+        "rc": 0,
+        "pass": true,
+        "output_path": "/opt/tracker/repo/.common/codex-assist/runs/20261019-console-publish/verify/tests.out"
+      },
+      {
+        "id": "import-page",
+        "rc": 0,
+        "pass": true,
+        "output_path": "/opt/tracker/repo/.common/codex-assist/runs/20261019-console-publish/verify/import-page.out"
+      },
+      {
+        "id": "no-external",
+        "rc": 0,
+        "pass": true,
+        "output_path": "/opt/tracker/repo/.common/codex-assist/runs/20261019-console-publish/verify/no-external.out"
+      }
+    ]
+  },
+  "verdict": "SCORABLE",
+  "recorded_at": "2026-10-19T03:58:46Z",
+  "recorder": {
+    "name": "record.py",
+    "version": "0.10.0",
+    "sha256": "a95169da0c93f0338ffb624a4a972faecc040c21f105b48b4fb1869c93139156"
+  },
+  "verify_result": "OK",
+  "defects": [],
+  "defects_spec_sha256": "3326060632526913a879e96855534a9ea197c73ecd54d514f4dd6c2cde144ca4"
+}

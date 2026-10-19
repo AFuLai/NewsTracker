@@ -1,0 +1,51 @@
+wc -l tracker/web_dashboard.py tracker/deploy.py tests/conftest.py; sed -n 1,230p tracker/web_dashboard.py
+grep -n "deploy" -B2 -A12 tests/conftest.py | head -50; grep -n "def deploy\|class DeployError" -A12 tracker/deploy.py | head -50
+grep -n '^_HTML' tracker/web_dashboard.py; awk 'NR>=218' tracker/web_dashboard.py | tr -d '\r'; file tracker/web_dashboard.py; sed -n 1,25p tracker/web_dashboard.py | tr -d '\r'
+grep -n "_HTML\|web_dashboard" -r tests | head -20
+mkdir -p /tmp/ca && cat > /tmp/ca/head.html <<'EOF'
+_HTML = r"""<!DOCTYPE html>
+<html lang="zh-Hant"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NewsTracker 控制台</title>
+<style>
+  :root { --bg:#f5f6fa; --card:#ffffff; --line:#e4e7ee; --txt:#1c2330;
+          --dim:#6b7686; --accent:#4f46e5; --accent-ink:#ffffff; --soft:#eef0f6;
+          --green:#1a9d57; --yellow:#b7791f; --red:#d93b3b;
+          --shadow:0 4px 18px rgba(28,35,48,.08); --radius:14p…
+cd /tmp/ca && python3 - <<'EOF'
+s=open('head.html',encoding='utf-8').read()
+s=s.replace('<section class="card config" id="sec-llm">','<section class="card" id="sec-llm">')
+s=s.replace('<section class="card cra wide hidden" id="sec-cra">\n      <div id="cra">\n','<section class="card cra wide hidden" id="cra">\n')
+s=s.replace('        <div class="cralist" id="craList"></div>\n      </div>\n    </section>','      <div class="cralist" id="craList"></div>\n    </section>')
+# dedent inner cra lines
+a=s.index('id…
+cd /tmp/ca && cat > apply.py <<'PYEOF'
+import re
+P='/opt/tracker/repo/tracker/web_dashboard.py'
+raw=open(P,'rb').read().decode('utf-8')
+crlf='\r\n' in raw
+print('crlf',crlf, raw.count('\r\n'), raw.count('\n'))
+s=raw.replace('\r\n','\n')
+def rep(old,new,cnt=1):
+    global s
+    assert s.count(old)==cnt,(old,s.count(old))
+    s=s.replace(old,new)
+
+# --- backend ---
+rep('''DEFAULT_PORT = 8787
+''','''DEFAULT_PORT = 8787
+
+# ── publish (Firebase) state ────────────────────────────────────────────────
+# One deploy…
+cd /opt/tracker/repo && sed -i "s/else if(st.running || st.control){ cls='run'/else if(st.running || st.control || (st.phases \&\& st.phases.length)){ cls='run'/" tracker/web_dashboard.py && grep -n "cls='run'" tracker/web_dashboard.py
+cat > tests/test_dashboard_publish.py <<'EOF'
+"""Publish (Firebase) action of the web dashboard: background, one at a time,
+failures recorded. No network, no real firebase (deploy() is always stubbed)."""
+from __future__ import annotations
+
+import threading
+import time
+
+impor…
+cd /opt/tracker/repo && sed -n 45,62p tests/test_web_dashboard.py
+cd /opt/tracker/repo && sed -i 's|<title>NewsTracker 控制台</title>|<title>NewsTracker 控制台 · Tracker 執行儀表板</title>|' tracker/web_dashboard.py && /opt/venv/bin/python -m pytest -q -p no:cacheprovider tests 2>&1 | tail -2; git status --short; rm -rf /tmp/ca

@@ -1,0 +1,152 @@
+# 新聞站分類與主題呈現規劃（唯讀，未改任何檔案）
+
+所有 `ui/index.html` 引用都附原文。未取自你給的事實的數字都標 **ESTIMATE**，多為把你給的數字相加。
+
+## 1. 問題診斷
+
+### security 頁
+- 這一頁只有 5 個 pill，來源是 searchinfo 的宣告：`/opt/tracker/repo/searchinfo/searchinfo_security.md:38 `| category 值 | 適用內容說明 |``，表中只列 法規與標準、漏洞與威脅情報、供應鏈與開源安全、重大事件、前瞻技術。
+  - 推論（INFERRED）：manifest 的 `categories` 來自 searchinfo，依據是 `tracker/cli.py:500 `tracker_metas[name] = {"title": ti.title, "categories": ti.categories}``。這個 manifest 我只讀到上述一行，沒有讀完整條產生流程。
+- 平台文章被折進「漏洞與威脅情報」：`/opt/tracker/repo/ui/index.html:1316 `'Linux':'漏洞與威脅情報', 'Windows':'漏洞與威脅情報', 'Apple':'漏洞與威脅情報',``
+- Android 也一樣，同一行把「重點關注」塞進「前瞻技術」：`/opt/tracker/repo/ui/index.html:1317 `'Android':'漏洞與威脅情報', '重點關注':'前瞻技術',``
+- 前瞻技術的 searchinfo 定義是 AI／PQC／零信任：`/opt/tracker/repo/searchinfo/searchinfo_security.md:44 `| 前瞻技術 | AI 攻擊工具與防禦、後量子密碼``。但 `重點關注` 的定義是跨平台趨勢與工具鏈：`/opt/tracker/repo/searchinfo/searchinfo_os.md:39 `| 重點關注 | 跨平台趨勢與值得開發者／資安人員注意的重點``。兩者語意不合。
+- 還有一組折疊：`/opt/tracker/repo/ui/index.html:1321 `'產業動態':'重大事件', '研討活動':'前瞻技術',``
+- 套用 CAT_MAP 後的分布（全時段，ESTIMATE，由你給的數字相加）：
+
+  | 項目 | 數字 |
+  |---|---|
+  | 漏洞與威脅情報 | 2675+997+411+180+119 = 4382 / 6536，約 67% |
+  | 漏洞與威脅情報（近 90 天） | 3093 / 4512，約 69% |
+  | 前瞻技術 | 581+325+21 = 927，其中 357 件（重點關注 + 研討活動）與主題無關 |
+  | 重大事件 | 409+121 = 530 |
+
+  漏洞與威脅情報的占比和你給的「約三分之二」一致。
+- 一個 pill 占三分之二，點下去幾乎等於沒篩。平台文章在畫面上被標成 🔴 漏洞，連 `.cat-Linux` 等現成的平台色（`ui/index.html:652`）都用不到。
+- 「uncategorized」31 件沒有任何 pill 可點，只在「全部」出現。因為 `/opt/tracker/repo/ui/index.html:1347 `return (m && m[cat]) || cat;`` 對未知值原樣回傳。這個欄位實際存的值我沒看到。
+
+### os 頁
+- 所有外來分類都折進「重點關注」：`/opt/tracker/repo/ui/index.html:1333 `'漏洞與威脅情報':'重點關注', '法規與標準':'重點關注', '供應鏈與開源安全':'重點關注',``，其餘延伸到 `/opt/tracker/repo/ui/index.html:1336 `'開源影響':'重點關注', '產業動態':'重點關注', '亞太對應':'重點關注', '研討活動':'重點關注',``。
+- 重點關注自己就是 2869，已是最大的分類。再加上外來的 443 件漏洞等，「約 40%」是你給的算術。只算你列出的六項，2869/8286 約 35%（ESTIMATE），所以 40% 要再加上沒列出的小分類。
+- 443 件漏洞文章是真有主題的內容，卻被抹成一個泛稱的「重點關注」。
+
+### eu_cra 頁
+- 7 個 pill 全是原生分類。產業動態在 searchinfo 裡是萬用桶：`/opt/tracker/repo/searchinfo/searchinfo_eu_cra.md:40 `| 產業動態 | 廠商合規聲明、產品認證案例、法律分析文章``，後面還有媒體評論、產業公會意見。
+- KISA 這個近期標籤其實屬於亞太對應：`/opt/tracker/repo/searchinfo/searchinfo_eu_cra.md:41 `| 亞太對應 | 亞太地區（日、韓、台、新、澳、印）製造商出口 CRA 衝擊``。亞太對應只有 19，產業動態有 253。
+- `/opt/tracker/repo/ui/index.html:1326 `'前瞻技術':'產業動態', '重大事件':'產業動態',`` 這條對應不太可能是 AI／零信任標籤漂移的主因。依你的事實，eu_cra 其他分類每個 ≤7 件，這條對應最多影響個位數到十幾件（ESTIMATE），而 AI 標籤有 40 件。比較可能是分類器把 AI 類新聞放進產業動態。這是假說，我沒有查 DB。
+- 這是分類問題，純呈現層救不了。
+
+### 共通
+- 篩選只吃已載入的日期：`/opt/tracker/repo/ui/index.html:1932 `const day = (window.TRACKER_DAYS || {})[date];``。因此畫面上的 pill 計數不可能是全時段數字，除非 manifest 提供。
+- 篩選狀態存在 hash，且還原時不驗證 pill 是否存在：
+  - 寫入：`/opt/tracker/repo/ui/index.html:2233 `if (state.filterCats.size) p.push('c=' + [...state.filterCats].map(encodeURIComponent).join(','));``
+  - 還原：`/opt/tracker/repo/ui/index.html:2273 `h.c.split(',').filter(Boolean).forEach(c => state.filterCats.add(c));``
+- 搜尋索引與列表共用同一個 `effectiveCat` 過濾（`/opt/tracker/repo/ui/index.html:1225 `!state.filterCats.has(effectiveCat(a, state.currentTracker))) continue;``）。改 `effectiveCat` 會同時影響月份選單的計數。
+- 每個外來分類的顏色 CSS 已存在，例如 `/opt/tracker/repo/ui/index.html:656 `.cat-重點關注 { background: var(--os-focus-fill); color: var(--os-focus-on); }``，pill 的 active 色在 `/opt/tracker/repo/ui/index.html:396 `.pill.cat-pill[data-cat="Linux"].active``。
+- 「今日重點」沒有排序訊號可用。我搜了 `ui/index.html` 與 `tracker/*.py`、`tracker/llm/*.py`，找 `importance|priority|"score"|featured`，命中 0（`grep -nic "importance\|priority\|\"score\"\|featured" ui/index.html` 回 0；`tracker/` 下沒有任何檔案命中）。
+
+## 2. 選項
+
+### 選項 A：第二排 pill 取代折疊（只改呈現）
+- **畫面**
+  - security 頁：維持 5 個安全 pill，下方新增一排「平台」pill：Linux、Windows、Apple、Android。卡片 badge 改顯示平台色，不再顯示 🔴 漏洞。
+  - os 頁：保留 5 個 pill，新增一排「類型」，只放值得獨立的外來分類，目前只有「漏洞與威脅情報」443 件。
+  - 小量外來分類（security 頁的開源影響 29、研討活動 21、法令更新 18、合規指引 12、調和標準 5、亞太對應 1，合計 86，ESTIMATE）維持折疊，不單獨成 pill。
+  - 第二排與第一排共用同一個多選 `filterCats`（OR 語意），所以 hash 的 `c=` 不用改格式，`c=Linux` 可直接還原。
+- **要改的程式**
+  - `CAT_MAP.security`（1316–1317）移除 4 個平台項。
+  - `CAT_MAP.os`（1333）移除「漏洞與威脅情報」一項。
+  - `buildCatPills` / `refreshCatPills`（1811–1842）支援分組列。
+  - 新增一個 UI 常數，指定各 tracker 的第二排內容。因為 manifest 的 `categories` 只有原生分類。
+  - 加一點 CSS 讓第二排換行。
+  - `renderArticles`（1942）與 `buildSearchIndex`（1225）不用改，它們已經走 `effectiveCat`。
+- **風險**
+  - 舊的 security 永久連結 `c=漏洞與威脅情報` 會變窄，從約 67% 降為只含原生漏洞文章。
+  - `refreshCatPills` 目前用 `data-cat` 當 key 與 CSS 選擇器，要確認第二排不會因同名 pill 重複而互相影響（我沒有實測）。
+  - 搜尋與月份選單沿用同一邏輯，行為一致。
+  - 手機寬度下兩排 pill 會多占垂直空間。
+- **分類**：不需要改 searchinfo 或 LLM prompt。
+- **預估效果**（ESTIMATE）
+  - security 漏洞 pill 降到 2675/6536，約 41%。
+  - 前瞻技術不再混入 重點關注（325）。
+  - 平台合計 1707（997+411+180+119）會有自己的入口。
+
+### 選項 B：pill 計數＋移除最差的折疊（只改呈現，最輕）
+- **畫面**
+  - 每個 pill 顯示件數，例如「漏洞與威脅情報 (123)」。
+  - 0 件的 pill 變灰。
+  - 修掉語意最差的兩條折疊：`'重點關注':'前瞻技術'`、`'研討活動':'前瞻技術'`。
+- **要改的程式**：`refreshCatPills`（1840 `btn.textContent = check + (btn.dataset.icon || '') + catLabel(c);`）、`CAT_MAP`，另外要有計數來源。
+- **計數範圍**：只算目前載入的日期很容易誤導；要全時段就得讓 manifest 帶計數（動到 `tracker/render.py:241 `"categories": meta.get("categories") or [],`` 的輸出，屬資料管線）。
+- **風險**：永久連結與搜尋不受影響。計數若隨搜尋與月份變動，要先說清楚是哪個範圍。
+- **缺點**：67% 的集中度不變。
+- **分類**：不需要改；若要全時段計數則需改建置輸出。
+
+### 選項 C：主題標籤列＋「今日重點」hero
+- **畫面**
+  - eu_cra 頁上方加標籤 chip（CRA、SBOM、KISA…），點擊用標籤篩選。
+  - 每頁最上方加「今日重點」區塊，放最新一天的前 N 件。
+- **要改的程式**
+  - 新增 `state.filterTags`。
+  - hash 新增參數；但 `c=` 在 library 模式已被 cluster 佔用（2217、2260），要另取名。
+  - `renderArticles`、`buildSearchIndex` 各加一段過濾。
+  - 新增 hero 的 DOM 與 CSS。
+- **風險**
+  - 標籤沒有正規化。CRA 與 Cyber Resilience Act 分開計（26 與 17），AI 與 AI安全 也是（40 與 29），chip 會重複。
+  - 沒有排序訊號可選 hero，見上方 grep。
+  - 標籤列只是把 產業動態 的漂移藏起來，沒有修正。
+- **分類**：需要。標籤別名表、重要度欄位或 LLM 輸出的排序訊號，都超出純呈現。
+
+## 3. 建議
+
+**採用選項 A，第二步再加選項 B 的計數；選項 C 暫緩。** 理由：
+- A 直接解決最大的兩個問題：security 的 67% 與 os 的 40%。
+- A 只動呈現，現有 CSS 都已備好，且與 hash、搜尋、月份選單相容。
+- B 若要全時段計數，會牽涉資料管線，應該獨立評估。
+- C 需要的標籤正規化與排序訊號目前都不存在。
+
+eu_cra 的產業動態（46%）建議另開一個分類審查，不要靠 UI 遮蓋。我不裁定這是否為誤分類。
+
+**需要你決定：**
+1. 第二排用 OR（與第一排同一個多選）還是 AND？我建議 OR，格式不變。
+2. 舊永久連結 `c=漏洞與威脅情報` 在 security 頁範圍變窄，是否接受？
+3. 第二排清單寫在 UI 常數，還是放進 manifest？
+4. 要不要做全時段計數？這會碰管線。
+5. 是否另外開 eu_cra 產業動態的分類審查？
+
+```
+CODEX-ASSIST-GAP
+  kind: acceptance
+  question: 「今日重點」要以什麼準則挑選文章（重要度、來源、分類）？
+  blocked-by: 程式碼與 ui 內沒有任何 importance/priority/featured 欄位（grep 命中 0）
+  needed: 使用者定義挑選準則，或指定要由 LLM 產出的排序欄位
+```
+```
+CODEX-ASSIST-GAP
+  kind: scope
+  question: security 頁 stored category 為 uncategorized 的 31 件，實際存的值是什麼？該歸哪個 pill？
+  blocked-by: 我沒有讀 DB，也沒有被指定可讀的資料檔
+  needed: 該欄位的實際值，以及歸屬規則
+```
+
+## 4. 驗收（選項 A）
+
+以下檢查都是建議，我沒有執行。
+
+1. 折疊已移除：`grep -nE "'Linux':'漏洞與威脅情報'|'Android':'漏洞與威脅情報'" /opt/tracker/repo/ui/index.html`，預期命中 0。
+2. 載入整年後，在瀏覽器 console 看分布（需 `m=*` 或把年份載完）：
+   ```js
+   const c={};Object.values(window.TRACKER_DAYS).flat().filter(a=>itemBelongsToTracker(a,'security')).forEach(a=>{const k=effectiveCat(a,'security');c[k]=(c[k]||0)+1});console.table(c)
+   ```
+   - 預期漏洞與威脅情報約 41%（ESTIMATE，2675/6536），並與上方事實的原生計數對得上。
+   - 單一分類上限門檻（例如 ≤45%）是我的提議，由你決定。
+   - os 頁換成 `'os'` 重跑，預期漏洞類型約 443。
+3. DOM 檢查：security 頁 `document.querySelectorAll('#cat-pills .cat-pill[data-cat="Linux"]').length === 1`，點擊後 `state.filterCats.has('Linux')` 為真、卡片數量下降、且每張卡 badge 為 `cat-Linux`。
+4. 永久連結：
+   - 開 `#t=security&c=Linux`，Linux pill 為 active。
+   - `#t=security&c=Linux,Windows` 兩個都 active。
+   - `#t=security&c=漏洞與威脅情報` 仍可載入且不報錯。
+5. 搜尋與月份選單：security 頁帶 `q=` 並選 Linux，`state.search.countByDate` 總和等於列表卡片數（兩者走同一個 `effectiveCat`）。
+6. 切換 tracker 後第二排消失或重建：`selectTracker` 重設 `filterCats`（1464），確認 eu_cra 頁沒有殘留平台 pill。
+7. 未知值：在 os 頁帶 `c=Linux`，也要確認空結果時顯示 `noCat` 訊息而不是崩潰（1966–1968）。
+
+`verified: 18  assumed: 6  gaps: 2  findings: 4`

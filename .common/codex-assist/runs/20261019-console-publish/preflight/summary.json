@@ -1,0 +1,20 @@
+[
+  {
+    "id": "tests",
+    "rc": 0,
+    "pass": true,
+    "output_path": "/opt/tracker/repo/.common/codex-assist/runs/20261019-console-publish/preflight/tests.out"
+  },
+  {
+    "id": "import-page",
+    "rc": 0,
+    "pass": true,
+    "output_path": "/opt/tracker/repo/.common/codex-assist/runs/20261019-console-publish/preflight/import-page.out"
+  },
+  {
+    "id": "no-external",
+    "rc": 0,
+    "pass": true,
+    "output_path": "/opt/tracker/repo/.common/codex-assist/runs/20261019-console-publish/preflight/no-external.out"
+  }
+]

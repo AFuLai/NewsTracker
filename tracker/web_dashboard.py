@@ -24,6 +24,54 @@ from .progress import NullReporter
 
 DEFAULT_PORT = 8787
 
+# ── publish (Firebase) state ────────────────────────────────────────────────
+# One deploy at a time, run off the HTTP handler thread (a firebase deploy takes
+# tens of seconds). The dict is only touched under _DEPLOY_LOCK; snapshot()
+# hands the page a copy.
+_DEPLOY_LOCK = threading.Lock()
+_DEPLOY: dict = {"state": "idle", "channel": "", "message": "",
+                 "started_at": 0.0, "finished_at": 0.0}
+
+
+def _deploy_snapshot() -> dict:
+    with _DEPLOY_LOCK:
+        return dict(_DEPLOY)
+
+
+def _deploy_worker(channel: str) -> None:
+    from . import deploy as _deploy_mod
+    try:
+        out = _deploy_mod.deploy(channel=channel or None)
+        state, message = "ok", str(out or "")
+    except _deploy_mod.DeployError as exc:
+        state, message = "failed", str(exc) or "DeployError"
+    except Exception as exc:  # a failure is never swallowed or reported as ok
+        state, message = "failed", f"{type(exc).__name__}: {exc}"
+    with _DEPLOY_LOCK:
+        _DEPLOY.update(state=state, message=message, finished_at=time.time())
+
+
+def _start_deploy(channel) -> tuple[bool, str]:
+    if channel is None:
+        channel = ""
+    if not isinstance(channel, str):
+        return False, "頻道名稱格式不正確"
+    channel = channel.strip()
+    with _DEPLOY_LOCK:
+        if _DEPLOY["state"] == "running":
+            return False, "已有發布作業進行中，請等它結束"
+        _DEPLOY.update(state="running", channel=channel, message="",
+                       started_at=time.time(), finished_at=0.0)
+    try:
+        threading.Thread(target=_deploy_worker, args=(channel,),
+                         daemon=True, name="dashboard-deploy").start()
+    except Exception as exc:
+        with _DEPLOY_LOCK:
+            _DEPLOY.update(state="failed", message=f"無法啟動發布：{exc}",
+                           finished_at=time.time())
+        return False, f"無法啟動發布：{exc}"
+    return True, ""
+
 
 class WebReporter(NullReporter):
     def __init__(self, controller=None, cra_job=None):
@@ -121,6 +169,7 @@ class WebReporter(NullReporter):
                 "finished": self.finished,
                 "summary": self.summary_data,
                 "control": control,
+                "deploy": _deploy_snapshot(),
             }
 
 
@@ -132,6 +181,10 @@ def _apply_control(controller, cmd: dict, cra_job=None) -> tuple[bool, str]:
     action = cmd.get("cmd")
     if action == "cralib":
         return bool(cra_job is not None and cra_job.start()), ""
+    if action == "deploy":
+        # Before the controller check, like cralib: publishing the site does
+        # not depend on a pipeline run being in flight.
+        return _start_deploy(cmd.get("channel"))
     if action in ("endpoint", "endpoint-add", "endpoint-remove", "endpoint-policy"):
         # Deliberately before the controller check: which ollama serves this
         # box is a process-wide setting, and the picker is most useful exactly
@@ -218,102 +271,137 @@ def serve(reporter: WebReporter, *, port: int = DEFAULT_PORT) -> ThreadingHTTPSe
 _HTML = r"""<!DOCTYPE html>
 <html lang="zh-Hant"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Tracker 執行儀表板</title>
+<title>NewsTracker 控制台 · Tracker 執行儀表板</title>
 <style>
-  :root { --bg:#0f1419; --card:#1a2129; --line:#2a333d; --txt:#e6edf3;
-          --dim:#8b98a5; --accent:#2dd4bf; --green:#3fb950; --yellow:#d29922;
-          --red:#f85149; }
+  :root { --bg:#f5f6fa; --card:#ffffff; --line:#e4e7ee; --txt:#1c2330;
+          --dim:#6b7686; --accent:#4f46e5; --accent-ink:#ffffff; --soft:#eef0f6;
+          --green:#1a9d57; --yellow:#b7791f; --red:#d93b3b;
+          --shadow:0 4px 18px rgba(28,35,48,.08); --radius:14px; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#0f1319; --card:#181e27; --line:#2a3340; --txt:#e8edf3;
+            --dim:#92a0b1; --accent:#8b83ff; --accent-ink:#10122b; --soft:#222a36;
+            --green:#3fb970; --yellow:#e0a93b; --red:#f2605c;
+            --shadow:0 4px 18px rgba(0,0,0,.35); }
+  }
   * { box-sizing: border-box; }
-  body { margin:0; background:var(--bg); color:var(--txt);
-         font-family:-apple-system,"Segoe UI","Microsoft JhengHei",sans-serif; }
-  .wrap { max-width: 820px; margin: 0 auto; padding: 24px 18px 48px; }
-  header { display:flex; align-items:baseline; gap:16px; flex-wrap:wrap;
-           border-bottom:1px solid var(--line); padding-bottom:14px; margin-bottom:18px; }
-  h1 { font-size:1.15rem; margin:0; font-weight:600; }
-  .sub { color:var(--dim); font-size:.9rem; }
-  .clock { margin-left:auto; font-variant-numeric:tabular-nums; font-size:1.05rem; }
-  .clock b { color:var(--accent); }
+  html { scroll-behavior:smooth; scroll-padding-top:84px; }
+  body { margin:0; background:var(--bg); color:var(--txt); line-height:1.5;
+         font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft JhengHei",
+                     "PingFang TC","Noto Sans TC",sans-serif; }
+  .topbar { position:sticky; top:0; z-index:10; display:flex; align-items:center;
+            justify-content:space-between; gap:16px; padding:14px 32px;
+            background:var(--card); border-bottom:1px solid var(--line);
+            box-shadow:var(--shadow); }
+  .brand { font-size:1.15rem; font-weight:700; letter-spacing:.02em; }
+  .brand::before { content:""; display:inline-block; width:12px; height:12px;
+                   border-radius:4px; background:var(--accent); margin-right:10px; }
+  .nav { display:flex; gap:6px; flex-wrap:wrap; }
+  .nav a { color:var(--dim); text-decoration:none; font-size:.95rem; font-weight:600;
+           padding:6px 14px; border-radius:999px; }
+  .nav a:hover { color:var(--accent); background:var(--soft); }
+  .wrap { max-width:1080px; margin:0 auto; padding:32px 24px 64px; }
+  .hero { background:var(--card); border:1px solid var(--line); border-radius:16px;
+          box-shadow:var(--shadow); padding:32px 36px; margin-bottom:32px;
+          border-left:6px solid var(--dim); }
+  .hero.run { border-left-color:var(--accent); }
+  .hero.ok { border-left-color:var(--green); }
+  .hero.fail { border-left-color:var(--red); }
+  .hero .state { font-size:2.6rem; font-weight:800; line-height:1.15; }
+  .hero.run .state { color:var(--accent); }
+  .hero.ok .state { color:var(--green); }
+  .hero.fail .state { color:var(--red); }
+  .hero .sub { color:var(--dim); font-size:1.1rem; margin-top:6px; min-height:1.5em; }
+  .hero .clock { margin-top:18px; font-variant-numeric:tabular-nums; font-size:1.5rem; }
+  .hero .clock b { color:var(--accent); font-size:1.9rem; }
   .eta { color:var(--yellow); }
-  .phase { display:flex; align-items:center; gap:12px; background:var(--card);
-           border:1px solid var(--line); border-radius:10px; padding:12px 16px;
+  .cards { display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:32px;
+           align-items:start; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+          box-shadow:var(--shadow); padding:24px 26px; min-width:0; }
+  .card.wide { grid-column:1 / -1; }
+  .card.hidden { display:none; }
+  .card > h2 { margin:0 0 18px; font-size:1.1rem; font-weight:700; }
+  @media (max-width:760px) {
+    .cards { grid-template-columns:1fr; gap:24px; }
+    .topbar { padding:12px 16px; flex-wrap:wrap; }
+    .wrap { padding:24px 16px 48px; }
+    .hero { padding:24px 22px; }
+    .hero .state { font-size:2rem; }
+  }
+  button, select, input { font:inherit; font-size:.9rem; color:var(--txt); background:var(--soft);
+          border:1px solid var(--line); border-radius:10px; padding:7px 12px; }
+  button { cursor:pointer; font-weight:600; }
+  button:hover:not(:disabled), select:hover { border-color:var(--accent); }
+  button:disabled { opacity:.45; cursor:default; }
+  button.primary, #btnStart { background:var(--accent); color:var(--accent-ink);
+          border-color:transparent; }
+  #btnStart { padding:11px 28px; font-size:1rem; font-weight:700; margin-top:4px; }
+  #btnStart:hover { filter:brightness(1.1); }
+  .phase { display:flex; align-items:center; gap:12px; background:var(--soft);
+           border:1px solid var(--line); border-radius:12px; padding:12px 16px;
            margin-bottom:10px; transition:border-color .2s; }
   .phase.running { border-color:var(--accent); }
   .ic { width:24px; height:24px; border-radius:50%; display:grid; place-items:center;
         font-size:.85rem; flex:none; }
-  .ic.pending { background:#222b34; color:var(--dim); }
+  .ic.pending { background:var(--line); color:var(--dim); }
   .ic.running { background:var(--yellow); color:#1a1200; animation:pulse 1.1s infinite; }
-  .ic.done { background:var(--green); color:#04210b; }
-  .ic.failed { background:var(--red); color:#2a0606; }
+  .ic.done { background:var(--green); color:#fff; }
+  .ic.failed { background:var(--red); color:#fff; }
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.45} }
   .pl { font-weight:600; width:96px; flex:none; }
   .pl.pending { color:var(--dim); }
   .detail { color:var(--dim); font-size:.92rem; flex:1; min-width:0;
             overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-  .bar { height:8px; background:#222b34; border-radius:5px; overflow:hidden;
+  .bar { height:8px; background:var(--line); border-radius:5px; overflow:hidden;
          flex:1; margin:0 6px; }
-  .bar > i { display:block; height:100%; background:var(--accent); width:0;
-             transition:width .3s; }
-  .count { font-variant-numeric:tabular-nums; color:var(--txt); font-size:.88rem;
-           flex:none; }
+  .bar > i { display:block; height:100%; background:var(--accent); width:0; transition:width .3s; }
+  .count { font-variant-numeric:tabular-nums; font-size:.88rem; flex:none; }
   .note { color:var(--dim); font-style:italic; font-size:.9rem; margin:8px 4px 0;
           min-height:1.2em; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-  .summary { margin-top:22px; background:var(--card); border:1px solid var(--green);
-             border-radius:12px; padding:18px 22px; }
+  .summary { margin-top:22px; border:1px solid var(--green); border-radius:12px;
+             padding:18px 22px; background:var(--soft); }
   .summary.fail { border-color:var(--red); }
   .summary h2 { margin:0 0 12px; font-size:1.05rem; }
   .grid { display:grid; grid-template-columns:auto 1fr; gap:6px 16px; font-size:.95rem; }
   .grid .k { color:var(--dim); text-align:right; }
   .grid .v { font-variant-numeric:tabular-nums; }
-  .dot { display:inline-block; width:8px; height:8px; border-radius:50%;
-         background:var(--green); margin-right:6px; }
+  .dot { display:inline-block; width:10px; height:10px; border-radius:50%;
+         background:var(--green); margin-right:8px; }
   .dot.off { background:var(--dim); }
-  .control { display:flex; flex-wrap:wrap; align-items:center; gap:8px;
-             background:var(--card); border:1px solid var(--line); border-radius:10px;
-             padding:10px 14px; margin-bottom:14px; font-size:.84rem; }
+  .control { display:flex; flex-wrap:wrap; align-items:center; gap:10px; font-size:.88rem; }
   .control.hidden { display:none; }
-  .control button, .control select { background:#222b34; color:var(--txt);
-             border:1px solid var(--line); border-radius:7px; padding:5px 10px;
-             cursor:pointer; font-size:.82rem; }
-  .control button:hover, .control select:hover { border-color:var(--accent); }
-  .control button.primary { background:var(--accent); color:#04210b;
-             border-color:transparent; font-weight:600; }
-  .control button:disabled { opacity:.4; cursor:default; }
-  .control .sep { width:1px; height:20px; background:var(--line); margin:0 4px; }
+  .control .sep { width:1px; height:22px; background:var(--line); margin:0 4px; }
   .control label { color:var(--dim); }
   .pausedBadge { color:var(--yellow); font-weight:600; }
-  .config { background:var(--card); border:1px solid var(--line); border-radius:12px;
-            padding:18px 20px; margin-bottom:16px; }
   .config.hidden { display:none; }
-  .config h3 { margin:0 0 14px; font-size:1.02rem; }
-  .cfgrow { display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin-bottom:12px; }
+  .cfgrow { display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin-bottom:14px; }
   .cfgrow > label { color:var(--dim); min-width:74px; }
-  .config input, .config select { background:#222b34; color:var(--txt);
-            border:1px solid var(--line); border-radius:7px; padding:5px 9px; font-size:.85rem; }
-  .config .cfgrow button { background:#222b34; color:var(--txt); border:1px solid var(--line);
-            border-radius:7px; padding:5px 10px; cursor:pointer; font-size:.85rem; }
-  .config .cfgrow button:hover:not(:disabled) { border-color:var(--accent); }
-  .config .cfgrow button:disabled { opacity:.4; cursor:default; }
   .config input[type=checkbox] { width:auto; min-width:0; }
   .config .chk { color:var(--txt); display:inline-flex; align-items:center; gap:5px; }
-  #btnStart { background:var(--green); color:#04210b; border:none; border-radius:8px;
-            padding:9px 22px; font-size:.95rem; font-weight:700; cursor:pointer; margin-top:4px; }
-  #btnStart:hover { filter:brightness(1.1); }
-  .cra { background:var(--card); border:1px solid var(--line); border-radius:10px;
-         padding:10px 14px; margin-bottom:14px; font-size:.86rem; }
+  .depstate { display:inline-flex; align-items:center; gap:10px; font-size:1.5rem;
+              font-weight:800; color:var(--dim); }
+  .depstate.running { color:var(--accent); }
+  .depstate.ok { color:var(--green); }
+  .depstate.failed { color:var(--red); }
+  .spin { width:18px; height:18px; border:3px solid var(--line); border-top-color:var(--accent);
+          border-radius:50%; animation:spin .8s linear infinite; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  .depmeta { display:grid; grid-template-columns:auto 1fr; gap:6px 16px; margin:14px 0 18px;
+             font-size:.92rem; }
+  .depmeta .k { color:var(--dim); }
+  .depmeta .v { min-width:0; overflow-wrap:anywhere; }
+  .depmeta a { color:var(--accent); }
+  .btnrow { display:flex; flex-wrap:wrap; gap:12px; }
   .cra.hidden { display:none; }
   .crahead { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
   .crahead b { font-weight:600; }
-  .cra button { background:#222b34; color:var(--txt); border:1px solid var(--line);
-         border-radius:7px; padding:5px 10px; cursor:pointer; font-size:.82rem; }
-  .cra button:hover:not(:disabled) { border-color:var(--accent); }
-  .cra button:disabled { opacity:.45; cursor:default; }
   .crastat { color:var(--dim); flex:1; min-width:0; overflow:hidden;
          text-overflow:ellipsis; white-space:nowrap; }
   .crastat.ok { color:var(--green); }
   .crastat.err { color:var(--red); }
-  .craprog { display:flex; align-items:center; gap:8px; margin-top:9px; }
+  .craprog { display:flex; align-items:center; gap:8px; margin-top:12px; }
   .craprog.hidden { display:none; }
-  .cralist { margin-top:9px; display:flex; flex-direction:column; gap:4px; }
+  .cralist { margin-top:12px; display:flex; flex-direction:column; gap:4px; font-size:.88rem; }
   .cralist:empty { display:none; }
   .cralist a { color:var(--txt); text-decoration:none; }
   .cralist a:hover { text-decoration:underline; }
@@ -326,95 +414,123 @@ _HTML = r"""<!DOCTYPE html>
   .cralist .d.dim { color:var(--dim); }
   .chip { flex:none; border-radius:5px; padding:1px 6px; font-size:.72rem;
          font-weight:700; letter-spacing:.02em; }
-  .chip.new { background:var(--green); color:#04210b; }
-  .chip.upd { background:var(--yellow); color:#1a1200; }
-  .chip.gone { background:var(--red); color:#2a0606; }
-  .chip.err { background:#3a1b1b; color:var(--red); }
+  .chip.new { background:var(--green); color:#fff; }
+  .chip.upd { background:var(--yellow); color:#fff; }
+  .chip.gone { background:var(--red); color:#fff; }
+  .chip.err { background:var(--soft); color:var(--red); }
   .cramore { color:var(--dim); font-size:.8rem; }
 </style></head>
-<body><div class="wrap">
-  <header>
-    <h1>🛡️ Tracker 執行儀表板</h1>
-    <span class="sub" id="title"></span>
-    <span class="clock"><span class="dot off" id="live"></span>
-      已過 <b id="elapsed">0:00</b><span class="eta" id="eta"></span></span>
-  </header>
-  <div class="config hidden" id="config">
-    <h3>⚙️ 確認參數後開始</h3>
-    <div class="cfgrow">
-      <label>日期</label>
-      <input id="cfgSince" type="date"> <span style="color:var(--dim)">→</span> <input id="cfgUntil" type="date">
-    </div>
-    <div class="cfgrow"><label>追蹤</label><span id="cfgTrackers"></span></div>
-    <div class="cfgrow">
-      <label>LLM</label>
-      <span class="chk">Summarize <select id="cfgSum"><option value="ollama">Ollama</option><option value="gemini">Gemini</option></select></span>
-      <span class="chk">Translate <select id="cfgTra"><option value="ollama">Ollama</option><option value="gemini">Gemini</option></select></span>
-    </div>
-    <div class="cfgrow">
-      <label>模型端點</label>
-      <select id="cfgEnd" style="min-width:210px"></select>
-      <input id="cfgEndNew" placeholder="http://主機:11434" style="width:168px">
-      <button id="btnEndAdd" title="加入清單">＋</button>
-      <button id="btnEndDel" title="移除下拉選單目前選取的端點">✕</button>
-      <span id="cfgEndMsg" style="color:var(--dim); margin-left:8px;"></span>
-    </div>
-    <div class="cfgrow">
-      <label>遠端政策</label>
-      <span class="chk">時段窗 <input id="cfgWin" placeholder="18:00-08:00（空=不限）" style="width:150px"></span>
-      <span class="chk">並發 <input id="cfgConc" type="number" min="1" style="width:64px"></span>
-      <button id="btnPolicy">套用</button>
-      <span id="cfgPolMsg" style="color:var(--dim); margin-left:8px;"></span>
-    </div>
-    <div class="cfgrow">
-      <label>選項</label>
-      <label class="chk"><input type="checkbox" id="cfgGate"> Gate 過濾</label>
-      <label class="chk"><input type="checkbox" id="cfgTranslate"> 翻譯</label>
-      <label class="chk"><input type="checkbox" id="cfgCleanup"> Cleanup</label>
-      <label class="chk">摘要上限 <input id="cfgLimit" type="number" min="1" style="width:74px"></label>
-    </div>
-    <button id="btnStart">▶ 開始執行</button>
-    <span id="cfgErr" style="color:var(--red); margin-left:10px;"></span>
+<body>
+<nav class="topbar">
+  <div class="brand">NewsTracker 控制台</div>
+  <div class="nav">
+    <a href="#sec-run">執行</a><a href="#sec-publish">發布</a>
+    <a href="#sec-llm">LLM 端點</a><a href="#cra">CRA 圖書庫</a>
   </div>
-  <div class="control hidden" id="control">
-    <button id="btnPause" class="primary">⏸ 暫停</button>
-    <span id="pausedTag"></span>
-    <span class="sep"></span>
-    <label>Summarize</label>
-    <select id="beSum"><option value="ollama">Ollama</option><option value="gemini">Gemini</option></select>
-    <label>Translate</label>
-    <select id="beTra"><option value="ollama">Ollama</option><option value="gemini">Gemini</option></select>
-    <span class="sep"></span>
-    <label>端點</label>
-    <select id="beEnd" style="min-width:190px"></select>
-    <span id="beEndMsg" style="color:var(--dim);"></span>
-    <span class="sep"></span>
-    <label>從</label>
-    <select id="reFrom">
-      <option value="fetch">Fetch</option><option value="gate">Gate</option>
-      <option value="summarize" selected>Summarize</option><option value="translate">Translate</option>
-      <option value="write">Write</option><option value="cleanup">Cleanup</option>
-    </select>
-    <label><input type="checkbox" id="reForce"> 強制重做</label>
-    <button id="btnRestart">↻ 重新來過</button>
-    <span class="sep"></span>
-    <button id="btnClose">✕ 關閉</button>
+</nav>
+<div class="wrap">
+  <section class="hero" id="hero">
+    <div class="state" id="heroState">待命</div>
+    <div class="sub" id="title"></div>
+    <div class="clock"><span class="dot off" id="live"></span>已過 <b id="elapsed">0:00</b><span class="eta" id="eta"></span></div>
+  </section>
+  <div class="cards">
+    <section class="card wide" id="sec-run">
+      <h2>執行</h2>
+      <div class="config hidden" id="config">
+        <div class="cfgrow">
+          <label>日期</label>
+          <input id="cfgSince" type="date"> <span style="color:var(--dim)">→</span> <input id="cfgUntil" type="date">
+        </div>
+        <div class="cfgrow"><label>追蹤</label><span id="cfgTrackers"></span></div>
+        <div class="cfgrow">
+          <label>LLM</label>
+          <span class="chk">Summarize <select id="cfgSum"><option value="ollama">Ollama</option><option value="gemini">Gemini</option></select></span>
+          <span class="chk">Translate <select id="cfgTra"><option value="ollama">Ollama</option><option value="gemini">Gemini</option></select></span>
+        </div>
+        <div class="cfgrow">
+          <label>選項</label>
+          <label class="chk"><input type="checkbox" id="cfgGate"> Gate 過濾</label>
+          <label class="chk"><input type="checkbox" id="cfgTranslate"> 翻譯</label>
+          <label class="chk"><input type="checkbox" id="cfgCleanup"> Cleanup</label>
+          <label class="chk">摘要上限 <input id="cfgLimit" type="number" min="1" style="width:84px"></label>
+        </div>
+        <button id="btnStart">▶ 開始執行</button>
+        <span id="cfgErr" style="color:var(--red); margin-left:10px;"></span>
+      </div>
+      <div class="control hidden" id="control">
+        <button id="btnPause" class="primary">⏸ 暫停</button>
+        <span id="pausedTag"></span>
+        <span class="sep"></span>
+        <label>Summarize</label>
+        <select id="beSum"><option value="ollama">Ollama</option><option value="gemini">Gemini</option></select>
+        <label>Translate</label>
+        <select id="beTra"><option value="ollama">Ollama</option><option value="gemini">Gemini</option></select>
+        <span class="sep"></span>
+        <label>端點</label>
+        <select id="beEnd" style="min-width:190px"></select>
+        <span id="beEndMsg" style="color:var(--dim);"></span>
+        <span class="sep"></span>
+        <label>從</label>
+        <select id="reFrom">
+          <option value="fetch">Fetch</option><option value="gate">Gate</option>
+          <option value="summarize" selected>Summarize</option><option value="translate">Translate</option>
+          <option value="write">Write</option><option value="cleanup">Cleanup</option>
+        </select>
+        <label><input type="checkbox" id="reForce"> 強制重做</label>
+        <button id="btnRestart">↻ 重新來過</button>
+        <span class="sep"></span>
+        <button id="btnClose">✕ 關閉</button>
+      </div>
+      <div id="phases" style="margin-top:18px"></div>
+      <div class="note" id="note"></div>
+      <div id="summary"></div>
+    </section>
+    <section class="card" id="sec-publish">
+      <h2>發布</h2>
+      <div class="depstate idle" id="depState">閒置</div>
+      <div class="depmeta">
+        <span class="k">頻道</span><span class="v" id="depChan">—</span>
+        <span class="k">訊息</span><span class="v" id="depMsg">—</span>
+        <span class="k">完成時間</span><span class="v" id="depTime">—</span>
+      </div>
+      <div class="btnrow">
+        <button id="btnPreview">預覽發布</button>
+        <button id="btnLive" class="primary">正式發布</button>
+      </div>
+      <div id="depErr" style="color:var(--red); margin-top:12px; min-height:1.2em;"></div>
+    </section>
+    <section class="card" id="sec-llm">
+      <h2>LLM 端點</h2>
+      <div class="cfgrow">
+        <label>模型端點</label>
+        <select id="cfgEnd" style="min-width:210px"></select>
+        <input id="cfgEndNew" placeholder="http://主機:11434" style="width:168px">
+        <button id="btnEndAdd" title="加入清單">＋</button>
+        <button id="btnEndDel" title="移除下拉選單目前選取的端點">✕</button>
+        <span id="cfgEndMsg" style="color:var(--dim); margin-left:8px;"></span>
+      </div>
+      <div class="cfgrow">
+        <label>遠端政策</label>
+        <span class="chk">時段窗 <input id="cfgWin" placeholder="18:00-08:00（空=不限）" style="width:170px"></span>
+        <span class="chk">並發 <input id="cfgConc" type="number" min="1" style="width:70px"></span>
+        <button id="btnPolicy">套用</button>
+        <span id="cfgPolMsg" style="color:var(--dim); margin-left:8px;"></span>
+      </div>
+    </section>
+    <section class="card cra wide hidden" id="cra">
+        <div class="crahead">
+          <b>📚 CRA 參考圖書庫</b>
+          <button id="btnCra">↻ 更新 CRA 庫</button>
+          <span class="crastat" id="craStat"></span>
+        </div>
+        <div class="craprog hidden" id="craProg">
+          <div class="bar"><i id="craBar"></i></div>
+          <span class="count" id="craCount"></span>
+        </div>
+      <div class="cralist" id="craList"></div>
+    </section>
   </div>
-  <div class="cra hidden" id="cra">
-    <div class="crahead">
-      <b>📚 CRA 參考圖書庫</b>
-      <button id="btnCra">↻ 更新 CRA 庫</button>
-      <span class="crastat" id="craStat"></span>
-    </div>
-    <div class="craprog hidden" id="craProg">
-      <div class="bar"><i id="craBar"></i></div>
-      <span class="count" id="craCount"></span>
-    </div>
-    <div class="cralist" id="craList"></div>
-  </div>
-  <div id="phases"></div>
-  <div class="note" id="note"></div>
-  <div id="summary"></div>
 </div>
 <script>
 const $ = id => document.getElementById(id);
@@ -584,16 +700,18 @@ function syncCra(st){
     craRows(r.errors.map(e=>({title:e, nodate:true})),'err','ERR');
 }
 function syncControl(st){
+  // The endpoint picker/policy card is always on the page (which ollama serves
+  // this box is process-wide, usable with or without a run), so fill it first.
+  fillEnd($('cfgEnd'), st.ollama);
+  fillPolicy(st.ollama);
+  // Editing goes to endpoints.json; with TRACKER_OLLAMA_URLS set that file
+  // is not consulted, so the buttons would edit something nobody reads.
+  const canEdit = !!(st.ollama && st.ollama.editable);
+  $('btnEndAdd').disabled = $('btnEndDel').disabled = !canEdit;
   if(!st.control){ $('control').classList.add('hidden'); $('config').classList.add('hidden'); return; }
   CTRL = st.control;
   if(!st.control.started){
     buildConfig(st.control.config||{});
-    fillEnd($('cfgEnd'), st.ollama);
-    fillPolicy(st.ollama);
-    // Editing goes to endpoints.json; with TRACKER_OLLAMA_URLS set that file
-    // is not consulted, so the buttons would edit something nobody reads.
-    const canEdit = !!(st.ollama && st.ollama.editable);
-    $('btnEndAdd').disabled = $('btnEndDel').disabled = !canEdit;
     $('config').classList.remove('hidden');
     $('control').classList.add('hidden');
     return;
@@ -612,6 +730,8 @@ async function poll(){
   let st; try{ st=await (await fetch('/state',{cache:'no-store'})).json(); }catch(e){ return; }
   syncControl(st);
   syncCra(st);            // usable before Start and after a run finishes
+  syncDeploy(st);
+  syncHero(st);
   $('title').textContent = st.title || '';
   if(st.control && !st.control.started){   // config mode: nothing is running yet
     $('elapsed').textContent='—'; $('eta').textContent='';
@@ -655,6 +775,51 @@ async function poll(){
       row('耗時', fmt(s.elapsed_s))+
       `</div></div>`;
   }
+}
+// ── publish card ─────────────────────────────────────────────────────────
+const DEP_LBL={idle:'閒置',running:'發布中…',ok:'發布成功',failed:'發布失敗'};
+async function deployCmd(cmd){
+  $('depErr').textContent = '';
+  $('btnPreview').disabled = $('btnLive').disabled = true;   // until the next poll
+  try{
+    const r = await fetch('/control',{method:'POST',
+      headers:{'Content-Type':'application/json'}, body:JSON.stringify(cmd)});
+    const j = await r.json();
+    if(!j.ok) $('depErr').textContent = j.msg || '發布失敗';
+  }catch(e){ $('depErr').textContent = String(e); }
+  poll();
+}
+$('btnPreview').onclick = ()=> deployCmd({cmd:'deploy', channel:'preview'});
+$('btnLive').onclick = ()=>{
+  if(!confirm('確定要發布到正式站 afu-news.web.app？')) return;
+  deployCmd({cmd:'deploy'});
+};
+function depMsgHtml(msg){
+  const m = /https:\/\/[^\s"'<>]+/.exec(msg||'');
+  if(!m) return esc(msg||'') || '—';
+  return esc(msg.slice(0,m.index)) +
+    `<a href="${esc(m[0])}" target="_blank" rel="noopener">${esc(m[0])}</a>` +
+    esc(msg.slice(m.index+m[0].length));
+}
+function syncDeploy(st){
+  const d = st.deploy || {state:'idle'};
+  const running = d.state==='running';
+  $('btnPreview').disabled = $('btnLive').disabled = running;
+  const el = $('depState');
+  el.className = 'depstate ' + d.state;
+  el.innerHTML = (running ? '<span class="spin"></span>' : '') + esc(DEP_LBL[d.state]||d.state);
+  $('depChan').textContent = d.state==='idle' ? '—' : (d.channel || '正式站');
+  $('depMsg').innerHTML = depMsgHtml(d.message);
+  $('depTime').textContent = d.finished_at ? new Date(d.finished_at*1000).toLocaleString('zh-TW') : '—';
+}
+// ── hero status ──────────────────────────────────────────────────────────
+function syncHero(st){
+  let cls='', txt='待命';
+  if(st.control && !st.control.started){ txt='待命'; }
+  else if(st.finished){ const ok = !st.summary || st.summary.ok; cls = ok?'ok':'fail'; txt = ok?'完成':'失敗'; }
+  else if(st.running || st.control || (st.phases && st.phases.length)){ cls='run'; txt='執行中'; }
+  $('hero').className = 'hero ' + cls;
+  $('heroState').textContent = txt;
 }
 function row(k,v){ return `<div class="k">${k}</div><div class="v">${esc(v)}</div>`; }
 function esc(x){ return String(x==null?'':x).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
