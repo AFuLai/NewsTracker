@@ -1,0 +1,12 @@
+{
+  "id": "20261019-site-categories-plan",
+  "engine": "agy",
+  "mode": "plan",
+  "root": "/opt/tracker/repo",
+  "prompt_file": ".common/codex-assist/tasks/20261019-site-categories-plan.prompt.md",
+  "inputs_glob": "ui/index.html searchinfo/*.md",
+  "timeout_s": 1200,
+  "note": "User 2026-10-19 (/agy-assist): review how the site presents categories/topics. Counts in the prompt were measured by the session from db/articles.sqlite (B3). Engine pinned to agy: the user invoked /agy-assist for this work.",
+  "pin_engine": true,
+  "model": "claude-sonnet-5-5-high"
+}

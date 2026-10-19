@@ -26,3 +26,9 @@ html/*.bak.*
 # Generated static site: rendered from db/ by tracker/render.py, published to
 # Legacy output dir: the site now renders to /opt/tracker/web/public (2026-10-19); kept ignored.
 /html/
+
+# codex-assist (Common skill): generated run streams and machine-local readings
+.common/codex-assist/runs/*/events.jsonl
+.common/codex-assist/runs/*/stderr.txt
+.common/codex-assist/quota/
+.common/codex-assist/panel/

@@ -1,0 +1,46 @@
+{
+ "task_id": "20261019-site-categories-plan",
+ "at": "2026-10-19T03:56:12Z",
+ "machine": "afu-delta",
+ "engine": "agy",
+ "model": "claude-sonnet-5-5-high",
+ "effort": null,
+ "step": 0,
+ "target_step": 0,
+ "fallback": false,
+ "rank": 4,
+ "target_rank": 3,
+ "pref": "balanced",
+ "verdict": "ROUTED",
+ "via": [
+  "SCHEDULE class review: 2 step(s), engine order codex gpt-6-astra/medium > agy claude-sonnet-5-5-high > agy gemini-3.8-flash-medium (pinned to agy)",
+  "BASE plan -> rank 3",
+  "QUOTA claude refresh failed: AUTH-EXPIRED (a Claude Code session refreshes it; not refreshed here)",
+  "LEARNED not applied under the schedule (its per-model history predates it)",
+  "SIMILAR 0 past task(s) with word overlap >= 0.60, 0 failed: no change",
+  "NPU SKIPPED: 0 decided past task(s) < 3",
+  "SCHEDULE chose agy claude-sonnet-5-5-high (step 0); bucket agy-claude is ON"
+ ],
+ "warnings": [],
+ "quota": {
+  "codex": "RESET",
+  "claude": "UNMETERED",
+  "agy": "UNDER",
+  "agy-claude": "ON"
+ },
+ "similar": {
+  "neighbours": []
+ },
+ "npu": {
+  "mode": "auto",
+  "status": "SKIPPED: 0 decided past task(s) < 3"
+ },
+ "router": {
+  "name": "route.py",
+  "version": "0.6.0",
+  "sha256": "7f8d0fa93091cc98b73f61139caefe5b1507b66b4918a51f49e5ece19e3bcdd5"
+ },
+ "policy_sha256": "9aaea5aac129190088898845d5d044028d0a2b613009b2ae8dc3815915f5e0eb",
+ "task_sha256": "a5c13d0d22a18e14cfc880ae71e519e5882ee7ced40b334f1c510c6e547e0abe",
+ "rederive": "python3 tools/codex-assist/route.py .common/codex-assist/tasks/20261019-site-categories-plan.json --no-write"
+}

@@ -1,0 +1,49 @@
+{
+  "id": "20261019-console-publish",
+  "engine": "agy",
+  "mode": "implement",
+  "root": "/opt/tracker/repo",
+  "prompt_file": ".common/codex-assist/tasks/20261019-console-publish.prompt.md",
+  "inputs_glob": "tracker/web_dashboard.py tracker/deploy.py tests/conftest.py tests/test_web_dashboard.py",
+  "touch_allow": [
+    "tracker/web_dashboard.py",
+    "tests/test_dashboard_publish.py"
+  ],
+  "acceptance": [
+    {
+      "id": "tests",
+      "argv": [
+        "/opt/venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "tests"
+      ],
+      "expect": "passed"
+    },
+    {
+      "id": "import-page",
+      "argv": [
+        "/opt/venv/bin/python",
+        "-c",
+        "import tracker.web_dashboard as w; assert '<html' in w._HTML and 'poll()' in w._HTML; print('page-ok')"
+      ],
+      "expect": "page-ok"
+    },
+    {
+      "id": "no-external",
+      "argv": [
+        "/opt/venv/bin/python",
+        "-c",
+        "import re,tracker.web_dashboard as w; bad=re.findall(r\"(?:src|href)=.https?://\", w._HTML); assert not bad, bad; print(\"self-contained\")"
+      ],
+      "expect": "self-contained"
+    }
+  ],
+  "timeout_s": 2400,
+  "note": "User 2026-10-19 (/agy-assist): rework the console after the Wix template gallery style and add publishing. New-behaviour checks (deploy action, publish card) are verified by the session after the run, not sealed here (B6: acceptance must be green on base). Engine pinned to agy: the user invoked /agy-assist for this work.",
+  "pin_engine": true,
+  "model": "claude-sonnet-5-5-medium"
+}
