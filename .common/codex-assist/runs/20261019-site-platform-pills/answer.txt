@@ -1,0 +1,35 @@
+CRLF file. Look at the regions.
+LF file. Rerun the edit without CRLF handling.
+`ui/index.html` is the only file changed. The platform pills now sit in their own second row on the security page, and `漏洞與威脅情報` does the same on the os page. I haven't loaded the page in a browser, so the layout and the `c=Linux` hash restore are untested.
+
+**What changed** (line numbers are after the edit):
+- **`CAT_MAP.security`, ~1330:** removed the four platform entries. `'重點關注':'前瞻技術'` and all the others stay.
+- **`CAT_MAP.os`, ~1349:** removed `'漏洞與威脅情報':'重點關注'`. Both explanatory comments now describe the new behaviour.
+- **`SECONDARY_PILLS`, 1360:** new constant, defined as you specified (`security` is `平台`, `os` is `類型`, no `eu_cra` entry).
+- **`buildCatPills`, ~1840–1868:**
+  - Pill creation is now a shared `mkPill` helper, so second-row pills are built exactly like first-row ones.
+  - It then renders a `.cat-row-2` wrapper holding a `.cat-row-label` and the pills, inside `#cat-pills`.
+  - The row is rebuilt on every call, so switching to `eu_cra` removes it.
+  - It skips any category already in the first row, so `#cat-pills` can never get two pills with the same `data-cat`.
+- **`refreshCatPills`:** unchanged. It already selects `#cat-pills .cat-pill`, so it covers the second row.
+- **Hash and state:** unchanged. There is no new state or hash parameter; the second row shares `state.filterCats`, and `setFilter` and the hash code are untouched.
+- **CSS, ~362 and 909:**
+  - `#cat-pills .cat-row-2` has `flex-basis:100%`, so it takes its own line, and wraps.
+  - The label is small and muted.
+  - In the `max-width:599px` block, which sets `nowrap` on `#cat-pills`, the row becomes `nowrap`, `flex-basis:auto` and `flex-shrink:0`. It then joins the same horizontal-scroll strip inside `.hd-row2`.
+- **Library mode, `buildClusterPills`, ~1555:** I didn't change it. It does its own `el.innerHTML = ''` and builds only cluster pills, so the second row can't leak into it.
+- **Card badges:** the `.cat-Linux`, `.cat-Windows`, `.cat-Apple` and `.cat-Android` styles already exist (~652), so I added no colours.
+
+**What I ran:**
+- **Syntax check:** I extracted the inline script to `/tmp/agy-probes/` and ran `node --check` on it. It printed `NODE_OK` with no errors. I deleted the directory afterwards.
+- **Tests:** `/opt/venv/bin/python -m pytest -q -p no:cacheprovider tests` printed `499 passed in 5.34s`.
+- **Scope:** `git status` shows only `ui/index.html` modified. The untracked `.common/codex-assist/runs/20261019-site-platform-pills/` directory is not mine.
+
+**What I assumed:**
+- **Manifest categories:** the security and os manifests don't list the secondary categories in `categories`. If one did, the skip-duplicates guard would leave that pill in the first row only.
+- **Tracker timing:** `state.currentTracker` is already set when `buildCatPills` is called at ~1125 and ~1473. The call at 1473 comes after `state.currentTracker = name` at ~1484 only if the tracker-switch code runs it that way; I didn't trace this fully.
+- **Page layout:** the file has LF line endings, which I kept. I did not read the full page layout.
+
+No contradictions with the existing code's contract found.
+
+verified: 4  assumed: 3  gaps: 0  findings: 0

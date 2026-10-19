@@ -359,6 +359,20 @@ header {
   gap: 0.3rem;
   flex-wrap: wrap;
 }
+#cat-pills .cat-row-2 {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3rem;
+  flex-basis: 100%;   /* own line under the first row */
+}
+.cat-row-label {
+  font-size: 12px;
+  color: var(--on-surface-variant);
+  opacity: 0.8;
+  white-space: nowrap;
+  margin-right: 0.1rem;
+}
 .pill {
   position: relative;
   padding: 0.3rem 0.7rem;
@@ -891,6 +905,8 @@ html[data-mode="lib"] .lib-sort { display: flex; }
   /* row2 becomes one horizontally-scrolling strip instead of wrapping */
   .hd-row2 { flex-wrap: nowrap; overflow-x: auto; }
   #year-pills, #cat-pills, .lib-sort { flex-wrap: nowrap; }
+  /* second row joins the same horizontally-scrolling strip */
+  #cat-pills .cat-row-2 { flex-wrap: nowrap; flex-basis: auto; flex-shrink: 0; }
   .hd-row1 { gap: 0.5rem; }
   /* Mobile has room to spare — enlarge the actual box instead of relying on
      the invisible ::after hit-slop (which is more prone to overlap in the
@@ -1312,9 +1328,9 @@ function itemBelongsToTracker(item, tracker) {
 // item is findable (and colour-coded) under a real pill of the viewing tracker.
 const CAT_MAP = {
   security: {
-    // os platforms → treated as vuln/threat intel under a security lens
-    'Linux':'漏洞與威脅情報', 'Windows':'漏洞與威脅情報', 'Apple':'漏洞與威脅情報',
-    'Android':'漏洞與威脅情報', '重點關注':'前瞻技術',
+    // os platforms keep their own category here: they surface in the second
+    // pill row (SECONDARY_PILLS.security) instead of folding into 漏洞與威脅情報
+    '重點關注':'前瞻技術',
     // eu_cra → security
     '法令更新':'法規與標準', '調和標準':'法規與標準', '合規指引':'法規與標準',
     '亞太對應':'法規與標準', '開源影響':'供應鏈與開源安全',
@@ -1330,11 +1346,20 @@ const CAT_MAP = {
   },
   os: {
     // no platform signal from a foreign article → cross-platform watchlist
-    '漏洞與威脅情報':'重點關注', '法規與標準':'重點關注', '供應鏈與開源安全':'重點關注',
+    // 漏洞與威脅情報 keeps its own category here (second pill row, SECONDARY_PILLS.os)
+    '法規與標準':'重點關注', '供應鏈與開源安全':'重點關注',
     '前瞻技術':'重點關注', '重大事件':'重點關注',
     '法令更新':'重點關注', '調和標準':'重點關注', '合規指引':'重點關注',
     '開源影響':'重點關注', '產業動態':'重點關注', '亞太對應':'重點關注', '研討活動':'重點關注',
   },
+};
+
+// Second pill row per tracker: categories that are not in the tracker's manifest
+// `categories` (first row) but are kept as their own category via CAT_MAP above.
+// They share state.filterCats with the first row (OR semantics). eu_cra has none.
+const SECONDARY_PILLS = {
+  security: { label: '平台', cats: ['Linux','Windows','Apple','Android'] },
+  os: { label: '類型', cats: ['漏洞與威脅情報'] },
 };
 
 // The category an article should display/filter under for the given tracker.
@@ -1814,14 +1839,29 @@ function buildCatPills(cats) {
   const all = ['全部', ...cats];
   const icons = { '全部':'', '法規與標準':'📋 ', '漏洞與威脅情報':'🔴 ', '供應鏈與開源安全':'🔗 ', '重大事件':'🚨 ', '前瞻技術':'🚀 ',
                   'Linux':'🐧 ', 'Windows':'🪟 ', 'Apple':'🍎 ', 'Android':'🤖 ', '重點關注':'⭐ ' };
-  all.forEach((c) => {
+  const mkPill = (c) => {
     const btn = document.createElement('button');
     btn.className = 'pill cat-pill';
     btn.dataset.cat = c;   // key stays Chinese; only the label is localized
     btn.dataset.icon = icons[c] || '';
     btn.onclick = () => setFilter(c);
-    el.appendChild(btn);
-  });
+    return btn;
+  };
+  all.forEach((c) => el.appendChild(mkPill(c)));
+  // Second row (rebuilt on every call, so a tracker switch removes it).
+  // Skip any category already in the first row: never two pills per data-cat.
+  const sec = SECONDARY_PILLS[state.currentTracker];
+  const secCats = sec ? sec.cats.filter(c => !all.includes(c)) : [];
+  if (secCats.length) {
+    const row = document.createElement('div');
+    row.className = 'cat-row-2';
+    const lab = document.createElement('span');
+    lab.className = 'cat-row-label';
+    lab.textContent = sec.label;
+    row.appendChild(lab);
+    secCats.forEach((c) => row.appendChild(mkPill(c)));
+    el.appendChild(row);
+  }
   refreshCatPills();   // sets textContent (icon + label + selected-checkmark), active, aria-pressed
 }
 

@@ -1,0 +1,30 @@
+grep -n "CAT_MAP\|cat-pills\|buildCatPills\|refreshCatPills\|flex-wrap: nowrap\|\.cat-Linux\|\.cat-Android\|\.cat-Apple\|\.cat-Windows" /opt/tracker/repo/ui/index.html
+grep -n "cat-pills\|catLabel = \|function catLabel\|state.currentTracker = " /opt/tracker/repo/ui/index.html
+python3 - <<'EOF'
+p='/opt/tracker/repo/ui/index.html'
+s=open(p,'rb').read().decode('utf-8')
+assert '\r\n' in s
+s=s.replace('\r\n','\n')
+def rep(a,b):
+    global s
+    assert s.count(a)==1,a
+    s=s.replace(a,b)
+rep("""    // os platforms → treated as vuln/threat intel under a security lens
+    'Linux':'漏洞與威脅情報', 'Windows':'漏洞與威脅情報', 'Apple':'漏洞與威脅情報',
+    'Android':'漏洞與威脅情報', '重點關注':'前瞻技術',
+""","""    // os platforms keep their own category here: they surface in the second
+    // pill row (SECONDARY_PILLS.s…
+file /opt/tracker/repo/ui/index.html; grep -c $'\r' /opt/tracker/repo/ui/index.html
+python3 - <<'EOF'
+p='/opt/tracker/repo/ui/index.html'
+s=open(p,'rb').read().decode('utf-8')
+assert '\r' not in s
+def rep(a,b):
+    global s
+    assert s.count(a)==1,a
+    s=s.replace(a,b)
+rep("""    // os platforms → treated as vuln/threat intel under a security lens
+    'Linux':'漏洞與威脅情報', 'Windows':'漏洞與威脅情報', 'Apple':'漏洞與威脅情報',
+    'Android':'漏洞與威脅情報', '重點關注':'前瞻技術',
+""","""    // os platforms keep their own category here: they surface in the second
+    // pill row (SECONDARY_PILLS.security) instead of fol…
