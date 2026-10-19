@@ -1,4 +1,4 @@
-本專案使用 D:\Claude\Common 之共用資源，須以最高級別遵守 D:\Claude\Common\rule\ 之憲法準則。
+本專案使用 D:\Claude\Common 之共用資源，須以最高級別遵守 D:\Claude\Common\repo\rule\ 之憲法準則（CORE.md＋STANDARD.md）。
 session 啟動時先讀取該目錄全部 .md 並據以行動。
 
 ## 兩側各放什麼
