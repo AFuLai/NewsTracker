@@ -1,0 +1,61 @@
+wc -l /opt/tracker/repo/ui/index.html; grep -n "PRESETS\|function parseView\|tracker_view\|function buildCard\|function buildRiverRow\|function renderArticles\|function applyLang\|view-select\|effectiveCat\|pv=\|function renderHero\|function renderHub\|timeline\|I18N" /opt/tracker/repo/ui/index.html | head -150
+grep -n "function buildCatPills\|function refreshCatPills\|function itemBelongsToTracker\|Escape\|cat-pills\|function escHtml\|--primary\|--tertiary\|--error\|--outline\|function initView\|restoring =\|DOMContentLoaded\|applyLang()" /opt/tracker/repo/ui/index.html | head -60; sed -n 985,1000p /opt/tracker/repo/ui/index.html; sed -n 615,635p /opt/tracker/repo/ui/index.html; sed -n 1550,1575p /opt/tracker/repo/ui/index.html
+cd /opt/tracker/repo/ui; grep -n "refreshCatPills\|keydown\|function itemBelongs\|function buildCatPills\|function escHtml" index.html | head -30; sed -n 357,400p index.html; sed -n 660,700p index.html; sed -n 1655,1672p index.html; git status --short | head
+cd /opt/tracker/repo/ui; grep -n "on-primary-container\|--surface-container:\|--shadow\|--elev-2\|--on-surface-variant:" index.html | head; grep -n "river-row {" -A12 index.html | head -30; grep -n "^\.overlay\b\|\.overlay {" -A8 index.html | head -20; git diff --stat | tail -1
+mkdir -p /tmp/w && cat > /tmp/w/edit.py <<'PYEOF'
+p='/opt/tracker/repo/ui/index.html'
+s=open(p,'rb').read().decode('utf-8')
+crlf='\r\n' in s
+s=s.replace('\r\n','\n')
+def rep(old,new):
+    global s
+    assert s.count(old)==1,(s.count(old),old[:60])
+    s=s.replace(old,new)
+
+# CSS
+rep("""#view-select option { background: var(--surface-container); color: var(--on-surface); }
+""","""#view-select option { background: var(--surface-container); color: var(--on-surface); }
+/* ── Watch (關注): button, panel, badge, ac…
+cat >> /tmp/w/edit.py <<'PYEOF'
+
+# I18N
+rep("""        tlOther:'其他', tlCount:n=>n+' 篇',
+""","""        tlOther:'其他', tlCount:n=>n+' 篇',
+        watchBtn:'關注', watchBadge:'★ 關注', watchOnly:'只看關注', watchRules:'關注規則',
+        watchCustom:'自訂關鍵字', watchKwPh:'輸入關鍵字…', watchAdd:'新增', watchReset:'恢復預設',
+        watchRemove:'移除', noWatch:'沒有符合關注規則的文章',
+""")
+rep("""        tlOther:'Other', tlCount:n=>n+(n===1?' article':' articles'),
+""","""        tlOther:'Other', tlCount:n=>n+(n===1?' article':' articles'),
+      …
+cd /tmp/w && python3 - <<'EOF'
+t=open('edit.py').read()
+t=t.replace("rep(\"\"\"        tlOther:'其他', tlCount:n=>n+' 篇',\n\"\"\",\"\"\"        tlOther","rep(\"\"\" tlOther:'其他', tlCount:n=>n+' 篇',\n\"\"\",\"\"\" tlOther")
+t=t.replace("rep(\"\"\"        tlOther:'Other', tlCount:n=>n+(n===1?' article':' articles'),\n\"\"\",\"\"\"        tlOther","rep(\"\"\" tlOther:'Other', tlCount:n=>n+(n===1?' article':' articles'),\n\"\"\",\"\"\" tlOther")
+open('edit.py','w').write(t)
+EOF
+python3 edit.py && cd /opt/tracker/…
+cd /tmp/w && python3 - <<'EOF'
+import re
+s=open('/opt/tracker/repo/ui/index.html').read()
+js=s[s.index('<script>\n')+9:s.rindex('</script>')]
+open('/tmp/w/all.js','w').write(js)
+a=js.index('const WATCH_RULES'); b=js.index('// ── Watch wiring')
+open('/tmp/w/pure.js','w').write(js[a:b])
+EOF
+node --check all.js && cat > t.js <<'EOF'
+const fs=require('fs');
+function effectiveCat(a){return a.category}
+eval(fs.readFileSync('/tmp/w/pure.js','utf8')+`
+console.log(JSON.stringify(parseWatch(undefined)),JSON.stringify…
+cd /opt/tracker/repo/ui && sed -i "s|join(' / '))));|join(' / ')));|" index.html && python3 - <<'EOF'
+s=open('/opt/tracker/repo/ui/index.html').read()
+js=s[s.index('<script>\n')+9:s.rindex('</script>')]
+open('/tmp/all.js','w').write(js)
+a=js.index('const WATCH_RULES'); b=js.index('// ── Watch wiring')
+open('/tmp/pure.js','w').write(js[a:b])
+EOF
+node --check /tmp/all.js && cat > /tmp/t.js <<'EOF'
+const fs=require('fs');
+function effectiveCat(a){return a.category}
+eval(fs.readFileSync('/tmp/pure.js','utf8')+`…

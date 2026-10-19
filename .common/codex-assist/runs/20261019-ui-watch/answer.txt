@@ -1,0 +1,30 @@
+Indentation is 8 spaces + 1 (line shows 9 spaces). Loosening the anchor.
+"關注"（watch）功能已加進 [ui/index.html](file:///opt/tracker/repo/ui/index.html)，只動了這個檔案。我只測了純函式，UI 沒有在瀏覽器裡跑過，也沒有用真實資料測試。
+
+**測試結果**
+- 整段 JS 通過 `node --check`。
+- 在 node 裡跑了 `parseWatch`、`serializeWatch`、`watchMatches`：
+  - 缺值、壞 JSON、`v` 不是 1 都回到預設（`cra_law`、`cra_std` 開，`kw` 空）。
+  - 未知規則 id 會被丟掉。
+  - 自訂關鍵字會去掉空白、空字串、重複項（不分大小寫），並限制最多 20 個。
+  - 三個案例的比對結果符合預期：`法令更新` 命中 `cra_law`；`調和標準` 在 `cra_law` 與 `kev` 下不命中；標題含 `KEV` 與自訂詞的文章回傳兩個標籤。
+
+**做了什麼**
+- **規則與儲存：** 新增 `WATCH_RULES`（七條規則，預設開啟的是 `cra_law`、`cra_std`）。`parseWatch`、`serializeWatch`、`watchMatches` 都是純函式，不碰 DOM 或儲存。儲存 key 是 `tracker_watch`，所有儲存存取都包在 try/catch 裡。`?pv=1` 時沿用 `isPreviewMode()`，不寫入。
+- **設定面板：** 標題列新增「關注」按鈕，彈出面板有規則核取方塊、自訂關鍵字輸入加可移除的標籤、「恢復預設」。Esc 關閉、Tab 在面板內循環。勾選後立即重新繪製並存檔。
+- **顯示：**
+  - 命中的文章會出現「★ 關注」徽章，matched 規則標籤放在 `title` 屬性裡，卡片與列左側有強調邊線。
+  - 徽章接在 `buildCard` 和 `buildRiverRow` 上，所以格狀卡片、river、hero、hub、事件時間軸都有。
+  - 分類 pill 列新增「只看關注」開關。它只存在記憶體，不會存檔，並已計入文章數；沒有符合文章時會顯示專用訊息。
+  - 顏色用現有的主色變數（`--primary`、`--primary-container`），深色、淺色主題都沿用。
+- **雙語：** 新增的標籤都放進 `I18N.ui`，由 `applyLang` 同步更新。
+
+**偏離與限制**
+- `watchMatches` 多了兩個可選參數 `(article, watch, tracker, lang)`，分別用來判斷「目前 tracker」和決定規則標籤的語言。
+- 目前 tracker 的判斷是：規則指定的 tracker 等於目前檢視的 tracker 就算符合，所以在 EU CRA 下，只要分類相符的文章都會命中 CRA 規則。
+- 關鍵字只比對 `title`、`title_en`、`tags`，沒有比對 `tags_en`，這是照你的規格做的。
+- 圖書館（library）模式沒有分類 pill 列，所以那裡看不到「只看關注」。
+
+沒有改 PRESETS、`p=`／`c=` hash 規則，也沒有改既有函式的行為。只有 `renderArticles`、`buildCatPills`、`applyLang`、`init` 與 `buildCard`／`buildRiverRow` 加了呼叫，既有註解都保留。暫存檔已清掉。
+
+verified: 7  assumed: 3  gaps: 0  findings: 0

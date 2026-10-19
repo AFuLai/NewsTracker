@@ -631,6 +631,85 @@ html[data-mode="lib"] #drawer-toggle { display: none !important; }
   max-width: 9.5rem;
 }
 #view-select option { background: var(--surface-container); color: var(--on-surface); }
+/* ── Watch (關注): button, panel, badge, accent ── */
+#watch-btn {
+  background: none;
+  border: 1px solid var(--outline);
+  color: var(--on-surface);
+  cursor: pointer;
+  padding: 0.3rem 0.7rem;
+  border-radius: var(--shape-full);
+  font-size: 14px;
+}
+#watch-btn[aria-expanded="true"] { background: var(--primary-container); color: var(--on-primary-container); }
+#watch-btn:focus-visible, .pill.watch-pill:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+#watch-panel {
+  position: fixed;
+  top: 3.5rem;
+  right: 0.75rem;
+  z-index: 110;   /* above the sticky header (z-index 100), which otherwise hides the top rows */
+  width: min(22rem, calc(100vw - 1.5rem));
+  max-height: 80vh;
+  overflow-y: auto;
+  background: var(--surface-container-high);
+  color: var(--on-surface);
+  border: 1px solid var(--outline-variant);
+  border-radius: var(--shape-m);
+  box-shadow: var(--elev-3);
+  padding: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 14px;
+}
+#watch-panel.hidden { display: none; }
+#watch-panel h4 { font-size: 14px; margin: 0; }
+#watch-panel label.watch-rule { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; }
+#watch-panel input[type="checkbox"] { accent-color: var(--primary); width: 1rem; height: 1rem; }
+#watch-panel .watch-add { display: flex; gap: 0.4rem; }
+#watch-panel input[type="text"] {
+  flex: 1; min-width: 0;
+  background: var(--surface-container);
+  color: var(--on-surface);
+  border: 1px solid var(--outline);
+  border-radius: var(--shape-full);
+  padding: 0.3rem 0.7rem;
+  font-size: 14px;
+}
+#watch-panel button {
+  background: none;
+  border: 1px solid var(--outline);
+  color: var(--on-surface);
+  cursor: pointer;
+  border-radius: var(--shape-full);
+  padding: 0.3rem 0.7rem;
+  font-size: 14px;
+}
+#watch-panel button:focus-visible, #watch-panel input:focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; }
+#watch-chips { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+#watch-chips .watch-chip {
+  display: inline-flex; align-items: center; gap: 0.25rem;
+  background: var(--primary-container);
+  color: var(--on-primary-container);
+  border-color: transparent;
+  padding: 0.15rem 0.3rem 0.15rem 0.6rem;
+}
+.pill.watch-pill.active { background: var(--primary); color: var(--on-primary); border-color: transparent; font-weight: 600; }
+.watch-badge {
+  display: inline-block;
+  width: fit-content;
+  padding: 0.1rem 0.5rem;
+  border-radius: var(--shape-full);
+  font-size: 13px;
+  font-weight: 600;
+  background: var(--primary-container);
+  color: var(--on-primary-container);
+  border: 1px solid var(--primary);
+  margin-left: 0.4rem;
+  white-space: nowrap;
+}
+.card.watched, .river-row.watched { border-left: 4px solid var(--primary); }
+.river-row .watch-badge { margin-left: 0; margin-right: 0.4rem; }
 html[data-density="compact"] .cards-grid { gap: 0.5rem; margin-bottom: 0.6rem; }
 html[data-density="compact"] .card { padding: 0.6rem; gap: 0.3rem; }
 html[data-density="compact"] .date-divider { padding: 0.3rem 0 0.2rem; margin-bottom: 0.4rem; }
@@ -991,6 +1070,7 @@ html[data-mode="lib"] .lib-sort { display: flex; }
       <span id="last-updated"></span>
       <button id="skin-btn" onclick="toggleSkin()" aria-label="切換外觀"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/></svg></button>
       <select id="view-select" onchange="setPreset(this.value)" aria-label="檢視模式" title="檢視模式"></select>
+      <button id="watch-btn" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="watch-panel">關注</button>
       <button id="theme-btn" onclick="toggleTheme()" aria-label="切換主題"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" id="theme-icon-light"><path d="M12 18C8.68 18 6 15.32 6 12s2.68-6 6-6 6 2.68 6 6-2.68 6-6 6zm0-10c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zM12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" id="theme-icon-dark" style="display:none"><path d="M21.64 10.75c-.5-.3-1.19-.26-1.63.13-.87.78-2.14 1.22-3.5 1.22-2.97 0-5.38-2.41-5.38-5.38 0-1.36.44-2.63 1.22-3.5.39-.44.43-1.13.13-1.63-.3-.5-.92-.74-1.53-.74-6.14 0-11.13 5-11.13 11.13 0 6.14 5 11.13 11.13 11.13 6.14 0 11.13-5 11.13-11.13 0-.61-.24-1.23-.74-1.53z"/></svg></button>
       <button id="lang-btn" onclick="toggleLang()" title="Language / 語言" aria-label="切換語言"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H4v3h10.52C9.47 7.69 8.96 8.99 8.19 10H4v3h4.52c.7 1.43 1.72 2.81 2.97 3.85l-2.55 2.54.96.96c1.66-1.44 3.01-3.38 3.89-5.58h.11l-.04.04c.3-.45.51-.95.65-1.46.46 1.29.76 2.61.76 4v1h3v-1c0-1.13-.21-2.22-.62-3.26z"/></svg></button>
     </div>
@@ -1039,6 +1119,7 @@ html[data-mode="lib"] .lib-sort { display: flex; }
   <div class="overlay-box" id="overlay-box" role="dialog" aria-modal="true" aria-labelledby="overlay-title"></div>
 </div>
 
+<div id="watch-panel" class="hidden" role="dialog" aria-label="關注"></div>
 <script>
 // ── State ────────────────────────────────────────────
 const state = {
@@ -1205,6 +1286,276 @@ function updateViewUI() {
   sel.title = t('viewLabel');
 }
 
+// ── Watch rules (關注) ────────────────────────────────
+// One localStorage key `tracker_watch` = {"v":1,"on":[rule ids],"kw":[custom keywords]}.
+// Rules live HERE (only ids + custom keywords are stored), so editing a rule needs no
+// migration. A rule matches when EVERY part it gives matches: tracker (in
+// article.trackers, or the tracker being viewed), category (raw or effectiveCat),
+// keyword (case-insensitive, in title / title_en / tags). parseWatch / serializeWatch /
+// watchMatches are pure (no DOM, no storage).
+const WATCH_RULES = [
+  { id: 'cra_law',    zh: 'EU CRA 法規更新',        en: 'EU CRA regulation updates',
+    match: { trackers: ['eu_cra'], categories: ['法令更新', '法規與標準'] }, def: true },
+  { id: 'cra_std',    zh: 'EU CRA 標準更新',        en: 'EU CRA standards updates',
+    match: { trackers: ['eu_cra'], categories: ['調和標準'] }, def: true },
+  { id: 'cra_guide',  zh: 'EU CRA 合規指引／FAQ',   en: 'EU CRA guidance / FAQ',
+    match: { trackers: ['eu_cra'], categories: ['合規指引'] }, def: false },
+  { id: 'kev',        zh: 'KEV 已遭利用漏洞',       en: 'KEV / actively exploited',
+    match: { keywords: ['KEV', '已知遭利用', '遭積極利用', 'actively exploited'] }, def: false },
+  { id: 'zeroday',    zh: '零時差漏洞',             en: 'Zero-day',
+    match: { keywords: ['零時差', 'zero-day', '0-day'] }, def: false },
+  { id: 'ransomware', zh: '勒索軟體',               en: 'Ransomware',
+    match: { keywords: ['勒索', 'ransomware'] }, def: false },
+  { id: 'nis2',       zh: 'NIS2',                   en: 'NIS2',
+    match: { keywords: ['NIS2'] }, def: false }
+];
+const WATCH_MAX_KW = 20;
+function isWatchRule(id) { return WATCH_RULES.some(r => r.id === id); }
+function defaultWatch() {
+  return { v: 1, on: WATCH_RULES.filter(r => r.def).map(r => r.id), kw: [] };
+}
+// Trim, drop empty / non-string / case-insensitive duplicates, cap at WATCH_MAX_KW.
+function cleanWatchKw(list) {
+  const out = [], seen = new Set();
+  (Array.isArray(list) ? list : []).forEach(k => {
+    if (typeof k !== 'string') return;
+    const v = k.trim();
+    const key = v.toLowerCase();
+    if (!v || seen.has(key) || out.length >= WATCH_MAX_KW) return;
+    seen.add(key);
+    out.push(v);
+  });
+  return out;
+}
+function cleanWatchOn(list) {
+  const set = new Set(Array.isArray(list) ? list : []);
+  return WATCH_RULES.filter(r => set.has(r.id)).map(r => r.id);   // unknown ids dropped
+}
+// string → watch. Missing / bad JSON / unknown v → defaults.
+function parseWatch(str) {
+  if (typeof str !== 'string') return defaultWatch();
+  let o;
+  try { o = JSON.parse(str); } catch (e) { return defaultWatch(); }
+  if (!o || typeof o !== 'object' || Array.isArray(o) || o.v !== 1) return defaultWatch();
+  return {
+    v: 1,
+    on: Array.isArray(o.on) ? cleanWatchOn(o.on) : defaultWatch().on,
+    kw: cleanWatchKw(o.kw)
+  };
+}
+// watch → string for storage (normalised through parseWatch's rules).
+function serializeWatch(obj) {
+  const w = (obj && typeof obj === 'object') ? obj : {};
+  return JSON.stringify({
+    v: 1,
+    on: Array.isArray(w.on) ? cleanWatchOn(w.on) : defaultWatch().on,
+    kw: cleanWatchKw(w.kw)
+  });
+}
+// article + watch → matched labels (rule labels, then matching custom keywords).
+// `tracker` = the tracker being viewed (optional); `lang` = 'zh' | 'en' for rule labels.
+function watchMatches(a, watch, tracker, lang) {
+  if (!a || !watch) return [];
+  const en = lang === 'en';
+  const trackers = (Array.isArray(a.trackers) && a.trackers.length) ? a.trackers : ['security'];
+  let hay = null;
+  const hasKw = (kws) => {
+    if (hay === null) {
+      hay = [a.title, a.title_en].concat(Array.isArray(a.tags) ? a.tags : [])
+        .filter(x => typeof x === 'string').join('\n').toLowerCase();
+    }
+    return kws.some(k => hay.includes(String(k).toLowerCase()));
+  };
+  const hasCat = (cats) => {
+    if (cats.includes(a.category)) return true;
+    return !!tracker && cats.includes(effectiveCat(a, tracker));
+  };
+  const labels = [];
+  const on = Array.isArray(watch.on) ? watch.on : [];
+  WATCH_RULES.forEach(r => {
+    if (!on.includes(r.id)) return;
+    const m = r.match;
+    let parts = 0;
+    if (m.trackers) { parts++; if (!m.trackers.some(t0 => trackers.includes(t0) || t0 === tracker)) return; }
+    if (m.categories) { parts++; if (!hasCat(m.categories)) return; }
+    if (m.keywords) { parts++; if (!hasKw(m.keywords)) return; }
+    if (parts) labels.push(en ? r.en : r.zh);
+  });
+  (Array.isArray(watch.kw) ? watch.kw : []).forEach(k => {
+    if (typeof k === 'string' && k && hasKw([k])) labels.push(k);
+  });
+  return labels;
+}
+
+// ── Watch wiring (DOM / storage side) ─────────────────
+// In-memory copy; stays authoritative if localStorage throws. ?pv=1 never writes
+// (same isPreviewMode rule as tracker_view).
+let watchPrefs = defaultWatch();
+let watchOnly = false;   // 只看關注: state only, not persisted
+function saveWatch() {
+  if (isPreviewMode()) return;
+  try { localStorage.setItem('tracker_watch', serializeWatch(watchPrefs)); } catch (e) {}
+}
+// Read-only: a bad stored value is NOT overwritten until the reader changes something.
+function initWatch() {
+  let raw = null;
+  try { raw = localStorage.getItem('tracker_watch'); } catch (e) {}
+  watchPrefs = parseWatch(raw);
+  buildWatchPanel();
+  updateWatchUI();
+}
+function watchLabels(a) {
+  return watchMatches(a, watchPrefs, state.currentTracker, state.lang);
+}
+function watchBadgeHtml(a) {
+  const labels = watchLabels(a);
+  if (!labels.length) return '';
+  return '<span class="watch-badge" title="' + escHtml(labels.join(' / ')) + '">' + escHtml(t('watchBadge')) + '</span>';
+}
+function watchChanged() {
+  saveWatch();
+  updateWatchUI();
+  if (state.currentTracker && !state.libActive) renderArticles();
+}
+function buildWatchPanel() {
+  const panel = document.getElementById('watch-panel');
+  if (!panel || panel.dataset.built) return;
+  panel.dataset.built = '1';
+  panel.innerHTML = '<h4 id="watch-title"></h4><div id="watch-rules"></div>' +
+    '<h4 id="watch-kw-title"></h4><div class="watch-add"><input type="text" id="watch-kw-input" maxlength="60">' +
+    '<button type="button" id="watch-kw-add"></button></div><div id="watch-chips"></div>' +
+    '<div><button type="button" id="watch-reset"></button></div>';
+  const box = document.getElementById('watch-rules');
+  WATCH_RULES.forEach(r => {
+    const lab = document.createElement('label');
+    lab.className = 'watch-rule';
+    const cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.dataset.rule = r.id;
+    cb.addEventListener('change', () => {
+      const s = new Set(watchPrefs.on);
+      if (cb.checked) s.add(r.id); else s.delete(r.id);
+      watchPrefs = { v: 1, on: cleanWatchOn([...s]), kw: watchPrefs.kw };
+      watchChanged();
+    });
+    const sp = document.createElement('span');
+    lab.appendChild(cb); lab.appendChild(sp);
+    box.appendChild(lab);
+  });
+  const input = document.getElementById('watch-kw-input');
+  const addKw = () => {
+    const v = input.value.trim();
+    if (!v) return;
+    watchPrefs = { v: 1, on: watchPrefs.on, kw: cleanWatchKw(watchPrefs.kw.concat([v])) };
+    input.value = '';
+    watchChanged();
+    input.focus();
+  };
+  document.getElementById('watch-kw-add').addEventListener('click', addKw);
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); addKw(); } });
+  document.getElementById('watch-reset').addEventListener('click', () => {
+    watchPrefs = defaultWatch();
+    watchChanged();
+  });
+  panel.addEventListener('keydown', e => {
+    if (e.key !== 'Tab') return;
+    const f = [...panel.querySelectorAll('button, input')].filter(el => el.offsetParent !== null);
+    if (!f.length) return;
+    if (e.shiftKey && document.activeElement === f[0]) { e.preventDefault(); f[f.length - 1].focus(); }
+    else if (!e.shiftKey && document.activeElement === f[f.length - 1]) { e.preventDefault(); f[0].focus(); }
+  });
+}
+function renderWatchChips() {
+  const box = document.getElementById('watch-chips');
+  if (!box) return;
+  box.innerHTML = '';
+  watchPrefs.kw.forEach(k => {
+    const chip = document.createElement('span');
+    chip.className = 'pill watch-chip';
+    chip.appendChild(document.createTextNode(k));
+    const x = document.createElement('button');
+    x.type = 'button';
+    x.textContent = '×';
+    x.setAttribute('aria-label', t('watchRemove') + ' ' + k);
+    x.addEventListener('click', () => {
+      watchPrefs = { v: 1, on: watchPrefs.on, kw: watchPrefs.kw.filter(z => z !== k) };
+      watchChanged();
+      const nx = document.getElementById('watch-kw-input');
+      if (nx) nx.focus();
+    });
+    chip.appendChild(x);
+    box.appendChild(chip);
+  });
+}
+// Re-sync every watch label / checked state / chip / pill with the language and prefs.
+function updateWatchUI() {
+  const btn = document.getElementById('watch-btn');
+  if (btn) { btn.textContent = t('watchBtn'); btn.title = t('watchBtn'); }
+  const panel = document.getElementById('watch-panel');
+  if (panel && panel.dataset.built) {
+    panel.setAttribute('aria-label', t('watchBtn'));
+    document.getElementById('watch-title').textContent = t('watchRules');
+    document.getElementById('watch-kw-title').textContent = t('watchCustom');
+    const input = document.getElementById('watch-kw-input');
+    input.placeholder = t('watchKwPh');
+    input.setAttribute('aria-label', t('watchCustom'));
+    document.getElementById('watch-kw-add').textContent = t('watchAdd');
+    document.getElementById('watch-reset').textContent = t('watchReset');
+    panel.querySelectorAll('input[data-rule]').forEach(cb => {
+      const r = WATCH_RULES.find(x => x.id === cb.dataset.rule);
+      cb.checked = watchPrefs.on.includes(cb.dataset.rule);
+      cb.nextSibling.textContent = r ? (state.lang === 'en' ? r.en : r.zh) : cb.dataset.rule;
+    });
+    renderWatchChips();
+  }
+  refreshWatchPill();
+}
+function refreshWatchPill() {
+  const p = document.querySelector('#cat-pills .watch-pill');
+  if (!p) return;
+  p.classList.toggle('active', watchOnly);
+  p.setAttribute('aria-pressed', watchOnly ? 'true' : 'false');
+  p.textContent = (watchOnly ? '✓ ' : '') + t('watchOnly');
+}
+function toggleWatchOnly() {
+  watchOnly = !watchOnly;
+  refreshWatchPill();
+  if (state.searchQuery && state.search) refreshSearchView(); else renderArticles();
+}
+function openWatchPanel() {
+  const panel = document.getElementById('watch-panel');
+  const btn = document.getElementById('watch-btn');
+  if (!panel || !btn) return;
+  buildWatchPanel();
+  updateWatchUI();
+  panel.classList.remove('hidden');
+  btn.setAttribute('aria-expanded', 'true');
+  const first = panel.querySelector('input[data-rule]');
+  if (first) first.focus();
+}
+function closeWatchPanel(refocus) {
+  const panel = document.getElementById('watch-panel');
+  const btn = document.getElementById('watch-btn');
+  if (!panel || panel.classList.contains('hidden')) return false;
+  panel.classList.add('hidden');
+  if (btn) { btn.setAttribute('aria-expanded', 'false'); if (refocus) btn.focus(); }
+  return true;
+}
+(function wireWatch() {
+  const btn = document.getElementById('watch-btn');
+  const panel = document.getElementById('watch-panel');
+  if (!btn || !panel) return;
+  btn.addEventListener('click', () => {
+    if (panel.classList.contains('hidden')) openWatchPanel(); else closeWatchPanel(true);
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && closeWatchPanel(true)) e.stopImmediatePropagation();
+  });
+  document.addEventListener('click', e => {
+    if (!panel.classList.contains('hidden') && !panel.contains(e.target) && !btn.contains(e.target)) closeWatchPanel(false);
+  });
+})();
+
 // ── i18n (language toggle: 中文 ⇄ English) ────────────
 // Category keys stay Chinese internally (filter + colour CSS class); only the
 // DISPLAY label is localized. Article title/summary/tags read the *_en mirror
@@ -1233,6 +1584,9 @@ const I18N = {
       clearSearch:'清除搜尋', close:'關閉',
        viewLabel:'檢視模式', srcCount:n=>n+' 個來源',
        tlOther:'其他', tlCount:n=>n+' 篇',
+        watchBtn:'關注', watchBadge:'★ 關注', watchOnly:'只看關注', watchRules:'關注規則',
+        watchCustom:'自訂關鍵字', watchKwPh:'輸入關鍵字…', watchAdd:'新增', watchReset:'恢復預設',
+        watchRemove:'移除', noWatch:'沒有符合關注規則的文章',
        presets:{ default:'預設', quick:'快讀', analyst:'分析師', event:'事件追蹤', cra:'合規 CRA' },
       searchPlaceholder:'搜尋全站新聞…', searching:'搜尋中…',
       scopeLabel:'範圍', scope:{title:'標題', body:'內文', tags:'標籤'},
@@ -1256,6 +1610,9 @@ const I18N = {
       clearSearch:'Clear search', close:'Close',
        viewLabel:'View preset', srcCount:n=>n+(n===1?' source':' sources'),
        tlOther:'Other', tlCount:n=>n+(n===1?' article':' articles'),
+        watchBtn:'Watch', watchBadge:'★ Watch', watchOnly:'Watched only', watchRules:'Watch rules',
+        watchCustom:'Custom keywords', watchKwPh:'Add a keyword…', watchAdd:'Add', watchReset:'Reset',
+        watchRemove:'Remove', noWatch:'No articles match your watch rules',
        presets:{ default:'Default', quick:'Quick read', analyst:'Analyst', event:'Event tracking', cra:'Compliance CRA' },
       searchPlaceholder:'Search all news…', searching:'Searching…',
       scopeLabel:'In', scope:{title:'Title', body:'Body', tags:'Tags'},
@@ -1314,6 +1671,7 @@ function applyLang() {
     sbBtn.setAttribute('aria-label', t('collapse'));
   }
   updateViewUI();
+  updateWatchUI();
   if (state.libActive) {
     buildTrackerPills(Object.keys(getTrackers()));   // re-labels the CRA pill
     document.getElementById('tracker-title').textContent =
@@ -1661,6 +2019,7 @@ function init() {
     showMsg(t('noTracker')); return;
   }
   buildTrackerPills(names);
+  initWatch();  // localStorage tracker_watch → watchPrefs
   initView();   // localStorage tracker_view → viewPrefs; the hash (below) may override it
   if (!applyHashRestore()) selectTracker(presetTracker(resolvePreset(viewPrefs), all) || names[0]);   // deep-link wins over default
   applyLang();   // sync all static labels + lang button to the active language
@@ -2043,6 +2402,10 @@ function buildCatPills(cats) {
     return btn;
   };
   all.forEach((c) => el.appendChild(mkPill(c)));
+  const wp = document.createElement('button');   // 只看關注: not a category, so refreshCatPills skips it
+  wp.className = 'pill watch-pill';
+  wp.onclick = toggleWatchOnly;
+  el.appendChild(wp);
   // Second row (rebuilt on every call, so a tracker switch removes it).
   // Skip any category already in the first row: never two pills per data-cat.
   const sec = SECONDARY_PILLS[state.currentTracker];
@@ -2058,6 +2421,7 @@ function buildCatPills(cats) {
     el.appendChild(row);
   }
   refreshCatPills();   // sets textContent (icon + label + selected-checkmark), active, aria-pressed
+  refreshWatchPill();
 }
 
 // Multi-select: 全部 is active when nothing is picked; otherwise every picked
@@ -2185,6 +2549,9 @@ function renderArticles(dateList) {
     articles = articles.filter(a => matchesQuery(a, q));
   }
 
+  // 只看關注: only articles matching an active watch rule (counted below).
+  if (watchOnly) articles = articles.filter(a => watchLabels(a).length);
+
   document.getElementById('article-count').textContent = articles.length;
   syncHash();   // keep the URL in step with the current view
 
@@ -2198,7 +2565,8 @@ function renderArticles(dateList) {
     noData.classList.remove('hidden');
     noData.textContent = state.searchQuery
       ? L().ui.noResults(state.searchQuery)
-      : (state.filterCats.size === 0
+      : (watchOnly ? t('noWatch')
+      : state.filterCats.size === 0
           ? t('noData')
           : L().ui.noCat([...state.filterCats].map(catLabel).join(' / ')));
     return;
@@ -2264,8 +2632,10 @@ function buildRiverRow(a) {
   const ecat = effectiveCat(a, state.currentTracker);
   const srcName = a.sources && a.sources[0] ? a.sources[0].name : '';
   const meta = [catLabel(ecat), srcName, a._date].filter(Boolean).join(' · ');
+  const wBadge = watchBadgeHtml(a);
+  if (wBadge) row.classList.add('watched');
   row.innerHTML = [
-    '<h3 class="card-title">' + linkifyCVE(escHtml(artTitle(a))) + '</h3>',
+    '<h3 class="card-title">' + wBadge + linkifyCVE(escHtml(artTitle(a))) + '</h3>',
     '<div class="card-meta">' + escHtml(meta) + '</div>'
   ].join('');
   bindOpen(row, a);
@@ -2358,8 +2728,10 @@ function buildCard(a) {
     }
     return '<span class="card-tag">' + escHtml(tg) + '</span>';
   }).join('');
+  const wBadge = watchBadgeHtml(a);
+  if (wBadge) card.classList.add('watched');
   card.innerHTML = [
-    '<span class="cat-badge ' + catClass + '">' + escHtml(catLabel(ecat)) + '</span>',
+    '<span class="cat-badge ' + catClass + '">' + escHtml(catLabel(ecat)) + '</span>' + wBadge,
     '<h3 class="card-title">' + linkifyCVE(escHtml(title)) + '</h3>',
     '<p class="card-summary-preview">' + escHtml(preview) + '</p>',
     '<div class="card-tags">' + tagsHtml + '</div>',
