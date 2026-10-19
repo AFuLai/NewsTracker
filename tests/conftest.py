@@ -34,3 +34,12 @@ def _never_deploy(monkeypatch):
     """No test may publish the real site: deploy() is replaced by a no-op."""
     import tracker.deploy as deploy_mod
     monkeypatch.setattr(deploy_mod, "deploy", lambda **_kw: "stubbed under test")
+
+
+@pytest.fixture(autouse=True)
+def _isolate_snapshots(tmp_path, monkeypatch):
+    """DB snapshots from tests land in the per-test temp dir, never state/backups/."""
+    import tracker.snapshot as snap
+    monkeypatch.setattr(snap, "SNAP_DIR", tmp_path / "snapshots")
+    real = snap.snapshot
+    monkeypatch.setattr(snap, "snapshot", lambda db, **kw: real(db, **{"dest": tmp_path / "snapshots", **kw}))

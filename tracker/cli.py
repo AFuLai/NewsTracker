@@ -1128,13 +1128,23 @@ def daily(
             "(','||trackers||',') LIKE '%,'||?||',%'", (tname,)).fetchone()
         per_tracker_written[tname] = row[0]
 
+    snap_state = "skipped: run not ok"
+    if rep.ok:
+        from .snapshot import snapshot
+        try:
+            snap_state = str(snapshot(db))
+        except Exception as exc:
+            snap_state = f"failed: {exc}"
+            errors.append(f"snapshot: {exc}")
+            console.print(f"[red]DB 快照失敗：{exc}[/red]")
     deploy_state = _deploy_site(rep, enabled=deploy_site)
     if deploy_state.startswith("failed"):
         errors.append(f"deploy: {deploy_state}")
-    ok = rep.ok and not deploy_state.startswith("failed")
+    ok = rep.ok and not deploy_state.startswith("failed") and not snap_state.startswith("failed")
     status = {
         "command": "daily",
         "deploy": deploy_state,
+        "snapshot": snap_state,
         "timestamp": utcnow().isoformat(),
         "days": days, "since": since, "until": until, "trackers": targets,
         "ok": ok,
