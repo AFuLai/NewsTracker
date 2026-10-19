@@ -279,7 +279,7 @@ class RunReport:
 
 
 def _setup_logger(run_ts: str) -> logging.Logger:
-    logs_dir = Path("/opt/tracker/logs")
+    logs_dir = Path("/opt/tracker/repo/logs")
     logs_dir.mkdir(parents=True, exist_ok=True)
     logger = logging.getLogger(f"tracker.run.{run_ts}")
     logger.setLevel(logging.DEBUG)

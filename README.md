@@ -4,7 +4,7 @@ Self-driving security / regulation news tracker. Runs entirely on WSL with a
 local Ollama model (`gemma4:e4b`) — **no external API**. Claude Code triggers it
 with one command and reads one line back; everything else (fetch, relevance
 gating, summarize, self-review, write, cleanup) happens locally. Outputs a static
-HTML site to `/opt/tracker/html/`.
+HTML site to `/opt/tracker/repo/html/`.
 
 **Trackers** (top-level topics, switchable in the UI; each has its own
 `searchinfo/searchinfo_*.md`, categories, and manifest tree):
@@ -17,7 +17,7 @@ Adding a tracker = one `searchinfo/searchinfo_*.md` + one line in `SEARCHINFOS`
 tracker pill all pick it up generically.
 
 **Paths.** The repo (engine + `searchinfo/`) lives on WSL's ext4 at
-`/opt/tracker` — `/mnt/d` is a 9p mount whose per-file latency makes both git
+`/opt/tracker/repo` — `/mnt/d` is a 9p mount whose per-file latency makes both git
 and the site render crawl. Only the Windows-side artefacts (`tarball/`,
 `status.json`) sit on the D: drive, at `D:\Claude\Tool\NewsTracker\`
 (`PROJECT_ROOT`).

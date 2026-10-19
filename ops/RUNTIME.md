@@ -1,6 +1,6 @@
 # Runtime environment (bootstrap)
 
-The pipeline runs **only under WSL** on the ext4 repo at `/opt/tracker`. Paths
+The pipeline runs **only under WSL** on the ext4 repo at `/opt/tracker/repo`. Paths
 like `PROJECT_ROOT = /mnt/d/Claude/Tool/NewsTracker` (`tracker/__init__.py`) are
 hardcoded for this deployment; the engine is not meant to be `pip install`-ed
 and run on an unrelated machine (release zips from `tracker pack` ship the
@@ -24,7 +24,7 @@ python3 -m venv /opt/venv
 ## Run the tests
 
 ```bash
-cd /opt/tracker
+cd /opt/tracker/repo
 /opt/venv/bin/python -m pytest -q                 # fast, hermetic (~5s)
 /opt/venv/bin/python -m pytest --cov=tracker       # coverage (needs .[dev])
 ```

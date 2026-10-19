@@ -135,18 +135,18 @@ change that.
 
 ```bash
 # per-phase and per-call numbers for any run
-grep -E "per-call|finished:" /opt/tracker/logs/run-*.log
+grep -E "per-call|finished:" /opt/tracker/repo/logs/run-*.log
 
 # the same, machine-readable, for the last run
-python3 -c 'import json;d=json.load(open("/opt/tracker/status.json"));print(d["llm_call_s"],d["phase_s"])'
+python3 -c 'import json;d=json.load(open("/mnt/d/Claude/Tool/NewsTracker/status.json"));print(d["llm_call_s"],d["phase_s"])'
 
 # what ollama decided to put on the GPU
-grep -E "offloaded|output layer|KvSize" /opt/tracker/logs/ollama-serve.log
+grep -E "offloaded|output layer|KvSize" /opt/tracker/repo/logs/ollama-serve.log
 
 # uncategorized share either side of b81add1
 python3 - <<'PY'
 import sqlite3
-c = sqlite3.connect("/opt/tracker/db/articles.sqlite")
+c = sqlite3.connect("/opt/tracker/repo/db/articles.sqlite")
 q = ("SELECT SUM(category='uncategorized'), COUNT(*) FROM articles "
      "WHERE summarized_at IS NOT NULL AND summary IS NOT NULL AND summarized_at %s ?")
 for op in ("<", ">="):

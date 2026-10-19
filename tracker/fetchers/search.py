@@ -18,7 +18,7 @@ from . import Candidate, DateWindow, FetchResult, Profile, register
 from ..sources.site import site_keyword_search, throttle
 from .. import utcnow
 
-_CACHE_PATH = Path("/opt/tracker/db/query_cache.json")
+_CACHE_PATH = Path("/opt/tracker/repo/db/query_cache.json")
 _TTL = timedelta(hours=24)
 
 

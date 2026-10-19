@@ -14,7 +14,7 @@ def utcnow() -> datetime:
     """
     return datetime.now(timezone.utc).replace(tzinfo=None)
 
-ROOT = Path("/opt/tracker")
+ROOT = Path("/opt/tracker/repo")
 PROJECT_ROOT = Path("/mnt/d/Claude/Tool/NewsTracker")
 # Static site output lives on ext4 (native to render.py): ~90x faster small-file
 # writes than drvfs(/mnt/d) and none of the cross-write pitfalls (drvfs speed

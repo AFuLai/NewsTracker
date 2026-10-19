@@ -44,7 +44,7 @@ started_here: bool = False
 #: degraded mid-run left no trace at all — run #65's translate phase cost
 #: 42.3 s/article against a 5.5 s bench, and those 100 minutes are blank in
 #: every artefact we keep. Appended, with a header per start.
-OLLAMA_LOG = Path("/opt/tracker/logs/ollama-serve.log")
+OLLAMA_LOG = Path("/opt/tracker/repo/logs/ollama-serve.log")
 
 #: The unit ops/systemd/ollama.service installs. Named here because it is the
 #: only daemon whose slot count this process can learn without having started

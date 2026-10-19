@@ -99,9 +99,9 @@ real snippets, so `SNIPPET_CHARS` is the lever if this needs to get cheaper.
 ## Re-derive
 
 ```bash
-sqlite3 /opt/tracker/db/articles.sqlite \
+sqlite3 /opt/tracker/repo/db/articles.sqlite \
   "select count(*), min(score), max(score) from cra_scores where model_tag='bge-reranker-v2-m3-FP16/b10423/queries-v1'"
-sqlite3 /opt/tracker/db/articles.sqlite \
+sqlite3 /opt/tracker/repo/db/articles.sqlite \
   "select a.title, c.score from cra_scores c join articles a on a.id=c.article_id order by c.score desc limit 40"
 ```
 
@@ -153,7 +153,7 @@ Cross-tagging is off unless asked for, and cost is why as much as caution: at
 Re-derive:
 
 ```bash
-sqlite3 /opt/tracker/db/articles.sqlite \
+sqlite3 /opt/tracker/repo/db/articles.sqlite \
   "select count(*) from articles where embedding is not null"
-grep semdedup /opt/tracker/logs/run-*.log       # shadow pairs, with cosines
+grep semdedup /opt/tracker/repo/logs/run-*.log       # shadow pairs, with cosines
 ```
