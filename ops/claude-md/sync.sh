@@ -18,6 +18,9 @@ set -euo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
 SHARED="$HERE/shared.md"
 DEFAULT_TARGET="/mnt/d/Claude/Tool/NewsTracker/CLAUDE.md"
+# --apply keeps the previous landing file in the workarea scratch/ (repo/../scratch),
+# never beside the target: a .bak in the session cwd is a loose root file (LAYOUT-13).
+BACKUP_DIR="$(cd "$HERE/../../.." && pwd)/scratch/claude-md"
 BEGIN='<!-- NEWSTRACKER-SHARED:BEGIN generated from ops/claude-md/shared.md -- do not hand-edit -->'
 END='<!-- NEWSTRACKER-SHARED:END -->'
 
@@ -38,7 +41,7 @@ done
 # The block-level work is text surgery; doing it in sed/awk invites quoting bugs
 # on a file that is mostly CJK prose, so it goes through python.
 run_py() {  # run_py <mode> <target>
-  BEGIN="$BEGIN" END="$END" SHARED="$SHARED" python3 - "$1" "$2" <<'PY'
+  BEGIN="$BEGIN" END="$END" SHARED="$SHARED" BACKUP_DIR="$BACKUP_DIR" python3 - "$1" "$2" <<'PY'
 import os, sys, pathlib
 mode, target = sys.argv[1], pathlib.Path(sys.argv[2])
 begin, end = os.environ["BEGIN"], os.environ["END"]
@@ -69,7 +72,10 @@ else:
 if out == text:
     print(f"OK       {target} already in sync; nothing written"); sys.exit(0)
 if target.exists():
-    bak = target.with_suffix(target.suffix + ".bak")
+    import time
+    bdir = pathlib.Path(os.environ["BACKUP_DIR"])
+    bdir.mkdir(parents=True, exist_ok=True)
+    bak = bdir / f"{target.name}.{time.strftime('%Y%m%d-%H%M%S')}.bak"
     bak.write_text(text, encoding="utf-8", newline="\n")
     print(f"backup   {bak}")
 target.parent.mkdir(parents=True, exist_ok=True)
