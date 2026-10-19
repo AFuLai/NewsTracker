@@ -23,3 +23,5 @@ html/*.bak
 html/*.bak.*
 # machine-local ollama endpoint list, edited by the dashboard
 /endpoints.json
+# Firebase Hosting deploy dir (firebase.json/.firebaserc + public -> html/); project-specific, never committed
+/web/
