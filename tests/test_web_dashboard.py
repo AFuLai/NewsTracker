@@ -192,3 +192,14 @@ def test_site_preview_route(monkeypatch, tmp_path):
     finally:
         httpd.shutdown()
         httpd.server_close()
+
+
+def test_every_script_id_exists_in_html():
+    """Every $('id') the dashboard script references must exist as id="..." in
+    _HTML, so a restyle cannot silently drop an element the JS binds to."""
+    import re
+    from tracker.web_dashboard import _HTML
+    used = set(re.findall(r"\$\('([^']+)'\)", _HTML))
+    have = set(re.findall(r'id="([^"]+)"', _HTML))
+    assert used, "no $('id') references found - regex out of date?"
+    assert not (used - have), f"ids used by script but missing: {sorted(used - have)}"

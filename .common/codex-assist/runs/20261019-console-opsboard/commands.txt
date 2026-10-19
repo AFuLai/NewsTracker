@@ -1,0 +1,24 @@
+wc -l tracker/web_dashboard.py tests/test_web_dashboard.py refs/plans/20261019-ux-mockups/README.md refs/plans/20261019-ux-mockups/Main.dc.html .common/codex-assist/runs/20261019-ux-research/answer.txt; git status --short | head
+grep -n "_HTML\|def test" tests/test_web_dashboard.py
+python3 - <<'E'
+p='tracker/web_dashboard.py'
+L=open(p,encoding='utf-8').read().split('\n')
+assert L[324]=='<style>' and L[603]=='</div>' and L[604]=='<script>'
+new=open('/tmp/opsboard_new.txt',encoding='utf-8').read().rstrip('\n').split('\n')
+L[324:604]=new
+open(p,'w',encoding='utf-8').write('\n'.join(L))
+E
+rm /tmp/opsboard_new.txt
+cat >> tests/test_web_dashboard.py <<'E'
+
+
+def test_every_script_id_exists_in_html():
+    """Every $('id') the dashboard script references must exist as id="..." in
+    _HTML, so…
+python3 -c "
+import sys;sys.path.insert(0,'.')
+import tests.test_web_dashboard as t
+t.test_every_script_id_exists_in_html();print('ok')
+from tracker.web_dashboard import _HTML
+import re;print(len(set(re.findall(r\"\\\$\('([^']+)'\)\",_HTML))))
+"; ls .venv venv 2>/dev/null | head -3; git diff tracker/web_dashboard.py | grep '^-.*//' | head

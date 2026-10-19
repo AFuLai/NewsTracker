@@ -1,0 +1,49 @@
+{
+  "id": "20261019-console-opsboard",
+  "engine": "agy",
+  "pin_engine": true,
+  "mode": "implement",
+  "root": "/opt/tracker/repo",
+  "prompt_file": ".common/codex-assist/tasks/20261019-console-opsboard.prompt.md",
+  "inputs_glob": "tracker/web_dashboard.py tests/test_web_dashboard.py refs/plans/20261019-ux-mockups/Main.dc.html refs/plans/20261019-ux-mockups/README.md .common/codex-assist/runs/20261019-ux-research/answer.txt",
+  "touch_allow": [
+    "tracker/web_dashboard.py",
+    "tests/test_web_dashboard.py"
+  ],
+  "acceptance": [
+    {
+      "id": "tests",
+      "argv": [
+        "/opt/venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "tests"
+      ],
+      "expect": "passed"
+    },
+    {
+      "id": "no-test-sniffing",
+      "argv": [
+        "python3",
+        "-c",
+        "import subprocess,re\nd=subprocess.run([\"git\",\"-C\",\"/opt/tracker/repo\",\"diff\",\"HEAD\",\"--\",\"ui\",\"tracker\"],capture_output=True,text=True).stdout\nbad=[l for l in d.splitlines() if l.startswith(\"+\") and re.search(r\"webdriver|__test|node_env|process\\.env|_getframe|PYTEST_CURRENT_TEST\",l,re.I)]\nprint(\"cheat-bad\" if bad else \"cheat-ok\")"
+      ],
+      "expect": "cheat-ok"
+    },
+    {
+      "id": "console-ids",
+      "argv": [
+        "python3",
+        "-c",
+        "import re\ns=open(\"/opt/tracker/repo/tracker/web_dashboard.py\",encoding=\"utf-8\").read()\nh=s[s.index('_HTML = r\"\"\"'):]\nused=set(re.findall(r\"\\$\\('([A-Za-z0-9_-]+)'\\)\",h))\nhave=set(re.findall(r'id=\"([A-Za-z0-9_-]+)\"',h))\nmiss=sorted(used-have)\nprint(\"ids-ok\" if not miss else \"ids-miss \"+\",\".join(miss))"
+      ],
+      "expect": "ids-ok"
+    }
+  ],
+  "timeout_s": 2400,
+  "model": "claude-sonnet-5-5-medium",
+  "note": "User 2026-10-19: implement ops-board console per mockup."
+}

@@ -1,0 +1,15 @@
+I restyled the console into the ops board, but I haven't opened it in a browser, so the layout is unchecked visually. Only [web_dashboard.py](file:///opt/tracker/repo/tracker/web_dashboard.py) and [test_web_dashboard.py](file:///opt/tracker/repo/tests/test_web_dashboard.py) changed.
+
+The new id test passes. I ran it by calling the function directly, because pytest isn't installed here, so I didn't run the rest of the suite. It found 60 `$('id')` references, and all of them exist in `_HTML`.
+
+- **Status band:** `#hero` is now a sticky dark band with at least 44px height. It holds the title, a state pill (`#live` and `#heroState`), the run title, and elapsed/ETA. The pause, backend, endpoint and restart controls (`#control`) sit in it too. The control row wraps onto a second line when space is tight, so the band grows past 44px on narrow screens.
+- **Columns:** the run card is on the left and Publish, LLM endpoints and the CRA library are stacked on the right, 7:5 with a 1440px maximum. The CRA card keeps its `hidden` class and the existing logic that toggles it. Below 1100px it becomes one column. I didn't test for horizontal scroll.
+- **Preview drawer:** it spans the bottom, collapsed by default, with the iframe capped at 45vh. The 全螢幕 button fills the viewport, and Esc or the same button exits. This is a small separate script before the existing one, and the existing script is untouched.
+- **Density:** 13px body, 12px/600 card titles with letter-spacing, 10–12px padding and gaps, 6×10 phase rows, 8px radius, 1px borders instead of shadows. Numbers use a system monospace stack with no external fonts.
+- **Nav links:** the old top nav and its anchor links are gone, since the band replaces them.
+- **Dark mode:** I kept the existing dark-mode variables.
+- **Comments:** the old HTML and CSS had no comments, and none were removed.
+
+verified: 4  assumed: 2  gaps: 0  findings: 0
+
+I verified the id test, the diff scope (two files), the splice markers before editing, and that no comments were removed. I assumed the layout and drawer behave correctly in a browser, and that the band's control row wrapping is acceptable.

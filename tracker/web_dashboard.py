@@ -323,169 +323,194 @@ _HTML = r"""<!DOCTYPE html>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>NewsTracker 控制台 · Tracker 執行儀表板</title>
 <style>
-  :root { --bg:#f5f6fa; --card:#ffffff; --line:#e4e7ee; --txt:#1c2330;
-          --dim:#6b7686; --accent:#4f46e5; --accent-ink:#ffffff; --soft:#eef0f6;
-          --green:#1a9d57; --yellow:#b7791f; --red:#d93b3b;
-          --shadow:0 4px 18px rgba(28,35,48,.08); --radius:14px; }
+  /* Single-screen ops board: dense (13px body, 10-12px card padding/gaps), 1px
+     borders instead of shadows, 8px radius, system monospace for numbers (no
+     external fonts). */
+  :root { --bg:#f4f5f7; --card:#ffffff; --line:#dadee5; --txt:#15181d;
+          --dim:#5b6472; --accent:#1e4fd0; --accent-ink:#ffffff; --soft:#eef0f3;
+          --green:#1a8a4c; --yellow:#b7791f; --red:#d93b3b;
+          --band:#15181d; --band-ink:#f4f5f7; --band-dim:#aeb6c2; --band-line:#3a414d;
+          --radius:8px;
+          --mono:ui-monospace,SFMono-Regular,"IBM Plex Mono",Menlo,Consolas,"Liberation Mono",monospace; }
   @media (prefers-color-scheme: dark) {
     :root { --bg:#0f1319; --card:#181e27; --line:#2a3340; --txt:#e8edf3;
-            --dim:#92a0b1; --accent:#8b83ff; --accent-ink:#10122b; --soft:#222a36;
-            --green:#3fb970; --yellow:#e0a93b; --red:#f2605c;
-            --shadow:0 4px 18px rgba(0,0,0,.35); }
+            --dim:#92a0b1; --accent:#7f9bff; --accent-ink:#10122b; --soft:#222a36;
+            --green:#3fb970; --yellow:#e0a93b; --red:#f2605c; }
   }
   * { box-sizing: border-box; }
-  html { scroll-behavior:smooth; scroll-padding-top:84px; }
-  body { margin:0; background:var(--bg); color:var(--txt); line-height:1.5;
+  body { margin:0; background:var(--bg); color:var(--txt); line-height:1.45; font-size:13px;
          font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft JhengHei",
                      "PingFang TC","Noto Sans TC",sans-serif; }
-  .topbar { position:sticky; top:0; z-index:10; display:flex; align-items:center;
-            justify-content:space-between; gap:16px; padding:14px 32px;
-            background:var(--card); border-bottom:1px solid var(--line);
-            box-shadow:var(--shadow); }
-  .brand { font-size:1.15rem; font-weight:700; letter-spacing:.02em; }
-  .brand::before { content:""; display:inline-block; width:12px; height:12px;
-                   border-radius:4px; background:var(--accent); margin-right:10px; }
-  .nav { display:flex; gap:6px; flex-wrap:wrap; }
-  .nav a { color:var(--dim); text-decoration:none; font-size:.95rem; font-weight:600;
-           padding:6px 14px; border-radius:999px; }
-  .nav a:hover { color:var(--accent); background:var(--soft); }
-  .wrap { max-width:1080px; margin:0 auto; padding:32px 24px 64px; }
-  .hero { background:var(--card); border:1px solid var(--line); border-radius:16px;
-          box-shadow:var(--shadow); padding:32px 36px; margin-bottom:32px;
-          border-left:6px solid var(--dim); }
-  .hero.run { border-left-color:var(--accent); }
-  .hero.ok { border-left-color:var(--green); }
-  .hero.fail { border-left-color:var(--red); }
-  .hero .state { font-size:2.6rem; font-weight:800; line-height:1.15; }
-  .hero.run .state { color:var(--accent); }
-  .hero.ok .state { color:var(--green); }
-  .hero.fail .state { color:var(--red); }
-  .hero .sub { color:var(--dim); font-size:1.1rem; margin-top:6px; min-height:1.5em; }
-  .hero .clock { margin-top:18px; font-variant-numeric:tabular-nums; font-size:1.5rem; }
-  .hero .clock b { color:var(--accent); font-size:1.9rem; }
-  .eta { color:var(--yellow); }
-  .cards { display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:32px;
-           align-items:start; }
-  .card { background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
-          box-shadow:var(--shadow); padding:24px 26px; min-width:0; }
-  .card.wide { grid-column:1 / -1; }
-  .card.hidden { display:none; }
-  .card > h2 { margin:0 0 18px; font-size:1.1rem; font-weight:700; }
-  @media (max-width:760px) {
-    .cards { grid-template-columns:1fr; gap:24px; }
-    .topbar { padding:12px 16px; flex-wrap:wrap; }
-    .wrap { padding:24px 16px 48px; }
-    .hero { padding:24px 22px; }
-    .hero .state { font-size:2rem; }
+  .hero { position:sticky; top:0; z-index:10; display:flex; flex-wrap:wrap; align-items:center;
+          gap:6px 14px; min-height:44px; padding:6px 16px; background:var(--band);
+          color:var(--band-ink); border-bottom:1px solid var(--band-line); }
+  .brand { font-size:14px; font-weight:700; letter-spacing:.02em; flex:none; }
+  .pill { display:inline-flex; align-items:center; gap:6px; padding:2px 10px; flex:none;
+          border:1px solid var(--band-line); border-radius:999px; font-size:12px; }
+  .hero .state { font-weight:600; }
+  .hero.run .state { color:#9db1ff; }
+  .hero.ok .state { color:#5fd391; }
+  .hero.fail .state { color:#ff7b78; }
+  .hero .sub { color:var(--band-dim); min-width:0; flex:0 1 auto; overflow:hidden;
+               text-overflow:ellipsis; white-space:nowrap; }
+  .hero .clock { font-family:var(--mono); font-variant-numeric:tabular-nums; color:var(--band-dim); flex:none; }
+  .hero .clock b { color:var(--band-ink); font-weight:500; }
+  .hero .grow { flex:1 1 0; }
+  .eta { color:#e0a93b; }
+  .wrap { max-width:1440px; margin:0 auto; padding:12px 16px 24px; display:grid;
+          grid-template-columns:minmax(0,7fr) minmax(0,5fr); gap:12px; align-items:start; }
+  .col { display:flex; flex-direction:column; gap:12px; min-width:0; }
+  @media (max-width:1100px) {
+    .wrap { grid-template-columns:minmax(0,1fr); padding:10px 10px 20px; }
   }
-  button, select, input { font:inherit; font-size:.9rem; color:var(--txt); background:var(--soft);
-          border:1px solid var(--line); border-radius:10px; padding:7px 12px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+          padding:10px 12px; min-width:0; }
+  .card.hidden { display:none; }
+  .card > h2 { margin:0 0 8px; font-size:12px; font-weight:600; letter-spacing:.06em; color:var(--dim); }
+  button, select, input { font:inherit; font-size:13px; color:var(--txt); background:var(--soft);
+          border:1px solid var(--line); border-radius:6px; padding:4px 10px; min-width:0; max-width:100%; }
   button { cursor:pointer; font-weight:600; }
   button:hover:not(:disabled), select:hover { border-color:var(--accent); }
   button:disabled { opacity:.45; cursor:default; }
   button.primary, #btnStart { background:var(--accent); color:var(--accent-ink);
           border-color:transparent; }
-  #btnStart { padding:11px 28px; font-size:1rem; font-weight:700; margin-top:4px; }
+  #btnStart { padding:6px 18px; font-weight:700; margin-top:2px; }
   #btnStart:hover { filter:brightness(1.1); }
-  .phase { display:flex; align-items:center; gap:12px; background:var(--soft);
-           border:1px solid var(--line); border-radius:12px; padding:12px 16px;
-           margin-bottom:10px; transition:border-color .2s; }
+  .hero button, .hero select, .hero input { background:#232a34; color:var(--band-ink);
+          border-color:var(--band-line); padding:3px 8px; }
+  .hero button.primary { background:var(--accent); color:#fff; border-color:transparent; }
+  .phase { display:flex; align-items:center; gap:10px; background:var(--soft);
+           border:1px solid var(--line); border-radius:var(--radius); padding:6px 10px;
+           margin-bottom:6px; transition:border-color .2s; }
   .phase.running { border-color:var(--accent); }
-  .ic { width:24px; height:24px; border-radius:50%; display:grid; place-items:center;
-        font-size:.85rem; flex:none; }
+  .ic { width:20px; height:20px; border-radius:50%; display:grid; place-items:center;
+        font-size:11px; flex:none; }
   .ic.pending { background:var(--line); color:var(--dim); }
   .ic.running { background:var(--yellow); color:#1a1200; animation:pulse 1.1s infinite; }
   .ic.done { background:var(--green); color:#fff; }
   .ic.failed { background:var(--red); color:#fff; }
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.45} }
-  .pl { font-weight:600; width:96px; flex:none; }
+  .pl { font-weight:600; width:84px; flex:none; }
   .pl.pending { color:var(--dim); }
-  .detail { color:var(--dim); font-size:.92rem; flex:1; min-width:0;
+  .detail { color:var(--dim); flex:1; min-width:0; font-family:var(--mono); font-size:12px;
             overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-  .bar { height:8px; background:var(--line); border-radius:5px; overflow:hidden;
-         flex:1; margin:0 6px; }
+  .bar { height:6px; background:var(--line); border-radius:3px; overflow:hidden;
+         flex:1; margin:0 4px; }
   .bar > i { display:block; height:100%; background:var(--accent); width:0; transition:width .3s; }
-  .count { font-variant-numeric:tabular-nums; font-size:.88rem; flex:none; }
-  .note { color:var(--dim); font-style:italic; font-size:.9rem; margin:8px 4px 0;
+  .count { font-family:var(--mono); font-variant-numeric:tabular-nums; font-size:12px; flex:none; }
+  .note { color:var(--dim); font-style:italic; margin:6px 2px 0;
           min-height:1.2em; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-  .summary { margin-top:22px; border:1px solid var(--green); border-radius:12px;
-             padding:18px 22px; background:var(--soft); }
+  .summary { margin-top:10px; border:1px solid var(--green); border-radius:var(--radius);
+             padding:10px 12px; background:var(--soft); }
   .summary.fail { border-color:var(--red); }
-  .summary h2 { margin:0 0 12px; font-size:1.05rem; }
-  .grid { display:grid; grid-template-columns:auto 1fr; gap:6px 16px; font-size:.95rem; }
+  .summary h2 { margin:0 0 8px; font-size:12px; font-weight:600; letter-spacing:.06em; }
+  .grid { display:grid; grid-template-columns:auto 1fr; gap:4px 12px; }
   .grid .k { color:var(--dim); text-align:right; }
-  .grid .v { font-variant-numeric:tabular-nums; }
-  .dot { display:inline-block; width:10px; height:10px; border-radius:50%;
-         background:var(--green); margin-right:8px; }
-  .dot.off { background:var(--dim); }
-  .control { display:flex; flex-wrap:wrap; align-items:center; gap:10px; font-size:.88rem; }
+  .grid .v { font-family:var(--mono); font-variant-numeric:tabular-nums; min-width:0; overflow-wrap:anywhere; }
+  .dot { display:inline-block; width:8px; height:8px; border-radius:50%;
+         background:#3fb970; }
+  .dot.off { background:#8b95a5; }
+  .control { display:flex; flex-wrap:wrap; align-items:center; gap:6px 8px; }
   .control.hidden { display:none; }
-  .control .sep { width:1px; height:22px; background:var(--line); margin:0 4px; }
-  .control label { color:var(--dim); }
+  .control .sep { width:1px; height:20px; background:var(--band-line); margin:0 2px; }
+  .control label { color:var(--band-dim); }
   .pausedBadge { color:var(--yellow); font-weight:600; }
   .config.hidden { display:none; }
-  .cfgrow { display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin-bottom:14px; }
-  .cfgrow > label { color:var(--dim); min-width:74px; }
+  .cfgrow { display:flex; flex-wrap:wrap; align-items:center; gap:6px 10px; margin-bottom:8px; }
+  .cfgrow > label { color:var(--dim); min-width:60px; }
   .config input[type=checkbox] { width:auto; min-width:0; }
   .config .chk { color:var(--txt); display:inline-flex; align-items:center; gap:5px; }
-  .depstate { display:inline-flex; align-items:center; gap:10px; font-size:1.5rem;
-              font-weight:800; color:var(--dim); }
+  .depstate { display:inline-flex; align-items:center; gap:8px; font-size:14px;
+              font-weight:700; color:var(--dim); }
   .depstate.running { color:var(--accent); }
   .depstate.ok { color:var(--green); }
   .depstate.failed { color:var(--red); }
-  .spin { width:18px; height:18px; border:3px solid var(--line); border-top-color:var(--accent);
+  .spin { width:14px; height:14px; border:2px solid var(--line); border-top-color:var(--accent);
           border-radius:50%; animation:spin .8s linear infinite; }
   @keyframes spin { to { transform:rotate(360deg); } }
-  .depmeta { display:grid; grid-template-columns:auto 1fr; gap:6px 16px; margin:14px 0 18px;
-             font-size:.92rem; }
+  .depmeta { display:grid; grid-template-columns:auto minmax(0,1fr); gap:4px 12px; margin:8px 0 10px; }
   .depmeta .k { color:var(--dim); }
   .depmeta .v { min-width:0; overflow-wrap:anywhere; }
   .depmeta a { color:var(--accent); }
-  .btnrow { display:flex; flex-wrap:wrap; gap:12px; }
+  .btnrow { display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
   .cra.hidden { display:none; }
-  .crahead { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .crahead { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
   .crahead b { font-weight:600; }
   .crastat { color:var(--dim); flex:1; min-width:0; overflow:hidden;
          text-overflow:ellipsis; white-space:nowrap; }
   .crastat.ok { color:var(--green); }
   .crastat.err { color:var(--red); }
-  .craprog { display:flex; align-items:center; gap:8px; margin-top:12px; }
+  .craprog { display:flex; align-items:center; gap:8px; margin-top:8px; }
   .craprog.hidden { display:none; }
-  .cralist { margin-top:12px; display:flex; flex-direction:column; gap:4px; font-size:.88rem; }
+  .cralist { margin-top:8px; display:flex; flex-direction:column; gap:4px; }
   .cralist:empty { display:none; }
   .cralist a { color:var(--txt); text-decoration:none; }
   .cralist a:hover { text-decoration:underline; }
   .cralist .row { display:flex; align-items:baseline; gap:8px; min-width:0; }
   .cralist .t { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-  .cralist .cl { color:var(--dim); font-size:.8rem; flex:none; }
-  .cralist .d { flex:none; font-variant-numeric:tabular-nums; font-size:.8rem;
+  .cralist .cl { color:var(--dim); font-size:11px; flex:none; }
+  .cralist .d { flex:none; font-family:var(--mono); font-variant-numeric:tabular-nums; font-size:11px;
          color:var(--accent); cursor:help; }
   .cralist .d.weak { color:var(--dim); text-decoration:underline dotted; }
   .cralist .d.dim { color:var(--dim); }
-  .chip { flex:none; border-radius:5px; padding:1px 6px; font-size:.72rem;
+  .chip { flex:none; border-radius:5px; padding:1px 6px; font-size:11px;
          font-weight:700; letter-spacing:.02em; }
   .chip.new { background:var(--green); color:#fff; }
   .chip.upd { background:var(--yellow); color:#fff; }
   .chip.gone { background:var(--red); color:#fff; }
   .chip.err { background:var(--soft); color:var(--red); }
-  .cramore { color:var(--dim); font-size:.8rem; }
+  .cramore { color:var(--dim); font-size:11px; }
+  /* site preview: full-width bottom drawer, collapsed by default */
+  .drawer { grid-column:1 / -1; }
+  .drawer .dhead { display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
+  .drawer .dhead h2 { margin:0; }
+  .drawer .dhead .grow { flex:1 1 0; }
+  .drawer .dbody { margin-top:8px; display:flex; flex-direction:column; gap:8px; min-height:0; }
+  .drawer.collapsed .dbody { display:none; }
+  .drawer .pvwrap { overflow:auto; max-width:100%; }
+  #pvFrame { display:block; width:100%; height:45vh; max-height:45vh;
+             border:1px solid var(--line); background:#fff; }
+  .drawer.fs { position:fixed; inset:0; z-index:100; border-radius:0; display:flex;
+               flex-direction:column; }
+  .drawer.fs .dbody { flex:1; }
+  .drawer.fs .pvwrap { flex:1; display:flex; min-height:0; }
+  .drawer.fs #pvFrame { height:100%; max-height:none; flex:none; }
 </style></head>
 <body>
-<nav class="topbar">
+<section class="hero" id="hero">
   <div class="brand">NewsTracker 控制台</div>
-  <div class="nav">
-    <a href="#sec-run">執行</a><a href="#sec-publish">發布</a>
-    <a href="#sec-llm">LLM 端點</a><a href="#cra">CRA 圖書庫</a>
+  <span class="pill"><span class="dot off" id="live"></span><span class="state" id="heroState">待命</span></span>
+  <span class="sub" id="title"></span>
+  <span class="clock">已過 <b id="elapsed">0:00</b><span class="eta" id="eta"></span></span>
+  <span class="grow"></span>
+  <div class="control hidden" id="control">
+    <button id="btnPause" class="primary">⏸ 暫停</button>
+    <span id="pausedTag"></span>
+    <span class="sep"></span>
+    <label>Summarize</label>
+    <select id="beSum"><option value="ollama">Ollama</option><option value="gemini">Gemini</option></select>
+    <label>Translate</label>
+    <select id="beTra"><option value="ollama">Ollama</option><option value="gemini">Gemini</option></select>
+    <span class="sep"></span>
+    <label>端點</label>
+    <select id="beEnd" style="min-width:150px"></select>
+    <span id="beEndMsg" style="color:var(--band-dim);"></span>
+    <span class="sep"></span>
+    <label>從</label>
+    <select id="reFrom">
+      <option value="fetch">Fetch</option><option value="gate">Gate</option>
+      <option value="summarize" selected>Summarize</option><option value="translate">Translate</option>
+      <option value="write">Write</option><option value="cleanup">Cleanup</option>
+    </select>
+    <label><input type="checkbox" id="reForce"> 強制重做</label>
+    <button id="btnRestart">↻ 重新來過</button>
+    <span class="sep"></span>
+    <button id="btnClose">✕ 關閉</button>
   </div>
-</nav>
+</section>
 <div class="wrap">
-  <section class="hero" id="hero">
-    <div class="state" id="heroState">待命</div>
-    <div class="sub" id="title"></div>
-    <div class="clock"><span class="dot off" id="live"></span>已過 <b id="elapsed">0:00</b><span class="eta" id="eta"></span></div>
-  </section>
-  <div class="cards">
-    <section class="card wide" id="sec-run">
+  <div class="col">
+    <section class="card" id="sec-run">
       <h2>執行</h2>
       <div class="config hidden" id="config">
         <div class="cfgrow">
@@ -508,34 +533,12 @@ _HTML = r"""<!DOCTYPE html>
         <button id="btnStart">▶ 開始執行</button>
         <span id="cfgErr" style="color:var(--red); margin-left:10px;"></span>
       </div>
-      <div class="control hidden" id="control">
-        <button id="btnPause" class="primary">⏸ 暫停</button>
-        <span id="pausedTag"></span>
-        <span class="sep"></span>
-        <label>Summarize</label>
-        <select id="beSum"><option value="ollama">Ollama</option><option value="gemini">Gemini</option></select>
-        <label>Translate</label>
-        <select id="beTra"><option value="ollama">Ollama</option><option value="gemini">Gemini</option></select>
-        <span class="sep"></span>
-        <label>端點</label>
-        <select id="beEnd" style="min-width:190px"></select>
-        <span id="beEndMsg" style="color:var(--dim);"></span>
-        <span class="sep"></span>
-        <label>從</label>
-        <select id="reFrom">
-          <option value="fetch">Fetch</option><option value="gate">Gate</option>
-          <option value="summarize" selected>Summarize</option><option value="translate">Translate</option>
-          <option value="write">Write</option><option value="cleanup">Cleanup</option>
-        </select>
-        <label><input type="checkbox" id="reForce"> 強制重做</label>
-        <button id="btnRestart">↻ 重新來過</button>
-        <span class="sep"></span>
-        <button id="btnClose">✕ 關閉</button>
-      </div>
-      <div id="phases" style="margin-top:18px"></div>
+      <div id="phases" style="margin-top:10px"></div>
       <div class="note" id="note"></div>
       <div id="summary"></div>
     </section>
+  </div>
+  <div class="col">
     <section class="card" id="sec-publish">
       <h2>發布</h2>
       <div class="depstate idle" id="depState">閒置</div>
@@ -548,10 +551,46 @@ _HTML = r"""<!DOCTYPE html>
         <button id="btnPreview">預覽頻道發布</button>
         <button id="btnLive" class="primary">正式發布</button>
       </div>
-      <div id="depErr" style="color:var(--red); margin-top:12px; min-height:1.2em;"></div>
+      <div id="depErr" style="color:var(--red); margin-top:8px; min-height:1.2em;"></div>
     </section>
-    <section class="card" id="sec-preview">
-      <h2>網站預覽</h2>
+    <section class="card" id="sec-llm">
+      <h2>LLM 端點</h2>
+      <div class="cfgrow">
+        <label>模型端點</label>
+        <select id="cfgEnd" style="min-width:180px"></select>
+        <input id="cfgEndNew" placeholder="http://主機:11434" style="width:168px">
+        <button id="btnEndAdd" title="加入清單">＋</button>
+        <button id="btnEndDel" title="移除下拉選單目前選取的端點">✕</button>
+        <span id="cfgEndMsg" style="color:var(--dim); margin-left:8px;"></span>
+      </div>
+      <div class="cfgrow">
+        <label>遠端政策</label>
+        <span class="chk">時段窗 <input id="cfgWin" placeholder="18:00-08:00（空=不限）" style="width:170px"></span>
+        <span class="chk">並發 <input id="cfgConc" type="number" min="1" style="width:70px"></span>
+        <button id="btnPolicy">套用</button>
+        <span id="cfgPolMsg" style="color:var(--dim); margin-left:8px;"></span>
+      </div>
+    </section>
+    <section class="card cra hidden" id="cra">
+        <div class="crahead">
+          <b>📚 CRA 參考圖書庫</b>
+          <button id="btnCra">↻ 更新 CRA 庫</button>
+          <span class="crastat" id="craStat"></span>
+        </div>
+        <div class="craprog hidden" id="craProg">
+          <div class="bar"><i id="craBar"></i></div>
+          <span class="count" id="craCount"></span>
+        </div>
+      <div class="cralist" id="craList"></div>
+    </section>
+  </div>
+  <section class="card drawer collapsed" id="sec-preview">
+    <div class="dhead">
+      <h2><button id="pvToggle" aria-expanded="false" style="border:0;background:none;padding:0;font:inherit;letter-spacing:inherit;color:inherit">▸ 網站預覽</button></h2>
+      <span class="grow"></span>
+      <button id="pvFull">全螢幕</button>
+    </div>
+    <div class="dbody">
       <div class="btnrow">
         <select id="pvPreset">
           <option value="">預設</option>
@@ -568,40 +607,31 @@ _HTML = r"""<!DOCTYPE html>
         <button id="btnLocalPreview">本機預覽</button>
         <a id="pvOpen" target="_blank" href="/site/index.html?pv=1">新分頁開啟</a>
       </div>
-      <iframe id="pvFrame" style="width:100%; height:560px; border:1px solid var(--line,#444); margin-top:12px; background:#fff"></iframe>
-    </section>
-    <section class="card" id="sec-llm">
-      <h2>LLM 端點</h2>
-      <div class="cfgrow">
-        <label>模型端點</label>
-        <select id="cfgEnd" style="min-width:210px"></select>
-        <input id="cfgEndNew" placeholder="http://主機:11434" style="width:168px">
-        <button id="btnEndAdd" title="加入清單">＋</button>
-        <button id="btnEndDel" title="移除下拉選單目前選取的端點">✕</button>
-        <span id="cfgEndMsg" style="color:var(--dim); margin-left:8px;"></span>
-      </div>
-      <div class="cfgrow">
-        <label>遠端政策</label>
-        <span class="chk">時段窗 <input id="cfgWin" placeholder="18:00-08:00（空=不限）" style="width:170px"></span>
-        <span class="chk">並發 <input id="cfgConc" type="number" min="1" style="width:70px"></span>
-        <button id="btnPolicy">套用</button>
-        <span id="cfgPolMsg" style="color:var(--dim); margin-left:8px;"></span>
-      </div>
-    </section>
-    <section class="card cra wide hidden" id="cra">
-        <div class="crahead">
-          <b>📚 CRA 參考圖書庫</b>
-          <button id="btnCra">↻ 更新 CRA 庫</button>
-          <span class="crastat" id="craStat"></span>
-        </div>
-        <div class="craprog hidden" id="craProg">
-          <div class="bar"><i id="craBar"></i></div>
-          <span class="count" id="craCount"></span>
-        </div>
-      <div class="cralist" id="craList"></div>
-    </section>
-  </div>
+      <div class="pvwrap"><iframe id="pvFrame"></iframe></div>
+    </div>
+  </section>
 </div>
+<script>
+// drawer for the site preview: collapsed by default; 全螢幕 fills the viewport,
+// Esc or the same button leaves it. Independent of the polling/control script below.
+(function(){
+  const d = document.getElementById('sec-preview'), t = document.getElementById('pvToggle'),
+        f = document.getElementById('pvFull');
+  function setOpen(o){
+    d.classList.toggle('collapsed', !o);
+    t.setAttribute('aria-expanded', o ? 'true' : 'false');
+    t.textContent = (o ? '▾ ' : '▸ ') + '網站預覽';
+  }
+  function setFull(on){
+    if(on) setOpen(true);
+    d.classList.toggle('fs', on);
+    f.textContent = on ? '離開全螢幕' : '全螢幕';
+  }
+  t.onclick = ()=>{ const open = d.classList.contains('collapsed'); if(!open) setFull(false); setOpen(open); };
+  f.onclick = ()=> setFull(!d.classList.contains('fs'));
+  document.addEventListener('keydown', e=>{ if(e.key==='Escape' && d.classList.contains('fs')) setFull(false); });
+})();
+</script>
 <script>
 const $ = id => document.getElementById(id);
 function fmt(s){ s=Math.max(0,Math.floor(s)); const h=(s/3600|0),m=(s%3600/60|0),x=s%60;
