@@ -1,0 +1,45 @@
+grep -n "^## \|^### " .common/codex-assist/runs/20261019-layout-scenarios-plan/answer.txt | head -50; grep -n "PRESETS\|function selectTracker\|refreshCatPills\|buildRiverRow\|renderHub\|filterCats\|CVE\|resolvePreset\|parseView\|view-select\|layout" ui/index.html | head -150
+grep -n "presets:\|viewLabel\|noCat:\|function t(\|function L(\|function currentManifest\|function applyLang\|date-divider" ui/index.html | head -30
+grep -n "artTags\|\.tags" ui/index.html | head; sed -n 1213,1214p ui/index.html | cat -A | cut -c1-80; sed -n 636,637p ui/index.html
+python3 - <<'EOF'
+p='/opt/tracker/repo/ui/index.html'
+s=open(p,encoding='utf-8',newline='').read()
+def rep(a,b):
+    global s
+    a=a.replace('\n','\r\n'); b=b.replace('\n','\r\n')
+    assert s.count(a)==1,a
+    s=s.replace(a,b)
+rep("""// Layouts without a renderer yet are drawn as another one (timeline: S7).
+const LAYOUT_FALLBACK = { timeline: 'grid' };""","""// Layouts without a renderer yet are drawn as another one (none at present;
+// timeline has its own renderer, renderTimeline).
+const LAYOUT_FALLBACK…
+python3 - <<'EOF'
+p='/opt/tracker/repo/ui/index.html'
+s=open(p,encoding='utf-8',newline='').read()
+def rep(a,b):
+    global s
+    a=a.replace('\r','').replace('\n','\r\n'); b=b.replace('\r','').replace('\n','\r\n')
+    assert s.count(a)==1,a
+    s=s.replace(a,b)
+rep("""// Layouts without a renderer yet are drawn as another one (timeline: S7).
+const LAYOUT_FALLBACK = { timeline: 'grid' };""","""// Layouts without a renderer yet are drawn as another one (none at present;
+// timeline has its own renderer, rend…
+grep -c $'\r' ui/index.html; git status --short
+python3 - <<'EOF'
+p='/opt/tracker/repo/ui/index.html'
+s=open(p,encoding='utf-8',newline='').read()
+def rep(a,b):
+    global s
+    a=a.replace('\r',''); b=b.replace('\r','')
+    assert s.count(a)==1,a
+    s=s.replace(a,b)
+rep("""// Layouts without a renderer yet are drawn as another one (timeline: S7).
+const LAYOUT_FALLBACK = { timeline: 'grid' };""","""// Layouts without a renderer yet are drawn as another one (none at present;
+// timeline has its own renderer, renderTimeline).
+const LAYOUT_FALLBACK = {};""…
+python3 - <<'EOF'
+import re
+s=open('/opt/tracker/repo/ui/index.html',encoding='utf-8').read()
+open('/tmp/x.js','w').write('\n'.join(re.findall(r'<script>(.*?)</script>',s,re.S)))
+EOF
+node --check /tmp/x.js && echo ok; rm /tmp/x.js; git diff | grep '^-' | grep -v '^---'

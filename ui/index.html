@@ -634,15 +634,21 @@ html[data-mode="lib"] #drawer-toggle { display: none !important; }
 html[data-density="compact"] .cards-grid { gap: 0.5rem; margin-bottom: 0.6rem; }
 html[data-density="compact"] .card { padding: 0.6rem; gap: 0.3rem; }
 html[data-density="compact"] .date-divider { padding: 0.3rem 0 0.2rem; margin-bottom: 0.4rem; }
+html[data-layout="timeline"] .river-list,
 html[data-layout="river"] .river-list { display: flex; flex-direction: column; margin-bottom: 0.6rem; }
+html[data-layout="timeline"] .river-row,
 html[data-layout="river"] .river-row {
   padding: 0.35rem 0.5rem;
   border-bottom: 1px solid var(--outline-variant);
   cursor: pointer;
 }
+html[data-layout="timeline"] .river-row:hover,
 html[data-layout="river"] .river-row:hover { background: var(--surface-container-high); }
+html[data-layout="timeline"] .river-row:focus-visible,
 html[data-layout="river"] .river-row:focus-visible { outline: 2px solid var(--primary); outline-offset: -2px; }
+html[data-layout="timeline"] .river-row .card-title,
 html[data-layout="river"] .river-row .card-title { margin: 0; }
+html[data-layout="timeline"] .river-row .card-meta,
 html[data-layout="river"] .river-row .card-meta {
   font-size: 12px;
   color: var(--on-surface-variant);
@@ -1067,11 +1073,14 @@ try {
 // are pure (no DOM, no storage) so node can evaluate them.
 const LAYOUTS = ['grid', 'river', 'hero', 'hub', 'timeline'];
 const DENSITIES = ['comfortable', 'compact'];
-// Layouts without a renderer yet are drawn as another one (timeline: S7).
-const LAYOUT_FALLBACK = { timeline: 'grid' };
+// Layouts without a renderer yet are drawn as another one (none at present;
+// timeline has its own renderer, renderTimeline).
+const LAYOUT_FALLBACK = {};
 const PRESETS = {
   default: { layout: 'grid',     density: 'comfortable' },   // = the UI before presets existed
-  quick:   { layout: 'river',    density: 'compact' },       // 快讀
+  // filters: default category pills for `tracker`; names missing from that tracker's pills are skipped.
+  quick:   { layout: 'river',    density: 'compact',
+             filters: { tracker: 'security', categories: ['重大事件', '漏洞與威脅情報'] } },       // 快讀
   analyst: { layout: 'grid',     density: 'comfortable', showTags: true, showSrcCount: true },   // 分析師
   event:   { layout: 'timeline', density: 'comfortable' },   // 事件追蹤
   cra:     { layout: 'hub',      density: 'comfortable', tracker: 'eu_cra' }   // 合規 CRA (tracker only if it exists)
@@ -1105,7 +1114,8 @@ function resolvePreset(view) {
     density: density,
     showTags: !!base.showTags,
     showSrcCount: !!base.showSrcCount,
-    tracker: base.tracker || null
+    tracker: base.tracker || null,
+    filters: base.filters || null
   };
 }
 // view → string for storage (normalised through parseView's rules).
@@ -1146,6 +1156,17 @@ function presetTracker(resolved, all) {
   return (resolved && resolved.tracker && all && Object.prototype.hasOwnProperty.call(all, resolved.tracker))
     ? resolved.tracker : null;
 }
+// Preset default filters → state.filterCats (only for the preset's tracker, only
+// categories that exist in that tracker's pills). Returns true if it applied.
+function applyPresetFilters() {
+  const f = resolvePreset(viewPrefs).filters;
+  if (!f || state.libActive || state.currentTracker !== f.tracker) return false;
+  const mf = currentManifest();
+  const have = (mf && mf.categories) || [];
+  state.filterCats = new Set((f.categories || []).filter(c => have.includes(c)));
+  refreshCatPills();
+  return true;
+}
 // From the URL hash: apply, do not persist. Returns true if the preset changed.
 function applyHashPreset(id) {
   if (!isPreset(id) || id === viewPrefs.preset) return false;
@@ -1163,8 +1184,8 @@ function setPreset(id) {
   updateViewUI();
   if (restoring) return;
   const tr = presetTracker(resolvePreset(viewPrefs), getTrackers());
-  if (tr && (state.libActive || state.currentTracker !== tr)) selectTracker(tr);
-  else if (state.currentTracker && !state.libActive) renderArticles();
+  if (tr && (state.libActive || state.currentTracker !== tr)) selectTracker(tr);   // applies preset filters itself
+  else if (state.currentTracker && !state.libActive) { applyPresetFilters(); renderArticles(); }
   else syncHash();
 }
 function updateViewUI() {
@@ -1211,6 +1232,7 @@ const I18N = {
       menu:'選單', skinBtn:'切換外觀', themeBtn:'切換主題', langLabel:'切換語言',
       clearSearch:'清除搜尋', close:'關閉',
        viewLabel:'檢視模式', srcCount:n=>n+' 個來源',
+       tlOther:'其他', tlCount:n=>n+' 篇',
        presets:{ default:'預設', quick:'快讀', analyst:'分析師', event:'事件追蹤', cra:'合規 CRA' },
       searchPlaceholder:'搜尋全站新聞…', searching:'搜尋中…',
       scopeLabel:'範圍', scope:{title:'標題', body:'內文', tags:'標籤'},
@@ -1233,6 +1255,7 @@ const I18N = {
       menu:'Menu', skinBtn:'Toggle appearance', themeBtn:'Toggle theme', langLabel:'Toggle language',
       clearSearch:'Clear search', close:'Close',
        viewLabel:'View preset', srcCount:n=>n+(n===1?' source':' sources'),
+       tlOther:'Other', tlCount:n=>n+(n===1?' article':' articles'),
        presets:{ default:'Default', quick:'Quick read', analyst:'Analyst', event:'Event tracking', cra:'Compliance CRA' },
       searchPlaceholder:'Search all news…', searching:'Searching…',
       scopeLabel:'In', scope:{title:'Title', body:'Body', tags:'Tags'},
@@ -1665,6 +1688,9 @@ function selectTracker(name) {
   document.getElementById('tracker-title').textContent = trackerTitle(name, mf);
   buildYearPills(mf.years || []);
   buildCatPills(mf.categories || []);
+  // Preset default filters; skipped during a hash restore (a `c=` in the URL wins,
+  // and a link without `c=` means "all").
+  if (!restoring) applyPresetFilters();
   // During a hash restore, applyHashRestore drives year/month/date itself.
   if (!restoring && mf.years && mf.years[0]) selectYear(mf.years[0]);
 }
@@ -2182,6 +2208,7 @@ function renderArticles(dateList) {
   // array, so #article-count (set above) is identical across layouts.
   const layout = resolvePreset(viewPrefs).layout;
   if (layout === 'hub') { renderHub(main, articles); return; }
+  if (layout === 'timeline') { renderTimeline(main, articles); return; }
 
   // Group by date descending
   const grouped = {};
@@ -2243,6 +2270,47 @@ function buildRiverRow(a) {
   ].join('');
   bindOpen(row, a);
   return row;
+}
+
+// timeline: one group per CVE id found in the tags (an article with several CVEs
+// appears under each), groups by latest date desc, rows newest first; articles
+// without a CVE follow under "其他"/"Other" in the normal river layout.
+function renderTimeline(main, articles) {
+  const byDate = (x, y) => (y._date || '').localeCompare(x._date || '');
+  const groups = {}, other = [];
+  articles.forEach(a => {
+    const ids = [];
+    artTags(a).forEach(tg => { if (/^CVE-\d{4}-\d{4,}$/.test(tg) && !ids.includes(tg)) ids.push(tg); });
+    if (!ids.length) { other.push(a); return; }
+    ids.forEach(id => (groups[id] = groups[id] || []).push(a));
+  });
+  const list = Object.keys(groups).map(id => {
+    const arts = groups[id].slice().sort(byDate);
+    return { id: id, arts: arts, latest: arts[0]._date || '', first: arts[arts.length - 1]._date || '' };
+  }).sort((x, y) => y.latest.localeCompare(x.latest) || x.id.localeCompare(y.id));
+  const frag = document.createDocumentFragment();
+  list.forEach(g => {
+    const head = document.createElement('div');
+    head.className = 'date-divider timeline-head';
+    const span = g.first === g.latest ? g.latest : g.first + ' ~ ' + g.latest;
+    head.textContent = g.id + ' · ' + L().ui.tlCount(g.arts.length) + ' · ' + span;
+    frag.appendChild(head);
+    const rows = document.createElement('div');
+    rows.className = 'river-list';
+    g.arts.forEach(a => rows.appendChild(buildRiverRow(a)));
+    frag.appendChild(rows);
+  });
+  if (other.length) {
+    const head = document.createElement('div');
+    head.className = 'date-divider timeline-head';
+    head.textContent = L().ui.tlOther;
+    frag.appendChild(head);
+    const rows = document.createElement('div');
+    rows.className = 'river-list';
+    other.slice().sort(byDate).forEach(a => rows.appendChild(buildRiverRow(a)));
+    frag.appendChild(rows);
+  }
+  main.appendChild(frag);
 }
 
 // hub: sections grouped by effective category (tracker's own order first).
@@ -2559,8 +2627,12 @@ function applyHashRestore() {
   selectTracker(h.t);          // restoring=true makes it skip its default year auto-select
   // category filter
   if (h.c) {
+    state.filterCats = new Set();
     h.c.split(',').filter(Boolean).forEach(c => state.filterCats.add(c));
     refreshCatPills();
+  } else if (h.p) {
+    // `p=` without `c=` (e.g. the console preview link): show the preset with its default filters.
+    applyPresetFilters();
   }
   // search query takes its own (search-aware) path
   if (h.q) {
