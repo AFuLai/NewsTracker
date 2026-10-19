@@ -1,0 +1,41 @@
+wc -l ui/index.html; git status --short | head
+grep -nE "data-skin|skin-btn|tracker_(lang|theme|skin|nav)|function (syncHash|applyHashRestore|renderArticles|buildCard|toggleSkin|applyLang|effectiveCat|init|selectTracker)|article-count|cards-grid|const I18N|CAT_MAP|eu_cra|^</?(style|script)" ui/index.html
+grep -nE "skin-btn|theme-btn|#lang-btn|hd-stats|function toggleLang|pendingDates|function runSearch|renderSearch|focus-visible" ui/index.html | head -40; grep -rnE "location.hash|#t=|'t=" tests 2>/dev/null | head
+git diff ui/index.html | sed -n '/function buildCard/,/card.onclick/p;/@@.*buildCard/,+25p' | head -60
+python3 - <<'EOF'
+p='/opt/tracker/repo/ui/index.html'
+s=open(p,encoding='utf-8',newline='').read()
+print(s.count('\r\n'), s.count('\n'))
+zh="clearSearch:'清除搜尋', close:'關閉',"
+en="clearSearch:'Clear search', close:'Close',"
+assert s.count(zh)==1 and s.count(en)==1
+nl='\r\n' if '\r\n' in s else '\n'
+s=s.replace(zh, zh+nl+"       viewLabel:'檢視模式', srcCount:n=>n+' 個來源',"+nl+"       presets:{ default:'預設', quick:'快讀', analyst:'分析師', event:'事件追蹤', cra:'合規 CRA' },")
+s=s.replace(en, en+nl+"       viewLabel:'View pre…
+python3 - <<'EOF'
+p='/opt/tracker/repo/ui/index.html'
+s=open(p,encoding='utf-8').read()
+def rep(old,new):
+    global s
+    assert s.count(old)==1,(s.count(old),old[:50])
+    s=s.replace(old,new)
+
+# hash: own-property check
+rep("(h && h.p && PRESETS[h.p]) && applyHashPreset(h.p)","(h && h.p && isPreset(h.p)) && applyHashPreset(h.p)")
+
+# core block
+anchor="""  if (g === 'cluster' || g === 'date' || g === 'source') state.libGroup = g;
+} catch (e) {}
+"""
+core = r"""
+// ── View presets (layout scenarios) ───────…
+node -e '
+const fs=require("fs");const h=fs.readFileSync("ui/index.html","utf8");
+const js=h.split("<script>").pop().split("</script>")[0];
+new Function(js.replace(/document\.addEventListener\(.DOMContentLoaded.*$/m,"")) ;
+console.log("syntax ok");
+const a=h.indexOf("const LAYOUTS"), b=h.indexOf("// ── View preset wiring");
+const code=h.slice(a,b)+";return {parseView,resolvePreset,serializeView,PRESETS}";
+const m=new Function(code)();
+const d=JSON.stringify(m.parseView("x"));
+console.log(d, JSON.stringify(m…

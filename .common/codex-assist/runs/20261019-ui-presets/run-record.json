@@ -1,0 +1,109 @@
+{
+  "task_id": "20261019-ui-presets",
+  "mode": "implement",
+  "requested": {
+    "root": "/opt/tracker/repo",
+    "sandbox": "host-ro+root-rw",
+    "model": "claude-sonnet-5-5-medium",
+    "egress": "cloud",
+    "allow_common": false,
+    "timeout_s": 2400,
+    "inputs_glob": "ui/index.html .common/codex-assist/runs/20261019-layout-scenarios-plan/answer.txt"
+  },
+  "actual": {
+    "engine": "agy",
+    "codex_bin": "/home/afu/.local/bin/agy",
+    "codex_version": "1.4.2",
+    "session_id": "f1586e5a-b812-4e71-9973-835565f9d3b1",
+    "model": "claude-sonnet-5-5-medium",
+    "cwd": "/opt/tracker/repo",
+    "sandbox": "host-ro+root-rw",
+    "denied_actions": [],
+    "host_fence": true,
+    "provider": "antigravity",
+    "rc": 0,
+    "elapsed_s": 170.2,
+    "tokens": 111829,
+    "usage": {
+      "fresh_input": 89616,
+      "cached_input": 1190303,
+      "output": 22213,
+      "reasoning": 0,
+      "raw": {
+        "input_tokens": 89616,
+        "output_tokens": 22213,
+        "thinking_tokens": 0,
+        "cache_read_tokens": 1190303,
+        "total_tokens": 111829
+      }
+    },
+    "effort": null,
+    "plan_usage": {},
+    "started_at": "2026-10-19T06:55:20Z",
+    "finished_at": "2026-10-19T06:58:10Z",
+    "ephemeral": false,
+    "commands": 7,
+    "machine": "afu-delta"
+  },
+  "role_sha256": "1cc596dacabf1cbfbcb6a8c50c4b0b0bc77d1e4528093742fbd058b591fd701f",
+  "sheet_sha256": null,
+  "acceptance_sha256": "c2256201c13e37747579cba3a9514d2e6c87eefe420a2ccbbf51b38032f3efe4",
+  "commands_sha256": [
+    "e2ae37e056fe331e172221b8a38ed544041d326ea5e38b5670ce3b328b296366",
+    "d7c9c5a90249fe83772f6aa0d7440b73b9f1e43cea0bac69e6cdb4f77018c145",
+    "0611bd3bb42561fc7c642b80487e9bafcd948a8bf1cfac3acb9c34f0b65ae150",
+    "aeea7be930e9478318ece21bd9b709f265030ace2d023ea797f9b917ddb3f9b0",
+    "58ff5506c004234599fd08a4f2099194f2a0b320c9ba178c10498e00199c17c4",
+    "0412682378e148a1d7c5794a8cffee7a558f7390d0c7f4e447ee71309a85335f",
+    "e9c5c787531e00def50e9b44a64cdce40caae0e4dc5f5cb9997d03326d9d3938"
+  ],
+  "answer_path": "/opt/tracker/repo/.common/codex-assist/runs/20261019-ui-presets/answer.txt",
+  "answer_shape": "summary-line",
+  "quote_gate": {
+    "status": "CLEAN",
+    "findings": 0
+  },
+  "verify": {
+    "touched_files": [
+      "ui/index.html"
+    ],
+    "out_of_scope": [],
+    "markers_removed": [],
+    "probes": [
+      {
+        "id": "tests",
+        "rc": 0,
+        "pass": true,
+        "output_path": "/opt/tracker/repo/.common/codex-assist/runs/20261019-ui-presets/verify/tests.out"
+      },
+      {
+        "id": "js-syntax",
+        "rc": 0,
+        "pass": true,
+        "output_path": "/opt/tracker/repo/.common/codex-assist/runs/20261019-ui-presets/verify/js-syntax.out"
+      },
+      {
+        "id": "core-fns",
+        "rc": 0,
+        "pass": true,
+        "output_path": "/opt/tracker/repo/.common/codex-assist/runs/20261019-ui-presets/verify/core-fns.out"
+      },
+      {
+        "id": "no-env-sniffing",
+        "rc": 0,
+        "pass": true,
+        "output_path": "/opt/tracker/repo/.common/codex-assist/runs/20261019-ui-presets/verify/no-env-sniffing.out"
+      }
+    ]
+  },
+  "verdict": "SCORABLE",
+  "recorded_at": "2026-10-19T06:58:11Z",
+  "recorder": {
+    "name": "record.py",
+    "version": "0.10.0",
+    "sha256": "a95169da0c93f0338ffb624a4a972faecc040c21f105b48b4fb1869c93139156"
+  },
+  "verify_result": "OK",
+  "defects": [],
+  "defects_spec_sha256": "3326060632526913a879e96855534a9ea197c73ecd54d514f4dd6c2cde144ca4"
+}

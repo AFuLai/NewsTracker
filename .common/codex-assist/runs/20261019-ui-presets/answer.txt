@@ -1,0 +1,32 @@
+Let me read the relevant parts of the file.
+I implemented S2–S5 in [ui/index.html](file:///opt/tracker/repo/ui/index.html), the only file I changed. The script parses, and `parseView`, `resolvePreset` and `serializeView` pass a node check. I have not opened the page in a browser, so the rendering, switcher, hash and storage behaviour below is untested.
+
+**S2 – view prefs**
+- **Pure functions:** `PRESETS`, `parseView`, `resolvePreset` and `serializeView` sit next to the other top-level state code. They touch no DOM or storage, so node can evaluate them.
+- **Node check:** bad JSON, unknown `v` and an unknown preset (including `"toString"`) all return the default view. Overrides with invalid layout or density values are dropped.
+- **Storage:** `initView` only reads `tracker_view`, so a bad stored value is never overwritten. `saveView` runs only when the user picks a preset, and both are wrapped in try/catch. On storage failure the in-memory `viewPrefs` stays in use.
+- **Attributes:** `html[data-layout]` and `html[data-density]` are set, with CSS modelled on `[data-skin]`. Default (grid, comfortable) has no new CSS rules.
+- **Preset behaviour:**
+  - The `event` preset renders as grid until S7 exists (`LAYOUT_FALLBACK`).
+  - The `cra` preset selects tracker `eu_cra` only if the manifest has it. This happens on boot with no deep link, and when you pick the preset.
+
+**S3 – hash**
+- `p=<preset>` is written by `syncHash` in both the tracker and library hashes. `applyHashRestore` reads it first, and a hash preset is applied without being persisted.
+- `isPreviewMode()` checks `pv=1` and skips every `tracker_view` write. A hash-only preset change re-renders in place.
+- **Hash change:** `p=` is now always in the hash, so default URLs gain `&p=default`. I did this so a shared link isn't overridden by the recipient's stored preset.
+
+**S4 – layouts**
+- `renderArticles` dispatches on the layout. The grid branch builds the same DOM as before.
+- River uses the new `buildRiverRow`: title plus one meta line.
+- Hero adds `.card-hero` to the first card.
+- Hub uses `renderHub`, which groups by `effectiveCat`.
+- The count is set before the dispatch, so it is the same for every layout.
+- **Analyst:** `buildCard` adds a source count to the card meta, but only for the analyst preset. Tags already show on grid cards, so I added nothing for them.
+
+**S5 – switcher**
+- A `<select id="view-select">` sits before `theme-btn`, next to the skin button. Being a native select, it works from the keyboard.
+- Labels and the aria-label come from `I18N.ui` (zh and en) and are refreshed in `applyLang`, before its library-mode early return.
+
+**Gap:** per the plan, the quick-read preset should default to a category filter (S6). I did not implement that, since S6 was not in this task.
+
+verified: 9  assumed: 4  gaps: 0  findings: 0

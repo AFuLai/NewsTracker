@@ -617,6 +617,43 @@ html[data-mode="lib"] #drawer-toggle { display: none !important; }
   margin-bottom: 1rem;
 }
 
+/* ── View presets: html[data-layout] / html[data-density] (modelled on [data-skin]) ──
+   The default preset (grid + comfortable) deliberately has NO rules here: it
+   must render exactly as before presets existed. */
+#view-select {
+  background: none;
+  border: 1px solid var(--outline);
+  color: var(--on-surface);
+  cursor: pointer;
+  padding: 0.3rem 0.55rem;
+  border-radius: var(--shape-full);
+  font-size: 14px;
+  max-width: 9.5rem;
+}
+#view-select option { background: var(--surface-container); color: var(--on-surface); }
+html[data-density="compact"] .cards-grid { gap: 0.5rem; margin-bottom: 0.6rem; }
+html[data-density="compact"] .card { padding: 0.6rem; gap: 0.3rem; }
+html[data-density="compact"] .date-divider { padding: 0.3rem 0 0.2rem; margin-bottom: 0.4rem; }
+html[data-layout="river"] .river-list { display: flex; flex-direction: column; margin-bottom: 0.6rem; }
+html[data-layout="river"] .river-row {
+  padding: 0.35rem 0.5rem;
+  border-bottom: 1px solid var(--outline-variant);
+  cursor: pointer;
+}
+html[data-layout="river"] .river-row:hover { background: var(--surface-container-high); }
+html[data-layout="river"] .river-row:focus-visible { outline: 2px solid var(--primary); outline-offset: -2px; }
+html[data-layout="river"] .river-row .card-title { margin: 0; }
+html[data-layout="river"] .river-row .card-meta {
+  font-size: 12px;
+  color: var(--on-surface-variant);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+html[data-layout="hero"] .cards-grid .card-hero { grid-column: 1 / -1; padding: 1.25rem; }
+html[data-layout="hero"] .card-hero .card-title { font-size: 20px; }
+html[data-layout="hero"] .card-hero .card-summary-preview { -webkit-line-clamp: 5; }
+
 /* ── Cards ───────────────────────────────────────── */
 .card {
   position: relative;
@@ -947,6 +984,7 @@ html[data-mode="lib"] .lib-sort { display: flex; }
       <span id="lbl-showing">顯示</span> <strong id="article-count">0</strong> <span id="lbl-articles">篇</span>
       <span id="last-updated"></span>
       <button id="skin-btn" onclick="toggleSkin()" aria-label="切換外觀"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/></svg></button>
+      <select id="view-select" onchange="setPreset(this.value)" aria-label="檢視模式" title="檢視模式"></select>
       <button id="theme-btn" onclick="toggleTheme()" aria-label="切換主題"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" id="theme-icon-light"><path d="M12 18C8.68 18 6 15.32 6 12s2.68-6 6-6 6 2.68 6 6-2.68 6-6 6zm0-10c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zM12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" id="theme-icon-dark" style="display:none"><path d="M21.64 10.75c-.5-.3-1.19-.26-1.63.13-.87.78-2.14 1.22-3.5 1.22-2.97 0-5.38-2.41-5.38-5.38 0-1.36.44-2.63 1.22-3.5.39-.44.43-1.13.13-1.63-.3-.5-.92-.74-1.53-.74-6.14 0-11.13 5-11.13 11.13 0 6.14 5 11.13 11.13 11.13 6.14 0 11.13-5 11.13-11.13 0-.61-.24-1.23-.74-1.53z"/></svg></button>
       <button id="lang-btn" onclick="toggleLang()" title="Language / 語言" aria-label="切換語言"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H4v3h10.52C9.47 7.69 8.96 8.99 8.19 10H4v3h4.52c.7 1.43 1.72 2.81 2.97 3.85l-2.55 2.54.96.96c1.66-1.44 3.01-3.38 3.89-5.58h.11l-.04.04c.3-.45.51-.95.65-1.46.46 1.29.76 2.61.76 4v1h3v-1c0-1.13-.21-2.22-.62-3.26z"/></svg></button>
     </div>
@@ -1021,6 +1059,131 @@ try {
   if (g === 'cluster' || g === 'date' || g === 'source') state.libGroup = g;
 } catch (e) {}
 
+// ── View presets (layout scenarios) ───────────────────
+// One localStorage key `tracker_view` = {"v":1,"preset":"<id>","overrides":{layout,density}}.
+// Only the preset id + user overrides are stored; preset DEFINITIONS live here,
+// so changing one needs no data migration. theme/skin/lang/nav are separate
+// axes and are NOT part of a preset. parseView / resolvePreset / serializeView
+// are pure (no DOM, no storage) so node can evaluate them.
+const LAYOUTS = ['grid', 'river', 'hero', 'hub', 'timeline'];
+const DENSITIES = ['comfortable', 'compact'];
+// Layouts without a renderer yet are drawn as another one (timeline: S7).
+const LAYOUT_FALLBACK = { timeline: 'grid' };
+const PRESETS = {
+  default: { layout: 'grid',     density: 'comfortable' },   // = the UI before presets existed
+  quick:   { layout: 'river',    density: 'compact' },       // 快讀
+  analyst: { layout: 'grid',     density: 'comfortable', showTags: true, showSrcCount: true },   // 分析師
+  event:   { layout: 'timeline', density: 'comfortable' },   // 事件追蹤
+  cra:     { layout: 'hub',      density: 'comfortable', tracker: 'eu_cra' }   // 合規 CRA (tracker only if it exists)
+};
+function isPreset(id) {
+  return typeof id === 'string' && Object.prototype.hasOwnProperty.call(PRESETS, id);
+}
+function defaultView() { return { v: 1, preset: 'default', overrides: {} }; }
+// string → view. Bad JSON / unknown v / unknown preset → default view.
+function parseView(str) {
+  if (typeof str !== 'string') return defaultView();
+  let o;
+  try { o = JSON.parse(str); } catch (e) { return defaultView(); }
+  if (!o || typeof o !== 'object' || Array.isArray(o) || o.v !== 1 || !isPreset(o.preset)) return defaultView();
+  const src = (o.overrides && typeof o.overrides === 'object' && !Array.isArray(o.overrides)) ? o.overrides : {};
+  const ov = {};
+  if (LAYOUTS.includes(src.layout)) ov.layout = src.layout;
+  if (DENSITIES.includes(src.density)) ov.density = src.density;
+  return { v: 1, preset: o.preset, overrides: ov };
+}
+// view → effective settings {preset, layout, density, showTags, showSrcCount, tracker}.
+function resolvePreset(view) {
+  const id = (view && isPreset(view.preset)) ? view.preset : 'default';
+  const base = PRESETS[id];
+  const ov = (view && view.overrides && typeof view.overrides === 'object') ? view.overrides : {};
+  const layout = LAYOUTS.includes(ov.layout) ? ov.layout : base.layout;
+  const density = DENSITIES.includes(ov.density) ? ov.density : base.density;
+  return {
+    preset: id,
+    layout: LAYOUT_FALLBACK[layout] || layout,
+    density: density,
+    showTags: !!base.showTags,
+    showSrcCount: !!base.showSrcCount,
+    tracker: base.tracker || null
+  };
+}
+// view → string for storage (normalised through parseView's rules).
+function serializeView(view) {
+  const id = (view && isPreset(view.preset)) ? view.preset : 'default';
+  const ov = {};
+  const src = (view && view.overrides && typeof view.overrides === 'object') ? view.overrides : {};
+  if (LAYOUTS.includes(src.layout)) ov.layout = src.layout;
+  if (DENSITIES.includes(src.density)) ov.density = src.density;
+  return JSON.stringify({ v: 1, preset: id, overrides: ov });
+}
+
+// ── View preset wiring (DOM / storage side) ───────────
+// In-memory copy; stays authoritative if localStorage throws.
+let viewPrefs = defaultView();
+// Console preview iframe (?pv=1) must never write localStorage.
+function isPreviewMode() {
+  try { return new URLSearchParams(location.search).get('pv') === '1'; } catch (e) { return false; }
+}
+function saveView() {
+  if (isPreviewMode()) return;
+  try { localStorage.setItem('tracker_view', serializeView(viewPrefs)); } catch (e) {}
+}
+function applyViewAttrs() {
+  const r = resolvePreset(viewPrefs);
+  document.documentElement.dataset.layout = r.layout;
+  document.documentElement.dataset.density = r.density;
+}
+// Read-only: a bad stored value is NOT overwritten until the user changes preset.
+function initView() {
+  let raw = null;
+  try { raw = localStorage.getItem('tracker_view'); } catch (e) {}
+  viewPrefs = parseView(raw);
+  applyViewAttrs();
+}
+// The preset's tracker, only if the manifest has it (else no-op).
+function presetTracker(resolved, all) {
+  return (resolved && resolved.tracker && all && Object.prototype.hasOwnProperty.call(all, resolved.tracker))
+    ? resolved.tracker : null;
+}
+// From the URL hash: apply, do not persist. Returns true if the preset changed.
+function applyHashPreset(id) {
+  if (!isPreset(id) || id === viewPrefs.preset) return false;
+  viewPrefs = { v: 1, preset: id, overrides: {} };
+  applyViewAttrs();
+  updateViewUI();
+  return true;
+}
+// From the switcher: apply + persist.
+function setPreset(id) {
+  if (!isPreset(id)) return;
+  viewPrefs = { v: 1, preset: id, overrides: {} };
+  saveView();
+  applyViewAttrs();
+  updateViewUI();
+  if (restoring) return;
+  const tr = presetTracker(resolvePreset(viewPrefs), getTrackers());
+  if (tr && (state.libActive || state.currentTracker !== tr)) selectTracker(tr);
+  else if (state.currentTracker && !state.libActive) renderArticles();
+  else syncHash();
+}
+function updateViewUI() {
+  const sel = document.getElementById('view-select');
+  if (!sel) return;
+  if (!sel.options.length) {
+    Object.keys(PRESETS).forEach(id => {
+      const o = document.createElement('option');
+      o.value = id;
+      sel.appendChild(o);
+    });
+  }
+  const names = L().ui.presets;
+  Array.from(sel.options).forEach(o => { o.textContent = names[o.value] || o.value; });
+  sel.value = viewPrefs.preset;
+  sel.setAttribute('aria-label', t('viewLabel'));
+  sel.title = t('viewLabel');
+}
+
 // ── i18n (language toggle: 中文 ⇄ English) ────────────
 // Category keys stay Chinese internally (filter + colour CSS class); only the
 // DISPLAY label is localized. Article title/summary/tags read the *_en mirror
@@ -1047,6 +1210,8 @@ const I18N = {
       expand:'展開側欄', collapse:'收起側欄',
       menu:'選單', skinBtn:'切換外觀', themeBtn:'切換主題', langLabel:'切換語言',
       clearSearch:'清除搜尋', close:'關閉',
+       viewLabel:'檢視模式', srcCount:n=>n+' 個來源',
+       presets:{ default:'預設', quick:'快讀', analyst:'分析師', event:'事件追蹤', cra:'合規 CRA' },
       searchPlaceholder:'搜尋全站新聞…', searching:'搜尋中…',
       scopeLabel:'範圍', scope:{title:'標題', body:'內文', tags:'標籤'},
       noResults:q=>'找不到符合「'+q+'」的新聞',
@@ -1067,6 +1232,8 @@ const I18N = {
       expand:'Expand', collapse:'Collapse',
       menu:'Menu', skinBtn:'Toggle appearance', themeBtn:'Toggle theme', langLabel:'Toggle language',
       clearSearch:'Clear search', close:'Close',
+       viewLabel:'View preset', srcCount:n=>n+(n===1?' source':' sources'),
+       presets:{ default:'Default', quick:'Quick read', analyst:'Analyst', event:'Event tracking', cra:'Compliance CRA' },
       searchPlaceholder:'Search all news…', searching:'Searching…',
       scopeLabel:'In', scope:{title:'Title', body:'Body', tags:'Tags'},
       noResults:q=>'No results for “'+q+'”',
@@ -1123,6 +1290,7 @@ function applyLang() {
     sbBtn.title = t('collapse');
     sbBtn.setAttribute('aria-label', t('collapse'));
   }
+  updateViewUI();
   if (state.libActive) {
     buildTrackerPills(Object.keys(getTrackers()));   // re-labels the CRA pill
     document.getElementById('tracker-title').textContent =
@@ -1470,7 +1638,8 @@ function init() {
     showMsg(t('noTracker')); return;
   }
   buildTrackerPills(names);
-  if (!applyHashRestore()) selectTracker(names[0]);   // deep-link wins over default
+  initView();   // localStorage tracker_view → viewPrefs; the hash (below) may override it
+  if (!applyHashRestore()) selectTracker(presetTracker(resolvePreset(viewPrefs), all) || names[0]);   // deep-link wins over default
   applyLang();   // sync all static labels + lang button to the active language
 }
 
@@ -2009,6 +2178,11 @@ function renderArticles(dateList) {
     return;
   }
 
+  // Layout dispatch (view preset). All layouts render the same `articles`
+  // array, so #article-count (set above) is identical across layouts.
+  const layout = resolvePreset(viewPrefs).layout;
+  if (layout === 'hub') { renderHub(main, articles); return; }
+
   // Group by date descending
   const grouped = {};
   articles.forEach(a => {
@@ -2019,15 +2193,79 @@ function renderArticles(dateList) {
   const sortedDates = Object.keys(grouped).sort((a, b) => b.localeCompare(a));
 
   const frag = document.createDocumentFragment();
-  sortedDates.forEach(date => {
+  sortedDates.forEach((date, di) => {
     const divider = document.createElement('div');
     divider.className = 'date-divider';
     divider.textContent = date;
     frag.appendChild(divider);
 
+    if (layout === 'river') {
+      const list = document.createElement('div');
+      list.className = 'river-list';
+      grouped[date].forEach(a => list.appendChild(buildRiverRow(a)));
+      frag.appendChild(list);
+      return;
+    }
+    // grid (default; also the stand-in for layouts not built yet) and hero
     const grid = document.createElement('div');
     grid.className = 'cards-grid';
-    grouped[date].forEach(a => grid.appendChild(buildCard(a)));
+    grouped[date].forEach((a, i) => {
+      const card = buildCard(a);
+      if (layout === 'hero' && di === 0 && i === 0) card.classList.add('card-hero');
+      grid.appendChild(card);
+    });
+    frag.appendChild(grid);
+  });
+  main.appendChild(frag);
+}
+
+// Wire click/keyboard activation of an article element to the overlay.
+function bindOpen(el, a) {
+  el.tabIndex = 0;
+  el.setAttribute('role', 'button');
+  el.setAttribute('aria-label', artTitle(a));
+  el.onclick = () => openOverlay(a, el);
+  el.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') { e.preventDefault(); openOverlay(a, el); }
+  });
+}
+
+// river: one compact row = title + a single meta line.
+function buildRiverRow(a) {
+  const row = document.createElement('div');
+  row.className = 'river-row';
+  const ecat = effectiveCat(a, state.currentTracker);
+  const srcName = a.sources && a.sources[0] ? a.sources[0].name : '';
+  const meta = [catLabel(ecat), srcName, a._date].filter(Boolean).join(' · ');
+  row.innerHTML = [
+    '<h3 class="card-title">' + linkifyCVE(escHtml(artTitle(a))) + '</h3>',
+    '<div class="card-meta">' + escHtml(meta) + '</div>'
+  ].join('');
+  bindOpen(row, a);
+  return row;
+}
+
+// hub: sections grouped by effective category (tracker's own order first).
+function renderHub(main, articles) {
+  const groups = {};
+  articles.forEach(a => {
+    const c = effectiveCat(a, state.currentTracker);
+    (groups[c] = groups[c] || []).push(a);
+  });
+  const own = ((currentManifest() || {}).categories) || [];
+  const keys = Object.keys(groups).sort((x, y) => {
+    const ix = own.indexOf(x), iy = own.indexOf(y);
+    return (ix < 0 ? 1e6 : ix) - (iy < 0 ? 1e6 : iy);
+  });
+  const frag = document.createDocumentFragment();
+  keys.forEach(c => {
+    const head = document.createElement('div');
+    head.className = 'date-divider hub-title';
+    head.textContent = catLabel(c) + ' (' + groups[c].length + ')';
+    frag.appendChild(head);
+    const grid = document.createElement('div');
+    grid.className = 'cards-grid';
+    groups[c].forEach(a => grid.appendChild(buildCard(a)));
     frag.appendChild(grid);
   });
   main.appendChild(frag);
@@ -2044,6 +2282,8 @@ function buildCard(a) {
   const title = artTitle(a), summary = artSummary(a);
   const preview = summary;
   const srcName = a.sources && a.sources[0] ? escHtml(a.sources[0].name) : '';
+  const srcCountHtml = resolvePreset(viewPrefs).showSrcCount
+    ? ' · ' + escHtml(L().ui.srcCount((a.sources || []).length)) : '';
   const tagsHtml = artTags(a).map(tg => {
     if (/^CVE-\d{4}-\d{4,}$/.test(tg)) {
       return '<a class="card-tag" href="https://www.cve.org/CVERecord?id=' + tg + '" target="_blank" rel="noopener">' + escHtml(tg) + '</a>';
@@ -2055,7 +2295,7 @@ function buildCard(a) {
     '<h3 class="card-title">' + linkifyCVE(escHtml(title)) + '</h3>',
     '<p class="card-summary-preview">' + escHtml(preview) + '</p>',
     '<div class="card-tags">' + tagsHtml + '</div>',
-    '<div class="card-meta">' + srcName + (srcName ? ' · ' : '') + escHtml(a._date) + '</div>'
+    '<div class="card-meta">' + srcName + (srcName ? ' · ' : '') + escHtml(a._date) + srcCountHtml + '</div>'
   ].join('');
   card.onclick = () => openOverlay(a, card);
   card.addEventListener('keydown', e => {
@@ -2257,6 +2497,7 @@ function syncHash() {
     if (state.libCluster) lp.push('c=' + encodeURIComponent(state.libCluster));
     if (state.libGroup !== 'cluster') lp.push('g=' + state.libGroup);
     if (skinOf()) lp.push('s=' + skinOf());
+    lp.push('p=' + encodeURIComponent(viewPrefs.preset));
     const lh = '#' + lp.join('&');
     if (lh !== location.hash) {
       try { history.replaceState(null, '', lh); }
@@ -2274,6 +2515,7 @@ function syncHash() {
   if (state.searchQuery) p.push('q=' + encodeURIComponent(state.searchQuery));
   const skin = document.documentElement.dataset.skin;
   if (skin) p.push('s=' + skin);
+  p.push('p=' + encodeURIComponent(viewPrefs.preset));
   const hash = '#' + p.join('&');
   if (hash === location.hash) return;
   try { history.replaceState(null, '', hash); }
@@ -2295,6 +2537,9 @@ function parseHash() {
 // Restore the view named by the hash. Returns true if it handled the load.
 function applyHashRestore() {
   const h = parseHash();
+  // View preset from the hash wins over localStorage; it is applied without
+  // being persisted (the hash is a link, not a user choice).
+  const presetChanged = !!(h && h.p && isPreset(h.p)) && applyHashPreset(h.p);
   if (h && h.lib) {          // CRA library deep-link
     if (h.s === 'md3' || h.s === 'classic') document.documentElement.dataset.skin = h.s;
     state.libCluster = h.c || null;
@@ -2302,7 +2547,11 @@ function applyHashRestore() {
     selectLibrary();
     return true;
   }
-  if (!h || !h.t) return false;
+  if (!h || !h.t) {
+    // preset-only hash change on an already-rendered view: re-render in place
+    if (presetChanged && state.currentTracker && !restoring) renderArticles();
+    return false;
+  }
   const all = getTrackers();
   if (!all || !all[h.t]) return false;
   if (h.s === 'md3' || h.s === 'classic') document.documentElement.dataset.skin = h.s;
