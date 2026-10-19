@@ -1190,11 +1190,12 @@ html[data-mode="lib"] .lib-sort { display: flex; }
   #sidebar { width: min(280px, 82vw); }
   .cards-grid { grid-template-columns: minmax(0, 1fr); }
   /* row2 becomes one horizontally-scrolling strip instead of wrapping */
-  .hd-row2 { flex-wrap: nowrap; overflow-x: auto; }
+  .hd-row2 { flex-wrap: nowrap; overflow-x: auto; min-width: 0; max-width: 100%; }   /* without min-width/max-width the strip grows with its pills and widens the whole page instead of scrolling */
   #year-pills, #cat-pills, .lib-sort { flex-wrap: nowrap; }
   /* second row joins the same horizontally-scrolling strip */
   #cat-pills .cat-row-2 { flex-wrap: nowrap; flex-basis: auto; flex-shrink: 0; }
-  .hd-row1 { gap: 0.5rem; }
+  .hd-row1 { gap: 0.5rem; flex-wrap: wrap; height: auto; min-height: 50px; padding-block: 0.4rem; }   /* tracker tabs + stats + header buttons do not fit 375px on one line */
+  .hd-stats { flex-wrap: wrap; min-width: 0; row-gap: 0.3rem; }
   /* Mobile has room to spare — enlarge the actual box instead of relying on
      the invisible ::after hit-slop (which is more prone to overlap in the
      dense month/date lists at this width). */
