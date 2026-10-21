@@ -1471,9 +1471,12 @@ html[data-theme="dark"] #ws-time-panel input[type="date"] { color-scheme: dark; 
 .ws-chart-axis { display: flex; justify-content: space-between; gap: 0.5rem; font-size: 11px; color: var(--on-surface-variant); }
 /* left rail */
 #ws-rail {
-  flex: 0 0 220px; width: 220px; flex-direction: column; gap: 0.3rem; padding: 0.5rem;
+  flex: 0 0 176px; width: 176px; flex-direction: column; gap: 0.3rem; padding: 0.5rem;
   overflow-y: auto; overflow-x: hidden; min-width: 0; box-sizing: border-box;
   background: var(--surface-container-low); border-right: 1px solid var(--outline-variant);
+}
+@media (min-width: 1360px) {
+  #ws-rail { flex: 0 0 200px; width: 200px; }
 }
 #ws-rail.collapsed { flex-basis: 48px; width: 48px; align-items: center; padding: 0.5rem 0.2rem; }
 #ws-rail.collapsed #ws-rail-body, #ws-rail:not(.collapsed) #ws-rail-strip { display: none; }
@@ -1509,9 +1512,241 @@ html[data-theme="dark"] #ws-time-panel input[type="date"] { color-scheme: dark; 
   }
   #ws-time-panel { padding: 0.5rem 0.75rem; }
 }
-/* list */
-.ws-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.5rem; padding: 0.4rem 0; font-size: 16px; font-weight: 600; }
+/* list & M5 dense cards / titles */
+:root {
+  --ws-ty-vuln: var(--cat-vuln-fill);         --ws-ty-vuln-on: var(--cat-vuln-on);
+  --ws-ty-incident: var(--cat-incident-fill); --ws-ty-incident-on: var(--cat-incident-on);
+  --ws-ty-regulation: var(--cat-law-fill);    --ws-ty-regulation-on: var(--cat-law-on);
+  --ws-ty-supply: var(--cat-supply-fill);     --ws-ty-supply-on: var(--cat-supply-on);
+  --ws-ty-focus: var(--os-focus-fill);        --ws-ty-focus-on: var(--os-focus-on);
+  --ws-ty-industry: var(--cra-industry-fill); --ws-ty-industry-on: var(--cra-industry-on);
+  --ws-ty-emerging: var(--cat-tech-fill);     --ws-ty-emerging-on: var(--cat-tech-on);
+  --ws-ty-events: var(--cra-event-fill);       --ws-ty-events-on: var(--cra-event-on);
+  --ws-ty-other: var(--os-apple-fill);        --ws-ty-other-on: var(--os-apple-on);
+  --ws-type-vuln: var(--ws-ty-vuln);         --ws-chip-vuln: var(--ws-ty-vuln);
+  --ws-type-incident: var(--ws-ty-incident); --ws-chip-incident: var(--ws-ty-incident);
+  --ws-type-regulation: var(--ws-ty-regulation); --ws-chip-regulation: var(--ws-ty-regulation);
+  --ws-type-supply: var(--ws-ty-supply);     --ws-chip-supply: var(--ws-ty-supply);
+  --ws-type-focus: var(--ws-ty-focus);       --ws-chip-focus: var(--ws-ty-focus);
+  --ws-type-industry: var(--ws-ty-industry); --ws-chip-industry: var(--ws-ty-industry);
+  --ws-type-emerging: var(--ws-ty-emerging); --ws-chip-emerging: var(--ws-ty-emerging);
+  --ws-type-events: var(--ws-ty-events);     --ws-chip-events: var(--ws-ty-events);
+  --ws-type-other: var(--ws-ty-other);       --ws-chip-other: var(--ws-ty-other);
+}
+html[data-mode="ws"] #search-row { position: static; }
+html[data-mode="ws"] .date-divider {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--surface);
+  padding: 0.5rem 0 0.35rem;
+  border-bottom: 1px solid var(--outline-variant);
+  margin-top: 0.5rem;
+  margin-bottom: 0.6rem;
+}
+.ws-head { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; padding: 0.4rem 0; font-size: 16px; font-weight: 600; }
 .ws-head .ws-sub { font-weight: 400; color: var(--on-surface-variant); }
+.ws-mode-toggle {
+  margin-left: auto;
+  display: inline-flex;
+  border: 1px solid var(--outline-variant);
+  border-radius: var(--shape-s, 6px);
+  overflow: hidden;
+  font-size: 13px;
+  background: var(--surface-container-low);
+}
+.ws-mode-btn {
+  border: none;
+  background: none;
+  color: var(--on-surface-variant);
+  padding: 4px 12px;
+  min-height: 28px;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background-color var(--motion-short, 0.15s), color var(--motion-short, 0.15s);
+}
+.ws-mode-btn:hover { background: var(--surface-container-high); color: var(--on-surface); }
+.ws-mode-btn[aria-pressed="true"] { background: var(--primary); color: var(--on-primary); font-weight: 600; }
+.ws-mode-btn:focus-visible { outline: 2px solid var(--primary); outline-offset: -2px; }
+.ws-date-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+.ws-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 10px;
+  margin-bottom: 0.5rem;
+}
+.ws-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+  min-height: 140px;
+  min-width: 0;
+  box-sizing: border-box;
+  background: var(--surface-container-lowest);
+  border: 1px solid var(--outline-variant);
+  border-radius: var(--shape-m, 8px);
+  cursor: pointer;
+  text-align: left;
+  transition: transform var(--motion-short, 0.15s), box-shadow var(--motion-short, 0.15s);
+}
+.ws-card:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--elev-1);
+}
+.ws-card:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+.ws-card.watched {
+  border-left: 3px solid var(--primary);
+}
+.ws-card-top {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+}
+.ws-type-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 1px 7px;
+  border-radius: var(--shape-full, 999px);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.ws-type-chip.ws-ty-vuln        { background: var(--ws-ty-vuln); color: var(--ws-ty-vuln-on); }
+.ws-type-chip.ws-ty-incident    { background: var(--ws-ty-incident); color: var(--ws-ty-incident-on); }
+.ws-type-chip.ws-ty-regulation  { background: var(--ws-ty-regulation); color: var(--ws-ty-regulation-on); }
+.ws-type-chip.ws-ty-supply      { background: var(--ws-ty-supply); color: var(--ws-ty-supply-on); }
+.ws-type-chip.ws-ty-focus       { background: var(--ws-ty-focus); color: var(--ws-ty-focus-on); }
+.ws-type-chip.ws-ty-industry    { background: var(--ws-ty-industry); color: var(--ws-ty-industry-on); }
+.ws-type-chip.ws-ty-emerging    { background: var(--ws-ty-emerging); color: var(--ws-ty-emerging-on); }
+.ws-type-chip.ws-ty-events      { background: var(--ws-ty-events); color: var(--ws-ty-events-on); }
+.ws-type-chip.ws-ty-other       { background: var(--ws-ty-other); color: var(--ws-ty-other-on); }
+.ws-star {
+  color: var(--pal-warn, #b45309);
+  font-size: 13px;
+  line-height: 1;
+  font-weight: bold;
+}
+html[data-theme="dark"] .ws-star {
+  color: var(--pal-warn, #fbbf24);
+}
+.ws-card-title {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.45;
+  color: var(--on-surface);
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.ws-card-summary {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--on-surface-variant);
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.ws-card-footer {
+  margin-top: auto;
+  font-size: 11px;
+  color: var(--on-surface-variant);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ws-titles {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-container-lowest);
+  border: 1px solid var(--outline-variant);
+  border-radius: var(--shape-m, 8px);
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+.ws-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 36px;
+  height: 36px;
+  box-sizing: border-box;
+  padding: 0 12px;
+  border-bottom: 1px solid var(--outline-variant);
+  background: none;
+  color: var(--on-surface);
+  cursor: pointer;
+  text-align: left;
+  font-size: 13px;
+  min-width: 0;
+  transition: background-color var(--motion-short, 0.15s);
+}
+.ws-title-row:last-child {
+  border-bottom: none;
+}
+.ws-title-row:hover {
+  background: var(--surface-container-high);
+}
+.ws-title-row:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: -2px;
+}
+.ws-title-row.watched {
+  border-left: 3px solid var(--primary);
+}
+.ws-title-row .ws-type-chip {
+  flex-shrink: 0;
+}
+.ws-title-row .ws-star {
+  flex-shrink: 0;
+  margin-left: -4px;
+}
+.ws-title-row .ws-title-text {
+  flex: 1 1 0;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 500;
+  color: var(--on-surface);
+}
+.ws-title-row .ws-title-src {
+  flex-shrink: 0;
+  font-size: 12px;
+  color: var(--on-surface-variant);
+  white-space: nowrap;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ws-title-row .ws-title-date {
+  flex-shrink: 0;
+  font-size: 12px;
+  color: var(--on-surface-variant);
+  white-space: nowrap;
+}
+@media (max-width: 599px) {
+  .ws-title-row {
+    padding: 0 8px;
+    gap: 6px;
+  }
+  .ws-title-row .ws-title-src {
+    max-width: 70px;
+  }
+}
 html[data-mode="ws"] .card { min-width: 0; }
 html[data-mode="ws"] .card-title { overflow-wrap: anywhere; }
 </style>
@@ -1595,6 +1830,7 @@ html[data-mode="ws"] .card-title { overflow-wrap: anywhere; }
 const TrackerPrefs = (() => {
   const LEGACY_KEYS = ['tracker_lang', 'tracker_theme', 'tracker_skin', 'tracker_palette', 'tracker_nav',
     'tracker_view', 'tracker_watch', 'tracker_watch_hub', 'tracker_watch_seen', 'tracker_lib_group'];
+  const EXTRA_KEYS = ['tracker_ws', 'tracker_read'];
   const KEY = 'tracker_prefs';
   const has = (o, k) => Object.prototype.hasOwnProperty.call(o, k);
   function load(storage) {
@@ -1606,7 +1842,7 @@ const TrackerPrefs = (() => {
     } catch (e) { parsed = null; }
     if (parsed && typeof parsed === 'object' && parsed.v === 2 &&
         parsed.values && typeof parsed.values === 'object' && !Array.isArray(parsed.values)) {
-      LEGACY_KEYS.forEach(k => {
+      LEGACY_KEYS.concat(EXTRA_KEYS).forEach(k => {
         if (has(parsed.values, k) && typeof parsed.values[k] === 'string') values[k] = parsed.values[k];
       });
       return { v: 2, values };
@@ -1620,11 +1856,12 @@ const TrackerPrefs = (() => {
     return { v: 2, values };
   }
   function get(prefs, key) {
+    if (LEGACY_KEYS.indexOf(key) < 0 && EXTRA_KEYS.indexOf(key) < 0) return null;
     const vs = prefs && prefs.values;
     return (vs && has(vs, key) && typeof vs[key] === 'string') ? vs[key] : null;
   }
   function set(prefs, key, value) {
-    if (LEGACY_KEYS.indexOf(key) < 0) return prefs;
+    if (LEGACY_KEYS.indexOf(key) < 0 && EXTRA_KEYS.indexOf(key) < 0) return prefs;
     const values = { ...((prefs && prefs.values) || {}) };
     if (value === null || value === undefined) delete values[key];
     else values[key] = String(value);
@@ -1634,7 +1871,7 @@ const TrackerPrefs = (() => {
     if (preview === true) return;
     try { storage.setItem(KEY, JSON.stringify(prefs)); } catch (e) {}
   }
-  return { LEGACY_KEYS, load, get, set, save };
+  return { LEGACY_KEYS, EXTRA_KEYS, load, get, set, save };
 })();
 /* TRACKER-PREFS:END */
 window.TrackerPrefs = TrackerPrefs;
@@ -2336,6 +2573,7 @@ const I18N = {
         wsArchive:'歷年封存', wsYearName:y=>y+' 年', wsDays:n=>n+' 天', wsChart:'每日篇數', wsBar:(d,n)=>d+': '+n+' 篇',
         wsAllSrc:'全部來源', wsSrc:'依來源瀏覽', wsTypes:'新聞類型', wsWatch:'★ 我的關注', wsPlat:'平台',
         wsCollapse:'« 收合', wsExpand:'» 展開', wsLoading:r=>'載入「'+r+'」…',
+        wsCards:'卡片', wsTitles:'標題',
         paletteBtn:'主題', paletteTitle:'主題', paletteDefault:'預設（跟隨系統主題）', paletteDefaultDark:'預設深色', paletteDefaultLight:'預設淺色', paletteApplied:'已套用配色主題',
        presets:{ default:'預設', quick:'快讀', analyst:'分析師', event:'事件追蹤', cra:'合規 CRA' },
       searchPlaceholder:'搜尋全站新聞…', searching:'搜尋中…',
@@ -2376,6 +2614,7 @@ const I18N = {
         wsArchive:'Archive by year', wsYearName:y=>String(y), wsDays:n=>n+(n===1?' day':' days'), wsChart:'Articles per day', wsBar:(d,n)=>d+': '+n+(n===1?' article':' articles'),
         wsAllSrc:'All sources', wsSrc:'Browse by source', wsTypes:'News types', wsWatch:'★ My watch', wsPlat:'Platforms',
         wsCollapse:'« Collapse', wsExpand:'» Expand', wsLoading:r=>'Loading “'+r+'”…',
+        wsCards:'Cards', wsTitles:'Titles',
         paletteBtn:'Theme', paletteTitle:'Theme', paletteDefault:'Default (follow system theme)', paletteDefaultDark:'Default dark', paletteDefaultLight:'Default light', paletteApplied:'Colour theme applied',
        presets:{ default:'Default', quick:'Quick read', analyst:'Analyst', event:'Event tracking', cra:'Compliance CRA' },
       searchPlaceholder:'Search all news…', searching:'Searching…',
@@ -3521,6 +3760,7 @@ function init() {
   initView();   // localStorage tracker_view → viewPrefs; the hash (below) may override it
   initPalette();   // localStorage tracker_palette → data-palette; a hash pal= (below) may override it
   initHubPrefs();  // localStorage tracker_watch_hub → hubPrefs; a hash hv= / hw= (below) may override it
+  ws.mode = wsLoadMode();
   if (!applyHashRestore()) selectWorkspace();   // deep-link wins; no / unknown hash → the news workspace (the home view; it was the 總覽 hub, which replaced the old default tracker wall)
   applyLang();   // sync all static labels + lang button to the active language
 }
@@ -3647,6 +3887,7 @@ window.addEventListener('resize', () => closeSrcMenu());
 const WS_QUICK = { today: 1, '7d': 7, '30d': 30, '90d': 90 };   // ranges served by ensureHubLoaded(N)
 const WS_PICKS = [['today', 'wsToday'], ['7d', 'ws7d'], ['30d', 'ws30d'], ['90d', 'ws90d'], ['year', 'wsYear'], ['all', 'wsAll']];
 const ws = {
+  mode: 'cards',    // 'cards' | 'titles'
   range: '30d',     // current range key
   prev: null,       // range to return to when the selected chart day is clicked again
   src: '', ty: '', w: '', pl: '',   // source tracker id / type id / watch rule id / platform ('' = no filter)
@@ -3656,6 +3897,27 @@ const ws = {
   panelOpen: false, railCollapsed: false, railInit: false,
   newest: '', focusKey: null
 };
+function wsLoadMode() {
+  let raw = null;
+  try { raw = prefGet('tracker_ws'); } catch (e) {}
+  if (raw && typeof raw === 'string') {
+    try {
+      const obj = JSON.parse(raw);
+      if (obj && typeof obj === 'object') {
+        if (obj.mode === 'titles' || obj.mode === 'cards') return obj.mode;
+      }
+    } catch (e) {}
+  }
+  return 'cards';
+}
+function wsSetMode(mode) {
+  if (mode !== 'titles' && mode !== 'cards') mode = 'cards';
+  if (ws.mode === mode) return;
+  ws.mode = mode;
+  try { prefSet('tracker_ws', JSON.stringify({ mode: mode })); } catch (e) {}
+  ws.focusKey = 'mode:' + mode;
+  wsDraw();
+}
 function wsIsDay(k) { return /^d\d{4}-\d{2}-\d{2}$/.test(String(k)); }
 function wsNormRange(k) {
   k = String(k || '');
@@ -4022,14 +4284,41 @@ function wsDraw() {
   const head = wsEl('h2', 'ws-head');
   head.appendChild(wsEl('span', '', wsRangeLabel(ws.range)));
   head.appendChild(wsEl('span', 'ws-sub', '· ' + t('tlCount')(shown.length)));
+
+  const toggle = wsEl('span', 'ws-mode-toggle');
+  const btnCards = wsEl('button', 'ws-mode-btn', t('wsCards'));
+  btnCards.type = 'button';
+  btnCards.setAttribute('aria-pressed', ws.mode === 'cards' ? 'true' : 'false');
+  btnCards.dataset.ws = 'mode:cards';
+  btnCards.onclick = () => wsSetMode('cards');
+
+  const btnTitles = wsEl('button', 'ws-mode-btn', t('wsTitles'));
+  btnTitles.type = 'button';
+  btnTitles.setAttribute('aria-pressed', ws.mode === 'titles' ? 'true' : 'false');
+  btnTitles.dataset.ws = 'mode:titles';
+  btnTitles.onclick = () => wsSetMode('titles');
+
+  toggle.appendChild(btnCards);
+  toggle.appendChild(btnTitles);
+  head.appendChild(toggle);
   frag.appendChild(head);
+
   const groups = new Map();
   shown.forEach(a => { if (!groups.has(a._date)) groups.set(a._date, []); groups.get(a._date).push(a); });
+  const isTitles = ws.mode === 'titles';
   groups.forEach((items, date) => {
-    frag.appendChild(wsEl('div', 'date-divider', date + ' · ' + t('tlCount')(items.length)));
-    const grid = wsEl('div', 'cards-grid');
-    items.forEach(a => grid.appendChild(buildCard(a)));
-    frag.appendChild(grid);
+    const group = wsEl('section', 'ws-date-group');
+    group.appendChild(wsEl('div', 'date-divider', date + ' · ' + t('tlCount')(items.length)));
+    if (isTitles) {
+      const titles = wsEl('div', 'ws-titles');
+      items.forEach(a => titles.appendChild(buildWsTitleRow(a)));
+      group.appendChild(titles);
+    } else {
+      const grid = wsEl('div', 'ws-grid');
+      items.forEach(a => grid.appendChild(buildWsCard(a)));
+      group.appendChild(grid);
+    }
+    frag.appendChild(group);
   });
   main.appendChild(frag);
   wsRefocus();
@@ -4067,8 +4356,12 @@ function selectWorkspace(patch) {
     ws.w = patch.w || '';
     ws.pl = HUB_PLATFORMS.includes(patch.pl) ? patch.pl : '';
     state.searchQuery = patch.q || '';
+    if (patch.v === 't') ws.mode = 'titles';
+    else if (patch.v === 'c' || patch.v === 'cards') ws.mode = 'cards';
+    else ws.mode = wsLoadMode();
   } else if (!was) {
     state.searchQuery = '';
+    ws.mode = wsLoadMode();
   }
   if (!ws.railInit) {
     ws.railInit = true;
@@ -4736,6 +5029,61 @@ function renderHub(main, articles) {
   main.appendChild(frag);
 }
 
+function wsTypeName(tyId) {
+  const ty = NEWS_TYPES.find(x => x.id === tyId);
+  return ty ? (state.lang === 'en' ? ty.en : ty.zh) : tyId;
+}
+
+function buildWsCard(a) {
+  const card = document.createElement('div');
+  const tyId = hubTypeId(a);
+  const tyName = wsTypeName(tyId);
+  const wl = watchLabels(a);
+  const hasStar = wl && wl.length > 0;
+  card.className = 'ws-card' + (hasStar ? ' watched' : '');
+  const title = artTitle(a);
+  const summary = artSummary(a);
+  const srcName = (a.sources && a.sources[0]) ? a.sources[0].name : (a.source || '');
+  const mmdd = (a._date || a.date || '').replace(/^\d{4}-/, '');
+  const footerText = [srcName, mmdd].filter(Boolean).join(' · ');
+
+  card.innerHTML = [
+    '<div class="ws-card-top">',
+      '<span class="ws-type-chip ws-ty-' + escHtml(tyId) + '">' + escHtml(tyName) + '</span>',
+      (hasStar ? '<span class="ws-star" title="' + escHtml(wl.join(' / ')) + '">★</span>' : ''),
+    '</div>',
+    '<h3 class="ws-card-title">' + escHtml(title) + '</h3>',
+    '<p class="ws-card-summary">' + escHtml(summary) + '</p>',
+    '<div class="ws-card-footer">' + escHtml(footerText) + '</div>'
+  ].join('');
+
+  bindOpen(card, a);
+  return card;
+}
+
+function buildWsTitleRow(a) {
+  const row = document.createElement('div');
+  const tyId = hubTypeId(a);
+  const tyName = wsTypeName(tyId);
+  const wl = watchLabels(a);
+  const hasStar = wl && wl.length > 0;
+  row.className = 'ws-title-row' + (hasStar ? ' watched' : '');
+  const title = artTitle(a);
+  const srcName = (a.sources && a.sources[0]) ? a.sources[0].name : (a.source || '');
+  const mmdd = (a._date || a.date || '').replace(/^\d{4}-/, '');
+
+  row.innerHTML = [
+    '<span class="ws-type-chip ws-ty-' + escHtml(tyId) + '">' + escHtml(tyName) + '</span>',
+    (hasStar ? '<span class="ws-star" title="' + escHtml(wl.join(' / ')) + '">★</span>' : ''),
+    '<span class="ws-title-text">' + escHtml(title) + '</span>',
+    (srcName ? '<span class="ws-title-src">' + escHtml(srcName) + '</span>' : ''),
+    '<span class="ws-title-date">' + escHtml(mmdd) + '</span>'
+  ].join('');
+
+  bindOpen(row, a);
+  return row;
+}
+
 function buildCard(a) {
   const card = document.createElement('div');
   card.className = 'card';
@@ -4972,6 +5320,7 @@ function syncHash() {
     if (ws.w) wp.push('w=' + encodeURIComponent(ws.w));
     if (ws.pl) wp.push('pl=' + encodeURIComponent(ws.pl));
     if (state.searchQuery) wp.push('q=' + encodeURIComponent(state.searchQuery));
+    if (ws.mode === 'titles') wp.push('v=t');
     if (skinOf()) wp.push('s=' + skinOf());
     if (palettePref) wp.push('pal=' + palettePref);
     wp.push('p=' + encodeURIComponent(viewPrefs.preset));
@@ -5069,7 +5418,7 @@ function applyHashRestore() {
   if (h && parsePalette(h.pal) && h.pal !== palettePref) applyPalette(h.pal);
   if (h && h.ws) {           // news workspace deep-link (the filters come from the hash; not persisted)
     if (h.s === 'md3' || h.s === 'classic') document.documentElement.dataset.skin = h.s;
-    selectWorkspace({ range: h.r, src: h.src, ty: h.ty, w: h.w, pl: h.pl, q: h.q });
+    selectWorkspace({ range: h.r, src: h.src, ty: h.ty, w: h.w, pl: h.pl, q: h.q, v: h.v });
     openPendingArticle();
     return true;
   }
