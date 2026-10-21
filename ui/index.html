@@ -1476,6 +1476,66 @@ html[data-palette] .wh-dash {
 <div id="watch-panel" class="hidden" role="dialog" aria-label="關注"></div>
 <div id="palette-panel" class="hidden" role="dialog" aria-label="配色"></div>
 <script>
+/* TRACKER-PREFS:BEGIN */
+// Pure prefs layer: ONE storage key `tracker_prefs` = {"v":2,"values":{<legacy key>: <string>}}, migrated
+// from the ten legacy keys. No DOM, no storage global: the storage object (getItem/setItem, may throw)
+// is passed in as an argument.
+const TrackerPrefs = (() => {
+  const LEGACY_KEYS = ['tracker_lang', 'tracker_theme', 'tracker_skin', 'tracker_palette', 'tracker_nav',
+    'tracker_view', 'tracker_watch', 'tracker_watch_hub', 'tracker_watch_seen', 'tracker_lib_group'];
+  const KEY = 'tracker_prefs';
+  const has = (o, k) => Object.prototype.hasOwnProperty.call(o, k);
+  function load(storage) {
+    const values = {};
+    let parsed = null;
+    try {
+      const raw = storage.getItem(KEY);
+      if (typeof raw === 'string') parsed = JSON.parse(raw);
+    } catch (e) { parsed = null; }
+    if (parsed && typeof parsed === 'object' && parsed.v === 2 &&
+        parsed.values && typeof parsed.values === 'object' && !Array.isArray(parsed.values)) {
+      LEGACY_KEYS.forEach(k => {
+        if (has(parsed.values, k) && typeof parsed.values[k] === 'string') values[k] = parsed.values[k];
+      });
+      return { v: 2, values };
+    }
+    LEGACY_KEYS.forEach(k => {
+      try {
+        const x = storage.getItem(k);
+        if (typeof x === 'string') values[k] = x;
+      } catch (e) {}
+    });
+    return { v: 2, values };
+  }
+  function get(prefs, key) {
+    const vs = prefs && prefs.values;
+    return (vs && has(vs, key) && typeof vs[key] === 'string') ? vs[key] : null;
+  }
+  function set(prefs, key, value) {
+    if (LEGACY_KEYS.indexOf(key) < 0) return prefs;
+    const values = { ...((prefs && prefs.values) || {}) };
+    if (value === null || value === undefined) delete values[key];
+    else values[key] = String(value);
+    return { v: 2, values };
+  }
+  function save(storage, prefs, preview) {
+    if (preview === true) return;
+    try { storage.setItem(KEY, JSON.stringify(prefs)); } catch (e) {}
+  }
+  return { LEGACY_KEYS, load, get, set, save };
+})();
+/* TRACKER-PREFS:END */
+window.TrackerPrefs = TrackerPrefs;
+// Module prefs (one `tracker_prefs` key, migrated from the legacy keys); initialised before any read.
+let prefs;
+try { prefs = TrackerPrefs.load(localStorage); }
+catch (e) { prefs = TrackerPrefs.load({ getItem() { throw new Error('storage'); }, setItem() { throw new Error('storage'); } }); }
+function prefGet(key) { return TrackerPrefs.get(prefs, key); }
+function prefSet(key, value) {
+  prefs = TrackerPrefs.set(prefs, key, value);
+  try { TrackerPrefs.save(localStorage, prefs, isPreviewMode()); } catch (e) {}
+}
+
 // ── State ────────────────────────────────────────────
 const state = {
   currentTracker: null,
@@ -1498,7 +1558,7 @@ const state = {
   hubActive:     false        // 我的關注 (watch hub) mode
 };
 try {
-  const g = localStorage.getItem('tracker_lib_group');
+  const g = prefGet('tracker_lib_group');
   if (g === 'cluster' || g === 'date' || g === 'source') state.libGroup = g;
 } catch (e) {}
 
@@ -1574,7 +1634,7 @@ function isPreviewMode() {
 }
 function saveView() {
   if (isPreviewMode()) return;
-  try { localStorage.setItem('tracker_view', serializeView(viewPrefs)); } catch (e) {}
+  try { prefSet('tracker_view', serializeView(viewPrefs)); } catch (e) {}
 }
 function applyViewAttrs() {
   const r = resolvePreset(viewPrefs);
@@ -1584,7 +1644,7 @@ function applyViewAttrs() {
 // Read-only: a bad stored value is NOT overwritten until the user changes preset.
 function initView() {
   let raw = null;
-  try { raw = localStorage.getItem('tracker_view'); } catch (e) {}
+  try { raw = prefGet('tracker_view'); } catch (e) {}
   viewPrefs = parseView(raw);
   applyViewAttrs();
 }
@@ -1760,12 +1820,12 @@ let watchPrefs = defaultWatch();
 let watchOnly = false;   // 只看關注: state only, not persisted
 function saveWatch() {
   if (isPreviewMode()) return;
-  try { localStorage.setItem('tracker_watch', serializeWatch(watchPrefs)); } catch (e) {}
+  try { prefSet('tracker_watch', serializeWatch(watchPrefs)); } catch (e) {}
 }
 // Read-only: a bad stored value is NOT overwritten until the reader changes something.
 function initWatch() {
   let raw = null;
-  try { raw = localStorage.getItem('tracker_watch'); } catch (e) {}
+  try { raw = prefGet('tracker_watch'); } catch (e) {}
   watchPrefs = parseWatch(raw);
   buildWatchPanel();
   updateWatchUI();
@@ -1996,15 +2056,15 @@ function setPalette(id) {
   applyPalette(id);
   if (!isPreviewMode()) {
     try {
-      if (palettePref) localStorage.setItem('tracker_palette', palettePref);
-      else localStorage.removeItem('tracker_palette');
+      if (palettePref) prefSet('tracker_palette', palettePref);
+      else prefSet('tracker_palette', null);
     } catch (e) {}
   }
   syncHash();
 }
 function initPalette() {
   let raw = null;
-  try { raw = localStorage.getItem('tracker_palette'); } catch (e) {}
+  try { raw = prefGet('tracker_palette'); } catch (e) {}
   applyPalette(parsePalette(raw));
 }
 function paletteName(p) { return state.lang === 'en' ? p.nameEn : p.name; }
@@ -2209,7 +2269,7 @@ function artSummary(a) { return (state.lang === 'en' && a.summary_en) ? a.summar
 function artTags(a)    { return (state.lang === 'en' && a.tags_en && a.tags_en.length) ? a.tags_en : (a.tags || []); }
 
 function applyLang() {
-  try { localStorage.setItem('tracker_lang', state.lang); } catch (e) {}
+  try { prefSet('tracker_lang', state.lang); } catch (e) {}
   document.documentElement.lang = state.lang === 'en' ? 'en' : 'zh-TW';
   // Localize icon-only buttons' accessible names (aria-label only — lang-btn's
   // bilingual title stays as-is; sidebar-toggle's label is set below).
@@ -2636,12 +2696,12 @@ let hubPick = null;                 // 儀表: the tile whose drill-down is show
 // Read-only: a bad stored value is NOT overwritten until the reader changes something.
 function initHubPrefs() {
   let raw = null;
-  try { raw = localStorage.getItem('tracker_watch_hub'); } catch (e) {}
+  try { raw = prefGet('tracker_watch_hub'); } catch (e) {}
   hubPrefs = parseHubPrefs(raw);
 }
 function saveHubPrefs() {
   if (isPreviewMode()) return;
-  try { localStorage.setItem('tracker_watch_hub', JSON.stringify(hubPrefs)); } catch (e) {}
+  try { prefSet('tracker_watch_hub', JSON.stringify(hubPrefs)); } catch (e) {}
 }
 function hubFlushSeen() {
   if (isPreviewMode() || !hubSnap) return;
@@ -2653,7 +2713,7 @@ function hubFlushSeen() {
     const at = (hubSeen && hubSeen.at > hubSnap.at) ? hubSeen.at : hubSnap.at;
     const out = JSON.stringify({ v: 1, at: at, ids: ids });
     if (out === hubLastWritten) return;
-    localStorage.setItem('tracker_watch_seen', out);
+    prefSet('tracker_watch_seen', out);
     hubLastWritten = out;
   } catch (e) {}
 }
@@ -2737,7 +2797,7 @@ function selectHub() {
   hideDateList();
   if (!wasHub) {
     let raw = null;
-    try { raw = localStorage.getItem('tracker_watch_seen'); } catch (e) {}
+    try { raw = prefGet('tracker_watch_seen'); } catch (e) {}
     hubSeen = parseHubSeen(raw);
     hubSnap = null; hubLastWritten = ''; hubSeenDue = false;
     hubPlat = new Set(); hubSecTag = {}; hubOpen = new Set(); hubPick = null;
@@ -3209,7 +3269,7 @@ function openNav(persist) {
   sidebar.classList.add('nav-open');
   if (ham) ham.setAttribute('aria-expanded', 'true');
   if (isCompact()) { if (scrim) scrim.classList.add('open'); main.inert = true; }
-  if (persist) { try { localStorage.setItem('tracker_nav', 'open'); } catch (e) {} }
+  if (persist) { try { prefSet('tracker_nav', 'open'); } catch (e) {} }
   const first = navFocusables()[0];
   if (first) first.focus();
 }
@@ -3223,7 +3283,7 @@ function closeNav(persist) {
   if (scrim) scrim.classList.remove('open');
   if (ham) ham.setAttribute('aria-expanded', 'false');
   main.inert = false;
-  if (persist) { try { localStorage.setItem('tracker_nav', 'collapsed'); } catch (e) {} }
+  if (persist) { try { prefSet('tracker_nav', 'collapsed'); } catch (e) {} }
   if (wasOpen) {
     if (navReturnFocus && document.body.contains(navReturnFocus) && navReturnFocus.offsetParent !== null) navReturnFocus.focus();
     else if (ham) ham.focus();
@@ -3239,11 +3299,11 @@ function toggleNav() {
 function init() {
   // Load persisted preferences (lang, theme, skin)
   try {
-    const saved_lang = localStorage.getItem('tracker_lang');
+    const saved_lang = prefGet('tracker_lang');
     if (saved_lang === 'en' || saved_lang === 'zh') state.lang = saved_lang;
   } catch (e) {}
   try {
-    const saved_theme = localStorage.getItem('tracker_theme');
+    const saved_theme = prefGet('tracker_theme');
     if (saved_theme === 'light' || saved_theme === 'dark') {
       document.documentElement.dataset.theme = saved_theme;
     } else if (matchMedia('(prefers-color-scheme: dark)').matches) {
@@ -3261,7 +3321,7 @@ function init() {
     }
   } catch (e) {}
   try {
-    const saved_skin = localStorage.getItem('tracker_skin');
+    const saved_skin = prefGet('tracker_skin');
     if (saved_skin === 'classic' || saved_skin === 'md3') {
       document.documentElement.dataset.skin = saved_skin;
     }
@@ -3269,7 +3329,7 @@ function init() {
   // Floating nav: default open on desktop, collapsed on compact; persisted.
   // Set the class directly (no openNav — avoid stealing focus on boot).
   try {
-    const navPref = localStorage.getItem('tracker_nav');
+    const navPref = prefGet('tracker_nav');
     const startOpen = navPref !== 'collapsed' && !isCompact();
     const sb = document.getElementById('sidebar');
     const ham = document.getElementById('drawer-toggle');
@@ -3548,7 +3608,7 @@ function buildLibSortPills() {
       btn.setAttribute('aria-pressed', String(on));
       btn.onclick = () => {
         state.libGroup = key;
-        try { localStorage.setItem('tracker_lib_group', key); } catch (e) {}
+        try { prefSet('tracker_lib_group', key); } catch (e) {}
         buildLibSortPills();
         renderLibrary();
       };
@@ -3861,6 +3921,7 @@ function setFilter(cat) {
 // ── Render ────────────────────────────────────────────
 function renderArticles(dateList) {
   if (state.hubActive) return;   // a late tracker load must not draw over the 我的關注 hub
+  if (pendingOpenId !== null) setTimeout(openPendingArticle, 0);   // `a=` permalink: open once this render has finished
   if (dateList !== undefined) state.pendingDates = dateList;
   const dates = state.pendingDates;
 
@@ -4096,6 +4157,8 @@ function overlayTabTrap(e) {
   if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
   else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
 }
+// Article id (String(id) or _key) shown in the overlay, or null; syncHash mirrors it as `a=`.
+var overlayArticleId = null;
 function openOverlay(a, triggerEl) {
   overlayReturnFocus = triggerEl || document.activeElement;
   const box = document.getElementById('overlay-box');
@@ -4124,6 +4187,8 @@ function openOverlay(a, triggerEl) {
   document.addEventListener('keydown', overlayTabTrap);
   const closeBtn = document.getElementById('overlay-close');
   if (closeBtn) closeBtn.focus();
+  overlayArticleId = (a.id !== undefined && a.id !== null) ? String(a.id) : (a._key !== undefined && a._key !== null ? String(a._key) : null);
+  if (overlayArticleId !== null) syncHash();
 }
 function closeOverlay() {
   const overlay = document.getElementById('overlay');
@@ -4134,6 +4199,7 @@ function closeOverlay() {
     overlayReturnFocus.focus();
   }
   overlayReturnFocus = null;
+  if (overlayArticleId !== null) { overlayArticleId = null; syncHash(); }
 }
 
 // ── Load helpers ──────────────────────────────────────
@@ -4247,13 +4313,13 @@ function toggleTheme() {
     lightIcon.style.display = isDark ? 'none' : 'inline-block';
     darkIcon.style.display = isDark ? 'inline-block' : 'none';
   }
-  try { localStorage.setItem('tracker_theme', isDark ? 'light' : 'dark'); } catch (e) {}
+  try { prefSet('tracker_theme', isDark ? 'light' : 'dark'); } catch (e) {}
 }
 
 function toggleSkin() {
   const isMd3 = document.documentElement.dataset.skin !== 'classic';
   document.documentElement.dataset.skin = isMd3 ? 'classic' : 'md3';
-  try { localStorage.setItem('tracker_skin', isMd3 ? 'classic' : 'md3'); } catch (e) {}
+  try { prefSet('tracker_skin', isMd3 ? 'classic' : 'md3'); } catch (e) {}
   syncHash();   // skin is part of the shareable view
 }
 
@@ -4276,6 +4342,7 @@ function syncHash() {
     if (skinOf()) hp.push('s=' + skinOf());
     if (palettePref) hp.push('pal=' + palettePref);
     hp.push('p=' + encodeURIComponent(viewPrefs.preset));
+    if (overlayArticleId !== null) hp.push('a=' + encodeURIComponent(overlayArticleId));
     const hh = '#' + hp.join('&');
     if (hh !== location.hash) {
       try { history.replaceState(null, '', hh); }
@@ -4290,6 +4357,7 @@ function syncHash() {
     if (skinOf()) lp.push('s=' + skinOf());
     if (palettePref) lp.push('pal=' + palettePref);
     lp.push('p=' + encodeURIComponent(viewPrefs.preset));
+    if (overlayArticleId !== null) lp.push('a=' + encodeURIComponent(overlayArticleId));
     const lh = '#' + lp.join('&');
     if (lh !== location.hash) {
       try { history.replaceState(null, '', lh); }
@@ -4309,6 +4377,7 @@ function syncHash() {
   if (skin) p.push('s=' + skin);
   if (palettePref) p.push('pal=' + palettePref);
   p.push('p=' + encodeURIComponent(viewPrefs.preset));
+  if (overlayArticleId !== null) p.push('a=' + encodeURIComponent(overlayArticleId));
   const hash = '#' + p.join('&');
   if (hash === location.hash) return;
   try { history.replaceState(null, '', hash); }
@@ -4327,9 +4396,26 @@ function parseHash() {
   return o;
 }
 
+// Article permalink (`a=`): id waiting to be opened, and the opener (no-op unless an id is pending).
+var pendingOpenId = null;
+function openPendingArticle() {
+  if (pendingOpenId === null) return;
+  const sid = pendingOpenId;
+  const days = window.TRACKER_DAYS || {};
+  let list = TrackerStore.collect(days, { dates: Object.keys(days) });
+  if (state.currentTracker && !state.libActive && !state.hubActive) {
+    list = list.filter(x => itemBelongsToTracker(x, state.currentTracker));
+  }
+  const art = list.find(x => x && (x._key === sid || String(x.id) === sid));
+  if (!art) return;
+  pendingOpenId = null;
+  openOverlay(art, null);
+}
+
 // Restore the view named by the hash. Returns true if it handled the load.
 function applyHashRestore() {
   const h = parseHash();
+  pendingOpenId = (h && h.a) ? h.a : null;   // article permalink: opened once the view has rendered
   // View preset from the hash wins over localStorage; it is applied without
   // being persisted (the hash is a link, not a user choice).
   const presetChanged = !!(h && h.p && isPreset(h.p)) && applyHashPreset(h.p);
@@ -4340,6 +4426,7 @@ function applyHashRestore() {
     state.libCluster = h.c || null;
     if (h.g === 'cluster' || h.g === 'date' || h.g === 'source') state.libGroup = h.g;
     selectLibrary();
+    openPendingArticle();
     return true;
   }
   if (h && h.hub) {            // 我的關注 deep-link (hv / hw override the stored choice, not persisted)
@@ -4347,6 +4434,7 @@ function applyHashRestore() {
     if (h.hv === 'sections' || h.hv === 'tiles') hubPrefs = { ...hubPrefs, hv: h.hv };
     if (HUB_WINDOWS.includes(+h.hw)) hubPrefs = { ...hubPrefs, hw: +h.hw };
     selectHub();
+    openPendingArticle();
     return true;
   }
   if (!h || !h.t) {
