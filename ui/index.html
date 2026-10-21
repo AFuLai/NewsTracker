@@ -1407,6 +1407,113 @@ html[data-palette] .wh-dash {
     scroll-behavior: auto !important;
   }
 }
+/* ── News workspace (html[data-mode="ws"]) ───────────────────────────────
+   The home view: time chip + collapsible time panel, left type rail, source filter. Every
+   element is hidden outside ws mode; colours come from the theme tokens only (the type chips
+   reuse the --cat-* / --cra-* / --os-* pairs, so light, dark and the palettes all apply). */
+#ws-rail, #ws-time-chip, #ws-time-panel, #ws-src { display: none; }
+html[data-mode="ws"] #sidebar,
+html[data-mode="ws"] #sidebar-scrim,
+html[data-mode="ws"] #drawer-toggle,
+html[data-mode="ws"] .hd-row2 { display: none !important; }
+html[data-mode="ws"] #ws-time-chip { display: inline-flex; align-items: center; font-weight: 600; max-width: 100%; }
+html[data-mode="ws"] #ws-src { display: inline-block; }
+html[data-mode="ws"] #ws-rail { display: flex; }
+html[data-mode="ws"] #ws-time-panel:not([hidden]) { display: block; }
+#ws-time-chip[aria-expanded="true"] { background: var(--primary-container); color: var(--on-primary-container); border-color: transparent; }
+#ws-src {
+  background: var(--surface-container); color: var(--on-surface);
+  border: 1px solid var(--outline); border-radius: var(--shape-full);
+  padding: 0.3rem 0.7rem; font: inherit; font-size: 13px; min-width: 0; max-width: 100%;
+}
+.ws-ty-all   { --ws-fill: var(--surface-container-highest); --ws-on: var(--on-surface); }
+.ws-ty-vuln  { --ws-fill: var(--cat-vuln-fill);     --ws-on: var(--cat-vuln-on); }
+.ws-ty-incident { --ws-fill: var(--cat-incident-fill); --ws-on: var(--cat-incident-on); }
+.ws-ty-regulation { --ws-fill: var(--cat-law-fill);  --ws-on: var(--cat-law-on); }
+.ws-ty-supply { --ws-fill: var(--cat-supply-fill);  --ws-on: var(--cat-supply-on); }
+.ws-ty-focus { --ws-fill: var(--os-focus-fill);     --ws-on: var(--os-focus-on); }
+.ws-ty-industry { --ws-fill: var(--cra-industry-fill); --ws-on: var(--cra-industry-on); }
+.ws-ty-emerging { --ws-fill: var(--cat-tech-fill);  --ws-on: var(--cat-tech-on); }
+.ws-ty-events { --ws-fill: var(--cra-event-fill);   --ws-on: var(--cra-event-on); }
+.ws-ty-other { --ws-fill: var(--os-apple-fill);     --ws-on: var(--os-apple-on); }
+/* time panel */
+#ws-time-panel {
+  background: var(--surface-container-low); border-bottom: 1px solid var(--outline-variant);
+  padding: 0.6rem 1.25rem; max-height: 50vh; overflow-y: auto; overflow-x: hidden;
+  min-width: 0; max-width: 100%; box-sizing: border-box; flex-shrink: 0;
+}
+.ws-tp-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem; margin-bottom: 0.5rem; min-width: 0; }
+.ws-tp-label { font-size: 12px; color: var(--on-surface-variant); margin-right: 0.25rem; }
+.ws-tp-btn {
+  padding: 0.25rem 0.7rem; border-radius: var(--shape-full); border: 1px solid var(--outline);
+  background: transparent; color: var(--on-surface-variant); font: inherit; font-size: 13px; cursor: pointer;
+}
+.ws-tp-btn:hover { background: var(--surface-container-high); }
+.ws-tp-btn[aria-pressed="true"] { background: var(--primary); color: var(--on-primary); border-color: transparent; font-weight: 600; }
+#ws-time-panel input[type="date"] {
+  background: var(--surface-container); color: var(--on-surface); border: 1px solid var(--outline);
+  border-radius: var(--shape-s); padding: 0.2rem 0.4rem; font: inherit; font-size: 13px; min-width: 0; max-width: 100%;
+}
+html[data-theme="dark"] #ws-time-panel input[type="date"] { color-scheme: dark; }
+.ws-chart {
+  display: flex; align-items: flex-end; gap: 1px; height: 72px; width: 100%; overflow: hidden;
+  border-bottom: 1px solid var(--outline); box-sizing: border-box;
+}
+.ws-bar {
+  flex: 1 1 0; min-width: 0; padding: 0; border: none; border-radius: 2px 2px 0 0;
+  background: var(--primary); opacity: 0.55; cursor: pointer;
+}
+.ws-bar:hover { opacity: 0.85; }
+.ws-bar[aria-pressed="true"] { opacity: 1; outline: 2px solid var(--on-surface); outline-offset: 1px; }
+.ws-bar:disabled { background: var(--outline-variant); opacity: 1; cursor: default; }
+.ws-bar:focus-visible, .ws-tp-btn:focus-visible, .ws-item:focus-visible, .ws-strip-chip:focus-visible,
+#ws-rail-toggle:focus-visible, #ws-time-chip:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.ws-chart-axis { display: flex; justify-content: space-between; gap: 0.5rem; font-size: 11px; color: var(--on-surface-variant); }
+/* left rail */
+#ws-rail {
+  flex: 0 0 220px; width: 220px; flex-direction: column; gap: 0.3rem; padding: 0.5rem;
+  overflow-y: auto; overflow-x: hidden; min-width: 0; box-sizing: border-box;
+  background: var(--surface-container-low); border-right: 1px solid var(--outline-variant);
+}
+#ws-rail.collapsed { flex-basis: 48px; width: 48px; align-items: center; padding: 0.5rem 0.2rem; }
+#ws-rail.collapsed #ws-rail-body, #ws-rail:not(.collapsed) #ws-rail-strip { display: none; }
+#ws-rail-strip { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+#ws-rail-toggle {
+  align-self: stretch; background: none; border: 1px solid var(--outline-variant); color: var(--on-surface-variant);
+  border-radius: var(--shape-s); padding: 0.25rem 0.5rem; font: inherit; font-size: 13px; cursor: pointer; text-align: left;
+}
+#ws-rail.collapsed #ws-rail-toggle { align-self: center; text-align: center; padding: 0.25rem 0.4rem; }
+#ws-rail-toggle:hover { background: var(--surface-container-high); }
+.ws-sec-h { font-size: 12px; font-weight: 600; color: var(--on-surface-variant); padding: 0.5rem 0.4rem 0.15rem; }
+.ws-item {
+  display: flex; align-items: center; gap: 0.5rem; width: 100%; min-width: 0; text-align: left;
+  background: none; border: none; color: var(--on-surface); font: inherit; font-size: 13px;
+  padding: 0.35rem 0.5rem; border-radius: var(--shape-s); cursor: pointer;
+}
+.ws-item:hover { background: var(--surface-container-high); }
+.ws-item[aria-pressed="true"] { background: var(--primary-container); color: var(--on-primary-container); font-weight: 600; }
+.ws-dot { flex: none; width: 10px; height: 10px; border-radius: 50%; background: var(--ws-fill); border: 1px solid var(--ws-on); }
+.ws-name { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
+.ws-n { flex: none; font-variant-numeric: tabular-nums; color: var(--on-surface-variant); }
+.ws-item[aria-pressed="true"] .ws-n { color: inherit; }
+.ws-strip-chip {
+  width: 32px; height: 32px; padding: 0; border-radius: var(--shape-s); cursor: pointer;
+  border: 2px solid transparent; background: var(--ws-fill); box-shadow: inset 0 0 0 1px var(--ws-on);
+}
+.ws-strip-chip[aria-pressed="true"] { border-color: var(--on-surface); }
+@media (max-width: 767px) {
+  /* expanded rail floats over the list instead of squeezing it: no horizontal scroll at 375px */
+  #ws-rail:not(.collapsed) {
+    position: absolute; top: 0; bottom: 0; left: 0; z-index: 55; flex-basis: auto; width: min(260px, 80vw);
+    background: var(--surface-container); box-shadow: var(--elev-3, 0 8px 24px rgba(0,0,0,.4));
+  }
+  #ws-time-panel { padding: 0.5rem 0.75rem; }
+}
+/* list */
+.ws-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.5rem; padding: 0.4rem 0; font-size: 16px; font-weight: 600; }
+.ws-head .ws-sub { font-weight: 400; color: var(--on-surface-variant); }
+html[data-mode="ws"] .card { min-width: 0; }
+html[data-mode="ws"] .card-title { overflow-wrap: anywhere; }
 </style>
 </head>
 <body>
@@ -1417,6 +1524,7 @@ html[data-palette] .wh-dash {
     <span class="hd-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12 2L3 6v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V6l-9-4z"/></svg></span>
     <div id="tracker-pills"></div>
     <span id="tracker-title">資安新聞追蹤</span>
+    <button id="ws-time-chip" class="pill" type="button" aria-expanded="false" aria-controls="ws-time-panel"></button>
     <div class="hd-spacer"></div>
     <div class="hd-stats" aria-live="polite" aria-atomic="true">
       <span class="hd-meta"><span id="lbl-showing">顯示</span> <strong id="article-count">0</strong> <span id="lbl-articles">篇</span>
@@ -1433,8 +1541,14 @@ html[data-palette] .wh-dash {
     <div id="cat-pills"></div>
   </div>
 </header>
+<div id="ws-time-panel" hidden role="region"></div>
 
 <div class="app-body">
+  <nav id="ws-rail">
+    <button id="ws-rail-toggle" type="button" aria-expanded="true"></button>
+    <div id="ws-rail-body"></div>
+    <div id="ws-rail-strip"></div>
+  </nav>
   <aside id="sidebar">
     <button id="sidebar-toggle" onclick="closeNav(true)" aria-label="收起側欄"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M15 18l-6-6 6-6"/></svg></button>
     <div class="sb-section">
@@ -1460,6 +1574,7 @@ html[data-palette] .wh-dash {
         <button class="scope-pill active" data-scope="body" aria-pressed="true">內文</button>
         <button class="scope-pill active" data-scope="tags" aria-pressed="true">標籤</button>
       </div>
+      <select id="ws-src"></select>
     </div>
     <div id="loading-msg">載入中…</div>
     <div id="no-data" class="hidden"></div>
@@ -1552,7 +1667,8 @@ const state = {
   libActive:     false,       // CRA reference-library mode
   libCluster:    null,        // active cluster filter in library mode
   libGroup:      "cluster",   // library grouping: "cluster" | "date" | "source"
-  hubActive:     false        // 我的關注 (watch hub) mode
+  hubActive:     false,       // 我的關注 (watch hub) mode
+  wsActive:      false        // news workspace (home view) mode; false in hub / library / tracker views
 };
 try {
   const g = prefGet('tracker_lib_group');
@@ -1839,6 +1955,7 @@ function watchChanged() {
   saveWatch();
   updateWatchUI();
   if (state.hubActive) { renderWatchHub(); return; }
+  if (state.wsActive) { renderWorkspace(); return; }
   if (state.currentTracker && !state.libActive) renderArticles();
 }
 function buildWatchPanel() {
@@ -2214,6 +2331,11 @@ const I18N = {
         hubPlat:'平台標籤', hubAllMore:'全部 ›', hubLess:'收合 ‹', hubTotal:n=>'共 '+n+' 篇', hubWatchHits:'關注',
         hubLoading:n=>'載入近 '+n+' 天…', hubSearchCount:n=>'搜尋結果：'+n+' 篇（近期窗口內全部來源）', hubEmpty:'這段期間沒有符合的文章', hubDrill:'DRILL-DOWN', hubPick:'點選上方方塊，在此檢視該類型文章',
         hubLegendHit:'■ 關注命中', hubLegendBar:'▮ 14 日篇數', hubTagFilter:'依標籤篩選', hubCount:n=>n+' 篇',
+        wsTab:'新聞', craTab:'CRA 法規庫', wsTitle:'資安新聞追蹤', wsTime:'時間', wsToday:'今天', ws7d:'近 7 天', ws30d:'近 30 天',
+        ws90d:'近 90 天', wsYear:'今年', wsAll:'全部', wsQuick:'快速選擇', wsCustom:'自訂', wsFrom:'從', wsTo:'到', wsApply:'套用',
+        wsArchive:'歷年封存', wsYearName:y=>y+' 年', wsDays:n=>n+' 天', wsChart:'每日篇數', wsBar:(d,n)=>d+': '+n+' 篇',
+        wsAllSrc:'全部來源', wsSrc:'依來源瀏覽', wsTypes:'新聞類型', wsWatch:'★ 我的關注', wsPlat:'平台',
+        wsCollapse:'« 收合', wsExpand:'» 展開', wsLoading:r=>'載入「'+r+'」…',
         paletteBtn:'主題', paletteTitle:'主題', paletteDefault:'預設（跟隨系統主題）', paletteDefaultDark:'預設深色', paletteDefaultLight:'預設淺色', paletteApplied:'已套用配色主題',
        presets:{ default:'預設', quick:'快讀', analyst:'分析師', event:'事件追蹤', cra:'合規 CRA' },
       searchPlaceholder:'搜尋全站新聞…', searching:'搜尋中…',
@@ -2249,6 +2371,11 @@ const I18N = {
         hubPlat:'Platforms', hubAllMore:'All ›', hubLess:'Less ‹', hubTotal:n=>n+(n===1?' article':' articles'), hubWatchHits:'Watch',
         hubLoading:n=>'Loading the last '+n+' days…', hubSearchCount:n=>n+(n===1?' result':' results')+' across all sources in this window', hubEmpty:'No matching articles in this window', hubDrill:'DRILL-DOWN', hubPick:'Pick a tile above to list its articles here',
         hubLegendHit:'■ Watch hits', hubLegendBar:'▮ 14-day count', hubTagFilter:'Filter by tag', hubCount:n=>n+(n===1?' article':' articles'),
+        wsTab:'News', craTab:'CRA library', wsTitle:'Security News Tracker', wsTime:'Time', wsToday:'Today', ws7d:'Last 7 days', ws30d:'Last 30 days',
+        ws90d:'Last 90 days', wsYear:'This year', wsAll:'All', wsQuick:'Quick picks', wsCustom:'Custom', wsFrom:'From', wsTo:'To', wsApply:'Apply',
+        wsArchive:'Archive by year', wsYearName:y=>String(y), wsDays:n=>n+(n===1?' day':' days'), wsChart:'Articles per day', wsBar:(d,n)=>d+': '+n+(n===1?' article':' articles'),
+        wsAllSrc:'All sources', wsSrc:'Browse by source', wsTypes:'News types', wsWatch:'★ My watch', wsPlat:'Platforms',
+        wsCollapse:'« Collapse', wsExpand:'» Expand', wsLoading:r=>'Loading “'+r+'”…',
         paletteBtn:'Theme', paletteTitle:'Theme', paletteDefault:'Default (follow system theme)', paletteDefaultDark:'Default dark', paletteDefaultLight:'Default light', paletteApplied:'Colour theme applied',
        presets:{ default:'Default', quick:'Quick read', analyst:'Analyst', event:'Event tracking', cra:'Compliance CRA' },
       searchPlaceholder:'Search all news…', searching:'Searching…',
@@ -2309,6 +2436,13 @@ function applyLang() {
   updateViewUI();
   updateWatchUI();
   updatePaletteUI();
+  if (state.wsActive) {
+    buildTrackerPills(Object.keys(getTrackers()));   // re-labels the two tabs
+    document.getElementById('tracker-title').textContent = t('wsTitle');
+    setActivePill('#tracker-pills', '[data-tracker="__ws"]');
+    renderWorkspace();
+    return;
+  }
   if (state.hubActive) {
     buildTrackerPills(Object.keys(getTrackers()));   // re-labels the hub pill
     document.getElementById('tracker-title').textContent = t('hubTitle');
@@ -2394,6 +2528,7 @@ function toggleScope(name, btn) {
   btn.classList.toggle('active', sc[name]);
   btn.setAttribute('aria-pressed', sc[name] ? 'true' : 'false');
   if (state.searchQuery && state.search) refreshSearchView();
+  else if (state.wsActive && state.searchQuery) renderWorkspace();
 }
 
 // Promise wrappers around the cb-style loaders so we can await the full set.
@@ -2533,7 +2668,32 @@ const TrackerStore = (() => {
              nextArticle: index < items.length - 1 ? items[index + 1] : null,
              nextInType, sameCveArticles: same };
   }
-  return { keyOf, newestDate, shiftDate, collect, sortNewest, extractCves, getReaderContext };
+  // Time-range key -> {from, to} (both 'YYYY-MM-DD', inclusive). Keys: 'today', '7d' / '30d' / '90d',
+  // 'year' (newest's year so far), 'all', 'y<YYYY>', 'd<YYYY-MM-DD>', 'c<from>_<to>' (swapped if
+  // reversed); anything else behaves as '30d'. `newest` is the newest date present; a malformed one
+  // falls back to 1970-01-01 so the arithmetic never throws. Pure: no clock.
+  function rangeOf(key, newest) {
+    const nw = /^\d{4}-\d{2}-\d{2}$/.test(String(newest)) ? String(newest) : '1970-01-01';
+    const k = (key === undefined || key === null) ? '' : String(key);
+    let m;
+    if (k === 'today') return { from: nw, to: nw };
+    if (k === 'year') return { from: nw.slice(0, 4) + '-01-01', to: nw };
+    if (k === 'all') return { from: '0000-01-01', to: '9999-12-31' };
+    if ((m = /^y(\d{4})$/.exec(k))) return { from: m[1] + '-01-01', to: m[1] + '-12-31' };
+    if ((m = /^d(\d{4}-\d{2}-\d{2})$/.exec(k))) return { from: m[1], to: m[1] };
+    if ((m = /^c(\d{4}-\d{2}-\d{2})_(\d{4}-\d{2}-\d{2})$/.exec(k))) {
+      return m[1] <= m[2] ? { from: m[1], to: m[2] } : { from: m[2], to: m[1] };
+    }
+    const n = (m = /^(7|30|90)d$/.exec(k)) ? +m[1] : 30;
+    return { from: shiftDate(nw, -(n - 1)), to: nw };
+  }
+  // list of collected items -> plain object {date: count} over item._date.
+  function dateCounts(list) {
+    const out = {};
+    (list || []).forEach(a => { if (a && a._date) out[a._date] = (out[a._date] || 0) + 1; });
+    return out;
+  }
+  return { keyOf, newestDate, shiftDate, collect, sortNewest, extractCves, getReaderContext, rangeOf, dateCounts };
 })();
 /* TRACKER-STORE:END */
 window.TrackerStore = TrackerStore;
@@ -2786,6 +2946,7 @@ function hubBrief(list, today) {
 }
 
 function selectHub() {
+  leaveWorkspace();   // coming from the news workspace (no-op otherwise)
   const wasHub = state.hubActive;
   state.hubActive = true;
   state.libActive = false;
@@ -3141,6 +3302,7 @@ async function runSearch() {
   if (!q) { clearSearch(); return; }
   state.searchQuery = q;
   if (state.hubActive) { renderWatchHub(); return; }   // hub: search the loaded window of all trackers
+  if (state.wsActive) { renderWorkspace(); return; }   // workspace: filter the current range
   showMsg(t('searching'));
   await ensureAllLoaded();
   if (state.searchQuery !== q) return;   // superseded by a newer keystroke
@@ -3167,6 +3329,7 @@ function clearSearch() {
   if (box) box.value = '';
   document.getElementById('search-clear').style.display = 'none';
   if (state.hubActive) { renderWatchHub(); return; }
+  if (state.wsActive) { renderWorkspace(); return; }
   const mf = currentManifest();
   if (!mf) return;
   buildYearPills(mf.years || []);
@@ -3358,7 +3521,7 @@ function init() {
   initView();   // localStorage tracker_view → viewPrefs; the hash (below) may override it
   initPalette();   // localStorage tracker_palette → data-palette; a hash pal= (below) may override it
   initHubPrefs();  // localStorage tracker_watch_hub → hubPrefs; a hash hv= / hw= (below) may override it
-  if (!applyHashRestore()) selectHub();   // deep-link wins; no / unknown hash → the 總覽 hub (replaces the old default tracker wall)
+  if (!applyHashRestore()) selectWorkspace();   // deep-link wins; no / unknown hash → the news workspace (the home view; it was the 總覽 hub, which replaced the old default tracker wall)
   applyLang();   // sync all static labels + lang button to the active language
 }
 
@@ -3367,6 +3530,7 @@ function selectTracker(name) {
   const all = getTrackers();
   if (!all || !all[name]) return;
   state.libActive = false;   // leaving the CRA library mode
+  leaveWorkspace();          // leaving the news workspace (no-op otherwise)
   leaveHub();                // leaving the 我的關注 hub (restores the search row)
   if (document.documentElement.dataset.mode === 'lib') delete document.documentElement.dataset.mode;
   const _srow = document.getElementById('search-row'); if (_srow) _srow.style.display = '';
@@ -3395,55 +3559,37 @@ function selectTracker(name) {
 function buildTrackerPills(names) {
   const el = document.getElementById('tracker-pills');
   el.innerHTML = '';
-  // 總覽 (hub) is the first pill: the site's main view, not a tracker.
-  const hb = document.createElement('button');
-  hb.className = 'pill' + (state.hubActive ? ' active' : '');
-  hb.dataset.tracker = '__hub';
-  hb.textContent = t('hubPill');
-  hb.title = t('hubTitle');
-  hb.setAttribute('aria-pressed', state.hubActive ? 'true' : 'false');
-  hb.onclick = selectHub;
-  el.appendChild(hb);
-  // 依來源瀏覽 menu: the manifest's trackers, each opens the old archive view (selectTracker).
-  const wrap = document.createElement('span');
-  wrap.className = 'src-wrap';
-  const sb = document.createElement('button');
-  sb.className = 'pill';
-  sb.id = 'src-btn';
-  sb.dataset.tracker = '__src';
-  sb.type = 'button';
-  sb.setAttribute('aria-haspopup', 'menu');
-  sb.setAttribute('aria-expanded', 'false');
-  sb.setAttribute('aria-controls', 'src-menu');
-  const menu = document.createElement('div');
-  menu.id = 'src-menu';
-  menu.setAttribute('role', 'menu');
-  menu.hidden = true;
-  names.forEach(n => {
-    const it = document.createElement('button');
-    it.type = 'button';
-    it.setAttribute('role', 'menuitem');
-    it.dataset.src = n;
-    it.textContent = trackerLabel(n);   // localized short label (資安 / Security)
-    it.title = (typeof TRACKER_TITLES !== 'undefined' && TRACKER_TITLES[n]) || n;
-    it.onclick = () => { closeSrcMenu(); selectTracker(n); };
-    menu.appendChild(it);
+  el.setAttribute('role', 'tablist');
+  // Two top-level tabs: 新聞 (the news workspace, home view; 依來源瀏覽 is now its source filter) and the
+  // CRA reference library (a special mode, not a real tracker). The 總覽 hub and the per-tracker
+  // archive views stay reachable by their old links (#hub=1, #t=...), not from the header.
+  // The library data (data/cra_library.js) loads on first click.
+  const tabs = [
+    ['__ws', t('wsTab'), t('wsTab'), selectWorkspace],
+    ['__cra', t('craTab'), 'CRA reference library', selectLibrary]
+  ];
+  tabs.forEach(([id, label, title, fn]) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'pill';
+    b.dataset.tracker = id;
+    b.setAttribute('role', 'tab');
+    b.textContent = label;
+    b.title = title;
+    b.onclick = () => fn();
+    el.appendChild(b);
   });
-  sb.onclick = (e) => { e.stopPropagation(); if (menu.hidden) openSrcMenu(); else closeSrcMenu(); };
-  wrap.appendChild(sb);
-  wrap.appendChild(menu);
-  el.appendChild(wrap);
-  // CRA reference-library pill (a special mode, not a real tracker). The data
-  // (data/cra_library.js) loads on first click.
-  const lb = document.createElement('button');
-  lb.className = 'pill' + (state.libActive ? ' active' : '');
-  lb.dataset.tracker = '__cra';
-  lb.textContent = '📚 ' + (state.lang === 'en' ? 'CRA Library' : 'CRA 庫');
-  lb.title = 'CRA reference library';
-  lb.setAttribute('aria-pressed', state.libActive ? 'true' : 'false');
-  lb.onclick = selectLibrary;
-  el.appendChild(lb);
-  syncSrcBtn();
+  syncTabs();
+}
+// Tabs show the current top-level view (aria-selected + .active).
+function syncTabs() {
+  const cur = { __ws: !!state.wsActive, __cra: !!state.libActive };
+  document.querySelectorAll('#tracker-pills [role="tab"]').forEach(b => {
+    const on = !!cur[b.dataset.tracker];
+    b.classList.toggle('active', on);
+    b.setAttribute('aria-selected', on ? 'true' : 'false');
+    b.removeAttribute('aria-pressed');
+  });
 }
 // The menu button shows the current tracker's name (and is active) while in a tracker view.
 function syncSrcBtn() {
@@ -3489,18 +3635,490 @@ document.addEventListener('keydown', (e) => {
 }, true);
 window.addEventListener('resize', () => closeSrcMenu());
 
+// ── News workspace (the home view) ────────────────────
+// ONE workspace over every tracker: a time range (chip in the header + collapsible #ws-time-panel),
+// a left rail of news types / watch rules / platforms with counts (#ws-rail), a source filter
+// (#ws-src; replaces the old 依來源瀏覽 menu) and the search box. Entered by the 新聞 tab
+// (selectWorkspace) and left through selectHub / selectLibrary / selectTracker (leaveWorkspace).
+// INVARIANT: while the workspace is active state.currentTracker is null (as in the hub), so
+// buildCard / watch badges show the raw category and tracker-less watch matches.
+// Hash: #ws=1 [&r=<range key, 30d omitted>] [&src=] [&ty=] [&w=] [&pl=] [&q=] [&a=<article id>].
+// Range keys are TrackerStore.rangeOf's: today 7d 30d 90d year all y<YYYY> d<date> c<from>_<to>.
+const WS_QUICK = { today: 1, '7d': 7, '30d': 30, '90d': 90 };   // ranges served by ensureHubLoaded(N)
+const WS_PICKS = [['today', 'wsToday'], ['7d', 'ws7d'], ['30d', 'ws30d'], ['90d', 'ws90d'], ['year', 'wsYear'], ['all', 'wsAll']];
+const ws = {
+  range: '30d',     // current range key
+  prev: null,       // range to return to when the selected chart day is clicked again
+  src: '', ty: '', w: '', pl: '',   // source tracker id / type id / watch rule id / platform ('' = no filter)
+  seq: 0,           // bumps on every render and on leave, so a late load never draws over another view
+  loads: new Map(), // range key -> { p: promise, done: bool }
+  allMonths: null,  // promise: every month manifest loaded (for the year archive day counts)
+  panelOpen: false, railCollapsed: false, railInit: false,
+  newest: '', focusKey: null
+};
+function wsIsDay(k) { return /^d\d{4}-\d{2}-\d{2}$/.test(String(k)); }
+function wsNormRange(k) {
+  k = String(k || '');
+  return (/^(today|7d|30d|90d|year|all)$/.test(k) || /^y\d{4}$/.test(k) || wsIsDay(k) ||
+          /^c\d{4}-\d{2}-\d{2}_\d{4}-\d{2}-\d{2}$/.test(k)) ? k : '30d';
+}
+function wsRangeLabel(key) {
+  const k = wsNormRange(key);
+  const pick = WS_PICKS.find(p => p[0] === k);
+  if (pick) return t(pick[1]);
+  if (k.charAt(0) === 'y') return t('wsYearName')(k.slice(1));
+  if (wsIsDay(k)) return k.slice(1);
+  const r = TrackerStore.rangeOf(k, '');
+  return r.from + ' – ' + r.to;
+}
+function wsEl(tag, cls, text) {
+  const e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (text !== undefined) e.textContent = text;
+  return e;
+}
+function wsTrackerNames() { return Object.keys(getTrackers() || {}).filter(k => k !== '__cra'); }
+
+// ── loading ──
+// Year manifests of every tracker; → { tks, monthsOf: {tracker: ['YYYY-MM', ...] sorted} }.
+async function wsLoadManifests() {
+  const all = getTrackers() || {};
+  const tks = wsTrackerNames();
+  const monthsOf = {};
+  for (const tk of tks) {
+    const ms = [];
+    for (const y of (all[tk].years || [])) {
+      await new Promise(r => loadYearManifest(y, r, tk));
+      const ym = getYearManifest(y, tk);
+      ((ym && ym.months) || []).forEach(m => ms.push(m));
+    }
+    monthsOf[tk] = ms.sort();
+  }
+  return { tks, monthsOf };
+}
+// Load the data a range needs. today / 7d / 30d / 90d: ensureHubLoaded(N). Any other range: the
+// year + month manifests and the day files of every tracker whose dates fall in the range.
+async function wsLoadRange(key) {
+  if (WS_QUICK[key]) { await ensureHubLoaded(WS_QUICK[key]); return; }
+  const { tks, monthsOf } = await wsLoadManifests();
+  let newest = '';
+  for (const tk of tks) {
+    const ms = monthsOf[tk];
+    if (!ms.length) continue;
+    await new Promise(r => loadMonthManifest(ms[ms.length - 1], r, tk));
+    for (const d of manifestDatesForMonth(ms[ms.length - 1], tk)) if (d.date > newest) newest = d.date;
+  }
+  if (!newest) return;
+  const rg = TrackerStore.rangeOf(key, newest);
+  const files = new Set();
+  for (const tk of tks) {
+    for (const m of monthsOf[tk]) {
+      if (m < rg.from.slice(0, 7) || m > rg.to.slice(0, 7)) continue;
+      await new Promise(r => loadMonthManifest(m, r, tk));
+      for (const d of manifestDatesForMonth(m, tk)) if (d.date >= rg.from && d.date <= rg.to) files.add(d.file);
+    }
+  }
+  await Promise.all([...files].map(f => new Promise(r => loadDayFile(f, r))));
+}
+function wsEnsure(key) {
+  let e = ws.loads.get(key);
+  if (e) return e.p;
+  e = { done: false };
+  e.p = Promise.resolve().then(() => wsLoadRange(key)).catch(() => {}).then(() => { e.done = true; });
+  ws.loads.set(key, e);
+  return e.p;
+}
+// Every month manifest (cheap) so the year archive can show day counts.
+function wsLoadAllMonths() {
+  if (!ws.allMonths) {
+    ws.allMonths = (async () => {
+      const { tks, monthsOf } = await wsLoadManifests();
+      for (const tk of tks) for (const m of monthsOf[tk]) await new Promise(r => loadMonthManifest(m, r, tk));
+    })().catch(() => {});
+  }
+  return ws.allMonths;
+}
+function wsYears() {
+  const all = getTrackers() || {};
+  const ys = new Set();
+  wsTrackerNames().forEach(tk => (all[tk].years || []).forEach(y => ys.add(String(y))));
+  return [...ys].sort().reverse();
+}
+// Distinct dates of a year known from the loaded month manifests of all trackers.
+function wsYearDays(y) {
+  const s = new Set();
+  wsTrackerNames().forEach(tk => {
+    const ym = getYearManifest(y, tk);
+    ((ym && ym.months) || []).forEach(m => manifestDatesForMonth(m, tk).forEach(d => s.add(d.date)));
+  });
+  return s.size;
+}
+
+// ── filters ──
+// range is applied by the caller; here: source + search (the base every count is taken over) ...
+function wsBase(list) {
+  const q = state.searchQuery;
+  return list.filter(a => (!ws.src || itemBelongsToTracker(a, ws.src)) && (!q || matchesQuery(a, q)));
+}
+// ... and type / watch rule / platform on top.
+function wsFacet(items) {
+  return items.filter(a => (!ws.ty || hubTypeId(a) === ws.ty) &&
+    (!ws.w || watchRuleIds(a, watchPrefs).includes(ws.w)) && (!ws.pl || a.category === ws.pl));
+}
+function wsActiveRules() {
+  const on = Array.isArray(watchPrefs.on) ? watchPrefs.on : [];
+  const ids = WATCH_RULES.filter(r => on.includes(r.id)).map(r => r.id);
+  (Array.isArray(watchPrefs.kw) ? watchPrefs.kw : []).forEach(k => { if (typeof k === 'string' && k) ids.push('kw:' + k); });
+  if (ws.w && !ids.includes(ws.w)) ids.push(ws.w);   // a linked rule stays visible (and pressed) even if switched off
+  return ids;
+}
+function wsSet(patch, focusKey) {
+  Object.assign(ws, patch);
+  ws.focusKey = focusKey || null;
+  renderWorkspace();
+}
+function wsToggle(field, val, focusKey) {
+  wsSet({ [field]: ws[field] === val ? '' : val }, focusKey);
+}
+function wsSetRange(key, focusKey) { wsSet({ range: wsNormRange(key), prev: null }, focusKey); }
+// Chart click: a day narrows the list to that day; the same day again returns to the previous range.
+function wsPickDay(d) {
+  if (ws.range === 'd' + d) wsSet({ range: ws.prev || '30d', prev: null }, 'd:' + d);
+  else wsSet({ prev: wsIsDay(ws.range) ? ws.prev : ws.range, range: 'd' + d }, 'd:' + d);
+}
+function wsRefocus() {
+  const key = ws.focusKey; ws.focusKey = null;
+  if (!key) return;
+  const el = [...document.querySelectorAll('[data-ws]')].find(x => x.dataset.ws === key && x.offsetParent !== null && !x.disabled);
+  if (el) el.focus();
+}
+
+// ── chrome (chip, panel visibility, rail toggle, source select) ──
+function wsSyncChrome() {
+  const chip = document.getElementById('ws-time-chip');
+  if (chip) {
+    chip.textContent = (ws.panelOpen ? '▴ ' : '▾ ') + t('wsTime') + (state.lang === 'en' ? ': ' : '：') + wsRangeLabel(ws.range);
+    chip.setAttribute('aria-expanded', ws.panelOpen ? 'true' : 'false');
+  }
+  const panel = document.getElementById('ws-time-panel');
+  if (panel) { panel.hidden = !ws.panelOpen; panel.setAttribute('aria-label', t('wsTime')); }
+  const rail = document.getElementById('ws-rail');
+  if (rail) {
+    rail.classList.toggle('collapsed', ws.railCollapsed);
+    rail.setAttribute('aria-label', t('wsTypes'));
+  }
+  const tg = document.getElementById('ws-rail-toggle');
+  if (tg) {
+    const lbl = ws.railCollapsed ? t('wsExpand') : t('wsCollapse');
+    tg.textContent = ws.railCollapsed ? '»' : lbl;
+    tg.title = lbl;
+    tg.setAttribute('aria-label', lbl);
+    tg.setAttribute('aria-expanded', ws.railCollapsed ? 'false' : 'true');
+  }
+  const sel = document.getElementById('ws-src');
+  if (sel) {
+    const names = wsTrackerNames();
+    const sig = state.lang + '|' + names.join(',');
+    if (sel.dataset.sig !== sig) {
+      sel.dataset.sig = sig;
+      sel.innerHTML = '';
+      [['', t('wsAllSrc')]].concat(names.map(n => [n, trackerLabel(n)])).forEach(([v, l]) => {
+        const o = document.createElement('option');
+        o.value = v; o.textContent = l;
+        sel.appendChild(o);
+      });
+      sel.setAttribute('aria-label', t('wsSrc'));
+      sel.title = t('wsSrc');
+    }
+    if (ws.src && !names.includes(ws.src)) ws.src = '';
+    sel.value = ws.src;
+  }
+}
+function wsToggleTimePanel(force) {
+  ws.panelOpen = force === undefined ? !ws.panelOpen : !!force;
+  wsSyncChrome();
+  if (!ws.panelOpen) return;
+  wsBuildPanel(ws.newest);
+  wsLoadAllMonths().then(() => { if (state.wsActive && ws.panelOpen) wsBuildPanel(ws.newest); });
+}
+function wsToggleRail() {
+  ws.railCollapsed = !ws.railCollapsed;
+  try { prefSet('tracker_nav', ws.railCollapsed ? 'collapsed' : 'open'); } catch (e) {}
+  wsSyncChrome();
+}
+
+// ── time panel: quick picks, custom range, year archive, per-day chart ──
+function wsBuildPanel(newest) {
+  const panel = document.getElementById('ws-time-panel');
+  if (!panel) return;
+  const oldF = panel.querySelector('#ws-from'), oldT = panel.querySelector('#ws-to');
+  const keepF = oldF && oldF.dataset.dirty ? oldF.value : null;
+  const keepT = oldT && oldT.dataset.dirty ? oldT.value : null;
+  panel.innerHTML = '';
+  const row = (label) => {
+    const r = wsEl('div', 'ws-tp-row');
+    if (label) r.appendChild(wsEl('span', 'ws-tp-label', label));
+    panel.appendChild(r);
+    return r;
+  };
+  const btn = (text, pressed, key, fn) => {
+    const b = wsEl('button', 'ws-tp-btn', text);
+    b.type = 'button';
+    b.setAttribute('aria-pressed', pressed ? 'true' : 'false');
+    b.dataset.ws = key;
+    b.onclick = fn;
+    return b;
+  };
+  // quick picks
+  const q = row(t('wsQuick'));
+  WS_PICKS.forEach(([k, lk]) => q.appendChild(btn(t(lk), ws.range === k, 'r:' + k, () => wsSetRange(k, 'r:' + k))));
+  // custom from / to
+  const c = row(t('wsCustom'));
+  const cur = ws.range === 'all' ? { from: '', to: '' } : TrackerStore.rangeOf(ws.range, newest);
+  const mk = (id, label, val, keep) => {
+    const lb = wsEl('label', 'ws-tp-label', label + ' ');
+    const inp = wsEl('input');
+    inp.type = 'date'; inp.id = id;
+    inp.setAttribute('aria-label', label);
+    inp.value = keep !== null ? keep : val;
+    if (keep !== null) inp.dataset.dirty = '1';
+    inp.addEventListener('input', () => { inp.dataset.dirty = '1'; });
+    lb.appendChild(inp);
+    c.appendChild(lb);
+    return inp;
+  };
+  const fi = mk('ws-from', t('wsFrom'), cur.from, keepF);
+  const ti = mk('ws-to', t('wsTo'), cur.to, keepT);
+  const ap = btn(t('wsApply'), false, 'apply', () => {
+    const iso = /^\d{4}-\d{2}-\d{2}$/;
+    if (!iso.test(fi.value) || !iso.test(ti.value)) return;
+    const a = fi.value <= ti.value ? fi.value : ti.value, b = fi.value <= ti.value ? ti.value : fi.value;
+    wsSetRange('c' + a + '_' + b, 'apply');
+  });
+  ap.removeAttribute('aria-pressed');
+  c.appendChild(ap);
+  // year archive
+  const ys = wsYears();
+  if (ys.length) {
+    const yr = row(t('wsArchive'));
+    ys.forEach(y => {
+      const n = wsYearDays(y);
+      yr.appendChild(btn(t('wsYearName')(y) + ' · ' + t('wsDays')(n), ws.range === 'y' + y, 'y:' + y, () => wsSetRange('y' + y, 'y:' + y)));
+    });
+  }
+  // per-day chart over the selected range (the last 90 days of it at most); while one day is selected
+  // the chart keeps showing the range it was picked from, so the day can be un-picked
+  const chartKey = (wsIsDay(ws.range) && ws.prev) ? ws.prev : ws.range;
+  const cr = TrackerStore.rangeOf(chartKey, newest);
+  const end = (newest && cr.to > newest) ? newest : cr.to;
+  const start = cr.from > TrackerStore.shiftDate(end, -89) ? cr.from : TrackerStore.shiftDate(end, -89);
+  row(t('wsChart'));
+  if (!newest || start > end) return;
+  const counts = TrackerStore.dateCounts(wsFacet(wsBase(
+    TrackerStore.collect(window.TRACKER_DAYS || {}, { fromDate: start, toDate: end }))));
+  let max = 1;
+  Object.keys(counts).forEach(d => { if (counts[d] > max) max = counts[d]; });
+  const chart = wsEl('div', 'ws-chart');
+  chart.setAttribute('role', 'group');
+  chart.setAttribute('aria-label', t('wsChart'));
+  for (let d = start; d <= end; d = TrackerStore.shiftDate(d, 1)) {
+    const n = counts[d] || 0;
+    const sel = ws.range === 'd' + d;
+    const b = wsEl('button', 'ws-bar');
+    b.type = 'button';
+    b.dataset.date = d;
+    b.dataset.ws = 'd:' + d;
+    b.setAttribute('aria-label', t('wsBar')(d, n));
+    b.title = t('wsBar')(d, n);
+    b.setAttribute('aria-pressed', sel ? 'true' : 'false');
+    b.style.height = n ? Math.max(4, Math.round(n / max * 100)) + '%' : '2px';
+    if (!n && !sel) b.disabled = true;
+    b.onclick = () => wsPickDay(d);
+    chart.appendChild(b);
+  }
+  panel.appendChild(chart);
+  const ax = wsEl('div', 'ws-chart-axis');
+  ax.appendChild(wsEl('span', '', start));
+  ax.appendChild(wsEl('span', '', 'max ' + max));
+  ax.appendChild(wsEl('span', '', end));
+  panel.appendChild(ax);
+}
+
+// ── left rail: news types / watch rules / platforms, with counts over range + source + search ──
+function wsBuildRail(base) {
+  const body = document.getElementById('ws-rail-body'), strip = document.getElementById('ws-rail-strip');
+  if (!body || !strip) return;
+  body.innerHTML = ''; strip.innerHTML = '';
+  const tc = {}, rc = {}, pc = {};
+  base.forEach(a => {
+    const ty = hubTypeId(a);
+    tc[ty] = (tc[ty] || 0) + 1;
+    watchRuleIds(a, watchPrefs).forEach(id => { rc[id] = (rc[id] || 0) + 1; });
+    if (HUB_PLATFORMS.includes(a.category)) pc[a.category] = (pc[a.category] || 0) + 1;
+  });
+  const item = (name, n, pressed, key, tyId, fn) => {
+    const b = wsEl('button', 'ws-item' + (tyId ? ' ws-ty-' + tyId : ''));
+    b.type = 'button';
+    b.dataset.ws = key;
+    b.setAttribute('aria-pressed', pressed ? 'true' : 'false');
+    if (tyId) b.appendChild(wsEl('span', 'ws-dot'));
+    b.appendChild(wsEl('span', 'ws-name', name));
+    b.appendChild(wsEl('span', 'ws-n', String(n)));
+    b.onclick = fn;
+    body.appendChild(b);
+  };
+  body.appendChild(wsEl('div', 'ws-sec-h', t('wsTypes')));
+  item(t('all'), base.length, !ws.ty, 'ty:', 'all', () => wsSet({ ty: '' }, 'ty:'));
+  NEWS_TYPES.forEach(ty => {
+    const n = tc[ty.id] || 0, name = hubTypeName(ty);
+    item(name, n, ws.ty === ty.id, 'ty:' + ty.id, ty.id, () => wsToggle('ty', ty.id, 'ty:' + ty.id));
+    const chip = wsEl('button', 'ws-strip-chip ws-ty-' + ty.id);
+    chip.type = 'button';
+    chip.title = name;
+    chip.setAttribute('aria-label', name + ' ' + n);
+    chip.dataset.ws = 'ty:' + ty.id;
+    chip.setAttribute('aria-pressed', ws.ty === ty.id ? 'true' : 'false');
+    chip.onclick = () => wsToggle('ty', ty.id, 'ty:' + ty.id);
+    strip.appendChild(chip);
+  });
+  const rules = wsActiveRules();
+  if (rules.length) {
+    body.appendChild(wsEl('div', 'ws-sec-h', t('wsWatch')));
+    rules.forEach(id => item(hubRuleLabel(id), rc[id] || 0, ws.w === id, 'w:' + id, '', () => wsToggle('w', id, 'w:' + id)));
+  }
+  body.appendChild(wsEl('div', 'ws-sec-h', t('wsPlat')));
+  HUB_PLATFORMS.forEach(p => item(p, pc[p] || 0, ws.pl === p, 'pl:' + p, '', () => wsToggle('pl', p, 'pl:' + p)));
+}
+
+// ── view ──
+function wsDraw() {
+  if (!state.wsActive) return;
+  const main = document.getElementById('main-content');
+  document.getElementById('loading-msg').style.display = 'none';
+  document.getElementById('no-data').classList.add('hidden');
+  Array.from(main.children).forEach(c => {
+    if (c.id !== 'loading-msg' && c.id !== 'no-data' && c.id !== 'search-row') c.remove();
+  });
+  const days = window.TRACKER_DAYS || {};
+  const newest = TrackerStore.newestDate(days);
+  ws.newest = newest;
+  const rg = TrackerStore.rangeOf(ws.range, newest);
+  const base = wsBase(TrackerStore.collect(days, { fromDate: rg.from, toDate: rg.to }));
+  const shown = TrackerStore.sortNewest(wsFacet(base));
+  document.getElementById('article-count').textContent = shown.length;
+  wsSyncChrome();
+  wsBuildRail(base);
+  wsBuildPanel(newest);
+  syncHash();   // keep the URL in step with the current view
+  if (pendingOpenId !== null) setTimeout(openPendingArticle, 0);   // `a=` permalink: open once this render has finished
+  if (!shown.length) {
+    const nd = document.getElementById('no-data');
+    nd.classList.remove('hidden');
+    nd.textContent = state.searchQuery ? L().ui.noResults(state.searchQuery) : t('noData');
+    wsRefocus();
+    return;
+  }
+  const frag = document.createDocumentFragment();
+  const head = wsEl('h2', 'ws-head');
+  head.appendChild(wsEl('span', '', wsRangeLabel(ws.range)));
+  head.appendChild(wsEl('span', 'ws-sub', '· ' + t('tlCount')(shown.length)));
+  frag.appendChild(head);
+  const groups = new Map();
+  shown.forEach(a => { if (!groups.has(a._date)) groups.set(a._date, []); groups.get(a._date).push(a); });
+  groups.forEach((items, date) => {
+    frag.appendChild(wsEl('div', 'date-divider', date + ' · ' + t('tlCount')(items.length)));
+    const grid = wsEl('div', 'cards-grid');
+    items.forEach(a => grid.appendChild(buildCard(a)));
+    frag.appendChild(grid);
+  });
+  main.appendChild(frag);
+  wsRefocus();
+}
+function renderWorkspace() {
+  if (!state.wsActive) return;
+  const seq = ++ws.seq;
+  wsSyncChrome();
+  const key = ws.range;
+  const hit = ws.loads.get(key);
+  if (hit && hit.done) { wsDraw(); return; }
+  showMsg(t('wsLoading')(wsRangeLabel(key)));
+  wsEnsure(key).then(() => {
+    if (seq !== ws.seq || !state.wsActive) return;   // a late load must not draw over another view (or a newer range)
+    wsDraw();
+  });
+}
+// patch (from a hash restore) replaces every workspace filter; without it the filters of the last
+// visit are kept (the search is always cleared on entry, as in the hub).
+function selectWorkspace(patch) {
+  const was = state.wsActive;
+  leaveHub();
+  state.wsActive = true;
+  state.libActive = false;
+  state.currentTracker = null; state.currentYear = null; state.currentMonth = null;
+  state.currentDate = null; state.currentMode = null; state.pendingDates = [];
+  state.filterCats = new Set();
+  state.search = null;
+  if (patch) {
+    const names = wsTrackerNames();
+    ws.range = wsNormRange(patch.range);
+    ws.prev = null;
+    ws.src = names.includes(patch.src) ? patch.src : '';
+    ws.ty = NEWS_TYPES.some(x => x.id === patch.ty) ? patch.ty : '';
+    ws.w = patch.w || '';
+    ws.pl = HUB_PLATFORMS.includes(patch.pl) ? patch.pl : '';
+    state.searchQuery = patch.q || '';
+  } else if (!was) {
+    state.searchQuery = '';
+  }
+  if (!ws.railInit) {
+    ws.railInit = true;
+    let pref = null;
+    try { pref = prefGet('tracker_nav'); } catch (e) {}
+    ws.railCollapsed = (typeof matchMedia === 'function' && matchMedia('(max-width: 767px)').matches) ? true : pref === 'collapsed';
+  }
+  const sb = document.getElementById('search-box'); if (sb) sb.value = state.searchQuery;
+  const sc = document.getElementById('search-clear'); if (sc) sc.style.display = state.searchQuery ? 'inline' : 'none';
+  document.documentElement.dataset.mode = 'ws';   // hides the date sidebar / second header row, shows the rail + time chip
+  const sr = document.getElementById('search-row'); if (sr) sr.style.display = '';
+  setActivePill('#tracker-pills', '[data-tracker="__ws"]');
+  document.getElementById('tracker-title').textContent = t('wsTitle');
+  document.getElementById('year-pills').innerHTML = '';
+  document.getElementById('month-grid').innerHTML = '';
+  document.getElementById('cat-pills').innerHTML = '';
+  hideDateList();
+  renderWorkspace();
+}
+function leaveWorkspace() {
+  if (!state.wsActive) return;
+  ws.seq++;
+  state.wsActive = false;
+  ws.panelOpen = false;
+  const panel = document.getElementById('ws-time-panel'); if (panel) panel.hidden = true;
+  const chip = document.getElementById('ws-time-chip'); if (chip) chip.setAttribute('aria-expanded', 'false');
+  if (document.documentElement.dataset.mode === 'ws') delete document.documentElement.dataset.mode;
+}
+(function wireWorkspace() {
+  const chip = document.getElementById('ws-time-chip');
+  if (chip) chip.addEventListener('click', () => wsToggleTimePanel());
+  const tg = document.getElementById('ws-rail-toggle');
+  if (tg) tg.addEventListener('click', wsToggleRail);
+  const sel = document.getElementById('ws-src');
+  if (sel) sel.addEventListener('change', () => wsSet({ src: sel.value }, null));
+})();
+
 // ── CRA reference library (special mode) ──────────────────────────────
 function loadCraLibrary(cb) {
   if (typeof CRA_LIBRARY !== 'undefined') { cb(); return; }
   injectScript('data/cra_library.js', cb);
 }
 function selectLibrary() {
+  leaveWorkspace();   // coming from the news workspace (no-op otherwise)
   leaveHub();   // coming from the 我的關注 hub (no-op otherwise)
   state.libActive = true;
   document.documentElement.dataset.mode = 'lib';   // hides the date sidebar
   state.searchQuery = ''; state.search = null;
   setActivePill('#tracker-pills', '[data-tracker="__cra"]');
-  document.querySelectorAll('#tracker-pills .pill').forEach(b =>
+  document.querySelectorAll('#tracker-pills .pill:not([role="tab"])').forEach(b =>
     b.setAttribute('aria-pressed', b.dataset.tracker === '__cra' ? 'true' : 'false'));
   document.getElementById('tracker-title').textContent =
     state.lang === 'en' ? 'CRA Reference Library' : 'CRA 參考圖書庫';
@@ -3537,6 +4155,7 @@ function daysBetween(a, b) {
   return Math.round((new Date(b + 'T00:00:00') - new Date(a + 'T00:00:00')) / 86400000);
 }
 function renderLibrary() {
+  if (state.wsActive) return;   // a late library load must not draw over the news workspace
   const main = document.getElementById('main-content');
   document.getElementById('loading-msg').style.display = 'none';
   document.getElementById('no-data').classList.add('hidden');
@@ -3928,7 +4547,7 @@ function setFilter(cat) {
 
 // ── Render ────────────────────────────────────────────
 function renderArticles(dateList) {
-  if (state.hubActive) return;   // a late tracker load must not draw over the 我的關注 hub
+  if (state.hubActive || state.wsActive) return;   // a late tracker load must not draw over the 我的關注 hub or the news workspace
   if (pendingOpenId !== null) setTimeout(openPendingArticle, 0);   // `a=` permalink: open once this render has finished
   if (dateList !== undefined) state.pendingDates = dateList;
   const dates = state.pendingDates;
@@ -4278,7 +4897,7 @@ function setActivePill(containerSel, btnSel) {
   container.querySelectorAll('.pill').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-pressed', 'false'); });
   const btn = container.querySelector(btnSel);
   if (btn) { btn.classList.add('active'); btn.setAttribute('aria-pressed', 'true'); }
-  if (containerSel === '#tracker-pills') syncSrcBtn();   // 依來源瀏覽 button follows the current tracker
+  if (containerSel === '#tracker-pills') { syncSrcBtn(); syncTabs(); }   // 依來源瀏覽 button follows the current tracker; tabs follow the view
 }
 function showMsg(msg) {
   const el = document.getElementById('loading-msg');
@@ -4345,6 +4964,25 @@ var suppressHashChange = false;
 function syncHash() {
   if (restoring) return;
   const skinOf = () => document.documentElement.dataset.skin;
+  if (state.wsActive) {   // news workspace: ws=1, range (30d omitted), filters, search, article
+    const wp = ['ws=1'];
+    if (ws.range !== '30d') wp.push('r=' + ws.range);
+    if (ws.src) wp.push('src=' + encodeURIComponent(ws.src));
+    if (ws.ty) wp.push('ty=' + encodeURIComponent(ws.ty));
+    if (ws.w) wp.push('w=' + encodeURIComponent(ws.w));
+    if (ws.pl) wp.push('pl=' + encodeURIComponent(ws.pl));
+    if (state.searchQuery) wp.push('q=' + encodeURIComponent(state.searchQuery));
+    if (skinOf()) wp.push('s=' + skinOf());
+    if (palettePref) wp.push('pal=' + palettePref);
+    wp.push('p=' + encodeURIComponent(viewPrefs.preset));
+    if (overlayArticleId !== null) wp.push('a=' + encodeURIComponent(overlayArticleId));
+    const wh = '#' + wp.join('&');
+    if (wh !== location.hash) {
+      try { history.replaceState(null, '', wh); }
+      catch (e) { suppressHashChange = true; location.hash = wh; }
+    }
+    return;
+  }
   if (state.hubActive) {   // 我的關注 hub: hub=1, presentation, window
     const hp = ['hub=1', 'hv=' + hubPrefs.hv, 'hw=' + hubPrefs.hw];
     if (skinOf()) hp.push('s=' + skinOf());
@@ -4429,6 +5067,12 @@ function applyHashRestore() {
   const presetChanged = !!(h && h.p && isPreset(h.p)) && applyHashPreset(h.p);
   // Palette from the hash wins over localStorage; applied without being persisted.
   if (h && parsePalette(h.pal) && h.pal !== palettePref) applyPalette(h.pal);
+  if (h && h.ws) {           // news workspace deep-link (the filters come from the hash; not persisted)
+    if (h.s === 'md3' || h.s === 'classic') document.documentElement.dataset.skin = h.s;
+    selectWorkspace({ range: h.r, src: h.src, ty: h.ty, w: h.w, pl: h.pl, q: h.q });
+    openPendingArticle();
+    return true;
+  }
   if (h && h.lib) {          // CRA library deep-link
     if (h.s === 'md3' || h.s === 'classic') document.documentElement.dataset.skin = h.s;
     state.libCluster = h.c || null;
@@ -4492,6 +5136,7 @@ document.getElementById('overlay').addEventListener('click', e => {
 document.addEventListener('keydown', e => {
   if (e.key !== 'Escape') return;
   if (!document.getElementById('overlay').classList.contains('hidden')) closeOverlay();
+  else if (state.wsActive && ws.panelOpen) { wsToggleTimePanel(false); const c = document.getElementById('ws-time-chip'); if (c) c.focus(); }
   else if (document.getElementById('sidebar').classList.contains('nav-open')) closeNav(true);
 });
 
