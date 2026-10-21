@@ -1,0 +1,5 @@
+# git status --porcelain at dispatch (this line keeps a clean tree's file non-empty)
+?? .common/codex-assist/routes/20261021-ui-architecture-plan.json
+?? .common/codex-assist/runs/20261021-ui-architecture-plan/
+?? .common/codex-assist/tasks/20261021-ui-architecture-plan.json
+?? .common/codex-assist/tasks/20261021-ui-architecture-plan.prompt.md

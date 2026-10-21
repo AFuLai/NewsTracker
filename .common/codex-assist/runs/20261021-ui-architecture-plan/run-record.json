@@ -1,0 +1,103 @@
+{
+  "task_id": "20261021-ui-architecture-plan",
+  "mode": "plan",
+  "requested": {
+    "root": "/opt/tracker/repo",
+    "sandbox": "host-ro+root-ro",
+    "model": "gemini-4-argon-medium",
+    "egress": "cloud",
+    "allow_common": false,
+    "timeout_s": 2400,
+    "inputs_glob": "ui/index.html refs/plans/20261019-ux-mockups/README.md refs/plans/20261019-watch-and-frame-decisions.md .common/codex-assist/runs/20261019-ux-research/answer.txt .common/codex-assist/runs/20261019-layout-scenarios-plan/answer.txt"
+  },
+  "actual": {
+    "engine": "agy",
+    "codex_bin": "/home/afu/.local/bin/agy",
+    "codex_version": "1.4.3",
+    "session_id": "c9d76b23-3e3a-4a43-a603-eabac1dbce5a",
+    "model": "gemini-4-argon-medium",
+    "cwd": "/opt/tracker/repo",
+    "sandbox": "host-ro+root-ro",
+    "denied_actions": [],
+    "host_fence": true,
+    "provider": "antigravity",
+    "rc": 0,
+    "elapsed_s": 908.2,
+    "tokens": 463843,
+    "usage": {
+      "fresh_input": 387826,
+      "cached_input": 2436853,
+      "output": 76017,
+      "reasoning": 5460,
+      "raw": {
+        "input_tokens": 387826,
+        "output_tokens": 76017,
+        "thinking_tokens": 5460,
+        "cache_read_tokens": 2436853,
+        "total_tokens": 463843
+      }
+    },
+    "effort": null,
+    "plan_usage": {},
+    "started_at": "2026-10-21T00:55:57Z",
+    "finished_at": "2026-10-21T01:11:05Z",
+    "ephemeral": false,
+    "commands": 14,
+    "machine": "afu-delta"
+  },
+  "role_sha256": "1cc596dacabf1cbfbcb6a8c50c4b0b0bc77d1e4528093742fbd058b591fd701f",
+  "sheet_sha256": null,
+  "acceptance_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "commands_sha256": [
+    "5607dd381332379890812448e441760532faeb01d882159caae5616c08379d27",
+    "8a5fb0a2cf42b98f4d7cac8759d715e74f25245732897c74ca66ad0178316781",
+    "6311528175c828e3befe7863a506b76365669717a18ee6647ffbfa80e068afc3",
+    "79b7508dacf1204233b655e39d2e4efc1872ca688a26105379e2ee0e24c316f0",
+    "7845af0def0f990f97b7582a8f8ec1250628c915080ad0b2af519342522e7ed6",
+    "30731f08ab6cad64d129c4bc912572552ce4381209b470b2941940127265d5bf",
+    "96c4ababa42b9df200b6a8a12a429504c583ccab711042b99c1220c5e0111640",
+    "9fcdc761a6e147ab548cc7221a44b3fc66f00b906efe8a85d3331b5884232fc0",
+    "db7c14dce700cd0968887c65f78989bc3864fcb25bee7b1d9ca09d678fbfc9d3",
+    "4ee0858c801e75a22cb877e7362c1804f739de882a8137cb32dd03fe11f38046",
+    "979607d4c1ed441dce5af77e343effedc18867ef4ba1875db3362152d98563d9",
+    "bbec57375c957501ed06ad28909af41dd0b9473526d1045f2db7f971c6b59b59",
+    "4aa2662fd5cf20dc0f53d062eebacea069ba7490aefec8d978fb12ed7f9c7d54",
+    "9f9c9c1b0481f9a6fc85675fe6984d63b710d77086b46d591a6a5db944b96224"
+  ],
+  "answer_path": "/opt/tracker/repo/.common/codex-assist/runs/20261021-ui-architecture-plan/answer.txt",
+  "answer_shape": "summary-line",
+  "quote_gate": {
+    "status": "CLEAN",
+    "findings": 0
+  },
+  "verify": {
+    "reader_violation": false,
+    "reader_delta": [],
+    "ro_fence": true,
+    "unattributed_delta": [],
+    "backstop_unavailable": null,
+    "citations": {
+      "checked": 148,
+      "verified": 148,
+      "missed": [],
+      "short": 0,
+      "line_off": [],
+      "format": []
+    },
+    "probe_check": {
+      "judged": 0,
+      "unrunnable": [],
+      "unparsed": 0
+    }
+  },
+  "verdict": "SCORABLE",
+  "recorded_at": "2026-10-21T01:11:07Z",
+  "recorder": {
+    "name": "record.py",
+    "version": "0.10.0",
+    "sha256": "a95169da0c93f0338ffb624a4a972faecc040c21f105b48b4fb1869c93139156"
+  },
+  "verify_result": "OK",
+  "defects": [],
+  "defects_spec_sha256": "3326060632526913a879e96855534a9ea197c73ecd54d514f4dd6c2cde144ca4"
+}

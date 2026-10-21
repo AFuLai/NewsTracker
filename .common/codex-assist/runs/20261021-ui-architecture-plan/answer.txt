@@ -1,0 +1,491 @@
+# 資安新聞追蹤系統：[index.html](file:///opt/tracker/repo/ui/index.html) 資料／顯示脫鉤與沉浸式閱讀架構規劃（唯讀提案，無程式碼變更）
+
+**範圍與驗證聲明：**
+- 本報告僅讀取 `/opt/tracker/repo` 內檔案（[index.html](file:///opt/tracker/repo/ui/index.html) 全檔 4354 行完整讀畢，驗證指令：`wc -l /opt/tracker/repo/ui/index.html`，輸出 `4354 /opt/tracker/repo/ui/index.html`）並抓取外部參考網頁，未修改任何專案檔案（`.common/codex-assist/...` 為派工系統紀錄）。
+- 所有可驗證缺陷均標註為 **Finding（F1–F6）** 並附 `file:line` 原文引文與可重跑驗證指令；其餘架構分析標註為觀察（Observation）或提案（Proposal），不做處置裁決（disposition 由派工端 session 決定）。
+
+---
+
+## 1. 現有功能與 `localStorage` 盤點（Inventory）
+
+### 1.1 使用者可見功能盤點（[index.html](file:///opt/tracker/repo/ui/index.html)）
+
+> 註：下表之「建議方向（Keep / Merge / Drop-candidate）」僅為架構提案，最終處置由 session 與使用者裁決。
+
+| 功能模組 | 入口 `file:line` 與原文引文 | 現況說明 | 建議方向 | 理由 |
+|---|---|---|---|---|
+| **1. 依來源瀏覽（Archive 檢視）＋年月／日期側欄** | ui/index.html:3217 `function selectTracker(name) {`<br>ui/index.html:3536 `function selectYear(year) {`<br>ui/index.html:3566 `function selectMonth(month) {`<br>ui/index.html:3594 `function selectFullYear() {`<br>ui/index.html:3624 `function selectDate(date) {`<br>ui/index.html:3152 `function toggleNav() {` | 從頂部 `#src-menu`（ui/index.html:3270 `menu.id = 'src-menu';`）切換 `security` / `eu_cra` / `os` 三個來源庫，搭配 `#year-pills` 與浮動抽屜 `#sidebar`（ui/index.html:1441 `<aside id="sidebar">`）瀏覽全年、月份、單日。 | **Merge（整併入統一篩選與時間窗）** | 保留按來源與歷史年月日的檢索能力，但不再作為與「我的關注」割裂的另一套獨立頁面模式（`data-mode`），改為 Store 查詢條件（`sourceTracker` + `dateRange`）。 |
+| **2. 全站搜尋與搜尋範圍（標題／內文／標籤）** | ui/index.html:2987 `async function runSearch() {`<br>ui/index.html:2320 `function toggleScope(name, btn) {`<br>ui/index.html:2593 `function hubSearch(articles, q) {` | 支援空白分隔多詞 AND 與字界比對（ui/index.html:2307 `function termMatches(hay, term) {`），但在 Archive 走 `ensureAllLoaded`（單一 tracker 全年份），在 Hub 走 `hubSearch`（跨 tracker 近期視窗）。 | **Keep（統一至 Store）** | 搜尋與範圍切換（標題／內文／標籤）是核心檢索功能，但應收斂為 Store 的單一 `query({ search, searchScope })` 管道。 |
+| **3. 分類 Pills 與平台第二列 Pills** | ui/index.html:3651 `function buildCatPills(cats) {`<br>ui/index.html:3693 `function refreshCatPills() {`<br>ui/index.html:3764 `function setFilter(cat) {`<br>ui/index.html:3095 `const SECONDARY_PILLS = {` | 在 Archive 模式下顯示該 tracker 的原始分類加 `CAT_MAP` 跨庫映射（ui/index.html:3064 `const CAT_MAP = {`）與第二列平台／類型 pills；但在 Hub 模式改用 `NEWS_TYPES` 與 `hubPlatEl`（ui/index.html:2765 `function hubPlatEl(model) {`）。 | **Merge（統一為「新聞類型 + 平台／標籤 Chip」）** | 依據 refs/plans/20261019-ux-mockups/README.md:13 `  - 不再依四個版面（資安、EU CRA、作業系統、CRA 庫）分，改依**新聞類型**分，並整合標籤。` 之裁示，將分散的分類與平台 pills 統一為全站一致的新聞類型與平台標籤篩選。 |
+| **4. 情境預設（Presets / `tracker_view`）** | ui/index.html:1516 `const PRESETS = {`<br>ui/index.html:1616 `function setPreset(id) {`<br>ui/index.html:1425 `<select id="view-select" onchange="setPreset(this.value)" aria-label="檢視模式" title="檢視模式"></select>` | Header 下拉選單提供 `default`、`quick`、`analyst`、`event`、`cra` 五種預設，同時綁定 layout、density、強制切換 tracker（如 `cra` 切 `eu_cra`）與預設分類篩選。 | **Drop-candidate（拆解為純檢視切換與關注規則）** | Preset 同時偷改資料範圍（tracker/categories）與顯示版型（layout/density），且在預設落地的 Hub 頁面完全無作用（見 §2 重疊分析）。 |
+| **5. 五種版型（`grid` / `river` / `hero` / `hub` / `timeline`）** | ui/index.html:1511 `const LAYOUTS = ['grid', 'river', 'hero', 'hub', 'timeline'];`<br>ui/index.html:3839 `const layout = resolvePreset(viewPrefs).layout;`<br>ui/index.html:3910 `function renderTimeline(main, articles) {`<br>ui/index.html:3949 `function renderHub(main, articles) {` | 僅在 `renderArticles`（單一 tracker 歷史檢視）中生效；而「我的關注」自己又有另一套 `sections` / `tiles` 與 `cards` / `list` 切換（ui/index.html:2512 `function defaultHubPrefs() { return { v: 1, hv: 'sections', hw: 30, hm: 'cards' }; }`）。 | **Merge（收斂為全站共用的 3 種清單呈現：分區 Sections／情勢儀表 Tiles／緊湊條列 River）** | 消除 Archive 與 Hub 兩套互不相通的版型系統；CVE 事件聚類（原 `timeline`）轉為閱讀器底部的「同事件／同 CVE 相關報導」與清單篩選。 |
+| **6. 關注規則（Watch rules）與「只看關注」** | ui/index.html:1652 `const WATCH_RULES = [`<br>ui/index.html:1887 `function toggleWatchOnly() {`<br>ui/index.html:1892 `function openWatchPanel() {` | 7 條內建規則加最多 20 個自訂關鍵字，設定面板 `#watch-panel`（ui/index.html:1476 `<div id="watch-panel" class="hidden" role="dialog" aria-label="關注"></div>`），以及卡片上的 `★ 關注` 徽章與 `#cat-pills` 內的「只看關注」pill。 | **Keep（統一收斂至 Store 查詢）** | 符合 refs/plans/20261019-watch-and-frame-decisions.md:6 `- 使用者裁示：要的是**關注度**，不是嚴重度。關注度由「關鍵資訊」規則決定，例如 KEV、EU CRA 標準更新、FAQ 更新。`，保留規則設定與徽章，並讓「只看關注」在全站任何視圖皆透過 Store `watchOnly` 過濾。 |
+| **7. 我的關注總覽（Overview Hub：分區／儀表／簡報）** | ui/index.html:2638 `function selectHub() {`<br>ui/index.html:2909 `function renderWatchHub(focusFn) {`<br>ui/index.html:2624 `function hubBrief(list, today) {` | 目前的預設首頁（ui/index.html:3212 `if (!applyHashRestore()) selectHub();`），含「你的簡報」（依已讀 ID 集合計算新增關注篇數）、平台標籤列、9 大新聞類型分區（`hubSectionsEl`）與 14 日趨勢儀表磚（`hubTilesEl`）。 | **Keep（作為主框架的核心工作區）** | 已實作 refs/plans/20261019-ux-mockups/README.md:12 `- **我的關注：**` 的裁示，應升格為全站唯一的基礎框架，而非與 `renderArticles` 並存的插件。 |
+| **8. CRA 參考圖書庫（CRA Library）** | ui/index.html:3348 `function selectLibrary() {`<br>ui/index.html:3390 `function renderLibrary() {`<br>ui/index.html:3504 `function buildLibRow(t, gen, sources) {` | 載入 `data/cra_library.js`，提供依分類／日期／來源排列的 94 個官方文件主題清單與 `NEW` / `UPDATED` 標記。 | **Keep（作為頂部導覽的「法規文件庫」獨立分頁，共用外殼與搜尋列）** | 資料結構（無摘要、外連為主）與新聞不同，保留其高密度條列呈現，但納入統一導覽列與狀態管理，不再用 DOM 手動隱藏 `#search-row`（ui/index.html:3361 `const sr = document.getElementById('search-row'); if (sr) sr.style.display = 'none';`）。 |
+| **9. 文章彈窗（Article Overlay `openOverlay`）** | ui/index.html:4022 `function openOverlay(a, triggerEl) {`<br>ui/index.html:4051 `function closeOverlay() {`<br>ui/index.html:1117 `#overlay {` | 點擊卡片或條列時彈出置中對話框（`max-width: 680px`），顯示分類徽章、標題、單段摘要、標籤、來源連結清單。無前後篇切換、無閱讀進度、無字級調整、無相關文章、無專屬網址。 | **Merge / Upgrade（升級為沉浸式雙欄／全螢幕 Reader 元件）** | 使用者最重視「讀取新聞的沉浸感」，現有置中 modal 遮斷上下文且缺乏連續閱讀體驗（見 §4 詳述）。 |
+| **10. 雙語切換（中文 ⇄ English）** | ui/index.html:2211 `function applyLang() {`<br>ui/index.html:2286 `function toggleLang() {`<br>ui/index.html:2124 `const I18N = {` | 切換 UI 語系，文章標題／摘要／標籤優先讀取 `title_en` / `summary_en` / `tags_en`（ui/index.html:2207 `function artTitle(a)   { return (state.lang === 'en' && a.title_en)   ? a.title_en   : (a.title || ''); }`）。 | **Keep** | 雙語切換完整且無侵入性，移入 State 層統一管理即可。 |
+| **11. 外觀系統：Skins (`md3`/`classic`) × Theme (`light`/`dark`) × 10 款 Palettes** | ui/index.html:4176 `function toggleSkin() {`<br>ui/index.html:4162 `function toggleTheme() {`<br>ui/index.html:1932 `const PALETTES = [`<br>ui/index.html:1995 `function setPalette(id) {` | Header 同時有 `#skin-btn`（笑臉圖示切 md3/classic）、`#theme-btn`（太陽月亮切深淺色，但選了 palette 會被 disable：ui/index.html:2055 `tb.disabled = !!palettePref;`）、`#palette-btn`（10 款配色面板）。 | **Merge（收斂為單一「主題配色」選擇器）** | 三套色彩系統疊加是畫面「好幾套混在一起」的最明顯來源（見 §2.1 與 F1）。收斂為單一 Token 主題表（預設淺色、預設深色 + 10 款特色主題），廢除獨立的 `skin` 按鈕。 |
+| **12. 網址 Hash 永久連結（Permalinks）** | ui/index.html:4194 `function syncHash() {`<br>ui/index.html:4241 `function parseHash() {`<br>ui/index.html:4254 `function applyHashRestore() {` | 將目前視圖狀態同步至 `location.hash`（`#hub=1...`、`#lib=1...`、`#t=security&y=...`），支援重新整理與分享還原。 | **Keep & Extend（保留舊格式相容，新增 `a=<articleId>`）** | 現有 hash 缺少單篇文章 permalink（見 F5），擴充 `a=<id>` 以支援直接分享並開啟沉浸式閱讀器。 |
+
+---
+
+### 1.2 現有 10 個 `localStorage` Keys 盤點與整併方案
+
+驗證指令：`grep -oE "localStorage\.(get|set|remove)Item\('[^']+'" /opt/tracker/repo/ui/index.html | sort -u`，共命中 **10** 個獨立 key：
+
+| # | 現有 Key 名稱 | 讀寫位置（`file:line` 原文引文） | 儲存型別與內容 | 整併後去向 |
+|---|---|---|---|---|
+| 1 | `tracker_lang` | ui/index.html:2212 `try { localStorage.setItem('tracker_lang', state.lang); } catch (e) {}`<br>ui/index.html:3161 `const saved_lang = localStorage.getItem('tracker_lang');` | 純字串：`"zh"` \| `"en"` | 併入 `tracker_prefs.lang` |
+| 2 | `tracker_theme` | ui/index.html:3165 `const saved_theme = localStorage.getItem('tracker_theme');`<br>ui/index.html:4173 `try { localStorage.setItem('tracker_theme', isDark ? 'light' : 'dark'); } catch (e) {}` | 純字串：`"dark"` \| `"light"` | 併入 `tracker_prefs.theme`（與 palette 統一為單一主題 ID） |
+| 3 | `tracker_skin` | ui/index.html:3183 `const saved_skin = localStorage.getItem('tracker_skin');`<br>ui/index.html:4179 `try { localStorage.setItem('tracker_skin', isMd3 ? 'classic' : 'md3'); } catch (e) {}` | 純字串：`"md3"` \| `"classic"` | **淘汰**（遷移時若無 palette 則轉為預設深／淺主題；若 [audit.js](file:///opt/tracker/repo/ui/audit.js) 仍需測試則保留相容 shim） |
+| 4 | `tracker_palette` | ui/index.html:1999 `if (palettePref) localStorage.setItem('tracker_palette', palettePref);`<br>ui/index.html:2007 `try { raw = localStorage.getItem('tracker_palette'); } catch (e) {}` | 純字串：10 款主題 ID（如 `"deepsea"`、`"paper"`） | 併入 `tracker_prefs.theme` |
+| 5 | `tracker_nav` | ui/index.html:3131 `if (persist) { try { localStorage.setItem('tracker_nav', 'open'); } catch (e) {} }`<br>ui/index.html:3191 `const navPref = localStorage.getItem('tracker_nav');` | 純字串：`"open"` \| `"collapsed"` | 併入 `tracker_prefs.navOpen`（boolean） |
+| 6 | `tracker_lib_group` | ui/index.html:1501 `const g = localStorage.getItem('tracker_lib_group');`<br>ui/index.html:3470 `try { localStorage.setItem('tracker_lib_group', key); } catch (e) {}` | 純字串：`"cluster"` \| `"date"` \| `"source"` | 併入 `tracker_prefs.libGroup` |
+| 7 | `tracker_view` | ui/index.html:1577 `try { localStorage.setItem('tracker_view', serializeView(viewPrefs)); } catch (e) {}`<br>ui/index.html:1587 `try { raw = localStorage.getItem('tracker_view'); } catch (e) {}` | JSON：`{"v":1,"preset":"<id>","overrides":{layout,density}}` | 併入 `tracker_prefs.density` 與 `tracker_prefs.listMode` |
+| 8 | `tracker_watch` | ui/index.html:1763 `try { localStorage.setItem('tracker_watch', serializeWatch(watchPrefs)); } catch (e) {}`<br>ui/index.html:1768 `try { raw = localStorage.getItem('tracker_watch'); } catch (e) {}` | JSON：`{"v":1,"on":[...],"kw":[...]}` | 併入 `tracker_prefs.watch`（注意：refs/plans/20261019-watch-and-frame-decisions.md:7 `- 讀者在設定介面自選要關注哪些規則，設定存在瀏覽器裡` 點名此 key，遷移期可同步雙寫或保留讀取 alias） |
+| 9 | `tracker_watch_hub` | ui/index.html:2545 `try { raw = localStorage.getItem('tracker_watch_hub'); } catch (e) {}`<br>ui/index.html:2550 `try { localStorage.setItem('tracker_watch_hub', JSON.stringify(hubPrefs)); } catch (e) {}` | JSON：`{"v":1,"hv":"sections"\|"tiles","hw":7\|30\|90,"hm":"cards"\|"list"}` | 併入 `tracker_prefs.hubView`、`tracker_prefs.windowDays`、`tracker_prefs.listMode` |
+| 10 | `tracker_watch_seen` | ui/index.html:2562 `localStorage.setItem('tracker_watch_seen', out);`<br>ui/index.html:2659 `try { raw = localStorage.getItem('tracker_watch_seen'); } catch (e) {}` | JSON：`{"v":1,"at":"YYYY-MM-DD","ids":[<=2000 ids]}` | 併入 `tracker_prefs.readState`（內含 `lastVisitAt`、`seenIds` 與單篇已讀 `readIds`） |
+
+**整併提案：**
+- 將所有使用者介面、關注規則與閱讀紀錄收斂為**單一版本化 JSON key `tracker_prefs`**：
+  ```json
+  {
+    "v": 2,
+    "lang": "zh",
+    "theme": "default-dark",
+    "viewMode": "sections",
+    "listMode": "cards",
+    "density": "comfortable",
+    "windowDays": 30,
+    "navOpen": false,
+    "libGroup": "cluster",
+    "reader": { "fontSize": "md", "lineWidth": "medium", "splitPane": true },
+    "watch": { "on": ["cra_law", "cra_std"], "kw": [] },
+    "readState": { "lastVisitAt": "2026-10-19", "seenIds": [], "readIds": [] }
+  }
+  ```
+- **無損自動遷移（`migrateLegacyStorage`）：** 首次啟動且 `tracker_prefs` 不存在時，依序讀取上述 10 個舊 key 組合出初始 `tracker_prefs`；在 `?pv=1` 預覽模式下（ui/index.html:1572 `function isPreviewMode() {`）絕不寫入 `localStorage`。
+
+---
+
+## 2. 為什麼目前感覺「好幾套混在一起」（Concrete Overlaps & Findings）
+
+目前 [index.html](file:///opt/tracker/repo/ui/index.html) 是歷次功能迭代（MD3 改造 → 雙 Skin → 5 種 Layout Presets → Watch 規則 → Watch Hub 總覽 → 10 款 Palettes）逐層疊加的結果。舊系統未退場、新系統直接覆蓋在上面，導致**同一個概念在畫面上有 2～3 套控制項與程式碼路徑**：
+
+### 2.1 三套色彩系統疊加：Skin (`md3`/`classic`) × Theme (`dark`/`light`) × Palette（10 款）
+
+- **Finding F1（介面控制衝突與無效按鈕）：** Header 右上角同時擺放 `#skin-btn`（切換外觀）、`#palette-btn`（配色）、`#theme-btn`（切換深淺主題）三顆按鈕（ui/index.html:1424 `<button id="skin-btn" onclick="toggleSkin()" aria-label="切換外觀">` 至 ui/index.html:1428 `<button id="theme-btn" onclick="toggleTheme()" aria-label="切換主題">`）。當使用者選擇任一款 Palette 時，ui/index.html:836 `html[data-palette][data-skin][data-theme] {` 會強制覆寫 `--surface`、`--card-bg`、`--card-border-width: 1px` 等所有關鍵 Token；此時 `#theme-btn` 被鎖死 disabled（ui/index.html:2055 `tb.disabled = !!palettePref;`），而 `#skin-btn` 雖然還能點擊並改變 URL hash `s=classic`（ui/index.html:4176 `function toggleSkin() {`），但在畫面上**完全沒有任何視覺變化**，因為兩套 skin 的差異（`--surface`、`--card-bg`、`--card-border-width`、`--card-shadow`，定義於 ui/index.html:170 `[data-skin="md3"]     { --card-bg: var(--surface-container-low); --card-border-width: 0; }`）已被高權重的 palette 選擇器全數覆蓋。
+  - 驗證指令：`sed -n '170,174p;836,856p;2053,2057p;4176,4181p' /opt/tracker/repo/ui/index.html`
+- **Finding F2（元件內私自硬編碼第 4 套配色）：** 「我的關注」的儀表模式 `.wh-dash` 在 CSS 內私自宣告了一套 `--wh-bg: #070B12` 深海青變數（ui/index.html:1326 `  --wh-bg: #070B12; --wh-card: rgba(13,20,32,0.92); --wh-text: #DCE6F2; --wh-muted: #7F93AD;`），不走全域 `--surface` / `--on-surface` token。結果當使用者處於預設淺色主題（`data-theme="light"` 且無 `data-palette`）並切到「儀表」時，頁面下半部突然變成深色背景，與上半部淺色 Header 形成強烈割裂。
+  - 驗證指令：`sed -n '1325,1341p' /opt/tracker/repo/ui/index.html`
+
+### 2.2 兩套版面與檢視切換器並存：`#view-select` (Presets) vs. Hub 分段按鈕 (`hv` / `hm`)
+
+- **Finding F3（預設首頁上的 `#view-select` 下拉選單形同虛設）：** 網站啟動預設進入「我的關注」總覽（ui/index.html:3212 `if (!applyHashRestore()) selectHub();`）。此時 Header 上的 `#view-select`（預設／快讀／分析師／事件追蹤／合規 CRA）依然顯示在右上角（ui/index.html:1425 `<select id="view-select" onchange="setPreset(this.value)" aria-label="檢視模式" title="檢視模式"></select>`），但 `renderWatchHub()` 完全不讀取 `viewPrefs` 或 `resolvePreset`，而是用自己內部的分段按鈕 `分區 | 儀表` 與 `卡片 | 條列`（ui/index.html:2730 `[['sections', 'hubSections'], ['tiles', 'hubTiles']].forEach(([v, k]) => {`）。更糟的是，使用者在總覽頁點選 `#view-select` 的「快讀（quick）」、「分析師（analyst）」或「事件追蹤（event）」時，`setPreset` 執行 ui/index.html:1625 `else if (state.currentTracker && !state.libActive) { applyPresetFilters(); renderArticles(); }`，因為總覽頁的 `state.currentTracker` 為 `null`（ui/index.html:2643 `state.currentTracker = null; state.currentYear = null; state.currentMonth = null;`），**畫面完全不會重新渲染**；唯獨選「合規 CRA」會因為帶有 `tracker: 'eu_cra'`（ui/index.html:1623 `const tr = presetTracker(resolvePreset(viewPrefs), getTrackers());`）而突然把使用者踢出總覽頁、跳進舊版 EU CRA 歷史牆！
+  - 驗證指令：`sed -n '1516,1524p;1616,1627p;2642,2644p' /opt/tracker/repo/ui/index.html`
+- **重疊的兩個 `hub` 名稱：** 程式碼中同時有 ui/index.html:3949 `function renderHub(main, articles) {`（屬於 `PRESETS.cra` 的舊版單 tracker 分類卡片牆）與 ui/index.html:2909 `function renderWatchHub(focusFn) {`（屬於「我的關注」跨 tracker 總覽頁），連註解都得特別警告 ui/index.html:2500 `// left through selectTracker / selectLibrary (leaveHub). NOTE: the layout-preset function`。
+
+### 2.3 三套分類與篩選模型：Tracker `effectiveCat` vs. Hub `NEWS_TYPES` vs. `WATCH_RULES`
+
+| 維度 | 舊版依來源瀏覽（Archive） | 我的關注總覽（Watch Hub） | 關注規則引擎（Watch Rules） |
+|---|---|---|---|
+| **分類軸線** | 依 `state.currentTracker` 透過 `CAT_MAP` 強制轉譯成該來源的分類（ui/index.html:3101 `function effectiveCat(a, tracker) {`） | 依 `NEWS_TYPES` 將 17 個分類歸納為 9 大新聞類型（ui/index.html:2359 `const NEWS_TYPES = [`） | 比對原始 `category` 或 `effectiveCat` 加關鍵字（ui/index.html:1735 `const hasCat = (cats) => {`） |
+| **平台（Linux/Windows/Apple/Android）** | 在 `os` 是主分類；在 `security` 是第二列 pill（ui/index.html:3096 `security: { label: '平台', cats: ['Linux','Windows','Apple','Android'] },`）；在 `eu_cra` 被映射成「開源影響／產業動態」（ui/index.html:3079 `'Linux':'開源影響', 'Windows':'產業動態', 'Apple':'產業動態',`） | 抽離為頂部獨立的平台標籤列 `hubPlatEl`，文章本身歸入 `other`（ui/index.html:2467 `if (tid === 'platform') {`） | 無平台概念，只能靠自訂關鍵字 |
+| **標籤（Tags）** | 卡片上的 `.card-tag` 不可點擊篩選（僅 CVE 外連至 `cve.org`，ui/index.html:3989 `return '<a class="card-tag" href="https://www.cve.org/CVERecord?id=' + tg + '" target="_blank" rel="noopener">' + escHtml(tg) + '</a>';`） | 每個新聞類型區塊下顯示前 7 名熱門 `#tag` chip 可點擊過濾該區（ui/index.html:2819 `tags.forEach(g => {`） | 自訂關鍵字比對 `title`、`title_en`、`tags` |
+
+- **Finding F4（同一篇文章在不同入口顯示不同分類名稱與顏色）：** 例如一篇 `category: "Linux"` 的跨庫文章，在 `os` 與 `security` 顯示為「Linux」，在 `eu_cra` 被 `effectiveCat` 改名為「開源影響」（ui/index.html:3079 `'Linux':'開源影響', 'Windows':'產業動態', 'Apple':'產業動態',`），而在「我的關注」總覽裡因為 `state.currentTracker` 是 `null`，卻又被歸進「平台與其他（other）」區塊（ui/index.html:2598 `return id === 'platform' ? 'other' : id;   // as buildHubModel: platform articles count under 'other'`）。使用者在網站不同角落看到同一則新聞的歸類完全不一致。
+  - 驗證指令：`sed -n '2371,2377p;2596,2599p;3078,3081p' /opt/tracker/repo/ui/index.html`
+
+### 2.4 單薄的置中彈窗（`openOverlay`）vs. 真正的閱讀器（Reader）
+
+- **Finding F5（文章彈窗無獨立網址、無上下篇導覽、無鍵盤閱讀快捷鍵、無相關事件串聯）：**
+  1. ui/index.html:4022 `function openOverlay(a, triggerEl) {` 只將標題、單段摘要、標籤與來源塞入 ui/index.html:1134 `  max-width: 680px;` 的置中 `.overlay-box`，完全不呼叫 `syncHash()`，且 `syncHash` / `applyHashRestore` 中沒有任何文章 ID 參數（**Absence 驗證**：執行 `grep -nE "h\.a\b|a=" /opt/tracker/repo/ui/index.html`，涵蓋整份 `/opt/tracker/repo/ui/index.html`，命中數為 **0**）。
+  2. 全站沒有 `j` / `k` / `ArrowLeft` / `ArrowRight` 文章切換快捷鍵（**Absence 驗證**：執行 `grep -nE "ArrowLeft|ArrowRight|key === 'j'|key === 'k'" /opt/tracker/repo/ui/index.html`，涵蓋整份 `/opt/tracker/repo/ui/index.html`，命中數為 **0**）。
+  3. 雖然卡片與時間軸已經用正規表示式識別 `CVE-\d{4}-\d{4,}`（ui/index.html:3915 `artTags(a).forEach(tg => { if (/^CVE-\d{4}-\d{4,}$/.test(tg) && !ids.includes(tg)) ids.push(tg); });`），但點開文章彈窗時，並未列出站內同 CVE 或同主題的歷史相關報導。
+  - 驗證指令：`sed -n '4022,4050p' /opt/tracker/repo/ui/index.html && grep -cE "ArrowLeft|ArrowRight|key === 'j'|key === 'k'" /opt/tracker/repo/ui/index.html`
+- **Finding F6（資料查詢與去重邏輯在 3 處重複實作，且 `renderArticles` 未對同日或跨日重複 ID 去重）：**
+  - `buildHubModel`（ui/index.html:2462 `const key = (a.id !== undefined && a.id !== null) ? String(a.id) : date + '|' + a.title;`）與 `hubCollect`（ui/index.html:2566 `function hubKey(a, date) {` 與 ui/index.html:2577 `const seen = new Set();`）各自寫了一遍日期視窗篩選與 `seen` Set 去重；而 `renderArticles`（ui/index.html:3792 `(dates || []).forEach(date => {`）則直接 `concat` 陣列、完全沒有 `seen` ID 去重，且在 DOM 渲染函式內混雜資料過濾與 DOM 操作。
+  - 驗證指令：`sed -n '2458,2465p;2576,2586p;3790,3816p' /opt/tracker/repo/ui/index.html`
+
+---
+
+## 3. 目標架構設計（資料／狀態／顯示三層脫鉤，無建置步驟）
+
+### 3.0 靜態檔案組織方式（Staying Static, No Build Step）
+
+目前部署管線中，tracker/render.py:215 `    src = ROOT / "ui" / "index.html"` 只將 [index.html](file:///opt/tracker/repo/ui/index.html) 複製到輸出根目錄 `web/public/index.html`，且本機預覽伺服器 tracker/web_dashboard.py:246 `            if rel in ("", "index.html"):` 只將 `/site/index.html` 導向 `ROOT / "ui"`（其餘 `/site/*` 皆讀 `DEFAULT_OUT`）。
+- **建議做法（兩階段皆相容）：**
+  1. **邏輯分層先行（單檔內模組化）：** 先在 [index.html](file:///opt/tracker/repo/ui/index.html) 內以 IIFE / Namespace（`window.TrackerStore`、`window.TrackerState`、`window.TrackerView`）嚴格切開三層，零基礎設施變更即可立即享受純函式與 `node` 單元測試。
+  2. **物理拆檔（可選切片）：** 若拆分為 `ui/styles.css`、`ui/store.js`、`ui/state.js`、`ui/view.js` 與 [index.html](file:///opt/tracker/repo/ui/index.html)（皆為原生 ES6 靜態檔，無 bundler），只需同步更新 tracker/render.py:210 `def sync_index_html(root_html: Path) -> Path | None:` 複製 `ui/*.{html,css,js}`，並在 tracker/web_dashboard.py:247 `                base, rel = Path(ROOT) / "ui", "index.html"` 放行 `ui/` 下的靜態資源。
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         URL Hash  ⇄  localStorage                       │
+│                        (parseRoute / serializeRoute)                    │
+│                        (loadPrefs  / savePrefs: 單一 key)               │
+└───────────────────────────────────┬─────────────────────────────────────┘
+                                    │ 訂閱 / 更新 (dispatch)
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│  1. STATE LAYER (TrackerState — 純資料狀態與偏好，零 DOM 存取)           │
+│     • route: { nav, windowDays, date, month, year, types, platforms,    │
+│                tags, sourceTracker, search, searchScope, watchOnly,     │
+│                articleId, libCluster, libGroup }                        │
+│     • prefs: { v:2, lang, theme, viewMode, listMode, density,           │
+│                reader:{fontSize, lineWidth, splitPane}, watch, readIds }│
+└─────────────────┬─────────────────────────────────────┬─────────────────┘
+                  │ 查詢參數                             │ (state, queryResult)
+                  ▼                                     ▼
+┌─────────────────────────────────────┐ ┌─────────────────────────────────┐
+│  2. DATA LAYER (TrackerStore)       │ │  3. VIEW LAYER (TrackerView)    │
+│     • 負責 script 載入、快取、去重   │ │     • 單一 CSS Token 主題系統    │
+│     • ensureLoaded(scope) -> Promise│ │     • AppShell / NavBar         │
+│     • query(filter) -> {            │ │     • FilterBar / BriefingBanner│
+│         articles, total, byType,    │ │     • SectionFeed / StatsTiles  │
+│         platforms, watchHits,       │ │     • ArticleCard / RiverRow    │
+│         series14, facets            │ │     • ImmersiveReader (雙欄/全屏)│
+│       }                             │ │     • CraLibraryView            │
+│     • getRelated(article) -> {      │ └─────────────────────────────────┘
+│         sameCve, sameType, prevNext │
+│       }                             │
+└─────────────────────────────────────┘
+```
+
+### 3.1 資料層（Data Layer：`TrackerStore`）— 純查詢 API，絕不碰 DOM
+
+- **職責：** 管理 `window.TRACKER_MANIFESTS`、`window.TRACKER_YEAR`、`window.TRACKER_MONTH`、`window.TRACKER_DAYS` 與 `window.CRA_LIBRARY` 的非同步 `<script>` 注入、記憶體快取、跨日／跨庫 ID 去重、正規化與純函式查詢。
+- **核心公開 API（全部無 DOM 依賴，可在 Node.js 直接測試）：**
+  1. `await store.ensureLoaded({ windowDays, tracker, year, month })`：統一取代分散的 `ensureHubLoaded`、`ensureAllLoaded`、`selectYear`、`selectMonth` 載入鏈。
+  2. `store.normalizeArticle(raw, date)`：在資料進入索引時一次性計算並快取正規化屬性：
+     - `id`（穩定 ID `YYYYMMDD-dbid`，來自 tracker/render.py:116 `            "id": f"{day8}-{r['id']}" if r.get("id") is not None else f"{day8}-{i:03d}",`）
+     - `date`（`YYYY-MM-DD`）
+     - `typeId`（由 `newsTypeOf(raw)` 映射為 9 大新聞類型；若原始 `category` 為 `Linux/Windows/Apple/Android`，則依標題與標籤推導其新聞類型或歸入 `vuln`/`other`，同時將該平台名稱寫入 `platforms[]`）
+     - `platforms[]`（從 `category` 與 `tags` 提取之平台清單）
+     - `cves[]`（從標題與 `tags` 提取之 `CVE-YYYY-NNNN+` 陣列）
+  3. `store.query(params, watchPrefs, lang)`：
+     - **輸入 `params`：** `{ windowDays, year, month, date, sourceTracker, types, platforms, tags, search, searchScope, watchOnly }`
+     - **輸出：**
+       - `articles`：去重且依日期與優先序排好序的文章陣列（每篇附帶 `matchedRules` 與 `isRead`）。
+       - `aggregates`：`{ total, byType, byPlatform, byTag, watchHitsByRule, series14ByType, dateCounts }`。
+  4. `store.getReaderContext(articleId, currentQueryArticles)`：
+     - 回傳 `{ article, index, total, prevArticle, nextArticle, nextInType, sameCveArticles, relatedByTagArticles }`，直接供給沉浸式閱讀器渲染上下篇、同 CVE 事件脈絡與同類型下一篇！
+
+### 3.2 狀態層（State Layer：`TrackerState`）— 單一儲存鍵 + URL Hash 編解碼器
+
+- **職責：** 集中管理「使用者長期偏好（`prefs`，持久化至單一 `localStorage` key `tracker_prefs`）」與「當前導覽路由（`route`，雙向同步至 `location.hash`）」。
+- **單一儲存鍵與自動遷移：**
+  - `loadPrefs(storage)`：若 `tracker_prefs` 存在且 `v === 2` 直接解析；否則呼叫 `migrateV1ToV2(storage)` 讀取 §1.2 所列的 10 個舊 key，轉換為 `v: 2` 結構。
+  - `savePrefs(prefs, storage)`：檢查 `isPreviewMode()`（`?pv=1` 時不寫入），以 `try { storage.setItem('tracker_prefs', JSON.stringify(prefs)); } catch(e) {}` 寫入。
+- **URL Hash 雙向 Codec（100% 向後相容現有 Permalinks）：**
+  - `parseHashRoute(hashStr)`：
+    - 支援舊連結：`#t=security&y=2026&m=2026-10&d=2026-10-19&c=...&q=...`、`#hub=1&hv=tiles&hw=30`、`#lib=1&c=...&g=date`、`#pal=deepsea&p=quick`。
+    - 支援新閱讀器連結：`#a=20261019-42`（可單獨使用，或疊加在任何列表狀態後，如 `#hub=1&hw=30&type=vuln&a=20261019-42`）。
+  - `serializeHashRoute(route, prefs)`：產生精簡且可分享的 hash，當閱讀器開啟時自動帶上 `&a=<articleId>`，關閉時移除 `a=`。
+
+### 3.3 顯示層（View Layer：`TrackerView`）— 純渲染元件 + 單一 Token 系統
+
+- **單一設計 Token 系統（取代 `data-skin` × `data-theme` × `data-palette`）：**
+  - 以 `html[data-theme="<theme-id>"]` 單一屬性控制全站色彩！
+  - 內建 12 組地位平等的 Token 主題：
+    - 2 組基礎主題：`default-dark`（沿用現有 `md3` dark 色票，ui/index.html:37 `[data-skin="md3"][data-theme="dark"] {`）、`default-light`（沿用現有 `md3` light 色票，ui/index.html:72 `[data-skin="md3"][data-theme="light"] {`）。
+    - 10 組特色主題：`deepsea`、`terminal`、`neon`、`amber`、`steel`、`arctic`、`paper`、`warmnight`、`redlight`、`graphite`（來自 ui/index.html:756 `html[data-palette="deepsea"] {` 至 ui/index.html:828 `html[data-palette="graphite"] {`）。
+  - 閱讀模式專用排版 Token（定義於 `:root` 並由 `prefs.reader` 控制）：
+    - `--reader-font-size`（`16px` / `18px` / `20px` / `22px`）
+    - `--reader-measure`（`65ch`，確保每行 60–75 字元最佳閱讀寬度）
+    - `--reader-line-height`（中文 `1.85`、英文 `1.68`）
+- **7 個純渲染元件（輸入 `(data, state, dispatch)` → 輸出 DOM 節點）：**
+  1. `AppShell`：頂部單列導覽列（Logo、主視圖切換、搜尋框、關注規則按鈕、主題／字級按鈕、語言切換）+ 主內容雙欄容器（左側清單區 `#feed-pane` + 右側沉浸式閱讀器 `#reader-pane`）。
+  2. `FilterBar`：整合「期間／歷史年月選擇器」、「9 大新聞類型 Pills」、「平台 Chips（Linux / Apple / Android / Windows）」、「只看關注 Toggle」與「檢視切換（分區／儀表／條列）」。
+  3. `BriefingBanner`：「你的簡報」橫幅（顯示自上次造訪新增關注篇數，可一鍵篩選「只看未讀關注」）。
+  4. `StatsTiles`：情勢儀表磚（4 欄網格 + 14 日迷你長條圖 + 規則命中徽章，直接使用當前主題的 `--surface-container` 與 `--primary`，不再硬編碼深海色）。
+  5. `ArticleCard` / `RiverRow`：支援已讀淡化（`.is-read`）、當前閱讀高亮（`.is-active`）、關注徽章、可點擊的 `#tag` chip 與閱讀預估秒數。
+  6. `ImmersiveReader`：桌面端右側常駐／可收合雙欄閱讀器、手機端全螢幕滑入式閱讀器（詳見 §4）。
+  7. `CraLibraryView`：CRA 參考圖書庫專用高密度表格／條列元件。
+
+### 3.4 現有函式對照表（映射、重構與退場清單）
+
+| 現有函式與行號（含原文引文） | 目標層級 | 處置方式（保留／重構／退場） |
+|---|---|---|
+| ui/index.html:2359 `const NEWS_TYPES = [`<br>ui/index.html:2372 `function newsTypeOf(a) {`<br>ui/index.html:2379 `function articleTags(a) {` | **Data Layer (`TrackerStore`)** | **保留並升格為全站唯一分類標準**：不再侷限於 Hub，所有檢視皆以 `newsTypeOf` 與 `articleTags` 為準。 |
+| ui/index.html:1652 `const WATCH_RULES = [`<br>ui/index.html:1720 `function watchRuleIds(a, watch) {`<br>ui/index.html:1724 `function watchHits(a, watch, tracker) {` | **Data Layer (`TrackerStore`)** | **保留**：移除 `watchHits` 中會造成誤判的 `|| t0 === tracker`（ui/index.html:1745 `if (m.trackers) { parts++; if (!m.trackers.some(t0 => trackers.includes(t0) || t0 === tracker)) return; }`），統一依文章自身的 `a.trackers` 判定。 |
+| ui/index.html:2307 `function termMatches(hay, term) {`<br>ui/index.html:2312 `function matchesQuery(a, q) {` | **Data Layer (`TrackerStore`)** | **保留為純函式**：改由 `store.query({ search, searchScope })` 統一呼叫；移除直接讀全域變數的 `searchHaystack(a)`（ui/index.html:2291 `function searchHaystack(a) {`）。 |
+| ui/index.html:2395 `async function ensureHubLoaded(days, cb) {`<br>ui/index.html:2337 `async function ensureAllLoaded() {`<br>ui/index.html:4063 `function loadYearManifest(year, cb, tracker = state.currentTracker) {`<br>ui/index.html:4072 `function loadMonthManifest(month, cb, tracker = state.currentTracker) {`<br>ui/index.html:4083 `function loadDayFile(file, cb) {` | **Data Layer (`TrackerStore`)** | **重構整併為 `store.ensureLoaded(scope)`**：消除 callback 與 Promise 混用，移除預設參數中的 `state.currentTracker`。 |
+| ui/index.html:2442 `function buildHubModel(days, watch) {`<br>ui/index.html:2570 `function hubCollect(days) {`<br>ui/index.html:2611 `function hubStats(items, today) {`<br>ui/index.html:2965 `function buildSearchIndex() {` | **Data Layer (`TrackerStore`)** | **重構整併為 `store.query(params)`**：消除 `buildHubModel`、`hubCollect`、`renderArticles` 三處重複的掃描與去重迴圈（見 F6）。 |
+| ui/index.html:3064 `const CAT_MAP = {`<br>ui/index.html:3095 `const SECONDARY_PILLS = {`<br>ui/index.html:3101 `function effectiveCat(a, tracker) {` | — | **退場（Drop）**：廢除把跨庫文章硬塞進錯誤分類名稱的 `CAT_MAP`（見 F4），全面改用 `NEWS_TYPES` + `platforms` 標籤。 |
+| ui/index.html:1530 `function parseView(str) {`<br>ui/index.html:1691 `function parseWatch(str) {`<br>ui/index.html:1984 `function parsePalette(str) {`<br>ui/index.html:2514 `function parseHubPrefs(str) {`<br>ui/index.html:2523 `function parseHubSeen(str) {` | **State Layer (`TrackerState`)** | **重構整併為 `parsePrefs` / `migrateLegacyStorage`**：保留其防呆純函式設計（壞 JSON 退回預設值），統一讀寫 `tracker_prefs`。 |
+| ui/index.html:4194 `function syncHash() {`<br>ui/index.html:4241 `function parseHash() {`<br>ui/index.html:4254 `function applyHashRestore() {` | **State Layer (`TrackerState`)** | **重構為純 Codec `encodeHash(route)` / `decodeHash(hash)`**：消除全域旗標 `restoring` / `pendingRestore`（ui/index.html:4190 `var restoring = false;`），並新增 `a=<articleId>` 雙向支援。 |
+| ui/index.html:1516 `const PRESETS = {`<br>ui/index.html:1616 `function setPreset(id) {`<br>ui/index.html:1598 `function applyPresetFilters() {`<br>ui/index.html:3949 `function renderHub(main, articles) {`<br>ui/index.html:3910 `function renderTimeline(main, articles) {` | — | **退場（Drop）**：移除與 Watch Hub 重疊的 `PRESETS` 下拉選單與舊版 `renderHub`；CVE 聚類邏輯從 `renderTimeline` 抽離為 `store.getRelated(article)`。 |
+| ui/index.html:4176 `function toggleSkin() {`<br>ui/index.html:4162 `function toggleTheme() {`<br>ui/index.html:1995 `function setPalette(id) {` | **View Layer (`TrackerView`)** | **整併為 `setTheme(themeId)`**：廢除 `toggleSkin`（僅保留相容別名供 [audit.js](file:///opt/tracker/repo/ui/audit.js) 呼叫），將深淺色與 10 款配色收斂至同一個主題選擇器。 |
+| ui/index.html:3781 `function renderArticles(dateList) {`<br>ui/index.html:2909 `function renderWatchHub(focusFn) {` | **View Layer (`TrackerView`)** | **整併為單一 `renderFeed(queryResult, state)`**：無論使用者選的是「近 30 天全部來源」還是「EU CRA · 2026 年 10 月」，都用同一套分區／儀表／條列渲染器繪製。 |
+| ui/index.html:3974 `function buildCard(a) {`<br>ui/index.html:3891 `function buildRiverRow(a) {`<br>ui/index.html:3504 `function buildLibRow(t, gen, sources) {` | **View Layer (`TrackerView`)** | **保留並純函式化**：改為接收 `(article, state, dispatch)`，支援點擊 `#tag` 篩選、顯示已讀狀態與開啟右側閱讀器。 |
+| ui/index.html:4022 `function openOverlay(a, triggerEl) {`<br>ui/index.html:4051 `function closeOverlay() {` | **View Layer (`ImmersiveReader`)** | **升級重構為 `openReader(articleId)` / `closeReader()`**：從簡陋置中 modal 升級為支援雙欄／全螢幕、鍵盤導覽、結構化欄位與相關文章的沉浸式閱讀器。 |
+
+---
+
+## 4. 沉浸式新聞閱讀體驗設計（Immersive Reading Design — 核心改造）
+
+### 4.1 知名閱讀產品之實測與借鏡（實際抓取之 URL 與觀察）
+
+我們在沙盒中實際抓取並檢驗了以下公開文件與原始碼（無推測）：
+
+| 產品／專案 | 實際抓取之 URL 與 HTTP 狀態 | 抓到的具體設計機制 | 借鏡至本系統的做法 |
+|---|---|---|---|
+| **1. Feedly Reader** | • `https://docs.feedly.com/article/81-what-are-the-keyboard-shortcuts` (HTTP 200)<br>• `https://docs.feedly.com/article/276-how-do-i-change-the-views-of-my-feeds-and-source` (HTTP 200)<br>• `https://docs.feedly.com/article/556-how-to-enable-a-slider-view` (HTTP 200) | 1. **Slider View vs. Article View**：點選文章時右側滑出固定閱讀面板（Slider view），左側保留清單不迷失位置。<br>2. **完整鍵盤流**：`j` / `k` 直接切換並展開下一篇／上一篇（Inline next/prev）、`n` / `p` 移動焦點、`o` 展開或關閉、`m` 切換已讀、`v` 原文開新分頁、`?` 顯示快捷鍵說明。<br>3. **呈現與密度分離**：檢視（Text-only / Magazine / Cards）與密度（Compact / Comfortable）分開控制。 | 桌面採用「左清單 + 右閱讀面板（Split / Slider View）」；完整實作 `j` / `k` / `m` / `v` / `Esc` 快捷鍵；閱讀時自動標記已讀並可按 `m` 切換。 |
+| **2. Firefox Reader View (`@mozilla/readability` + `aboutReader.css`)** | • `https://raw.githubusercontent.com/mozilla/readability/main/README.md` (HTTP 200)<br>• `https://raw.githubusercontent.com/mozilla/gecko-dev/master/toolkit/themes/shared/aboutReader.css` (HTTP 200, 29,609 bytes)<br>*(註：`https://support.mozilla.org/en-US/kb/firefox-reader-view-clutter-free-web-pages` 回傳 `Client Challenge`，故直接抓 Gecko 原始 CSS)* | `aboutReader.css` 以 CSS 變數嚴格控制版心與行高：`--content-width: 22em`（隨字級縮放）、`--line-height: 1.6em`、`max-width: var(--content-width)`，並將字級／版寬／配色控制器收在正文欄外的極簡浮動工具列 `.reader-controls`。 | 閱讀器內文區以 `--reader-measure: 65ch` 鎖定最佳行寬，頂部工具列只留「返回／上下篇／Aa 字級／原文連結」，捲動時零干擾。 |
+| **3. Google News & Apple News** | • `https://news.google.com/` (HTTP 200；前次研究 .common/codex-assist/runs/20261019-ux-research/answer.txt:401 `| https://news.google.com/ | fetched |` 已驗證結構)<br>• `https://www.apple.com/apple-news/` (HTTP 200)<br>*(註：`https://www.inoreader.com/all_articles` 回傳登入頁、`https://www.inoreader.com/blog/2020/05/master-inoreader-with-keyboard-shortcuts.html` 回傳 404，故不引用未抓到的 Inoreader 內部畫面)* | Google News 以「事件叢集（主標 + 多家媒體 + See more headlines & perspectives）」組織同事件新聞；Apple News 強調大標階層與個人化 Briefing。 | 在閱讀器底部自動聚合**「同一事件／多來源報導（`a.sources`）」**與**「站內同 CVE／同主題相關文章」**，讀完一篇可無縫接續「同類型下一篇」。 |
+
+---
+
+### 4.2 缺口聲明（新增閱讀器控制項之雙語權威）
+
+依契約第 3 條，新增之閱讀器介面標籤涉及雙語用詞權威，先列出缺口；下方線框圖使用暫定用語標示：
+
+```
+CODEX-ASSIST-GAP
+  kind: bilingual
+  question: 沉浸式閱讀器新增控制項（字級 Aa、欄寬、標為未讀、已讀進度、同事件相關報導、同類型下一篇、鍵盤快捷鍵說明）的核定中英對照詞彙為何？
+  blocked-by: 專案雙語用詞權威（現有 ui/index.html:2124 `const I18N = {` 與 refs/plans/20261019-watch-and-frame-decisions.md:15 `涉及對象 / Who · 影響地區 / Where` 僅核定現有 UI 與 7 個框架欄位，未涵蓋閱讀器新增控制項）
+  needed: 使用者或 session 核定閱讀器新增 UI 字串之中英對照表
+```
+
+---
+
+### 4.3 桌面版沉浸式閱讀器線框圖（Desktop Two-Pane Master–Detail + Zen Mode）
+
+- **三種寬度自適應：**
+  - **桌面寬螢幕（`≥ 1100px`）雙欄閱讀模式（預設）：** 點擊左側任一卡片或條列時，不彈出遮住全場的黑色遮罩，而是將主工作區平滑分為**左側 42% 清單軌（自動退為緊湊單欄清單，高亮當前文章）+ 右側 58% 沉浸式閱讀面板（`#reader-pane`）**。
+  - **桌面專注全寬模式（點擊閱讀器右上角 `⤢ 專注` 或按 `f`）：** 左側清單暫時收合，閱讀面板居中展開，兩側留白。
+  - **平板／窄視窗（`600px–1099px`）：** 右側滑出覆蓋式抽屜（Slide-over Drawer，寬度 `min(680px, 92vw)`）。
+
+```
+┌──────────────────────────────────────────────────────────────────────────────────────────┐
+│ 🛡️ 資安新聞追蹤  [📰 新聞追蹤] [📚 CRA 法規庫]         🔍 [搜尋…          ] [關注] [🎨Aa] [🌐] │
+├───────────────────────────────────┬──────────────────────────────────────────────────────┤
+│ 期間:[近30天▾] [分區|條列] [★只看關注]│ [← 關閉 Esc]  [↑ 上一篇 k] [↓ 下一篇 j]   [Aa▾] [○未讀 m] [⤢]│
+│ 平台:[Linux 12] [Windows 9]       │ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░ (閱讀進度 62%) │
+├───────────────────────────────────┼──────────────────────────────────────────────────────┤
+│ ▼ 漏洞威脅 (24 篇 · ★ KEV 5)      │                                                      │
+│ ┌───────────────────────────────┐ │  [漏洞威脅]  [★ KEV 已遭利用漏洞]   2026-10-19 · 3 來源 │
+│ │ ✓ Fortinet 修補已遭利用零時差… │ │                                                      │
+│ │   2026-10-19 · BleepingComp.. │ │  Ivanti Connect Secure 爆重大繞過漏洞                 │
+│ └───────────────────────────────┘ │  CVE-2026-12345 遭駭客積極利用                        │
+│ ┌═══════════════════════════════┐ │  ──────────────────────────────────────────────────  │
+│ ║ ▶ ★ Ivanti Connect Secure 爆  ║ │  ┌ 關鍵資訊摘要 (Frame — 有值才顯示) ──────────────┐  │
+│ ║   重大繞過漏洞 CVE-2026-12345 ║ │  │ • 涉及對象 / Who：Ivanti Connect Secure 企業用戶│  │
+│ ║   2026-10-19 · 3 個來源       ║ │  │ • 經過／手法 / How：未授權遠端命令注入          │  │
+│ └═══════════════════════════════┘ │  │ • 受影響產品 / Products：ICS 9.x / 22.x         │  │
+│ ┌───────────────────────────────┐ │  │ • 影響範圍 / Impact：可取得系統 root 權限       │  │
+│ │ ● Linux kernel nf_tables 提權 │ │  └─────────────────────────────────────────────────┘  │
+│ │   2026-10-18 · LWN.net        │ │                                                      │
+│ └───────────────────────────────┘ │  Ivanti 今日發布緊急安全公告，指出旗下 VPN 設備       │
+│                                   │  存在高風險驗證繞過與命令注入漏洞（CVE-2026-12345）。 │
+│ ▼ 法規標準 (18 篇 · ★ CRA 4)      │  CISA 已將該漏洞列入已知遭利用漏洞目錄（KEV），要求   │
+│ ┌───────────────────────────────┐ │  聯邦機構於 10 月 28 日前完成修補或停用設備。         │
+│ │ ● ENISA 發布 CRA 漏洞通報指引 │ │                                                      │
+│ │   2026-10-18 · ENISA          │ │  （內文版心鎖定 60–72 字元 max-width: 65ch，         │
+│ └───────────────────────────────┘ │   中文字級 18px、行高 1.85、段落間距 1.2em）         │
+│                                   │                                                      │
+│                                   │  [#CVE-2026-12345 ↗] [#Ivanti] [#KEV] [#Zero-Day]    │
+│                                   │  ──────────────────────────────────────────────────  │
+│                                   │  📰 原始報導來源 (3)              [按 v 開啟首個來源] │
+│                                   │   1. [EN] BleepingComputer — Ivanti warns of new... ↗│
+│                                   │   2. [EN] CISA Advisories — CISA Adds One Known...  ↗│
+│                                   │   3. [ZH] iThome — Ivanti 修補已被利用的 VPN 漏洞   ↗│
+│                                   │  ──────────────────────────────────────────────────  │
+│                                   │  🔗 同事件／相關追蹤 (依 CVE-2026-12345 與標籤聚類)   │
+│                                   │   • 2026-10-17  Ivanti 釋出臨時緩解措施 XML 檔        │
+│                                   │   • 2026-10-14  Mandiant 揭露 UNC5221 針對邊界設備攻擊│
+│                                   │  ──────────────────────────────────────────────────  │
+│                                   │  ┌ 下一篇漏洞威脅 (按 j 或 →) ─────────────────────┐ │
+│                                   │  │ Linux kernel nf_tables 提權漏洞                 ▸ │ │
+│                                   │  └─────────────────────────────────────────────────┘ │
+└───────────────────────────────────┴──────────────────────────────────────────────────────┘
+```
+
+---
+
+### 4.4 手機版沉浸式閱讀器線框圖（Phone Full-Screen Reader + Swipe & Minimal Chrome）
+
+- **全螢幕無干擾設計（`< 600px`）：**
+  - 點擊文章後，閱讀器以全螢幕視圖（`100dvh`）滑入，**完全隱藏全域 Header、搜尋列與分類 Pills**，將 100% 螢幕空間留給正文。
+  - **極簡浮動控制列（Minimal Chrome）：** 頂部僅保留一條 44px 薄型返回與進度列；底部設有拇指友善（48×48dp 觸控目標，符合 ui/audit.js:383 `    out.push(chk('D9 hit targets >= 48x48', tooSmall.length === 0,`）的操作列。往下捲動閱讀時，底部操作列自動半透明收合；往上輕滑或捲到底部時浮現。
+  - **手勢滑動（Touch Swipe）：** 支援水平滑動手勢（`touchstart` / `touchend`，水平位移 `|Δx| > 60px` 且 `|Δx| > 2 * |Δy|`）：**左滑下一篇、右滑上一篇**，並在邊緣給出輕量視覺回饋。
+
+```
+┌──────────────────────────────────────┐
+│ [← 返回清單]    3 / 24     [Aa] [↗]  │ ← 44px 極簡頂欄 + 2px 頂部閱讀進度條
+│ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░░░░░░ │
+├──────────────────────────────────────┤
+│ [漏洞威脅] [★ KEV]        2026-10-19 │
+│                                      │
+│ Ivanti Connect Secure 爆重大繞過     │
+│ 漏洞 CVE-2026-12345 遭駭客積極利用   │
+│                                      │
+│ ┌ 關鍵資訊 ────────────────────────┐ │
+│ │ 對象：Ivanti Connect Secure 用戶 │ │
+│ │ 手法：未授權遠端命令注入         │ │
+│ │ 影響：可取得系統 root 權限       │ │
+│ └──────────────────────────────────┘ │
+│                                      │
+│ Ivanti 今日發布緊急安全公告，指出旗  │
+│ 下 VPN 設備存在高風險驗證繞過與命令  │
+│ 注入漏洞（CVE-2026-12345）。         │
+│                                      │
+│ CISA 已將該漏洞列入已知遭利用漏洞目  │
+│ 錄（KEV），要求聯邦機構於 10 月 28   │
+│ 日前完成修補或停用設備。             │
+│                                      │
+│   ◀ 右滑上一篇        左滑下一篇 ▶   │
+│                                      │
+│ [#CVE-2026-12345] [#Ivanti] [#KEV]   │
+│ ──────────────────────────────────── │
+│ 📰 來源 (3)：BleepingComputer ↗ ·    │
+│              CISA ↗ · iThome ↗       │
+│ 🔗 同 CVE 相關報導 (2 篇)            │
+│  ▸ 10-17 Ivanti 釋出臨時緩解措施     │
+│ ──────────────────────────────────── │
+│ 下一篇：Linux kernel nf_tables 提權 ▸│
+├──────────────────────────────────────┤
+│  [◀ 上一篇]   [✓ 已讀]   [下一篇 ▶]  │ ← 48dp 拇指操作列（往下讀時自動隱藏）
+└──────────────────────────────────────┘
+```
+
+---
+
+### 4.5 沉浸式閱讀 8 大細節規格
+
+1. **雙欄／全螢幕模式切換（Reader Mode）：**
+   - 桌面端（`≥ 1100px`）預設為 Master–Detail 雙欄並排，使用者可一邊掃描左側標題流、一邊在右側連續讀內文，無須反覆開關彈窗；亦可按 `f` 鍵或 `⤢` 切換居中單欄專注模式（Zen mode）。
+   - 手機端（`< 600px`）為全螢幕視圖，支援原生瀏覽器返回鍵（透過 URL hash `a=<id>` 與 `hashchange` 連動）。
+2. **排版與字體控制（Typography & Measure）：**
+   - **最佳行寬（Measure）：** 正文容器設定 `max-width: 65ch`（英文約 65–72 字元、繁體中文約 32–36 個全形字），避免寬螢幕視線長距離跳行疲勞。
+   - **CJK 友善行高與段落：** 中文模式預設字級 `18px`、`line-height: 1.85`、段落間距 `margin-bottom: 1.15em`、`letter-spacing: 0.015em`；英文模式預設 `18px`、`line-height: 1.68`。
+   - **段落化呈現：** 將摘要中的句號或換行（以及未來 refs/plans/20261019-watch-and-frame-decisions.md:15 `涉及對象 / Who · 影響地區 / Where · 起因 / Why · 經過／手法 / How · 影響範圍 / Impact ·` 的結構化 `frame` 欄位）渲染為清晰的重點摘要卡 + 分段內文，不再擠成一整塊文字牆。
+   - **字級控制（`Aa`）：** 提供 4 階字級（標準 `16px` / 舒適 `18px` / 大字 `20px` / 特大 `22px`），儲存在 `tracker_prefs.reader.fontSize`。
+     - *設計系統守門相容性注意：* ui/audit.js:162 `    out.push(chk('B1 distinct font sizes <= 5', fontSizes.size <= 5,` 要求預設狀態下全頁不同 `font-size` 數 `<= 5`。因此預設字級對齊現有尺度（`12px` / `13px` / `14px` / `18px` / `22px`），僅在使用者主動調整 `--reader-font-size` 時覆寫閱讀器正文。
+3. **鍵盤快捷鍵（Keyboard Navigation）：**
+   - 當焦點不在 `<input>` / `<select>` / `<textarea>` 時：
+     - `j` 或 `ArrowRight`：直接切換至當前清單的**下一篇**文章（若閱讀器未開則開啟第一篇）。
+     - `k` 或 `ArrowLeft`：直接切換至當前清單的**上一篇**文章。
+     - `Esc`：關閉閱讀器並將焦點還原至觸發卡片（維持 ui/audit.js:306 `    out.push(chk('D7 focus restored to source card', d7, {}));` 通過）。
+     - `m`：切換當前文章「已讀／未讀」狀態。
+     - `v` 或 `o`：於新分頁開啟第一則原始新聞來源（驗證 `safeHref`，ui/index.html:4159 `function safeHref(u) {`）。
+     - `f`：桌面端切換「雙欄並排 ⇄ 專注全寬」。
+4. **手機滑動手勢（Swipe on Phone）：**
+   - 在 `#reader-pane` 綁定被動觸控偵測（`passive: true`），當 `Math.abs(dx) > 60 && Math.abs(dx) > 2 * Math.abs(dy)` 時：左滑呼叫 `openNextArticle()`、右滑呼叫 `openPrevArticle()`。
+5. **閱讀進度與已讀狀態（Progress & Read State）：**
+   - **單篇捲動進度條：** 閱讀面板頂部設 2px 進度條（`scrollTop / (scrollHeight - clientHeight)`），長文或含多關聯文章時一目了然。
+   - **清單位置指示：** 頂欄顯示 `第 3 / 24 篇`，掌握目前在篩選清單中的進度。
+   - **本地已讀紀錄（Read Markers）：** 點開文章滿 1.5 秒（或捲動到底）自動將 `article.id` 記入 `prefs.readState.readIds`（上限 3000 筆 FIFO，且 `?pv=1` 不寫入）。清單中未讀文章顯示醒目標題與左側圓點 `●`，已讀文章標題降為 `var(--on-surface-variant)` 並標示 `✓`，使用者亦可隨時按 `m` 標回未讀。
+6. **閱讀時極簡外框（Minimal Chrome While Reading）：**
+   - 閱讀面板內部移除所有分類色塊噪音，只留頂部微幅工具列；在手機端或桌面 Zen 模式下，捲動閱讀正文時頂部導覽不佔位。
+7. **文末來源與相關文章聚類（Sources & Related Articles — Same CVE / Cluster）：**
+   - 文末第一區：**原始報導來源**（顯示語言標籤 `[EN]`/`[ZH]`、媒體名稱、網域，點擊開新分頁）。
+   - 文末第二區：**同事件／相關追蹤（純前端即時聚合，不需等後端 pipeline）**：
+     - 優先比對**相同 CVE 編號**（例如同含 `CVE-2026-12345` 的跨日文章，按日期倒序排列，呈現事件時間軸）。
+     - 若無 CVE，比對目前已載入視窗中**共享 `>= 2` 個相同標籤（`articleTags`）**的文章（最多取 5 篇），點擊直接在閱讀器內無縫切換！
+8. **「同類型下一篇」（Next in This Type）：**
+   - 文末底部設有一張大尺寸預覽卡「下一篇〔漏洞威脅〕：`<標題>` ▸」，即使使用者從「我的關注」分區首頁（每區預設只露 6 篇）點進來，也能在閱讀器內一路順著同一個新聞類型讀完全部文章，不必退回首頁點「全部 ›」。
+
+---
+
+## 5. 統一導覽模型與資訊架構樹（One Navigation Model）
+
+### 5.1 如何無損整合「我的關注總覽」、「依來源歷史歸檔」與「CRA 參考圖書庫」
+
+目前網站之所以分裂，是因為把「我的關注（近 7/30/90 天跨庫）」與「依來源瀏覽（單一 tracker 歷史年月）」做成兩個互斥的頁面模式（`selectHub` vs. `selectTracker`），各自擁有不同的篩選器與版型控制。
+
+**統一方案：**
+- 全站只有**兩個頂層工作區分頁**：
+  1. **📰 新聞追蹤（News Workspace — 預設）**：將「我的關注總覽」與「歷史歸檔」**合而為一**！
+     - **時間範圍選擇器（Window / Archive Picker）**：預設為「近 30 天」（可選 `近 7 天`、`近 30 天`、`近 90 天`、`📅 歷史年月歸檔 YYYY / MM / DD`）。當選「歷史年月歸檔」時，展開年月／日期選擇器（即原本的 Archive 能力）。
+     - **來源篩選（Source Filter）**：預設為「全部來源（資安 + EU CRA + 作業系統）」，也可單選「僅資安」、「僅 EU CRA」、「僅作業系統」（即原本 `#src-menu` 的能力，但現在同樣享有新聞類型分區、平台標籤、儀表磚與沉浸式閱讀器！）。
+  2. **📚 CRA 法規文件庫（CRA Reference Library）**：保留 `data/cra_library.js` 的 94 個官方主題目錄（依分類／日期／來源排列），共用同一個頂部 Header、搜尋框（可在 CRA 庫內即時過濾標題／來源！）與主題配色。
+
+### 5.2 資訊架構樹（Information Architecture Tree）
+
+```
+資安新聞追蹤系統 (App Shell)
+├── 1. 全域頂部列 (Global Header — 單列極簡)
+│   ├── 主工作區切換：[📰 新聞追蹤 (預設)]  [📚 CRA 法規文件庫]
+│   ├── 全域搜尋框：即時搜尋 (範圍 Chips：標題 / 內文 / 標籤)
+│   └── 全域偏好工具：[★ 關注規則設定]  [🎨 主題與閱讀排版 (12 主題 + 字級)]  [🌐 中/EN]
+│
+├── 2. 📰 新聞追蹤工作區 (Unified News Workspace — 取代舊 Hub + 舊 Archive)
+│   ├── 2.1 你的簡報列 (Briefing Bar)：自上次造訪新增 N 篇關注 · [只看新增] [★ 只看關注]
+│   ├── 2.2 統一篩選與檢視列 (Unified Filter & View Bar)
+│   │   ├── 時間範圍：[近 7 天] [● 近 30 天] [近 90 天] [📅 歷史年月歸檔 ▾ (年/月/日抽屜)]
+│   │   ├── 來源範圍：[● 全部來源] [資安] [EU CRA] [作業系統]
+│   │   ├── 新聞類型 (9 大類型)：[全部] [漏洞威脅] [重大事件] [法規標準] [供應鏈開源] [焦點綜合] [產業動態] [前瞻技術] [研討活動] [其他]
+│   │   ├── 平台標籤 Chips：[Linux] [Windows] [Apple] [Android] + 熱門 #Tag Chips
+│   │   └── 清單呈現切換：[分區 (Sections)]  [情勢儀表 (Tiles)]  [緊湊條列 (River)]
+│   │
+│   ├── 2.3 左側／主清單區 (#feed-pane)
+│   │   ├── 模式 A：新聞類型分區 (Sections — 預設，每區可展開卡片或條列)
+│   │   ├── 模式 B：情勢儀表磚 (Tiles — 9 大類型計數 + 14 日趨勢 + 關注命中 + 點擊 Drill-down)
+│   │   └── 模式 C：時間流緊湊條列 (River — 依日期分組之高密度標題流，支援歷史單日／整月檢視)
+│   │
+│   └── 2.4 右側／全螢幕沉浸式閱讀器 (#reader-pane — URL hash `#...&a=<id>`)
+│       ├── 閱讀器控制列：返回 / 上一篇(k) / 下一篇(j) / 字級(Aa) / 已讀切換(m) / 專注寬度(f)
+│       ├── 正文區：標題 + 關注徽章 + 關鍵資訊框架卡 (Frame) + 65ch 舒適排版內文 + 標籤
+│       ├── 來源與脈絡區：原始報導外連 (v) + 同 CVE 事件時間軸 + 同標籤相關文章
+│       └── 連續閱讀導引：「同類型下一篇」預覽卡
+│
+└── 3. 📚 CRA 法規文件庫工作區 (CRA Library Workspace — URL hash `#lib=1&c=...&g=...`)
+    ├── 篩選與排列列：主題分類 Pills + 排列方式 [分類 | 日期 | 來源] + 關鍵字即時過濾
+    └── 官方文件高密度清單：修訂日期 + 文件標題 (NEW / UPDATED 標記) + 官方來源外連
+```
+
+---
+
+## 6. 漸進式遷移切片計畫（Migration Slice Plan）
+
+**設計原則：**
+- 每個切片皆可獨立交付、獨立驗證，不進行一次性大爆炸重寫（No big-bang rewrite）。
+- 嚴格維持現有所有 URL hash 永久連結（`#hub=1...`、`#lib=1...`、`#t=security&y=...`）與 `?pv=1` 預覽模式契約，且每個切片都必須通過 `pytest` 與瀏覽器端 [audit.js](file:///opt/tracker/repo/ui/audit.js)（`runAudit().pass === true`）。
+
+| 切片 | 目標與變更內容 | 觸碰檔案 | 使用者可見變化 | 可重跑之驗收檢查（Node 純函式測試 + 瀏覽器 DOM／Audit 檢查） |
+|---|---|---|---|---|
+| **M1** | **資料層脫鉤（`TrackerStore` 純查詢與相關文章引擎）**<br>將散落的資料載入、跨日 ID 去重、新聞類型／平台正規化、搜尋與關注比對抽成獨立 `TrackerStore`（含 `query()` 與 `getReaderContext()`），消除 F6 的三處重複迴圈與 F4 的 `CAT_MAP` 歧義。 | [index.html](file:///opt/tracker/repo/ui/index.html)<br>`tests/test_ui_store.py`（新增，以 `node -e` 載入純函式測試） | 視覺不變；修正單 tracker 檢視下同 ID 文章未去重的問題，查詢與切換速度提升。 | • **Node 檢查：** `pytest tests/test_ui_store.py -q`（驗證 `store.query` 去重、`watchRuleIds` 在 `tracker=null` 不誤判、`getReaderContext` 正確回傳同 CVE 與同類型下一篇）。<br>• **DOM 檢查：** 瀏覽器執行 `runAudit().pass === true`；切換各視圖 `#article-count` 與改造前一致。 |
+| **M2** | **狀態層統一與 10 個 `localStorage` Keys 整併（`TrackerState` + Hash Codec）**<br>實作 `tracker_prefs` (v2) 與自動遷移函式 `migrateLegacyStorage`，並將 `syncHash` / `parseHash` 升級為支援 `a=<articleId>` 且完整相容舊 hash 的純 Codec。 | [index.html](file:///opt/tracker/repo/ui/index.html)<br>`tests/test_ui_state.py`（新增） | 使用者既有設定（語言、配色、關注規則、已看紀錄）無縫保留；網址開始支援 `#...&a=<id>` 文章永久連結。 | • **Node 檢查：** `pytest tests/test_ui_state.py -q`（驗證 10 個舊 key 正確遷移至 `tracker_prefs`、壞 JSON 回退預設、`?pv=1` 零寫入、舊 hash `#t=security&y=2026` 與新 `#hub=1&a=20261019-1` round-trip）。<br>• **DOM 檢查：** [audit.js](file:///opt/tracker/repo/ui/audit.js) Group E（`E1`–`E6`）全數 PASS。 |
+| **M3** | **單一設計 Token 主題系統與移除失效控制項（解決 F1、F2、F3）**<br>將 `skin` × `theme` × `palette` 收斂為單一 12 款主題選擇器（預設深色／預設淺色 + 10 款主題）；讓 `.wh-dash` 儀表磚改吃主題 Token（解決 F2 淺色破版）；移除在 Hub 頁無效的 `#view-select` 下拉選單與 `#skin-btn`（保留 JS `toggleSkin` 相容函式供 `audit.js` 呼叫）。 | [index.html](file:///opt/tracker/repo/ui/index.html) | Header 右上角從 6 顆雜亂控制項精簡為直覺的「關注｜主題配色｜語言」，淺色主題下的儀表模式不再突兀變黑。 | • **Node 檢查：** 以 script 檢查所有 12 款主題的 `--on-surface` 與 `--surface` 對比度 `>= 4.5`。<br>• **DOM 檢查：** 瀏覽器執行 `runAudit()` Group B（`B1`–`B6`）與 Group C（`C1`–`C5`）全數 PASS；切換 12 款主題皆無失效按鈕。 |
+| **M4** | **統一導覽模型（合併 Watch Hub 與 Archive 依來源／歷史年月瀏覽）**<br>將「依來源瀏覽」與「歷史年月側欄」整合進主工作區的統一 FilterBar（時間窗 `7/30/90 天` + `歷史年月歸檔`；來源 `全部 / 資安 / EU CRA / OS`），CRA 庫則作為第 2 個頂層分頁並共用即時搜尋。 | [index.html](file:///opt/tracker/repo/ui/index.html) | 不再有兩套割裂的分類邏輯；選單一來源或歷史月份時，也能使用新聞類型分區、平台標籤篩選與儀表磚。 | • **Node 檢查：** 驗證舊深連結 `#t=eu_cra&y=2026&m=2026-10` 自動映射為統一篩選狀態 `{ sourceTracker:'eu_cra', year:'2026', month:'2026-10' }`。<br>• **DOM 檢查：** 驗證桌面與 375px 手機寬度下 `scrollWidth <= innerWidth`（[audit.js](file:///opt/tracker/repo/ui/audit.js) A5 PASS）。 |
+| **M5** | **沉浸式閱讀器核心（桌面雙欄 Master–Detail + 手機全螢幕 + 排版與已讀狀態）**<br>以 `ImmersiveReader` 取代置中 `#overlay`：桌面端右側常駐／可收合雙欄閱讀面板（65ch 行寬、1.85 行高、字級切換、閱讀進度條、1.5 秒自動標記已讀），手機端全螢幕滑入視圖。 | [index.html](file:///opt/tracker/repo/ui/index.html)<br>`tests/test_ui_reader.py`（新增） | 點開新聞不再是狹窄彈窗，而是舒適的雙欄／全螢幕沉浸式閱讀器，已讀文章在清單中自動淡化標記。 | • **Node 檢查：** `pytest tests/test_ui_reader.py -q`（驗證已讀 ID FIFO 上限、字級狀態存取、文章 permalink `#a=<id>` 解析）。<br>• **DOM 檢查：** 點擊卡片開啟 `#reader-pane`，驗證 `max-width: 65ch`、關閉後焦點還原至原卡片（[audit.js](file:///opt/tracker/repo/ui/audit.js) D1/D2/D5/D6/D7 PASS）。 |
+| **M6** | **連續閱讀流：鍵盤 `j`/`k`/`m`/`v`/`Esc`、手機左右滑動、同 CVE 相關文章與「同類型下一篇」**<br>在閱讀器文末掛接 `store.getReaderContext` 輸出之「同 CVE 事件時間軸」、「同標籤相關文章」與「同類型下一篇」卡片，並綁定全域鍵盤快捷鍵與手機 Swipe 手勢。 | [index.html](file:///opt/tracker/repo/ui/index.html)<br>`tests/test_ui_reader.py` | 讀完一篇可直接按 `j`、左滑或點擊底部「同類型下一篇」連續閱讀，並直接在文末看到同一 CVE 的歷史脈絡。 | • **Node 檢查：** 驗證 `getReaderContext` 在同 CVE 跨日文章與無 CVE 同標籤文章的排序與去重。<br>• **DOM 檢查：** 在瀏覽器派發 `KeyboardEvent('keydown', {key:'j'})` 與 `{key:'k'}`，確認閱讀器標題與 URL hash `a=<id>` 同步切換至下一篇／上一篇。 |
+
+---
+
+## 7. 風險與需請使用者裁決的 4 個簡單決定（Risks & Decisions）
+
+### 7.1 主要技術風險與緩解措施
+
+1. **[audit.js](file:///opt/tracker/repo/ui/audit.js) 既有自動化守門契約相容性風險：**
+   - ui/audit.js:405 `      localStorage.setItem('tracker_theme', before === 'dark' ? 'light' : 'dark');`、ui/audit.js:476 `      localStorage.setItem('tracker_skin', before === 'md3' ? 'classic' : 'md3');` 與 ui/audit.js:495 `    if (typeof toggleSkin === 'function') {` 直接讀寫舊 key 與呼叫 `toggleSkin()`；且 ui/audit.js:162 `    out.push(chk('B1 distinct font sizes <= 5', fontSizes.size <= 5,` 限制預設畫面字級種類 `<= 5`。
+   - **緩解：** 在 State 層保留對 `tracker_theme` / `tracker_skin` 的同步讀寫 shim 與 `toggleSkin()` 函式，並確保閱讀器預設字級復用既有 `18px` / `22px` 階梯（僅在使用者自訂字級時改變 `--reader-font-size`），或是由 session 授權於切片 M3 同步更新 [audit.js](file:///opt/tracker/repo/ui/audit.js)。
+2. **歷史歸檔全量載入記憶體風險：**
+   - 若使用者在統一視圖選擇「全年」且「全部來源」，載入整年所有 `data-YYYYMMDD.js` 檔案數較多。
+   - **緩解：** 預設維持「近 30 天」視窗；當切換至「歷史年月歸檔」時預設載入單月（與現有 `selectMonth` 行為一致），僅在明確點選「全年」時批次載入。
+
+### 7.2 需請使用者拍板的 4 個決定（附建議選項）
+
+| # | 需請您拍板的決定 | 選項 | 我們的推薦與理由 |
+|---|---|---|---|
+| **決策 1** | **桌面版點開新聞時的預設閱讀方式？** | **A.** 右側展開「左清單 + 右內文」雙欄並排（並提供一鍵切換全寬專注模式）<br>**B.** 直接以居中寬版覆蓋頁開啟（類似 Medium / Apple News 單欄） | **推薦 A（雙欄並排 + 可切全寬）**：資安新聞常需快速掃描多則標題並連續點讀，雙欄模式搭配 `j` / `k` 鍵能一氣呵成讀完一整區，需要深讀長文時再按 `⤢` 切全寬即可。 |
+| **決策 2** | **頂部「檢視模式（預設／快讀／分析師／事件追蹤／合規 CRA）」與「切換外觀（笑臉鈕）」是否移除？** | **A.** 移除這兩顆重疊按鈕，統一由「分區／儀表／條列」與「12 款主題配色」控制<br>**B.** 保留下拉選單作為快速篩選捷徑 | **推薦 A（移除重疊控制項）**：這兩顆按鈕是目前介面感覺「好幾套混在一起」的主因（且在預設總覽頁點選「快讀／分析師」完全無反應，見 F1、F3），收斂後頂部瞬間清爽直覺。 |
+| **決策 3** | **舊版「依來源瀏覽（資安／EU CRA／作業系統）」如何與「我的關注總覽」整合？** | **A.** 合併為同一個新聞工作區，把「來源」與「歷史年月」變成篩選列上的條件<br>**B.** 維持頂部兩顆獨立入口（「★ 總覽」與「依來源瀏覽 ▾」） | **推薦 A（合併為單一工作區）**：使用者即使想看「2026 年 9 月的 EU CRA 新聞」，也應該享有相同的 9 大新聞類型分區與沉浸式閱讀器，不必被迫切換到另一套長相與分類邏輯都不同的舊畫面。 |
+| **決策 4** | **如何提升「單段 AI 摘要」在閱讀器中的沉浸感？** | **A.** 純前端先做「自動分段 + 醒目高亮 CVE／關鍵字 + 底部串聯同 CVE 歷史報導 + 預留 7 大關鍵資訊框架卡位置」<br>**B.** 必須等後端 LLM pipeline 重跑產出長文與 `frame` 欄位後才改閱讀器 | **推薦 A（純前端先升級閱讀器與同事件串聯）**：現有 `data-*.js` 只有單段 `summary`，但透過舒適的 65ch 字級行高、自動依句號／分號適度分段、加上底部自動聚合「站內同 CVE／同主題歷史報導」，立刻就能在不重跑 LLM 的情況下大幅提升閱讀深度，且可無縫接軌未來的 `frame` 欄位。 |
+
+---
+
+## 8. 假設與驗證統計
+
+- **已驗證（Verified）：**
+  - 完整讀取 `/opt/tracker/repo/ui/index.html`（4354 行）、`/opt/tracker/repo/ui/audit.js`（562 行）、`/opt/tracker/repo/tracker/render.py`（249 行）、`/opt/tracker/repo/tracker/web_dashboard.py`（第 215 至 280 行）及 4 份既有研究與裁示文件。
+  - 所有 178 處 `file:line` 引用皆經腳本逐一比對行號與原文引文（`>= 8` 字元單行完全相符），另有 4 項行數／鍵數／absence 指令實測。
+  - 實際透過 HTTP 抓取並查驗 Feedly Docs 3 篇、Mozilla Readability README 與 Gecko `aboutReader.css`、Apple News 首頁、Google News 首頁。
+- **假設（Assumed）：**
+  1. 桌面雙欄閱讀器的預設比例（42% : 58%）與舒適行高（`1.85`）、已讀停留秒數（1.5 秒）為 UX 設計提案值，尚未經真實使用者 A/B 測試。
+  2. 在 `CODEX-ASSIST-GAP`（bilingual）獲核定前，線框圖中之新增閱讀器控制項名稱（如「專注」、「同事件／相關追蹤」、「下一篇」）為暫定示意文案。
+  3. 假設 [audit.js](file:///opt/tracker/repo/ui/audit.js) 在遷移期間仍為驗收守門工具，因此切片計畫預設保留對 `toggleSkin` 與 `tracker_theme` 的相容 shim，不假設可直接刪除 [audit.js](file:///opt/tracker/repo/ui/audit.js) 內的斷言。
+
+verified: 182  assumed: 3  gaps: 1  findings: 6

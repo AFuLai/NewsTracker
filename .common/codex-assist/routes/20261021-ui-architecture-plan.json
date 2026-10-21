@@ -1,0 +1,51 @@
+{
+ "task_id": "20261021-ui-architecture-plan",
+ "at": "2026-10-21T00:55:48Z",
+ "machine": "afu-delta",
+ "engine": "agy",
+ "model": "gemini-4-argon-medium",
+ "effort": null,
+ "ab_of": "gemini-3.8-flash-medium",
+ "step": 0,
+ "target_step": 0,
+ "fallback": false,
+ "rank": null,
+ "target_rank": 3,
+ "pref": "balanced",
+ "verdict": "ROUTED",
+ "via": [
+  "SCHEDULE class review: 2 step(s), engine order codex gpt-6.1-sol/medium > codex gpt-6-sol/medium > codex gpt-6-astra/medium > agy gemini-3.8-flash-medium (pinned to agy)",
+  "BASE plan -> rank 3",
+  "QUOTA agy pools refreshed from `agy -p /usage` (4 readings)",
+  "QUOTA claude plan refreshed from its usage endpoint (2 readings)",
+  "LEARNED not applied under the schedule (its per-model history predates it)",
+  "SIMILAR 0 past task(s) with word overlap >= 0.60, 0 failed: no change",
+  "NPU 0 similar past task(s), 0 failed: no change (it never lowers)",
+  "AB arm B: gemini-4-argon-medium instead of gemini-3.8-flash-medium",
+  "SCHEDULE chose agy gemini-4-argon-medium (step 0); bucket agy is UNDER"
+ ],
+ "warnings": [],
+ "quota": {
+  "codex": "ON",
+  "claude": "ON",
+  "agy": "UNDER",
+  "agy-claude": "ON"
+ },
+ "similar": {
+  "neighbours": []
+ },
+ "npu": {
+  "mode": "auto",
+  "status": "RAN",
+  "device": "NPU",
+  "neighbours": []
+ },
+ "router": {
+  "name": "route.py",
+  "version": "0.7.0",
+  "sha256": "42393f70d32062854957c79ab32c2f98e6c17c937cf28dcce191b7b98e1afb82"
+ },
+ "policy_sha256": "c09e1d86517d48ee74c6120c11e955ca474ed7d0142846249242b7e639ddd01e",
+ "task_sha256": "07524813e5c553d96c7979af1ca0ec377c0dd9f015587c036b8d274240e9630c",
+ "rederive": "python3 tools/codex-assist/route.py .common/codex-assist/tasks/20261021-ui-architecture-plan.json --no-write"
+}

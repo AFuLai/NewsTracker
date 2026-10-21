@@ -1,0 +1,74 @@
+grep -n "localStorage" /opt/tracker/repo/ui/index.html
+curl -sL -m 10 -w "\nHTTP_STATUS:%{http_code}\n" "https://docs.feedly.com/article/55-keyboard-shortcuts" | head -n 40; curl -sL -m 10 -w "\nHTTP_STATUS:%{http_code}\n" "https://www.inoreader.com/blog/2020/05/master-inoreader-with-keyboard-shortcuts.html" | head -n 40; curl -sL -m 10 -w "\nHTTP_STATUS:%{http_code}\n" "https://support.mozilla.org/en-US/kb/firefox-reader-view-clutter-free-web-pages" | head -n 40; curl -sL -m 10 -w "\nHTTP_STATUS:%{http_code}\n" "https://news.google.com/" | head -n 40
+grep -oE "localStorage\.(get|set|remove)Item\('[^']+'" /opt/tracker/repo/ui/index.html | sort -u; curl -sL -m 10 -o /tmp/apple_news.html -w "APPLE:%{http_code}\n" "https://www.apple.com/apple-news/"; curl -sL -m 10 -o /tmp/feedly_kb.html -w "FEEDLY:%{http_code}\n" "https://docs.feedly.com/article/70-keyboard-shortcuts"; curl -sL -m 10 -o /tmp/inoreader_home.html -w "INO:%{http_code}\n" "https://www.inoreader.com/"; grep -iE "shortcut|view|magazine|card|column|reader|swipe|font" /tmp/apple_news.html /tmp/fee…
+curl -sL -m 10 -w "\nSTATUS1:%{http_code}\n" "https://raw.githubusercontent.com/mozilla/readability/main/README.md" | head -n 35; curl -sL -m 10 -w "\nSTATUS2:%{http_code}\n" "https://www.inoreader.com/all_articles" | grep -iE "title|view|column|card|magazine" | head -n 20; curl -sL -m 10 -w "\nSTATUS3:%{http_code}\n" "https://docs.feedly.com/search?query=keyboard" | grep -oE 'href="[^"]*article/[^"]*"' | head -n 10
+curl -sL -m 10 "https://docs.feedly.com/article/81-what-are-the-keyboard-shortcuts" | sed -e 's/<[^>]*>/ /g' | tr -s ' \n' ' ' | fold -w 100 | head -n 25; echo "---"; curl -sL -m 10 "https://docs.feedly.com/search?query=views" | grep -oE 'href="[^"]*article/[^"]*"' | head -n 10; echo "---"; curl -sL -m 10 -w "\nAPPLE_GUIDE:%{http_code}\n" "https://support.apple.com/en-us/HT202526" | sed -e 's/<[^>]*>/ /g' | tr -s ' \n' ' ' | fold -w 100 | head -n 20
+node -e '
+const https = require("https");
+function get(u) {
+  return new Promise(r => https.get(u, res => {
+    let b = ""; res.on("data", c => b += c); res.on("end", () => r(b));
+  }));
+}
+(async () => {
+  for (const u of [
+    "https://docs.feedly.com/article/81-what-are-the-keyboard-shortcuts",
+    "https://docs.feedly.com/article/276-how-do-i-change-the-views-of-my-feeds-and-source",
+    "https://docs.feedly.com/article/556-how-to-enable-a-slider-view"
+  ]) {
+    const h = await get(u);
+    const m = h.m…
+node -e '
+const https = require("https");
+function get(u) {
+  return new Promise(r => https.get(u, res => {
+    let b = ""; res.on("data", c => b += c); res.on("end", () => r(b));
+  }));
+}
+(async () => {
+  const h = await get("https://docs.feedly.com/article/81-what-are-the-keyboard-shortcuts");
+  const m = h.match(/id="fullArticle"[^>]*>([\s\S]*?)<\/article>/);
+  console.log("FEEDLY_KB:", m ? m[1].replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim() : "");
+  const r = await get("https://raw.githubuserconte…
+ls -la /opt/tracker/repo/tests/ && head -n 35 /opt/tracker/repo/tests/test_ui_view_presets.py /opt/tracker/repo/tests/test_ui_watch.py /opt/tracker/repo/tests/test_ui_hub.py 2>/dev/null || true
+grep -rn "index\.html" /opt/tracker/repo/tests/
+ls -la /opt/tracker/repo/ui /opt/tracker/repo/refs/plans /opt/tracker/repo/refs/plans/20261019-ux-mockups; wc -l /opt/tracker/repo/ui/index.html; grep -cE "j|k|ArrowLeft|ArrowRight" /opt/tracker/repo/ui/index.html; grep -nE "addEventListener\('keydown'" /opt/tracker/repo/ui/index.html
+cat << 'EOF' > /tmp/draft.md
+# 資安新聞追蹤系統：`ui/index.html` 資料／顯示脫鉤與沉浸式閱讀架構規劃（唯讀提案，無程式碼變更）
+
+**範圍與驗證聲明：**
+- 本報告僅讀取 `/opt/tracker/repo` 內檔案（`ui/index.html` 全檔 4354 行完整讀畢，驗證指令：`wc -l /opt/tracker/repo/ui/index.html`，輸出 `4354 /opt/tracker/repo/ui/index.html`）並抓取外部參考網頁，未修改任何專案檔案。
+- 所有可驗證缺陷均標註為 **Finding（F1–F6）** 並附 `file:line` 原文引文與可重跑驗證指令；其餘架構分析標註為觀察（Observation）或提案（Proposal），不做處置裁決（disposition 由派工端 session 決定）。
+
+---
+
+## 1. 現有功能與 `localStorage` 盤點（Inventory）
+
+### 1.1 使用者可見功能盤點（`ui/index.html`）
+
+> 註：下表之「建議方向（Keep / …
+node -e '
+const fs = require("fs");
+function getLine(file, line) {
+  return fs.readFileSync("/opt/tracker/repo/" + file, "utf8").split("\n")[line - 1];
+}
+console.log("1117:", JSON.stringify(getLine("ui/index.html", 1117)));
+console.log("1118:", JSON.stringify(getLine("ui/index.html", 1118)));
+console.log("1325:", JSON.stringify(getLine("ui/index.html", 1325)));
+console.log("1326:", JSON.stringify(getLine("ui/index.html", 1326)));
+console.log("401:", JSON.stringify(getLine(".common/codex-assist/runs/20261019…
+cat << 'EOF' > /tmp/draft2.md
+# 資安新聞追蹤系統：`ui/index.html` 資料／顯示脫鉤與沉浸式閱讀架構規劃（唯讀提案，無程式碼變更）
+
+**範圍與驗證聲明：**
+- 本報告僅讀取 `/opt/tracker/repo` 內檔案（`ui/index.html` 全檔 4354 行完整讀畢，驗證指令：`wc -l /opt/tracker/repo/ui/index.html`，輸出 `4354 /opt/tracker/repo/ui/index.html`）並抓取外部參考網頁，未修改任何專案檔案。
+- 所有可驗證缺陷均標註為 **Finding（F1–F6）** 並附 `file:line` 原文引文與可重跑驗證指令；其餘架構分析標註為觀察（Observation）或提案（Proposal），不做處置裁決（disposition 由派工端 session 決定）。
+
+---
+
+## 1. 現有功能與 `localStorage` 盤點（Inventory）
+
+### 1.1 使用者可見功能盤點（`ui/index.html`）
+
+> 註：下表之「建議方向（Keep /…
+sed -n '2372p;2523p' /opt/tracker/repo/ui/index.html && sed -n '7p' /opt/tracker/repo/refs/plans/20261019-watch-and-frame-decisions.md && git -C /opt/tracker/repo status -s && ls -la /tmp/draft* 2>/dev/null || true

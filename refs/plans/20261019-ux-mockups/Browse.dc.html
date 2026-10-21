@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>高密度瀏覽＋彈出閱讀</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F5F4EF}
+a{color:#1F5FBF}a:hover{color:#143F80}
+button{font:inherit;cursor:pointer}
+</style>
+</helmet>
+<div style="font-family: 'Noto Sans TC',sans-serif; color: #1C1B19; background: #F5F4EF; min-height: 1000px; position: relative;">
+  <header style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; padding: 8px 20px; border-bottom: 1px solid #E2DED3; background: #FBFAF7;">
+    <strong style="font-size: 15px;">資安新聞追蹤</strong>
+    <nav aria-label="工作區" style="display: flex; gap: 4px;">
+      <a href="#" style="padding: 5px 12px; border-radius: 6px; background: #1C1B19; color: #FBFAF7; text-decoration: none; font-size: 13px;">新聞</a>
+      <a href="#" style="padding: 5px 12px; border-radius: 6px; color: #1C1B19; text-decoration: none; font-size: 13px;">CRA 法規庫</a>
+    </nav>
+    <label style="flex: 1 1 260px; display: flex;"><span style="position: absolute; left: -9999px;">搜尋</span><input type="search" placeholder="搜尋標題、內文、標籤…" style="flex: 1; font: inherit; font-size: 13px; padding: 6px 12px; border: 1px solid #E2DED3; border-radius: 6px; background: #fff;"></label>
+    <span style="font-size: 13px; color: #5E5A50;">全部來源 ▾</span>
+    <button style="background: none; border: 1px solid #E2DED3; border-radius: 6px; padding: 5px 10px; min-height: 32px; font-size: 13px;">外觀 Aa</button>
+    <button style="background: none; border: 1px solid #E2DED3; border-radius: 6px; padding: 5px 10px; min-height: 32px; font-size: 13px;">中 / EN</button>
+  </header>
+
+  <div style="display: flex; flex-wrap: wrap;">
+    <sc-if value="{{ sideClosed }}" hint-placeholder-val="{{ false }}">
+      <aside aria-label="分類（已收合）" style="flex: 0 0 44px; border-right: 1px solid #E2DED3; padding: 8px 4px; display: flex; flex-direction: column; align-items: center; gap: 6px;">
+        <button onClick="{{ toggleSide }}" aria-label="展開側邊欄" title="展開側邊欄" style="border: 1px solid #E2DED3; background: #fff; border-radius: 6px; min-width: 36px; min-height: 36px;">»</button>
+        <sc-for list="{{ types }}" as="ty" hint-placeholder-count="9">
+          <button onClick="{{ ty.pick }}" aria-label="{{ ty.name }}" title="{{ ty.name }} {{ ty.n }}" style="border: 0; border-radius: 6px; min-width: 36px; min-height: 30px; background: {{ ty.bg }}; display: flex; align-items: center; justify-content: center;"><span style="width: 10px; height: 10px; border-radius: 2px; background: {{ ty.color }};"></span></button>
+        </sc-for>
+      </aside>
+    </sc-if>
+    <sc-if value="{{ sideOpen }}" hint-placeholder-val="{{ true }}">
+    <aside aria-label="分類與篩選" style="flex: 0 0 220px; border-right: 1px solid #E2DED3; padding: 12px 10px; display: flex; flex-direction: column; gap: 14px; font-size: 13px;">
+      <button onClick="{{ toggleSide }}" style="align-self: flex-end; border: 1px solid #E2DED3; background: #fff; border-radius: 6px; padding: 2px 8px; min-height: 30px; font-size: 12px; color: #5E5A50;">« 收合</button>
+      <div style="display: flex; flex-direction: column; gap: 1px;">
+        <span style="font-size: 11px; color: #77725F; letter-spacing: .08em; padding: 0 8px 4px;">新聞類型</span>
+        <sc-for list="{{ types }}" as="ty" hint-placeholder-count="9">
+          <button onClick="{{ ty.pick }}" style="display: flex; align-items: center; gap: 8px; border: 0; border-radius: 6px; padding: 6px 8px; min-height: 32px; background: {{ ty.bg }}; color: {{ ty.fg }}; text-align: left;">
+            <span style="width: 8px; height: 8px; border-radius: 2px; background: {{ ty.color }};"></span>
+            <span style="flex-grow: 1;">{{ ty.name }}</span>
+            <span style="font-family: 'IBM Plex Mono',monospace; font-size: 12px; opacity: .75;">{{ ty.n }}</span>
+          </button>
+        </sc-for>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 1px;">
+        <span style="font-size: 11px; color: #77725F; letter-spacing: .08em; padding: 0 8px 4px;">★ 我的關注</span>
+        <sc-for list="{{ watch }}" as="w" hint-placeholder-count="3">
+          <span style="display: flex; gap: 8px; padding: 5px 8px;"><span style="flex-grow: 1;">{{ w.name }}</span><span style="font-family: 'IBM Plex Mono',monospace; font-size: 12px; color: #9A4A0B;">{{ w.n }}</span></span>
+        </sc-for>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; gap: 4px; padding: 0 4px;">
+        <span style="font-size: 11px; color: #77725F; letter-spacing: .08em; width: 100%; padding: 0 4px 2px;">平台</span>
+        <span style="font-size: 12px; border: 1px solid #E2DED3; border-radius: 999px; padding: 2px 8px;">Linux 455</span>
+        <span style="font-size: 12px; border: 1px solid #E2DED3; border-radius: 999px; padding: 2px 8px;">Apple 328</span>
+        <span style="font-size: 12px; border: 1px solid #E2DED3; border-radius: 999px; padding: 2px 8px;">Android 200</span>
+        <span style="font-size: 12px; border: 1px solid #E2DED3; border-radius: 999px; padding: 2px 8px;">Windows 139</span>
+      </div>
+    </aside>
+    </sc-if>
+
+    <main style="flex: 999 1 640px; min-width: 0; padding: 12px 20px 40px; display: flex; flex-direction: column; gap: 10px;">
+      <sc-if value="{{ timeOpen }}" hint-placeholder-val="{{ true }}">
+      <section aria-label="時間範圍" style="background: #FFFFFF; border: 1px solid #E2DED3; border-radius: 8px; padding: 10px 12px; display: flex; flex-direction: column; gap: 8px;">
+        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px;">
+          <button onClick="{{ toggleTime }}" aria-label="收合時間面板" style="border: 0; background: none; padding: 0 4px 0 0; min-height: 30px; font-size: 12px; color: #77725F;">▾ 時間</button>
+          <sc-for list="{{ ranges }}" as="r" hint-placeholder-count="6">
+            <button onClick="{{ r.pick }}" style="border: 1px solid {{ r.border }}; background: {{ r.bg }}; color: {{ r.fg }}; border-radius: 999px; padding: 3px 11px; min-height: 30px; font-size: 13px;">{{ r.name }}</button>
+          </sc-for>
+          <span style="width: 1px; height: 18px; background: #E2DED3; margin: 0 4px;"></span>
+          <label style="display: inline-flex; align-items: center; gap: 4px; font-size: 13px;">自訂 <input type="date" value="2026-10-13" style="font: inherit; font-size: 13px; border: 1px solid #E2DED3; border-radius: 6px; padding: 2px 6px;"></label>
+          <label style="display: inline-flex; align-items: center; gap: 4px; font-size: 13px;">至 <input type="date" value="2026-10-19" style="font: inherit; font-size: 13px; border: 1px solid #E2DED3; border-radius: 6px; padding: 2px 6px;"></label>
+          <span style="flex-grow: 1;"></span>
+          <span style="font-size: 12px; color: #5E5A50;">歷史歸檔</span>
+          <sc-for list="{{ years }}" as="y" hint-placeholder-count="6">
+            <button onClick="{{ y.pick }}" style="border: 1px solid {{ y.border }}; background: {{ y.bg }}; color: {{ y.fg }}; border-radius: 6px; padding: 2px 8px; min-height: 30px; font-size: 12px; font-family: 'IBM Plex Mono',monospace;">{{ y.name }}<span style="opacity: .6;"> {{ y.n }}天</span></button>
+          </sc-for>
+        </div>
+        <div style="display: flex; align-items: flex-end; gap: 2px; height: 44px;" aria-label="每日篇數，點一天只看當天">
+          <sc-for list="{{ bars }}" as="b" hint-placeholder-count="30">
+            <button onClick="{{ b.pick }}" aria-label="{{ b.label }}" title="{{ b.label }}" style="flex: 1 1 0; min-width: 0; height: {{ b.h }}; border: 0; padding: 0; border-radius: 2px 2px 0 0; background: {{ b.c }};"></button>
+          </sc-for>
+        </div>
+        <div style="display: flex; justify-content: space-between; font-family: 'IBM Plex Mono',monospace; font-size: 11px; color: #77725F;"><span>09-20</span><span>10-05</span><span>10-19</span></div>
+      </section>
+      </sc-if>
+      <div style="display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px;">
+        <h1 style="margin: 0; font-size: 17px;">{{ heading }}</h1>
+        <button onClick="{{ toggleTime }}" aria-expanded="{{ timeOpen }}" title="{{ timeHint }}" style="display: inline-flex; align-items: center; gap: 6px; border: 1px solid #E2DED3; background: #FFFFFF; border-radius: 999px; padding: 3px 12px; min-height: 32px; font-size: 14px; font-weight: 600;">{{ rangeLabel }}<span style="font-weight: 400; color: #77725F; font-size: 12px;">{{ timeArrow }}</span></button>
+        <span style="font-size: 13px; color: #5E5A50;">{{ shown }} 篇 · 點卡片看全文摘要</span>
+        <span style="flex-grow: 1;"></span>
+        <span style="display: flex; border: 1px solid #E2DED3; border-radius: 6px; overflow: hidden; font-size: 13px;">
+          <button onClick="{{ setCards }}" style="border: 0; padding: 5px 12px; min-height: 32px; background: {{ cardBg }}; color: {{ cardFg }};">卡片</button>
+          <button onClick="{{ setList }}" style="border: 0; padding: 5px 12px; min-height: 32px; background: {{ listBg }}; color: {{ listFg }};">標題</button>
+        </span>
+      </div>
+
+      <sc-for list="{{ days }}" as="day" hint-placeholder-count="2">
+        <section style="display: flex; flex-direction: column; gap: 8px;">
+          <h2 style="margin: 6px 0 0; font-size: 13px; color: #5E5A50; font-weight: 500; border-bottom: 1px solid #E2DED3; padding-bottom: 4px;">{{ day.d }} · {{ day.n }} 篇</h2>
+          <sc-if value="{{ cards }}" hint-placeholder-val="{{ true }}">
+            <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px;">
+              <sc-for list="{{ day.items }}" as="it" hint-placeholder-count="8">
+                <button onClick="{{ it.open }}" style="text-align: left; border: 1px solid #E2DED3; border-radius: 8px; background: #FFFFFF; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; min-height: 150px;">
+                  <span style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: #5E5A50;">
+                    <span style="width: 7px; height: 7px; border-radius: 2px; background: {{ it.color }};"></span>{{ it.type }}
+                    <sc-if value="{{ it.star }}" hint-placeholder-val="{{ false }}"><span style="color: #9A4A0B;">★</span></sc-if>
+                  </span>
+                  <span style="font-size: 14px; line-height: 1.45; font-weight: 600; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">{{ it.t }}</span>
+                  <span style="font-size: 12px; line-height: 1.55; color: #5E5A50; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">{{ it.s }}</span>
+                  <span style="font-size: 11px; color: #77725F; margin-top: auto;">{{ it.src }}</span>
+                </button>
+              </sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{ list }}" hint-placeholder-val="{{ false }}">
+            <div style="display: flex; flex-direction: column; background: #fff; border: 1px solid #E2DED3; border-radius: 8px;">
+              <sc-for list="{{ day.items }}" as="it" hint-placeholder-count="8">
+                <button onClick="{{ it.open }}" style="text-align: left; border: 0; border-bottom: 1px solid #EEEBE3; background: none; padding: 7px 12px; display: flex; align-items: center; gap: 10px; min-height: 36px; font-size: 14px;">
+                  <span style="width: 7px; height: 7px; border-radius: 2px; background: {{ it.color }}; flex: 0 0 7px;"></span>
+                  <span style="flex: 0 0 84px; font-size: 12px; color: #5E5A50;">{{ it.type }}</span>
+                  <span style="flex: 1 1 auto; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ it.t }}</span>
+                  <span style="font-size: 12px; color: #77725F;">{{ it.src }}</span>
+                </button>
+              </sc-for>
+            </div>
+          </sc-if>
+        </section>
+      </sc-for>
+    </main>
+  </div>
+
+  <sc-if value="{{ open }}" hint-placeholder-val="{{ true }}">
+    <div style="position: absolute; inset: 0; background: rgba(28,27,25,0.45); display: flex; justify-content: center; align-items: flex-start; padding: 56px 16px;">
+      <div role="dialog" aria-label="文章" style="width: 100%; max-width: 720px; background: #FFFFFF; border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,0.25); display: flex; flex-direction: column;">
+        <div style="display: flex; align-items: center; gap: 8px; padding: 10px 16px; border-bottom: 1px solid #EEEBE3; font-size: 13px; color: #5E5A50;">
+          <button onClick="{{ prev }}" style="background: none; border: 1px solid #E2DED3; border-radius: 6px; padding: 4px 10px; min-height: 32px;">‹ 上一篇</button>
+          <button onClick="{{ next }}" style="background: none; border: 1px solid #E2DED3; border-radius: 6px; padding: 4px 10px; min-height: 32px;">下一篇 ›</button>
+          <span>{{ pos }} / {{ shown }}　← → 切換・Esc 關閉</span>
+          <span style="flex-grow: 1;"></span>
+          <button onClick="{{ close }}" aria-label="關閉" style="background: none; border: 0; font-size: 20px; min-width: 36px; min-height: 36px;">×</button>
+        </div>
+        <article style="padding: 20px 28px 24px; display: flex; flex-direction: column; gap: 14px;">
+          <span style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 12px; color: #5E5A50;">
+            <span style="width: 8px; height: 8px; border-radius: 2px; background: {{ cur.color }};"></span>{{ cur.type }} · {{ cur.d }} · {{ cur.src }}
+          </span>
+          <h2 style="margin: 0; font-size: 22px; line-height: 1.45;">{{ cur.t }}</h2>
+          <p style="margin: 0; font-size: 16px; line-height: 1.85; max-width: 38em;">{{ cur.full }}</p>
+          <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+            <sc-for list="{{ cur.tags }}" as="g" hint-placeholder-count="3">
+              <a href="#" style="font-size: 12px; padding: 2px 9px; border-radius: 999px; border: 1px solid #E2DED3; text-decoration: none; color: #3E3B33;">#{{ g }}</a>
+            </sc-for>
+          </div>
+          <a href="#" style="font-size: 14px;">閱讀原文：{{ cur.src }} ↗</a>
+          <sc-if value="{{ cur.hasRel }}" hint-placeholder-val="{{ false }}">
+            <section style="border-top: 1px solid #EEEBE3; padding-top: 12px; display: flex; flex-direction: column; gap: 6px;">
+              <h3 style="margin: 0; font-size: 13px; color: #5E5A50; font-weight: 500;">同一事件 · CVE-2026-102764（共 5 篇，4 天）</h3>
+              <span style="font-size: 13px;">10-19 疑似中國間諜組織 ARMORY CASTLE 利用 BeyondTrust 零時差漏洞…</span>
+              <span style="font-size: 13px;">10-16 CISA新增兩項已知遭利用漏洞：Fortinet與BeyondTrust…</span>
+              <span style="font-size: 13px;">10-16 BeyondTrust Remote Support遭零日漏洞攻擊：Mandiant揭露「Armory Castle」…</span>
+              <span style="font-size: 13px;">10-16 中國資安駭客群 Armory Castle 零日攻擊 BeyondTrust Remote Support…</span>
+            </section>
+          </sc-if>
+        </article>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1000}}'>
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { type: 'all', open: 5, mode: 'cards', range: '30d', day: null }; }
+  timeVals() {
+    const DAYS = '09-20:27,09-21:122,09-22:150,09-23:65,09-24:97,09-25:107,09-26:27,09-27:29,09-28:118,09-29:173,09-30:182,10-01:142,10-02:122,10-03:35,10-04:29,10-05:83,10-06:181,10-07:86,10-08:96,10-09:113,10-10:34,10-11:26,10-12:84,10-13:189,10-14:160,10-15:136,10-16:116,10-17:26,10-18:24,10-19:18'
+      .split(',').map(x => x.split(':')).map(([d, n]) => [d, +n]);
+    const st = this.state;
+    const R = [['today', '今天', 1], ['7d', '近 7 天', 7], ['30d', '近 30 天', 30], ['90d', '近 90 天', 90], ['year', '今年', 0], ['all', '全部', 0]];
+    const mark = (on) => ({ border: on ? '#1C1B19' : '#E2DED3', bg: on ? '#1C1B19' : '#FFFFFF', fg: on ? '#FBFAF7' : '#1C1B19' });
+    const ranges = R.map(([k, name]) => ({ name, ...mark(!st.day && st.range === k), pick: () => this.setState({ range: k, day: null }) }));
+    const Y = [['2026', 216], ['2025', 39], ['2024', 10], ['2023', 6], ['2022', 3], ['更早', 2]];
+    const years = Y.map(([name, n]) => ({ name, n, ...mark(!st.day && st.range === 'y' + name), pick: () => this.setState({ range: 'y' + name, day: null }) }));
+    const span = (R.find(r => r[0] === st.range) || [0, 0, 30])[2] || 30;
+    const mx = Math.max(...DAYS.map(d => d[1]));
+    const bars = DAYS.map(([d, n], i) => {
+      const inRange = st.day ? st.day === d : (st.range.startsWith('y') || st.range === 'year' || st.range === 'all' || i >= DAYS.length - span);
+      return { label: d + '：' + n + ' 篇', h: Math.max(3, Math.round(44 * n / mx)) + 'px', c: inRange ? (st.day === d ? '#C2410C' : '#1F5FBF') : '#D9D5C9',
+        pick: () => this.setState({ day: st.day === d ? null : d }) };
+    });
+    const rl = st.day ? '2026-' + st.day + '（單日）' : (st.range.startsWith('y') ? st.range.slice(1) + ' 年歸檔' : (R.find(r => r[0] === st.range) || R[2])[1]);
+    return { ranges, years, bars, rangeLabel: rl };
+  }
+  renderVals() {
+    const C = { vuln: '#C2410C', incident: '#B91C1C', regulation: '#1D4ED8', supply: '#047857', emerging: '#7C3AED', industry: '#A16207', platform: '#57534E', events: '#0E7490', focus: '#475569' };
+    const TY = { '漏洞與威脅情報': ['vuln', '漏洞威脅'], '重大事件': ['incident', '重大事件'], '法規與標準': ['regulation', '法規標準'], '亞太對應': ['regulation', '法規標準'],
+      '供應鏈與開源安全': ['supply', '供應鏈開源'], '前瞻技術': ['emerging', '前瞻技術'], '產業動態': ['industry', '產業動態'], 'Linux': ['platform', 'Linux'], 'Windows': ['platform', 'Windows'] };
+    const RAW = [
+      ['2026-10-19','重大事件','日本漢堡王App會員資訊遭駭：千萬筆個人資料外洩，包含姓名至訂單紀錄','速食連鎖業者漢堡王（Burger King）公告其官方App會員資訊管理系統遭未授權存取，導致超過千萬筆會員個人資料外洩。攻擊者據初步判斷是在10月2日至10月7日期間竊取資訊。','iThome',['漢堡王','資料外洩']],
+      ['2026-10-19','Linux','Linux KVM 發現 PwnEscape 漏洞：利用惡意 IPv4 封包實現 Guest-Host 逃逸','研究人員 Paulos Yibelo 發現了名為 PwnEscape 的嚴重漏洞，該漏洞存在於 Linux KVM 虛擬化監控器中，已被指定為 CVE-2026-99999。','The Register',['Linux KVM','CVE-2026-99999']],
+      ['2026-10-19','法規與標準','G7國家擬舉行演練，模擬AI輔助網路攻擊，檢驗金融體系應變能力','隨著AI技術的快速發展，金融業面臨新的網路攻擊風險。七大工業國集團（G7）計畫舉行桌上演練，模擬金融體系遭到AI輔助的網路攻擊。','iThome',['G7','AI','金融體系']],
+      ['2026-10-19','Windows','Windows 11 仍保留 Windows 95 記憶體管理員，提供 EmulateHeap 兼容性修復','本文揭露 Windows 11 系統內仍包含一段 Windows 95 時代的程式碼，用於提供名為 EmulateHeap 的兼容性修復。','Windows Latest',['Windows 11','EmulateHeap']],
+      ['2026-10-19','漏洞與威脅情報','資安業者揭露 OpenBSD 核心漏洞：可追溯至 1988 年的遠端 RCE 缺陷，PoC 取得 root 權限','資安業者 Calif 近日揭露 OpenBSD 核心存在可串連利用的漏洞，這些缺陷可追溯至 1988 年的原始 BSD 程式碼，潛藏長達數十年。','iThome',['OpenBSD','核心漏洞']],
+      ['2026-10-19','漏洞與威脅情報','CISA警告：Fortinet與BeyondTrust兩大漏洞已遭積極利用，要求聯邦機構緊急修補','美國網路安全與基礎設施安全局（CISA）於10月16日宣布，根據積極利用證據，已將兩個新漏洞加入已遭利用漏洞名單（KEV）。受影響的漏洞包括Fortinet應用系統路徑遍歷漏洞CVE-2025-61624，以及BeyondTrust Remote Support身分驗證繞過漏洞CVE-2026-102764。CISA要求聯邦機構必須在10月19日之前完成修補。資安公司指出，CVE-2026-102764在修補前已被駭客組織UNC5221（Armory Castle）利用，意圖入侵企業內部系統。','iThome',['CISA','KEV','CVE-2026-102764'], true],
+      ['2026-10-19','漏洞與威脅情報','疑似中國間諜組織 ARMORY CASTLE 利用 BeyondTrust 零時差漏洞 CVE-2026-102764 攻擊企業遠端支援系統','Google 威脅情報團隊（GTIG）與 Mandiant 揭露，疑似與中國相關的網路間諜組織 ARMORY CASTLE，已利用 BeyondTrust Remote Support 的零時差漏洞攻擊企業遠端支援設備。','iThome 等 2 家',['BeyondTrust','CVE-2026-102764'], true],
+      ['2026-10-19','漏洞與威脅情報','Nginx發布1.30.6與1.31.7版本修補五個資安漏洞，包含記憶體溢位與TLS繞過風險','網路應用與資安業者F5旗下Nginx專案於10月14日發布了1.30.6及1.31.7版本，修補了五個資安漏洞。','iThome',['Nginx','F5']],
+      ['2026-10-19','漏洞與威脅情報','微軟與Health-ISAC合作，接管地下犯罪網域，打擊跨國網釣與帳號詐騙','微軟與醫療產業資安資訊分享與分析中心Health-ISAC合作，依據美國聯邦法院命令，接管並重新導向多個地下犯罪服務。','iThome',['微軟','Azure']],
+      ['2026-10-19','供應鏈與開源安全','Proofpoint宣布以約63億美元併購Varonis，打造整合式資料與AI安全平臺','資安業者Proofpoint宣布與資料安全業者Varonis簽署併購協議，預計以約63億美元全現金完成。','iThome',['Proofpoint','Varonis']],
+      ['2026-10-19','前瞻技術','SailPoint CEO談AI發展與安全平衡：強調「適應性身分」應對動態環境風險','SailPoint執行長Mark McClain針對近期AI模型服務失控事件，指出AI發展不會停滯，關鍵在於提升安全性。','iThome',['AI代理','SailPoint']],
+      ['2026-10-19','產業動態','FBI與CrowdStrike聯手瓦解北韓駭客群FAMOUS CHOLLIMA的美國「筆電農場」外匯犯罪網絡','美國聯邦調查局（FBI）與全球資安公司CrowdStrike合作，成功瓦解了與北韓相關的駭客組織FAMOUS CHOLLIMA所運營的「筆電農場」基礎設施。','Boannews 韓國',['FBI','CrowdStrike']],
+      ['2026-10-18','重大事件','ConnectWise 宣布停用多個應用程式身份，調查遭惡意取得權限入侵 Microsoft 365 環境','IT 管理軟體供應商 ConnectWise 於 2026 年 10 月 17 日宣布，因調查未知威脅行為者取得其應用程式身份的未經授權存取權。','The Hacker News',['ConnectWise','Microsoft 365']],
+      ['2026-10-18','Linux','Debian 發布安全公告 DSA-6571-1：修補 OpenSSH 服務中的潛在漏洞','Debian 官方透過安全公告 DSA-6571-1，修補了 OpenSSH 服務中發現的潛在安全漏洞。','Debian Security',['Debian','OpenSSH']],
+      ['2026-10-18','Linux','Linux 核心 7.3 版本發布：包含 failfs、group-scheduling 等多項重大功能更新','Linux 核心開發者 Linus Torvalds 正式發布了 7.3 版本，匯集了來自 3,021 位開發者提交的 18,765 個非合併提交。','LWN.net',['Linux 核心','7.3']],
+      ['2026-10-18','Linux','Linux 7.3 核心版本發布：提升 I/O 效能、支援 AMD Zen 6 並修復系統穩定性問題','Linux 核心版本 7.3 已按時發布，本次更新包含多項重大改進，特別是針對現代系統的 I/O 性能提升。','Phoronix',['Linux 7.3','AMD Zen 6']]
+    ];
+    const all = RAW.map(([d, cat, t, full, src, tags, star], j) => {
+      const [type, name] = TY[cat] || ['focus', cat];
+      return { j, d, type: name, key: type, color: C[type], t, full, s: full, src, tags, star: !!star, hasRel: !!star };
+    });
+    const sel = this.state.type;
+    const shownArr = all.filter(a => sel === 'all' || a.key === sel);
+    const open = (a) => () => this.setState({ open: a.j });
+    const byDay = {};
+    shownArr.forEach(a => { (byDay[a.d] = byDay[a.d] || []).push({ ...a, open: open(a) }); });
+    const days = Object.keys(byDay).sort().reverse().map(d => ({ d, n: byDay[d].length, items: byDay[d] }));
+    const T = [['all', '全部', 2797], ['vuln', '漏洞威脅', 538], ['incident', '重大事件', 81], ['regulation', '法規標準', 44], ['supply', '供應鏈開源', 125],
+      ['focus', '焦點綜合', 622], ['industry', '產業動態', 123], ['emerging', '前瞻技術', 117], ['events', '研討活動', 25], ['platform', '平台與其他', 1122]];
+    const types = T.map(([k, name, n]) => ({ name, n, color: k === 'all' ? '#1C1B19' : C[k],
+      bg: sel === k ? '#1C1B19' : 'transparent', fg: sel === k ? '#FBFAF7' : '#1C1B19', pick: () => this.setState({ type: k }) }));
+    const idx = shownArr.findIndex(a => a.j === this.state.open);
+    const cur = this.state.open === null ? all[0] : all.find(a => a.j === this.state.open) || all[0];
+    const step = (dlt) => () => { const n = shownArr.length; const i = idx < 0 ? 0 : (idx + dlt + n) % n; this.setState({ open: shownArr[i].j }); };
+    const cards = this.state.mode === 'cards';
+    const sideOpen = this.state.side !== false, timeOpen = this.state.time !== false;
+    return {
+      ...this.timeVals(),
+      sideOpen, sideClosed: !sideOpen, timeOpen, timeClosed: !timeOpen,
+      timeArrow: timeOpen ? '▴' : '▾', timeHint: timeOpen ? '收合時間面板' : '展開時間面板',
+      toggleSide: () => this.setState({ side: !sideOpen }), toggleTime: () => this.setState({ time: !timeOpen }),
+      types, days, shown: shownArr.length, heading: (T.find(x => x[0] === sel) || T[0])[1],
+      watch: [{ name: 'EU CRA 法規更新', n: 8 }, { name: 'EU CRA 標準更新', n: 4 }, { name: 'KEV 已遭利用', n: 49 }],
+      cards, list: !cards,
+      cardBg: cards ? '#1C1B19' : '#fff', cardFg: cards ? '#FBFAF7' : '#1C1B19', listBg: cards ? '#fff' : '#1C1B19', listFg: cards ? '#1C1B19' : '#FBFAF7',
+      setCards: () => this.setState({ mode: 'cards' }), setList: () => this.setState({ mode: 'list' }),
+      open: this.state.open !== null, cur, pos: idx + 1,
+      close: () => this.setState({ open: null }), next: step(1), prev: step(-1)
+    };
+  }
+}
+</script>
+</body>
+</html>

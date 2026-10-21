@@ -1,0 +1,12 @@
+{
+  "id": "20261021-ui-architecture-plan",
+  "engine": "agy",
+  "pin_engine": true,
+  "mode": "plan",
+  "root": "/opt/tracker/repo",
+  "prompt_file": ".common/codex-assist/tasks/20261021-ui-architecture-plan.prompt.md",
+  "inputs_glob": "ui/index.html refs/plans/20261019-ux-mockups/README.md refs/plans/20261019-watch-and-frame-decisions.md .common/codex-assist/runs/20261019-ux-research/answer.txt .common/codex-assist/runs/20261019-layout-scenarios-plan/answer.txt",
+  "timeout_s": 2400,
+  "note": "User 2026-10-21 /agy-assist: framework the UI (data/display decoupled), one coherent design, keep features, immersive reading first. Plan only.",
+  "model": "gemini-4-argon-medium"
+}
