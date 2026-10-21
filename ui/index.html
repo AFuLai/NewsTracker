@@ -2368,6 +2368,106 @@ const NEWS_TYPES = [
   { id: 'other',     zh: '平台與其他', en: 'Platforms & other',         categories: [] }
 ];
 const HUB_PLATFORMS = ['Linux', 'Apple', 'Android', 'Windows'];
+/* TRACKER-STORE:BEGIN */
+// Pure data layer over the TRACKER_DAYS shape ({ 'YYYY-MM-DD': [article, ...] }). No DOM, no
+// storage, no globals: anything it needs (e.g. a type function) is passed in as an argument.
+const TrackerStore = (() => {
+  const CVE_RE = /CVE-\d{4}-\d{4,}/ig;
+  function keyOf(a, date) {
+    return (a.id !== undefined && a.id !== null) ? String(a.id) : date + '|' + a.title;
+  }
+  function newestDate(daysMap) {
+    let newest = '';
+    for (const d in (daysMap || {})) if (d > newest && Array.isArray(daysMap[d]) && daysMap[d].length) newest = d;
+    return newest;
+  }
+  // 'YYYY-MM-DD' + n days -> 'YYYY-MM-DD' (UTC arithmetic, no clock, no timezone).
+  function shiftDate(iso, n) {
+    const t = Date.UTC(+iso.slice(0, 4), +iso.slice(5, 7) - 1, +iso.slice(8, 10)) + n * 86400000;
+    return new Date(t).toISOString().slice(0, 10);
+  }
+  function collect(daysMap, opts) {
+    const data = daysMap || {};
+    const o = opts || {};
+    const dates = Array.isArray(o.dates)
+      ? o.dates
+      : Object.keys(data).filter(d => d >= o.fromDate && d <= o.toDate).sort();
+    const seen = new Set();
+    const out = [];
+    for (const date of dates) {
+      const day = data[date];
+      if (!Array.isArray(day)) continue;
+      for (const a of day) {
+        if (!a) continue;
+        const key = keyOf(a, date);
+        if (seen.has(key)) continue;
+        seen.add(key);
+        out.push({ ...a, _date: date, _key: key });
+      }
+    }
+    return out;
+  }
+  function sortNewest(list) {
+    return list.slice().sort((x, y) => (y._date < x._date ? -1 : y._date > x._date ? 1 : 0) ||
+      (String(y.id) < String(x.id) ? -1 : String(y.id) > String(x.id) ? 1 : 0));
+  }
+  function extractCves(a) {
+    const out = [];
+    const seen = new Set();
+    if (!a) return out;
+    const parts = [a.title, a.title_en, a.summary, a.summary_en];
+    if (Array.isArray(a.tags)) parts.push(...a.tags);
+    for (const part of parts) {
+      if (part === undefined || part === null) continue;
+      for (const m of String(part).match(CVE_RE) || []) {
+        const id = m.toUpperCase();
+        if (!seen.has(id)) { seen.add(id); out.push(id); }
+      }
+    }
+    return out;
+  }
+  function getReaderContext(id, list, opts) {
+    const o = opts || {};
+    const items = list || [];
+    const pool = Array.isArray(o.pool) ? o.pool : items;
+    const typeOf = typeof o.typeOf === 'function' ? o.typeOf : null;
+    const sid = String(id);
+    const index = items.findIndex(x => x && (x._key === sid || String(x.id) === sid));
+    if (index < 0) {
+      return { article: null, index: -1, total: items.length, prevArticle: null, nextArticle: null,
+               nextInType: null, sameCveArticles: [] };
+    }
+    const article = items[index];
+    let nextInType = null;
+    if (typeOf) {
+      const t = typeOf(article);
+      for (let i = index + 1; i < items.length; i++) {
+        if (items[i] && typeOf(items[i]) === t) { nextInType = items[i]; break; }
+      }
+    }
+    const mine = extractCves(article);
+    const same = [];
+    if (mine.length) {
+      const aKey = article._key !== undefined ? article._key : keyOf(article, article._date);
+      const seen = new Set([aKey]);
+      for (const x of pool) {
+        if (!x) continue;
+        const k = x._key !== undefined ? x._key : keyOf(x, x._date);
+        if (seen.has(k)) continue;
+        seen.add(k);
+        if (extractCves(x).some(c => mine.includes(c))) same.push(x);
+      }
+      same.sort((x, y) => (x._date < y._date ? -1 : x._date > y._date ? 1 : 0));
+    }
+    return { article, index, total: items.length,
+             prevArticle: index > 0 ? items[index - 1] : null,
+             nextArticle: index < items.length - 1 ? items[index + 1] : null,
+             nextInType, sameCveArticles: same };
+  }
+  return { keyOf, newestDate, shiftDate, collect, sortNewest, extractCves, getReaderContext };
+})();
+/* TRACKER-STORE:END */
+window.TrackerStore = TrackerStore;
 // article → type id from its raw category; platform categories → 'platform'; unknown → 'other'.
 function newsTypeOf(a) {
   const c = a && a.category;
@@ -2432,8 +2532,7 @@ async function ensureHubLoaded(days, cb) {
 }
 // 'YYYY-MM-DD' + n days → 'YYYY-MM-DD' (UTC arithmetic, no clock, no timezone).
 function hubShiftDate(iso, n) {
-  const t = Date.UTC(+iso.slice(0, 4), +iso.slice(5, 7) - 1, +iso.slice(8, 10)) + n * 86400000;
-  return new Date(t).toISOString().slice(0, 10);
+  return TrackerStore.shiftDate(iso, n);
 }
 
 // Pure aggregate over the already-loaded window.TRACKER_DAYS. "Today" = newest date present.
@@ -2442,8 +2541,7 @@ function hubShiftDate(iso, n) {
 function buildHubModel(days, watch) {
   const n = (days > 0) ? Math.floor(days) : 30;
   const data = window.TRACKER_DAYS || {};
-  let today = '';
-  for (const d in data) if (d > today && Array.isArray(data[d]) && data[d].length) today = d;
+  const today = TrackerStore.newestDate(data);
   const model = { total: 0, byType: [], platforms: [], rules: {} };
   const buckets = {};
   NEWS_TYPES.forEach(t => {
@@ -2454,14 +2552,10 @@ function buildHubModel(days, watch) {
   const plat = new Map();
   if (today) {
     const cutoff = hubShiftDate(today, -(n - 1));
-    const seen = new Set();
-    const dates = Object.keys(data).filter(d => d >= cutoff && d <= today).sort();
-    for (const date of dates) {
-      for (const a of (Array.isArray(data[date]) ? data[date] : [])) {
-        if (!a) continue;
-        const key = (a.id !== undefined && a.id !== null) ? String(a.id) : date + '|' + a.title;
-        if (seen.has(key)) continue;
-        seen.add(key);
+    {
+      for (const item of TrackerStore.collect(data, { fromDate: cutoff, toDate: today })) {
+        const { _key, ...a } = item;
+        const date = item._date;
         model.total++;
         let tid = newsTypeOf(a);
         if (tid === 'platform') {
@@ -2564,28 +2658,15 @@ function hubFlushSeen() {
   } catch (e) {}
 }
 function hubKey(a, date) {
-  return (a.id !== undefined && a.id !== null) ? String(a.id) : date + '|' + a.title;
+  return TrackerStore.keyOf(a, date);
 }
 // Same window / de-dup rule as buildHubModel, but keeps every article (newest first).
 function hubCollect(days) {
   const data = window.TRACKER_DAYS || {};
-  let today = '';
-  for (const d in data) if (d > today && Array.isArray(data[d]) && data[d].length) today = d;
-  const list = [];
-  if (!today) return { today: today, list: list };
-  const cutoff = hubShiftDate(today, -(days - 1));
-  const seen = new Set();
-  Object.keys(data).filter(d => d >= cutoff && d <= today).sort().forEach(date => {
-    (Array.isArray(data[date]) ? data[date] : []).forEach(a => {
-      if (!a) return;
-      const key = hubKey(a, date);
-      if (seen.has(key)) return;
-      seen.add(key);
-      list.push({ ...a, _date: date, _key: key });
-    });
-  });
-  list.sort((x, y) => (y._date < x._date ? -1 : y._date > x._date ? 1 : 0) ||
-    (String(y.id) < String(x.id) ? -1 : String(y.id) > String(x.id) ? 1 : 0));
+  const today = TrackerStore.newestDate(data);
+  if (!today) return { today: today, list: [] };
+  const cutoff = TrackerStore.shiftDate(today, -(days - 1));
+  const list = TrackerStore.sortNewest(TrackerStore.collect(data, { fromDate: cutoff, toDate: today }));
   return { today: today, list: list };
 }
 // Pure: articles whose displayed title / summary / tags match q (same matcher and scope as the
@@ -3788,11 +3869,7 @@ function renderArticles(dateList) {
   document.getElementById('no-data').classList.add('hidden');
 
   // Collect articles
-  let articles = [];
-  (dates || []).forEach(date => {
-    const day = (window.TRACKER_DAYS || {})[date];
-    if (day) articles = articles.concat(day.map(a => ({ ...a, _date: date })));
-  });
+  let articles = TrackerStore.collect(window.TRACKER_DAYS || {}, { dates: dates || [] });
 
   // Filter by current tracker (multi-belong: keep items whose `trackers`
   // includes the current tracker; legacy items default to security).
