@@ -1251,7 +1251,7 @@ html[data-mode="lib"] .lib-sort { display: flex; }
 /* ── 我的關注 (watch hub) ─────────────────────────────────
    html[data-mode="hub"] hides the date sidebar the way data-mode="lib" does. Every
    other selector here is prefixed .wh, so no other view is touched. The 儀表 panel
-   (.wh-dash) uses the deep-sea colours of HubTiles.dc.html as its defaults; with a
+   (.wh-dash) takes its defaults from the active theme tokens (HubTiles.dc.html layout); with a
    palette active (html[data-palette]) it takes that palette's --pal-* tokens instead. */
 html[data-mode="hub"] #sidebar,
 html[data-mode="hub"] #sidebar-scrim,
@@ -1323,9 +1323,9 @@ html[data-mode="hub"] .wh .card { min-width: 0; }
 html[data-mode="hub"] .wh .card-title { overflow-wrap: anywhere; }
 /* 儀表 */
 .wh-dash {
-  --wh-bg: #070B12; --wh-card: rgba(13,20,32,0.92); --wh-text: #DCE6F2; --wh-muted: #7F93AD;
-  --wh-line: #1C2A3D; --wh-accent: #5FE1FF; --wh-dim: #2A6F8A; --wh-warn: #FFB547; --wh-warn-text: #070B12;
-  --wh-sel: #0F2A3A; --wh-grid: rgba(95,225,255,0.05);
+  --wh-bg: var(--surface-container-low); --wh-card: var(--surface-container); --wh-text: var(--on-surface); --wh-muted: var(--on-surface-variant);
+  --wh-line: var(--outline-variant); --wh-accent: var(--primary); --wh-dim: var(--outline); --wh-warn: var(--wh-hit); --wh-warn-text: var(--surface);
+  --wh-sel: color-mix(in srgb, var(--surface-container-low), var(--primary) 14%); --wh-grid: color-mix(in srgb, var(--primary) 5%, transparent);
   display: flex; flex-direction: column; gap: 0.8rem; min-width: 0;
   padding: 0.8rem; border: 1px solid var(--wh-line); border-radius: var(--shape-m);
   color: var(--wh-text); background-color: var(--wh-bg);
@@ -1421,11 +1421,8 @@ html[data-palette] .wh-dash {
     <div class="hd-stats" aria-live="polite" aria-atomic="true">
       <span class="hd-meta"><span id="lbl-showing">顯示</span> <strong id="article-count">0</strong> <span id="lbl-articles">篇</span>
       <span id="last-updated"></span></span>
-      <button id="skin-btn" onclick="toggleSkin()" aria-label="切換外觀"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/></svg></button>
-      <select id="view-select" onchange="setPreset(this.value)" aria-label="檢視模式" title="檢視模式"></select>
       <button id="watch-btn" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="watch-panel">關注</button>
-      <button id="palette-btn" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="palette-panel">配色</button>
-      <button id="theme-btn" onclick="toggleTheme()" aria-label="切換主題"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" id="theme-icon-light"><path d="M12 18C8.68 18 6 15.32 6 12s2.68-6 6-6 6 2.68 6 6-2.68 6-6 6zm0-10c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zM12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" id="theme-icon-dark" style="display:none"><path d="M21.64 10.75c-.5-.3-1.19-.26-1.63.13-.87.78-2.14 1.22-3.5 1.22-2.97 0-5.38-2.41-5.38-5.38 0-1.36.44-2.63 1.22-3.5.39-.44.43-1.13.13-1.63-.3-.5-.92-.74-1.53-.74-6.14 0-11.13 5-11.13 11.13 0 6.14 5 11.13 11.13 11.13 6.14 0 11.13-5 11.13-11.13 0-.61-.24-1.23-.74-1.53z"/></svg></button>
+      <button id="palette-btn" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="palette-panel">主題</button>
       <button id="lang-btn" onclick="toggleLang()" title="Language / 語言" aria-label="切換語言"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H4v3h10.52C9.47 7.69 8.96 8.99 8.19 10H4v3h4.52c.7 1.43 1.72 2.81 2.97 3.85l-2.55 2.54.96.96c1.66-1.44 3.01-3.38 3.89-5.58h.11l-.04.04c.3-.45.51-.95.65-1.46.46 1.29.76 2.61.76 4v1h3v-1c0-1.13-.21-2.22-.62-3.26z"/></svg></button>
     </div>
   </div>
@@ -2062,6 +2059,13 @@ function setPalette(id) {
   }
   syncHash();
 }
+// Default dark / light option: clears the palette, sets data-theme, persists tracker_theme.
+function setDefaultTheme(mode) {
+  const m = mode === 'light' ? 'light' : 'dark';
+  document.documentElement.dataset.theme = m;
+  if (!isPreviewMode()) { try { prefSet('tracker_theme', m); } catch (e) {} }
+  setPalette('');
+}
 function initPalette() {
   let raw = null;
   try { raw = prefGet('tracker_palette'); } catch (e) {}
@@ -2074,7 +2078,8 @@ function buildPalettePanel() {
   if (!panel || panel.dataset.built) return;
   panel.dataset.built = '1';
   panel.innerHTML = '<h4 id="palette-title"></h4>' +
-    '<button type="button" class="pal-default" id="palette-default" data-pal=""></button>' +
+    '<button type="button" class="pal-default" id="palette-default" data-pal="" data-base="dark"></button>' +
+    '<button type="button" class="pal-default" id="palette-default-light" data-pal="" data-base="light"></button>' +
     '<div id="palette-grid"></div>';
   const grid = document.getElementById('palette-grid');
   PALETTES.forEach(p => {
@@ -2096,7 +2101,8 @@ function buildPalettePanel() {
   });
   panel.addEventListener('click', e => {
     const b = e.target.closest('button[data-pal]');
-    if (b) setPalette(b.dataset.pal);
+    if (!b) return;
+    if (b.dataset.base) setDefaultTheme(b.dataset.base); else setPalette(b.dataset.pal);
   });
   panel.addEventListener('keydown', e => {
     if (e.key !== 'Tab') return;
@@ -2119,9 +2125,13 @@ function updatePaletteUI() {
   if (!panel || !panel.dataset.built) return;
   panel.setAttribute('aria-label', t('paletteBtn'));
   document.getElementById('palette-title').textContent = t('paletteTitle');
+  const lightNow = document.documentElement.dataset.theme === 'light';
   const def = document.getElementById('palette-default');
-  def.textContent = t('paletteDefault');
-  def.setAttribute('aria-pressed', palettePref ? 'false' : 'true');
+  def.textContent = t('paletteDefaultDark');
+  def.setAttribute('aria-pressed', (!palettePref && !lightNow) ? 'true' : 'false');
+  const defL = document.getElementById('palette-default-light');
+  defL.textContent = t('paletteDefaultLight');
+  defL.setAttribute('aria-pressed', (!palettePref && lightNow) ? 'true' : 'false');
   panel.querySelectorAll('#palette-grid button').forEach(b => {
     const p = PALETTES.find(x => x.id === b.dataset.pal);
     if (!p) return;
@@ -2204,7 +2214,7 @@ const I18N = {
         hubPlat:'平台標籤', hubAllMore:'全部 ›', hubLess:'收合 ‹', hubTotal:n=>'共 '+n+' 篇', hubWatchHits:'關注',
         hubLoading:n=>'載入近 '+n+' 天…', hubSearchCount:n=>'搜尋結果：'+n+' 篇（近期窗口內全部來源）', hubEmpty:'這段期間沒有符合的文章', hubDrill:'DRILL-DOWN', hubPick:'點選上方方塊，在此檢視該類型文章',
         hubLegendHit:'■ 關注命中', hubLegendBar:'▮ 14 日篇數', hubTagFilter:'依標籤篩選', hubCount:n=>n+' 篇',
-        paletteBtn:'配色', paletteTitle:'配色主題', paletteDefault:'預設（跟隨系統主題）', paletteApplied:'已套用配色主題',
+        paletteBtn:'主題', paletteTitle:'主題', paletteDefault:'預設（跟隨系統主題）', paletteDefaultDark:'預設深色', paletteDefaultLight:'預設淺色', paletteApplied:'已套用配色主題',
        presets:{ default:'預設', quick:'快讀', analyst:'分析師', event:'事件追蹤', cra:'合規 CRA' },
       searchPlaceholder:'搜尋全站新聞…', searching:'搜尋中…',
       scopeLabel:'範圍', scope:{title:'標題', body:'內文', tags:'標籤'},
@@ -2239,7 +2249,7 @@ const I18N = {
         hubPlat:'Platforms', hubAllMore:'All ›', hubLess:'Less ‹', hubTotal:n=>n+(n===1?' article':' articles'), hubWatchHits:'Watch',
         hubLoading:n=>'Loading the last '+n+' days…', hubSearchCount:n=>n+(n===1?' result':' results')+' across all sources in this window', hubEmpty:'No matching articles in this window', hubDrill:'DRILL-DOWN', hubPick:'Pick a tile above to list its articles here',
         hubLegendHit:'■ Watch hits', hubLegendBar:'▮ 14-day count', hubTagFilter:'Filter by tag', hubCount:n=>n+(n===1?' article':' articles'),
-        paletteBtn:'Theme', paletteTitle:'Colour theme', paletteDefault:'Default (follow system theme)', paletteApplied:'Colour theme applied',
+        paletteBtn:'Theme', paletteTitle:'Theme', paletteDefault:'Default (follow system theme)', paletteDefaultDark:'Default dark', paletteDefaultLight:'Default light', paletteApplied:'Colour theme applied',
        presets:{ default:'Default', quick:'Quick read', analyst:'Analyst', event:'Event tracking', cra:'Compliance CRA' },
       searchPlaceholder:'Search all news…', searching:'Searching…',
       scopeLabel:'In', scope:{title:'Title', body:'Body', tags:'Tags'},
@@ -2273,8 +2283,7 @@ function applyLang() {
   document.documentElement.lang = state.lang === 'en' ? 'en' : 'zh-TW';
   // Localize icon-only buttons' accessible names (aria-label only — lang-btn's
   // bilingual title stays as-is; sidebar-toggle's label is set below).
-  [['drawer-toggle', 'menu'], ['skin-btn', 'skinBtn'], ['theme-btn', 'themeBtn'],
-   ['lang-btn', 'langLabel'], ['search-clear', 'clearSearch']].forEach(([id, key]) => {
+  [['drawer-toggle', 'menu'], ['lang-btn', 'langLabel'], ['search-clear', 'clearSearch']].forEach(([id, key]) => {
     const el = document.getElementById(id);
     if (el && t(key)) el.setAttribute('aria-label', t(key));
   });
@@ -3321,10 +3330,9 @@ function init() {
     }
   } catch (e) {}
   try {
-    const saved_skin = prefGet('tracker_skin');
-    if (saved_skin === 'classic' || saved_skin === 'md3') {
-      document.documentElement.dataset.skin = saved_skin;
-    }
+    // One theme system: the page always runs md3; the stored tracker_skin is no longer applied.
+    // (A hash s=classic is still honoured for that page view in applyHashRestore.)
+    document.documentElement.dataset.skin = 'md3';
   } catch (e) {}
   // Floating nav: default open on desktop, collapsed on compact; persisted.
   // Set the class directly (no openNav — avoid stealing focus on boot).
