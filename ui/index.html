@@ -1749,6 +1749,244 @@ html[data-theme="dark"] .ws-star {
 }
 html[data-mode="ws"] .card { min-width: 0; }
 html[data-mode="ws"] .card-title { overflow-wrap: anywhere; }
+
+/* ── Reader dialog (workspace immersive reader) ── */
+.reader-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  box-sizing: border-box;
+}
+.reader-backdrop.hidden, #reader.hidden {
+  display: none !important;
+}
+#reader {
+  position: relative;
+  width: 100%;
+  max-width: 760px;
+  background: var(--surface-container-lowest);
+  color: var(--on-surface);
+  border: 1px solid var(--outline-variant);
+  border-radius: var(--shape-l, 12px);
+  box-shadow: var(--elev-3, 0 20px 60px rgba(0,0,0,0.25));
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+  margin: auto;
+  overflow: hidden;
+  outline: none;
+}
+@media (max-width: 767px) {
+  .reader-backdrop {
+    padding: 0;
+  }
+  #reader {
+    max-width: 100%;
+    width: 100%;
+    height: 100%;
+    max-height: 100%;
+    border-radius: 0;
+    border: none;
+  }
+}
+.reader-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--outline-variant);
+  font-size: 13px;
+  color: var(--on-surface-variant);
+  background: var(--surface-container-low);
+  flex-shrink: 0;
+}
+.reader-nav-btn {
+  background: var(--surface-container);
+  color: var(--on-surface);
+  border: 1px solid var(--outline-variant);
+  border-radius: var(--shape-s, 6px);
+  padding: 4px 10px;
+  min-height: 32px;
+  cursor: pointer;
+  font-size: 13px;
+  font-family: inherit;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color var(--motion-short, 0.15s);
+}
+.reader-nav-btn:hover:not(:disabled) {
+  background: var(--surface-container-high);
+}
+.reader-nav-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.reader-pos-text {
+  font-size: 13px;
+  white-space: nowrap;
+}
+.reader-hint {
+  font-size: 12px;
+  color: var(--on-surface-variant);
+  margin-left: 4px;
+}
+@media (max-width: 480px) {
+  .reader-hint {
+    display: none;
+  }
+  .reader-toolbar {
+    padding: 8px 12px;
+    gap: 6px;
+  }
+  .reader-nav-btn {
+    padding: 4px 8px;
+    font-size: 12px;
+  }
+}
+.reader-spacer {
+  flex: 1 1 0;
+}
+.reader-close-btn {
+  background: none;
+  border: none;
+  color: var(--on-surface);
+  cursor: pointer;
+  font-size: 22px;
+  line-height: 1;
+  min-width: 36px;
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--shape-s, 6px);
+  padding: 0;
+}
+.reader-close-btn:hover {
+  background: var(--surface-container-high);
+}
+.reader-body {
+  padding: 24px 28px 28px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-sizing: border-box;
+}
+@media (max-width: 767px) {
+  .reader-body {
+    padding: 16px 16px 24px;
+  }
+}
+.reader-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  font-size: 12px;
+  color: var(--on-surface-variant);
+}
+.reader-title {
+  margin: 0;
+  font-size: 22px;
+  line-height: 1.4;
+  font-weight: 600;
+  color: var(--on-surface);
+  overflow-wrap: anywhere;
+}
+.reader-summary {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.85;
+  max-width: 65ch;
+  color: var(--on-surface);
+  overflow-wrap: anywhere;
+}
+.reader-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.reader-tag {
+  font-size: 12px;
+  padding: 2px 9px;
+  border-radius: var(--shape-full, 999px);
+  border: 1px solid var(--outline-variant);
+  background: var(--surface-container);
+  color: var(--on-surface-variant);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+.reader-tag:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+.reader-orig {
+  margin-top: 4px;
+}
+.reader-orig-link {
+  font-size: 14px;
+  color: var(--primary);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.reader-orig-link:hover {
+  text-decoration: underline;
+}
+.reader-same {
+  border-top: 1px solid var(--outline-variant);
+  padding-top: 14px;
+  margin-top: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.reader-same-h {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--on-surface-variant);
+}
+.reader-same-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.reader-same-item {
+  font-size: 13px;
+  color: var(--on-surface);
+  background: none;
+  border: none;
+  padding: 6px 8px;
+  border-radius: var(--shape-s, 4px);
+  text-align: left;
+  cursor: pointer;
+  display: block;
+  text-decoration: none;
+  line-height: 1.45;
+  font-family: inherit;
+  transition: background-color var(--motion-short, 0.15s);
+  overflow-wrap: anywhere;
+}
+.reader-same-item:hover, .reader-same-item:focus-visible {
+  background: var(--surface-container-high);
+  color: var(--primary);
+}
+
+/* ── Read mark for cards and title rows ── */
+.ws-card.is-read .ws-card-title,
+.ws-title-row.is-read .ws-title-text {
+  color: var(--on-surface-variant);
+}
 </style>
 </head>
 <body>
@@ -1818,6 +2056,20 @@ html[data-mode="ws"] .card-title { overflow-wrap: anywhere; }
 
 <div id="overlay" class="hidden">
   <div class="overlay-box" id="overlay-box" role="dialog" aria-modal="true" aria-labelledby="overlay-title"></div>
+</div>
+
+<div id="reader-backdrop" class="reader-backdrop hidden">
+  <div id="reader" class="hidden" role="dialog" aria-modal="true" aria-labelledby="reader-title" tabindex="-1">
+    <div class="reader-toolbar">
+      <button type="button" id="reader-prev" class="reader-nav-btn reader-prev" aria-label="上一篇">‹ 上一篇</button>
+      <button type="button" id="reader-next" class="reader-nav-btn reader-next" aria-label="下一篇">下一篇 ›</button>
+      <span id="reader-pos" class="reader-pos-text"></span>
+      <span id="reader-hint" class="reader-hint"></span>
+      <span class="reader-spacer"></span>
+      <button type="button" id="reader-close" class="reader-close-btn" aria-label="關閉">×</button>
+    </div>
+    <div id="reader-body" class="reader-body"></div>
+  </div>
 </div>
 
 <div id="watch-panel" class="hidden" role="dialog" aria-label="關注"></div>
@@ -2574,6 +2826,7 @@ const I18N = {
         wsAllSrc:'全部來源', wsSrc:'依來源瀏覽', wsTypes:'新聞類型', wsWatch:'★ 我的關注', wsPlat:'平台',
         wsCollapse:'« 收合', wsExpand:'» 展開', wsLoading:r=>'載入「'+r+'」…',
         wsCards:'卡片', wsTitles:'標題',
+        readerPrev:'‹ 上一篇', readerNext:'下一篇 ›', readerOrig:'閱讀原文', readerSameEvent:'同一事件', readerNavHint:'← → 切換・Esc 關閉',
         paletteBtn:'主題', paletteTitle:'主題', paletteDefault:'預設（跟隨系統主題）', paletteDefaultDark:'預設深色', paletteDefaultLight:'預設淺色', paletteApplied:'已套用配色主題',
        presets:{ default:'預設', quick:'快讀', analyst:'分析師', event:'事件追蹤', cra:'合規 CRA' },
       searchPlaceholder:'搜尋全站新聞…', searching:'搜尋中…',
@@ -2615,6 +2868,7 @@ const I18N = {
         wsAllSrc:'All sources', wsSrc:'Browse by source', wsTypes:'News types', wsWatch:'★ My watch', wsPlat:'Platforms',
         wsCollapse:'« Collapse', wsExpand:'» Expand', wsLoading:r=>'Loading “'+r+'”…',
         wsCards:'Cards', wsTitles:'Titles',
+        readerPrev:'‹ Prev', readerNext:'Next ›', readerOrig:'Read original', readerSameEvent:'Same event', readerNavHint:'← → switch · Esc close',
         paletteBtn:'Theme', paletteTitle:'Theme', paletteDefault:'Default (follow system theme)', paletteDefaultDark:'Default dark', paletteDefaultLight:'Default light', paletteApplied:'Colour theme applied',
        presets:{ default:'Default', quick:'Quick read', analyst:'Analyst', event:'Event tracking', cra:'Compliance CRA' },
       searchPlaceholder:'Search all news…', searching:'Searching…',
@@ -2680,6 +2934,9 @@ function applyLang() {
     document.getElementById('tracker-title').textContent = t('wsTitle');
     setActivePill('#tracker-pills', '[data-tracker="__ws"]');
     renderWorkspace();
+    if (typeof readerCurrentArticle !== 'undefined' && readerCurrentArticle) {
+      openReader(readerCurrentArticle, readerCurrentList, readerReturnFocus);
+    }
     return;
   }
   if (state.hubActive) {
@@ -4267,6 +4524,7 @@ function wsDraw() {
   const rg = TrackerStore.rangeOf(ws.range, newest);
   const base = wsBase(TrackerStore.collect(days, { fromDate: rg.from, toDate: rg.to }));
   const shown = TrackerStore.sortNewest(wsFacet(base));
+  ws.shown = shown;
   document.getElementById('article-count').textContent = shown.length;
   wsSyncChrome();
   wsBuildRail(base);
@@ -4383,6 +4641,7 @@ function selectWorkspace(patch) {
 }
 function leaveWorkspace() {
   if (!state.wsActive) return;
+  closeReader();
   ws.seq++;
   state.wsActive = false;
   ws.panelOpen = false;
@@ -4397,6 +4656,8 @@ function leaveWorkspace() {
   if (tg) tg.addEventListener('click', wsToggleRail);
   const sel = document.getElementById('ws-src');
   if (sel) sel.addEventListener('change', () => wsSet({ src: sel.value }, null));
+  const rbd = document.getElementById('reader-backdrop');
+  if (rbd) rbd.addEventListener('click', e => { if (e.target === rbd) closeReader(); });
 })();
 
 // ── CRA reference library (special mode) ──────────────────────────────
@@ -5034,13 +5295,29 @@ function wsTypeName(tyId) {
   return ty ? (state.lang === 'en' ? ty.en : ty.zh) : tyId;
 }
 
+function bindWsOpen(el, a) {
+  el.tabIndex = 0;
+  el.setAttribute('role', 'button');
+  el.setAttribute('aria-label', artTitle(a));
+  el.onclick = () => openReader(a, ws.shown, el);
+  el.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+      e.preventDefault();
+      openReader(a, ws.shown, el);
+    }
+  });
+}
+
 function buildWsCard(a) {
   const card = document.createElement('div');
   const tyId = hubTypeId(a);
   const tyName = wsTypeName(tyId);
   const wl = watchLabels(a);
   const hasStar = wl && wl.length > 0;
-  card.className = 'ws-card' + (hasStar ? ' watched' : '');
+  const isRead = isArticleRead(a);
+  const idStr = articleIdOf(a);
+  card.className = 'ws-card' + (hasStar ? ' watched' : '') + (isRead ? ' is-read' : '');
+  if (idStr) card.dataset.id = idStr;
   const title = artTitle(a);
   const summary = artSummary(a);
   const srcName = (a.sources && a.sources[0]) ? a.sources[0].name : (a.source || '');
@@ -5057,7 +5334,7 @@ function buildWsCard(a) {
     '<div class="ws-card-footer">' + escHtml(footerText) + '</div>'
   ].join('');
 
-  bindOpen(card, a);
+  bindWsOpen(card, a);
   return card;
 }
 
@@ -5067,7 +5344,10 @@ function buildWsTitleRow(a) {
   const tyName = wsTypeName(tyId);
   const wl = watchLabels(a);
   const hasStar = wl && wl.length > 0;
-  row.className = 'ws-title-row' + (hasStar ? ' watched' : '');
+  const isRead = isArticleRead(a);
+  const idStr = articleIdOf(a);
+  row.className = 'ws-title-row' + (hasStar ? ' watched' : '') + (isRead ? ' is-read' : '');
+  if (idStr) row.dataset.id = idStr;
   const title = artTitle(a);
   const srcName = (a.sources && a.sources[0]) ? a.sources[0].name : (a.source || '');
   const mmdd = (a._date || a.date || '').replace(/^\d{4}-/, '');
@@ -5080,7 +5360,7 @@ function buildWsTitleRow(a) {
     '<span class="ws-title-date">' + escHtml(mmdd) + '</span>'
   ].join('');
 
-  bindOpen(row, a);
+  bindWsOpen(row, a);
   return row;
 }
 
@@ -5176,6 +5456,286 @@ function closeOverlay() {
   overlayReturnFocus = null;
   if (overlayArticleId !== null) { overlayArticleId = null; syncHash(); }
 }
+
+// ── Workspace Popup Reader (M6) ───────────────────────
+let readerReturnFocus = null;
+let readerCurrentArticle = null;
+let readerCurrentList = null;
+var readerArticleId = null;
+
+let readSet = new Set();
+function loadReadSet() {
+  try {
+    const raw = prefGet('tracker_read');
+    if (raw && typeof raw === 'string') {
+      const arr = JSON.parse(raw);
+      if (Array.isArray(arr)) {
+        const clean = arr.filter(x => typeof x === 'string' || typeof x === 'number').map(String);
+        return new Set(clean.slice(-2000));
+      }
+    }
+  } catch (e) {}
+  return new Set();
+}
+readSet = loadReadSet();
+
+function articleIdOf(a) {
+  if (!a) return '';
+  if (a.id !== undefined && a.id !== null) return String(a.id);
+  if (a._key !== undefined && a._key !== null) return String(a._key);
+  return TrackerStore.keyOf(a, a._date || a.date || '');
+}
+
+function isArticleRead(a) {
+  if (!a) return false;
+  if (a.id !== undefined && a.id !== null && readSet.has(String(a.id))) return true;
+  if (a._key !== undefined && a._key !== null && readSet.has(String(a._key))) return true;
+  return false;
+}
+
+function markArticleRead(a) {
+  if (!a) return;
+  const id = articleIdOf(a);
+  if (!id) return;
+  if (readSet.has(id)) {
+    readSet.delete(id);
+  }
+  readSet.add(id);
+  while (readSet.size > 2000) {
+    const oldest = readSet.values().next().value;
+    readSet.delete(oldest);
+  }
+  if (!isPreviewMode()) {
+    try {
+      prefSet('tracker_read', JSON.stringify([...readSet]));
+    } catch (e) {}
+  }
+  const escaped = (typeof CSS !== 'undefined' && CSS.escape) ? CSS.escape(id) : id.replace(/"/g, '\\"');
+  try {
+    document.querySelectorAll('.ws-card[data-id="' + escaped + '"], .ws-title-row[data-id="' + escaped + '"]').forEach(el => {
+      el.classList.add('is-read');
+    });
+  } catch (e) {}
+}
+
+function readerPool() {
+  const days = window.TRACKER_DAYS || {};
+  return TrackerStore.collect(days, { dates: Object.keys(days) });
+}
+
+function openReader(article, list, triggerEl) {
+  if (!article) return;
+  const backdrop = document.getElementById('reader-backdrop');
+  const reader = document.getElementById('reader');
+  if (!backdrop || !reader) return;
+
+  const wasOpen = !reader.classList.contains('hidden');
+  if (!wasOpen) {
+    readerReturnFocus = triggerEl || document.activeElement;
+  }
+
+  markArticleRead(article);
+
+  const curList = Array.isArray(list) ? list : ((ws && ws.shown && ws.shown.length) ? ws.shown : readerPool());
+  readerCurrentArticle = article;
+  readerCurrentList = curList;
+
+  const artId = articleIdOf(article);
+  readerArticleId = artId;
+  overlayArticleId = artId;
+  syncHash();
+
+  const pool = readerPool();
+  const ctx = TrackerStore.getReaderContext(artId, curList, { pool: pool, typeOf: newsTypeOf });
+  const cur = ctx.article || article;
+
+  // Toolbar
+  const btnPrev = document.getElementById('reader-prev');
+  if (btnPrev) {
+    btnPrev.disabled = !ctx.prevArticle;
+    btnPrev.textContent = t('readerPrev');
+    btnPrev.onclick = () => readerStep(-1);
+  }
+  const btnNext = document.getElementById('reader-next');
+  if (btnNext) {
+    btnNext.disabled = !ctx.nextArticle;
+    btnNext.textContent = t('readerNext');
+    btnNext.onclick = () => readerStep(1);
+  }
+  const posEl = document.getElementById('reader-pos');
+  if (posEl) {
+    posEl.textContent = (ctx.index >= 0 ? (ctx.index + 1) : '-') + ' / ' + ctx.total;
+  }
+  const hintEl = document.getElementById('reader-hint');
+  if (hintEl) {
+    hintEl.textContent = t('readerNavHint');
+  }
+  const closeBtn = document.getElementById('reader-close');
+  if (closeBtn) {
+    closeBtn.setAttribute('aria-label', t('close'));
+    closeBtn.onclick = () => closeReader();
+  }
+
+  // Meta line
+  const tyId = hubTypeId(cur);
+  const tyName = wsTypeName(tyId);
+  const dateStr = cur._date || cur.date || '';
+  const srcName = (cur.sources && cur.sources[0]) ? cur.sources[0].name : (cur.source || '');
+
+  // Tags
+  const tags = artTags(cur);
+  let tagsHtml = '';
+  if (tags && tags.length) {
+    tagsHtml = '<div class="reader-tags">' + tags.map(tg => {
+      if (/^CVE-\d{4}-\d{4,}$/.test(tg)) {
+        return '<a class="reader-tag" href="https://www.cve.org/CVERecord?id=' + escHtml(tg) + '" target="_blank" rel="noopener">#' + escHtml(tg) + '</a>';
+      }
+      return '<span class="reader-tag">#' + escHtml(tg) + '</span>';
+    }).join('') + '</div>';
+  }
+
+  // Read original link
+  const origUrl = cur.url || (cur.sources && cur.sources[0] && cur.sources[0].url) || '';
+  const origLabel = (state.lang === 'en' ? 'Read original' : '閱讀原文') + (srcName ? '：' + srcName : '') + ' ↗';
+  const origHtml = '<div class="reader-orig"><a class="reader-orig-link" href="' + escHtml(safeHref(origUrl || '#')) + '" target="_blank" rel="noopener">' + escHtml(origLabel) + '</a></div>';
+
+  // Same event section
+  const same = ctx.sameCveArticles || [];
+  let sameHtml = '';
+  if (same.length > 0) {
+    const cves = TrackerStore.extractCves(cur);
+    const cveStr = cves.length ? cves.join(', ') : 'CVE';
+    const totalCount = same.length + 1;
+    const countStr = (state.lang === 'en'
+      ? 'Same event · ' + cveStr + ' (' + totalCount + ' ' + (totalCount === 1 ? 'article' : 'articles') + ')'
+      : '同一事件 · ' + cveStr + '（共 ' + totalCount + ' 篇）');
+    sameHtml = '<section class="reader-same">' +
+      '<h3 class="reader-same-h">' + escHtml(countStr) + '</h3>' +
+      '<div class="reader-same-list" id="reader-same-list"></div>' +
+    '</section>';
+  }
+
+  const bodyEl = document.getElementById('reader-body');
+  if (bodyEl) {
+    bodyEl.innerHTML = [
+      '<div class="reader-meta">',
+        '<span class="ws-type-chip ws-ty-' + escHtml(tyId) + '">' + escHtml(tyName) + '</span>',
+        '<span class="reader-meta-text">' + escHtml(dateStr) + (srcName ? ' · ' + escHtml(srcName) : '') + '</span>',
+      '</div>',
+      '<h2 id="reader-title" class="reader-title">' + linkifyCVE(escHtml(artTitle(cur))) + '</h2>',
+      '<div class="reader-summary">' + linkifyCVE(escHtml(artSummary(cur))) + '</div>',
+      tagsHtml,
+      origHtml,
+      sameHtml
+    ].filter(Boolean).join('');
+
+    if (same.length > 0) {
+      const sameList = document.getElementById('reader-same-list');
+      if (sameList) {
+        same.forEach(rel => {
+          const mmdd = (rel._date || rel.date || '').replace(/^\d{4}-/, '');
+          const title = artTitle(rel);
+          const item = document.createElement('button');
+          item.type = 'button';
+          item.className = 'reader-same-item';
+          item.textContent = (mmdd ? mmdd + ' ' : '') + title;
+          item.onclick = () => openReader(rel, curList, item);
+          sameList.appendChild(item);
+        });
+      }
+    }
+    bodyEl.scrollTop = 0;
+  }
+
+  backdrop.classList.remove('hidden');
+  reader.classList.remove('hidden');
+  reader.removeAttribute('hidden');
+
+  document.removeEventListener('keydown', readerKeyHandler);
+  document.addEventListener('keydown', readerKeyHandler);
+
+  if (!wasOpen && closeBtn) {
+    closeBtn.focus();
+  }
+}
+
+function closeReader() {
+  const backdrop = document.getElementById('reader-backdrop');
+  const reader = document.getElementById('reader');
+  const wasOpen = reader && !reader.classList.contains('hidden');
+  if (backdrop) backdrop.classList.add('hidden');
+  if (reader) {
+    reader.classList.add('hidden');
+    reader.setAttribute('hidden', '');
+  }
+  document.removeEventListener('keydown', readerKeyHandler);
+
+  let focusTarget = null;
+  if (readerCurrentArticle) {
+    const curId = articleIdOf(readerCurrentArticle);
+    const escaped = (typeof CSS !== 'undefined' && CSS.escape) ? CSS.escape(curId) : curId.replace(/"/g, '\\"');
+    try { focusTarget = document.querySelector('.ws-card[data-id="' + escaped + '"], .ws-title-row[data-id="' + escaped + '"]'); } catch (e) {}
+  }
+  if (!focusTarget) focusTarget = readerReturnFocus;
+  if (wasOpen && focusTarget && document.body.contains(focusTarget)) {
+    try { focusTarget.focus(); } catch (e) {}
+  }
+
+  readerReturnFocus = null;
+  readerCurrentArticle = null;
+  readerArticleId = null;
+  overlayArticleId = null;
+  syncHash();
+}
+
+function readerStep(delta) {
+  if (!readerCurrentArticle) return;
+  const list = readerCurrentList || ((ws && ws.shown && ws.shown.length) ? ws.shown : readerPool());
+  const artId = articleIdOf(readerCurrentArticle);
+  const pool = readerPool();
+  const ctx = TrackerStore.getReaderContext(artId, list, { pool: pool, typeOf: newsTypeOf });
+  const target = delta < 0 ? ctx.prevArticle : ctx.nextArticle;
+  if (target) {
+    openReader(target, list, readerReturnFocus);
+  }
+}
+
+function readerKeyHandler(e) {
+  const reader = document.getElementById('reader');
+  if (!reader || reader.classList.contains('hidden')) return;
+  if (e.key === 'Escape') {
+    e.preventDefault();
+    closeReader();
+    return;
+  }
+  if (e.key === 'ArrowLeft') {
+    e.preventDefault();
+    readerStep(-1);
+    return;
+  }
+  if (e.key === 'ArrowRight') {
+    e.preventDefault();
+    readerStep(1);
+    return;
+  }
+  if (e.key === 'Tab') {
+    const focusables = [...reader.querySelectorAll('button:not([disabled]), [href], input, [tabindex]:not([tabindex="-1"])')]
+      .filter(el => el.offsetParent !== null);
+    if (!focusables.length) return;
+    const first = focusables[0], last = focusables[focusables.length - 1];
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
+  }
+}
+
+window.openReader = openReader;
+window.closeReader = closeReader;
+window.readerStep = readerStep;
 
 // ── Load helpers ──────────────────────────────────────
 function loadYearManifest(year, cb, tracker = state.currentTracker) {
@@ -5324,7 +5884,8 @@ function syncHash() {
     if (skinOf()) wp.push('s=' + skinOf());
     if (palettePref) wp.push('pal=' + palettePref);
     wp.push('p=' + encodeURIComponent(viewPrefs.preset));
-    if (overlayArticleId !== null) wp.push('a=' + encodeURIComponent(overlayArticleId));
+    const activeArtId = (readerArticleId !== null) ? readerArticleId : overlayArticleId;
+    if (activeArtId !== null) wp.push('a=' + encodeURIComponent(activeArtId));
     const wh = '#' + wp.join('&');
     if (wh !== location.hash) {
       try { history.replaceState(null, '', wh); }
@@ -5404,7 +5965,11 @@ function openPendingArticle() {
   const art = list.find(x => x && (x._key === sid || String(x.id) === sid));
   if (!art) return;
   pendingOpenId = null;
-  openOverlay(art, null);
+  if (state.wsActive) {
+    openReader(art, (ws && ws.shown && ws.shown.length) ? ws.shown : list, null);
+  } else {
+    openOverlay(art, null);
+  }
 }
 
 // Restore the view named by the hash. Returns true if it handled the load.
@@ -5485,6 +6050,7 @@ document.getElementById('overlay').addEventListener('click', e => {
 document.addEventListener('keydown', e => {
   if (e.key !== 'Escape') return;
   if (!document.getElementById('overlay').classList.contains('hidden')) closeOverlay();
+  else if (document.getElementById('reader') && !document.getElementById('reader').classList.contains('hidden')) closeReader();
   else if (state.wsActive && ws.panelOpen) { wsToggleTimePanel(false); const c = document.getElementById('ws-time-chip'); if (c) c.focus(); }
   else if (document.getElementById('sidebar').classList.contains('nav-open')) closeNav(true);
 });
