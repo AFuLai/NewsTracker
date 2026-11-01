@@ -1,0 +1,21 @@
+CRLF file. Let me read.
+Now test: purity under node, and a behavior comparison.
+I added `TrackerStore` to `/opt/tracker/repo/ui/index.html` and routed the three collect/de-dup loops through it. I only ran node checks. I didn't open the page in a browser or compare rendered output before and after, so "visual output unchanged" is untested.
+
+**Block.** `/* TRACKER-STORE:BEGIN */` … `/* TRACKER-STORE:END */` sits just before the `newsTypeOf` comment. `window.TrackerStore = TrackerStore;` follows the END marker. The block holds `keyOf`, `newestDate`, `shiftDate`, `collect`, `sortNewest`, `extractCves` and `getReaderContext`.
+
+**Rewiring.**
+- `hubKey` calls `keyOf`.
+- `hubShiftDate` delegates to `shiftDate`.
+- `hubCollect` uses `newestDate`, `shiftDate`, `collect` and `sortNewest`.
+- `buildHubModel` takes `today` from `newestDate` and iterates `collect(...)`. It strips `_key` from each item so `top` entries have the same fields as before. Its counting logic is unchanged.
+- `renderArticles` builds its initial list with `collect(..., { dates })`. Items there now carry an extra `_key` field.
+
+**Checks.**
+- Evaluating the block text alone with `new Function` under node runs and returns a working store. A small fixture exercised `collect`, `newestDate`, `shiftDate`, `extractCves` and `getReaderContext`, and the results matched the spec (duplicate ids, a null article and a non-array day were all handled).
+- The main script parses with no syntax error.
+- No removed lines mention `CAT_MAP`, `NOTE` or `INVARIANT`.
+- `git status` shows only `ui/index.html` changed. The `.common/codex-assist` files were already untracked.
+- I wrote and deleted a scratch script in `/tmp`.
+
+verified: 5  assumed: 1  gaps: 0  findings: 0

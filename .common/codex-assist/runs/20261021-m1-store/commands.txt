@@ -1,0 +1,24 @@
+cd /opt/tracker/repo/ui; grep -n "hubKey\|hubCollect\|hubShiftDate\|function newsTypeOf\|function renderArticles\|function buildHubModel\|function matchesQuery\|<script" index.html | head -60; git status --short | head
+cd /opt/tracker/repo/ui; sed -n '2365,2375p;2410,2520p;2560,2600p;3781,3815p' index.html | tr -d '\r'
+cd /opt/tracker/repo/ui; cat > /tmp/m1.py <<'EOF'
+p='/opt/tracker/repo/ui/index.html'
+s=open(p,newline='').read()
+assert '\r\n' in s
+s=s.replace('\r\n','\n')
+block=r'''/* TRACKER-STORE:BEGIN */
+// Pure data layer over the TRACKER_DAYS shape ({ 'YYYY-MM-DD': [article, ...] }). No DOM, no
+// storage, no globals: anything it needs (e.g. a type function) is passed in as an argument.
+const TrackerStore = (() => {
+  const CVE_RE = /CVE-\d{4}-\d{4,}/ig;
+  function keyOf(a, date) {
+    return (a.id !== undefined &&…
+cd /opt/tracker/repo/ui; sed -i "s/^assert '.r.n' in s$//; s/^s=s.replace('.r.n','.n')$//; s/s.replace('.n','.r.n')/s/" /tmp/m1.py; sed -n '1,6p' /tmp/m1.py | head -5; tail -1 /tmp/m1.py; python3 /tmp/m1.py && git diff --stat
+cd /opt/tracker/repo/ui; node -e "
+const s=require('fs').readFileSync('index.html','utf8');
+const b=s.slice(s.indexOf('/* TRACKER-STORE:BEGIN */'),s.indexOf('/* TRACKER-STORE:END */'));
+const T=new Function(b+';return TrackerStore')();
+const d={'2026-01-01':[{id:1,title:'a CVE-2024-1234',tags:['cve-2024-1234']},null,{id:1,title:'dup'}],'2026-01-02':[{id:2,title:'b',summary:'cve-2024-1234'},{title:'x'}],'2026-01-03':'z'};
+const l=T.collect(d,{fromDate:'2026-01-01',toDate:'2026-01-03'});
+console.log(l.length,…
+cd /opt/tracker/repo/ui; node -e "
+const s=require('fs').readFileSync('index.html','utf8');const i=s.indexOf('<script>')+8;new Function(s.slice(i,s.indexOf('</script>',i)));console.log('syntax ok')"; rm /tmp/m1.py

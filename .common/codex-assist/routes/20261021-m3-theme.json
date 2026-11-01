@@ -1,0 +1,48 @@
+{
+ "task_id": "20261021-m3-theme",
+ "at": "2026-10-21T02:20:26Z",
+ "machine": "afu-delta",
+ "engine": "agy",
+ "model": "claude-sonnet-5-5-medium",
+ "effort": null,
+ "ab_of": null,
+ "step": 0,
+ "target_step": 0,
+ "fallback": false,
+ "rank": 3,
+ "target_rank": 2,
+ "pref": "balanced",
+ "verdict": "ROUTED",
+ "via": [
+  "SCHEDULE class implement: 3 step(s), engine order agy claude-sonnet-5-5-medium > codex gpt-6-sol/low > codex gpt-6-astra/low > agy gemini-3.8-flash-medium (pinned to agy)",
+  "BASE implement -> rank 2",
+  "LEARNED not applied under the schedule (its per-model history predates it)",
+  "SIMILAR 0 past task(s) with word overlap >= 0.60, 0 failed: no change",
+  "NPU 0 similar past task(s), 0 failed: no change (it never lowers)",
+  "SCHEDULE chose agy claude-sonnet-5-5-medium (step 0); bucket agy-claude is ON"
+ ],
+ "warnings": [],
+ "quota": {
+  "codex": "ON",
+  "claude": "ON",
+  "agy": "UNDER",
+  "agy-claude": "ON"
+ },
+ "similar": {
+  "neighbours": []
+ },
+ "npu": {
+  "mode": "auto",
+  "status": "RAN",
+  "device": "NPU",
+  "neighbours": []
+ },
+ "router": {
+  "name": "route.py",
+  "version": "0.7.0",
+  "sha256": "42393f70d32062854957c79ab32c2f98e6c17c937cf28dcce191b7b98e1afb82"
+ },
+ "policy_sha256": "c09e1d86517d48ee74c6120c11e955ca474ed7d0142846249242b7e639ddd01e",
+ "task_sha256": "2822b34f37ac25ab07546e5aef3891cd8782ff30aa50c0897161f84904e7a02b",
+ "rederive": "python3 tools/codex-assist/route.py .common/codex-assist/tasks/20261021-m3-theme.json --no-write"
+}

@@ -1,0 +1,127 @@
+git status
+git log -n 5 --oneline
+cat .common/codex-assist/tasks/20261021-m5-cards.json
+cat .common/codex-assist/tasks/20261021-m5-cards.prompt.md
+grep -in "m5" .common/codex-assist/runs/20261021-ui-architecture-plan/answer.txt || true
+grep -E -C 5 "卡片|標題|mode|ws-grid" refs/plans/20261019-ux-mockups/Browse.dc.html || true
+grep -E -C 15 "cards" refs/plans/20261019-ux-mockups/Browse.dc.html | head -n 40
+grep -n -C 20 "TRACKER-PREFS" ui/index.html
+/opt/venv/bin/python -m pytest -q -p no:cacheprovider tests
+git grep "TrackerPrefs" tests/
+cat tests/test_ui_prefs.py
+grep -n -C 25 "renderWorkspace" ui/index.html
+sed -n '3800,4109p' ui/index.html
+sed -n '3750,3810p' ui/index.html
+grep -n -C 10 "const ws =" ui/index.html || grep -n -C 10 "let ws =" ui/index.html
+grep -n -C 20 "applyHashRestore" ui/index.html
+sed -n '4980,5045p' ui/index.html
+sed -n '4960,4985p' ui/index.html
+sed -n '3565,3585p' ui/index.html
+git grep -n -C 5 "initHubPrefs" ui/index.html
+sed -n '2870,2900p' ui/index.html
+git grep -n -C 5 "hv=" ui/index.html
+git grep -n -C 5 "h\.hv" ui/index.html
+git grep -n "applyHashRestore" tests/
+ls tests/
+cat tests/test_ui_range.py
+cat tests/test_browser.py
+grep -n -C 10 "ws-head" ui/index.html
+grep -n -C 15 "wsTab" ui/index.html
+grep -n -C 20 "#ws-rail" ui/index.html
+grep -n -C 10 "NEWS_TYPES" ui/index.html
+grep -n -C 15 "main-content" ui/index.html
+sed -n '1540,1570p' ui/index.html
+sed -n '1475,1515p' ui/index.html
+sed -n '1470,1478p' ui/index.html
+grep -n "box-sizing" ui/index.html
+grep -n -C 30 "function buildCard(" ui/index.html
+sed -n '4765,4795p' ui/index.html
+grep -n -C 5 "bindOpen" ui/index.html
+grep -n -C 5 "cat-vuln-fill" ui/index.html
+grep -n -C 10 "data-palette" ui/index.html | head -n 35
+grep -n -C 10 "const C =" refs/plans/20261019-ux-mockups/Browse.dc.html
+grep -n -C 20 "list" refs/plans/20261019-ux-mockups/Browse.dc.html | head -n 45
+sed -n '120,170p' refs/plans/20261019-ux-mockups/Browse.dc.html
+grep -n -C 5 "function hubTypeName" ui/index.html
+grep -n -C 10 "\.cat-badge" ui/index.html
+sed -n '4790,4815p' ui/index.html
+sed -n '4815,4840p' ui/index.html
+grep -n -C 5 "os-focus-fill" ui/index.html
+grep -n -C 5 "a\.sources" ui/index.html
+git grep "watchBadge" tests/
+grep -n -C 5 "cve-link" ui/index.html
+grep -n -C 10 "\.date-divider" ui/index.html
+grep -n "sticky" refs/plans/20261019-ux-mockups/Browse.dc.html || grep -n "sticky" ui/index.html
+grep -n "search-row" ui/index.html
+git show f2bde6a --stat
+cat .common/codex-assist/tasks/20261021-m4-workspace.prompt.md
+grep -n -C 5 "position:\s*sticky" ui/index.html
+git grep "date-divider" ui/ tests/
+git grep "ws-rail" tests/
+grep -n -C 10 "function artTitle(" ui/index.html
+python3 -c "
+import subprocess
+js = '''
+const TrackerPrefs = (() => {
+  const LEGACY_KEYS = ['tracker_lang', 'tracker_theme', 'tracker_skin', 'tracker_palette', 'tracker_nav',
+    'tracker_view', 'tracker_watch', 'tracker_watch_hub', 'tracker_watch_seen', 'tracker_lib_group'];
+  const EXTRA_KEYS = ['tracker_ws', 'tracker_read'];
+  const KEY = 'tracker_prefs';
+  const has = (o, k) => Object.prototype.hasOwnProperty.call(o, k);
+  function load(storage) {
+    const values = {};
+    let parsed = null;
+    try {…
+sed -n '1410,1445p' ui/index.html
+sed -n '1500,1520p' ui/index.html
+/opt/venv/bin/python -m pytest -q -p no:cacheprovider tests/test_ui_prefs.py
+grep -n -C 10 "wsCollapse" ui/index.html
+grep -n -C 10 "function init()" ui/index.html
+python3 -c 'import re,subprocess,os,tempfile
+s=open("/opt/tracker/repo/ui/index.html",encoding="utf-8").read()
+js="\n".join(re.findall(r"<script>(.*?)</script>", s, re.S))
+f=tempfile.NamedTemporaryFile("w",suffix=".js",delete=False,encoding="utf-8"); f.write(js); f.close()
+r=subprocess.run(["node","--check",f.name]); os.unlink(f.name)
+print("js-ok" if r.returncode==0 else "js-bad"); raise SystemExit(r.returncode)
+'
+python3 -c 'import re
+s=open("/opt/tracker/repo/ui/index.html",encoding="utf-8").read()
+need=["effectiveCat","buildCatPills","refreshCatPills","renderArticles","buildCard","openOverlay","syncHash","applyHashRestore","selectTracker","buildClusterPills","renderLibrary","toggleSkin","applyLang"]
+miss=[n for n in need if not re.search(r"function "+n+r"\b",s)]
+print("fns-ok" if not miss and "const CAT_MAP" in s else "fns-miss "+str(miss))
+'
+python3 -c 'import subprocess,re
+d=subprocess.run(["git","-C","/opt/tracker/repo","diff","HEAD","--","ui"],capture_output=True,text=True).stdout
+bad=[l for l in d.splitlines() if l.startswith("+") and re.search(r"webdriver|__test|node_env|process\.env",l,re.I)]
+print("cheat-bad" if bad else "cheat-ok")
+'
+/opt/venv/bin/python -m pytest -q -p no:cacheprovider tests
+git diff --stat ui/index.html
+git diff ui/index.html
+python3 -c 'import re,subprocess,os,tempfile
+s=open("/opt/tracker/repo/ui/index.html",encoding="utf-8").read()
+js="\n".join(re.findall(r"<script>(.*?)</script>", s, re.S))
+f=tempfile.NamedTemporaryFile("w",suffix=".js",delete=False,encoding="utf-8"); f.write(js); f.close()
+r=subprocess.run(["node","--check",f.name]); os.unlink(f.name)
+print("js-ok" if r.returncode==0 else "js-bad"); raise SystemExit(r.returncode)
+'
+python3 -c 'import re
+s=open("/opt/tracker/repo/ui/index.html",encoding="utf-8").read()
+need=["effectiveCat","buildCatPills","refreshCatPills","renderArticles","buildCard","openOverlay","syncHash","applyHashRestore","selectTracker","buildClusterPills","renderLibrary","toggleSkin","applyLang"]
+miss=[n for n in need if not re.search(r"function "+n+r"\b",s)]
+print("fns-ok" if not miss and "const CAT_MAP" in s else "fns-miss "+str(miss))
+'
+python3 -c 'import subprocess,re
+d=subprocess.run(["git","-C","/opt/tracker/repo","diff","HEAD","--","ui"],capture_output=True,text=True).stdout
+bad=[l for l in d.splitlines() if l.startswith("+") and re.search(r"webdriver|__test|node_env|process\.env",l,re.I)]
+print("cheat-bad" if bad else "cheat-ok")
+'
+/opt/venv/bin/python -m pytest -q -p no:cacheprovider tests
+git status -s
+grep -n "EXTRA_KEYS = \['tracker_ws'" ui/index.html
+grep -n "function wsSetMode" ui/index.html
+grep -n "function buildWsCard" ui/index.html
+grep -n "function buildWsTitleRow" ui/index.html
+grep -n "grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));" ui/index.html
+grep -n -C 2 "position: sticky;" ui/index.html
+grep -n "if (ws.mode === 'titles') wp.push('v=t');" ui/index.html

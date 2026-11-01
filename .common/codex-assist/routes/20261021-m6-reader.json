@@ -1,0 +1,57 @@
+{
+ "task_id": "20261021-m6-reader",
+ "at": "2026-10-21T03:21:14Z",
+ "machine": "afu-delta",
+ "engine": "agy",
+ "model": "gemini-3.8-flash-medium",
+ "effort": null,
+ "ab_of": "gemini-4-argon-medium",
+ "step": 0,
+ "target_step": 0,
+ "fallback": false,
+ "rank": 2,
+ "target_rank": 2,
+ "pref": "balanced",
+ "verdict": "ROUTED",
+ "via": [
+  "SCHEDULE class implement: 3 step(s), engine order agy claude-sonnet-5-5-medium > codex gpt-6-sol/low > codex gpt-6-astra/low > agy gemini-3.8-flash-medium (pinned to agy)",
+  "BASE implement -> rank 2",
+  "LEARNED not applied under the schedule (its per-model history predates it)",
+  "SIMILAR 0 past task(s) with word overlap >= 0.60, 0 failed: no change",
+  "NPU 1 similar past task(s), 0 failed: no change (it never lowers)",
+  "SCHEDULE skip agy claude-sonnet-5-5-medium: bucket agy-claude is RESERVE",
+  "AB agy gemini-3.8-flash-medium arm A; arm B would be gemini-4-argon-medium",
+  "SCHEDULE chose agy gemini-3.8-flash-medium (step 0); bucket agy is UNDER"
+ ],
+ "warnings": [],
+ "quota": {
+  "codex": "ON",
+  "claude": "ON",
+  "agy": "UNDER",
+  "agy-claude": "RESERVE"
+ },
+ "similar": {
+  "neighbours": []
+ },
+ "npu": {
+  "mode": "auto",
+  "status": "RAN",
+  "device": "NPU",
+  "neighbours": [
+   {
+    "id": "20261021-m5-cards",
+    "sim": 0.9511,
+    "outcome": "ok",
+    "rank": 2
+   }
+  ]
+ },
+ "router": {
+  "name": "route.py",
+  "version": "0.7.0",
+  "sha256": "42393f70d32062854957c79ab32c2f98e6c17c937cf28dcce191b7b98e1afb82"
+ },
+ "policy_sha256": "c09e1d86517d48ee74c6120c11e955ca474ed7d0142846249242b7e639ddd01e",
+ "task_sha256": "0ecdb238569f006a77e9297985f819ca9295ad151b609071e5804a8449be8df0",
+ "rederive": "python3 tools/codex-assist/route.py .common/codex-assist/tasks/20261021-m6-reader.json --no-write"
+}

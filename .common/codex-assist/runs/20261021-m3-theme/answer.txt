@@ -1,0 +1,21 @@
+I made the M3 changes in `/opt/tracker/repo/ui/index.html` only. The script blocks pass `node --check`, but I did not load the page in a browser, so none of the behaviour has been exercised.
+
+- **Header:** `#skin-btn`, `#view-select` and `#theme-btn` are gone from the DOM (grep for their ids returns 0). `#palette-btn` is relabelled 主題 / Theme through the `paletteBtn` I18N key. `applyLang` no longer lists the removed buttons.
+- **Removed-element handling:** the JS that touches them already null-checked, so I changed nothing there. `toggleSkin`, `toggleTheme`, `setPreset` and `updateViewUI` are untouched and still callable.
+- **Theme panel:**
+  - **Options:** it now has 預設深色 / Default dark (`#palette-default`) and 預設淺色 / Default light (`#palette-default-light`), then the 10 palettes.
+  - **Default options:** a new function `setDefaultTheme` sets `data-theme`, saves `tracker_theme` through `prefSet` (skipped in preview mode, as palettes are), then calls `setPalette('')`.
+  - **Pressed state:** `updatePaletteUI` shows default-dark or default-light as pressed when no palette is active, according to `data-theme`.
+  - **Focus trap and Esc:** unchanged.
+  - **Old string:** the `paletteDefault` I18N key is kept but no longer used.
+- **Skin:** `init` now sets `data-skin="md3"` and no longer reads `tracker_skin`. The existing `s=classic` handling in `applyHashRestore` is unchanged, and so is `syncHash`.
+- **Dashboard:** `.wh-dash` defaults now come from the theme variables. Those are `--surface-container-low`, `--surface-container`, `--on-surface`, `--on-surface-variant`, `--outline-variant`, `--primary` and `--outline`. The warn colour uses `--wh-hit` and its text uses `--surface`. The `html[data-palette] .wh-dash` override is unchanged.
+- **Presets:** nothing changed. `p=` and storage behave as before.
+
+**Left as is:** the `#theme-btn` CSS rules and the `.pal-default` styling are still there. They match nothing now, so they do nothing. I did not remove them because you said not to remove existing things.
+
+**Found along the way:** `s=classic` is only applied when the hash also names a library, hub or tracker view. A hash with only `s=classic` is ignored, as it was before.
+
+Because `tracker_skin` is no longer read, a stored `classic` value now has no effect. `toggleSkin` still writes it.
+
+verified: 3  assumed: 2  gaps: 0  findings: 0

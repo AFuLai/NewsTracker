@@ -1,0 +1,46 @@
+### Summary of Changes
+
+Slice M6 of the UI reframe has been implemented directly in [ui/index.html](file:///opt/tracker/repo/ui/index.html).
+
+1. **Popup Reader Dialog (`#reader`)**:
+   - Added modal markup at [ui/index.html:2061](file:///opt/tracker/repo/ui/index.html#L2061) `<div id="reader-backdrop" class="reader-backdrop hidden">` containing `<div id="reader" class="hidden" role="dialog" aria-modal="true" aria-labelledby="reader-title" tabindex="-1">`.
+   - Styled dialog container at [ui/index.html:1768](file:///opt/tracker/repo/ui/index.html#L1768) `#reader {` with `max-width: 760px; margin: auto;` (centred), body summary at `max-width: 65ch; line-height: 1.85;`, and full-screen display (`width: 100%; height: 100%; max-height: 100%; border-radius: 0; border: none;`) below 768px via `@media (max-width: 767px)`.
+   - Populated reader content in [ui/index.html:5526](file:///opt/tracker/repo/ui/index.html#L5526) `function openReader(article, list, triggerEl) {`:
+     - Meta line: news type chip, date, and source (`type · date · source`).
+     - Title labelled with `id="reader-title"`.
+     - Full summary rendered with `linkifyCVE(escHtml(artSummary(cur)))`.
+     - Tags as `#chips` linking CVE tags to `cve.org`.
+     - Read original link: `閱讀原文 / Read original` using `safeHref` and `target="_blank" rel="noopener"`.
+     - Same event section: when `ctx.sameCveArticles` (collected via `TrackerStore.collect` across all loaded dates in `window.TRACKER_DAYS`) is non-empty, displays heading with shared CVE id and count (`同一事件 · <CVE>（共 N 篇）` / `Same event · <CVE> (N articles)`), listing related articles as `"MM-DD title"`, each clickable to open in the reader.
+
+2. **Reader Navigation & Stepping**:
+   - Implemented [ui/index.html:5691](file:///opt/tracker/repo/ui/index.html#L5691) `function readerStep(delta) {` navigating through `ctx.prevArticle` and `ctx.nextArticle` over the workspace's currently shown list.
+   - Wired `‹ 上一篇 / 下一篇 ›` buttons and `i / N` position indicator; disabled buttons when boundary reached.
+   - Handled keyboard navigation: `ArrowLeft` / `ArrowRight` to step, `Escape` to close.
+   - Trapped Tab focus within `#reader` while open.
+   - Implemented [ui/index.html:5662](file:///opt/tracker/repo/ui/index.html#L5662) `function closeReader() {` returning focus to the card/row that triggered it.
+   - Stepping and opening update the hash `a=<id>` via `history.replaceState` in `syncHash()`; closing removes `a=`.
+
+3. **Read Marks**:
+   - Implemented [ui/index.html:5489](file:///opt/tracker/repo/ui/index.html#L5489) `function isArticleRead(a) {` and [ui/index.html:5496](file:///opt/tracker/repo/ui/index.html#L5496) `function markArticleRead(a) {`.
+   - On opening an article, its id is appended to a FIFO read set capped at the 2000 most recent items and persisted via `prefSet('tracker_read', JSON.stringify([...readSet]))`, never written when `isPreviewMode()` is true.
+   - Added class `is-read` to workspace cards (`.ws-card.is-read .ws-card-title`) and title rows (`.ws-title-row.is-read .ws-title-text`), muting title colour to `var(--on-surface-variant)` while preserving WCAG AA contrast (> 5.7:1 across light, dark, and all 10 palettes).
+
+4. **Workspace Card & Title Row Activation**:
+   - Defined [ui/index.html:5298](file:///opt/tracker/repo/ui/index.html#L5298) `function bindWsOpen(el, a) {` wiring click and Enter/Space activation of `.ws-card` and `.ws-title-row` elements to `openReader(a, ws.shown, el)`. Classic archive views retain `openOverlay` unchanged.
+   - Updated `openPendingArticle()` to invoke `openReader` when `state.wsActive` is true, ensuring restored `a=<id>` hashes in the news workspace open into the reader.
+
+5. **Responsiveness & Invariants**:
+   - Verified no horizontal overflow at 375px; responsive toolbar hides verbose navigation hints on narrow viewports.
+   - All existing functions, constants, and decision comments preserved.
+
+---
+
+### Verification
+
+- Ran pytest acceptance suite: 511 tests passed in 7.37s (`/opt/venv/bin/python -m pytest -q -p no:cacheprovider tests`).
+- Verified JavaScript syntax: `js-ok` via `node --check`.
+- Verified core functions: `fns-ok` with required functions intact.
+- Verified absence of test-environment sniffing: `cheat-ok`.
+
+verified: 4  assumed: 0  gaps: 0  findings: 0

@@ -1,0 +1,740 @@
+cd /opt/tracker/repo && git status
+cat /opt/tracker/repo/.common/codex-assist/tasks/20261021-m6-reader.json
+cd /opt/tracker/repo && git log -n 6 --oneline
+cat /opt/tracker/repo/.common/codex-assist/runs/20261021-m5-cards/answer.txt
+python3 -c '
+s = open("refs/plans/20261019-ux-mockups/Browse.dc.html").read()
+# find dialog or reader
+import re
+print("Length:", len(s))
+matches = [m.start() for m in re.finditer(r"(?i)reader|dialog", s)]
+print("Matches:", matches[:10])
+for idx in matches[:5]:
+    print("--- SNIPPET AT", idx, "---")
+    print(s[max(0, idx-100):min(len(s), idx+400)])
+'
+python3 -c '
+s = open("refs/plans/20261019-ux-mockups/Browse.dc.html").read()
+idx = s.find("role=\"dialog\"")
+print(s[idx-200:idx+4000])
+'
+cat /opt/tracker/repo/.common/codex-assist/runs/20261021-ui-architecture-plan/answer.txt
+python3 -c '
+with open("/opt/tracker/repo/ui/index.html", "r", encoding="utf-8") as f:
+    lines = f.readlines()
+print("Total lines:", len(lines))
+for i, l in enumerate(lines):
+    if any(k in l for k in ["TrackerStore", "getReaderContext", "openOverlay", "buildWsCard", "tracker_read", "syncHash", "applyHashRestore"]):
+        print(f"{i+1}: {l.strip()[:100]}")
+'
+python3 -c '
+s = open("/opt/tracker/repo/ui/index.html", encoding="utf-8").read()
+lines = s.splitlines()
+def show(start, end):
+    for i in range(start-1, min(end, len(lines))):
+        print(f"{i+1}: {lines[i]}")
+
+print("=== TrackerStore.getReaderContext ===")
+show(2870, 2945)
+'
+python3 -c '
+s = open("/opt/tracker/repo/ui/index.html", encoding="utf-8").read()
+lines = s.splitlines()
+def show(start, end):
+    for i in range(start-1, min(end, len(lines))):
+        print(f"{i+1}: {lines[i]}")
+
+print("=== openOverlay / closeOverlay / overlayTabTrap ===")
+show(5130, 5205)
+'
+python3 -c '
+s = open("/opt/tracker/repo/ui/index.html", encoding="utf-8").read()
+lines = s.splitlines()
+for i in range(5090, 5136):
+    print(f"{i+1}: {lines[i]}")
+'
+python3 -c '
+s = open("/opt/tracker/repo/ui/index.html", encoding="utf-8").read()
+lines = s.splitlines()
+for i in range(5020, 5090):
+    print(f"{i+1}: {lines[i]}")
+'
+python3 -c '
+s = open("/opt/tracker/repo/ui/index.html", encoding="utf-8").read()
+lines = s.splitlines()
+for i, l in enumerate(lines):
+    if "bindOpen" in l:
+        print(f"{i+1}: {l}")
+'
+python3 -c '
+s = open("/opt/tracker/repo/ui/index.html", encoding="utf-8").read()
+lines = s.splitlines()
+for i in range(4930, 4975):
+    print(f"{i+1}: {lines[i]}")
+'
+python3 -c '
+s = open("/opt/tracker/repo/ui/index.html", encoding="utf-8").read()
+lines = s.splitlines()
+for i, l in enumerate(lines):
+    if "function renderWorkspace" in l:
+        print(f"renderWorkspace at line {i+1}")
+        for j in range(i, min(i+100, len(lines))):
+            print(f"{j+1}: {lines[j]}")
+        break
+'
+python3 -c '
+s = open("/opt/tracker/repo/ui/index.html", encoding="utf-8").read()
+lines = s.splitlines()
+for i in range(4245, 4326):
+    print(f"{i+1}: {lines[i]}")
+'
+python3 -c '
+s = open("/opt/tracker/repo/ui/index.html", encoding="utf-8").read()
+lines = s.splitlines()
+for i, l in enumerate(lines):
+    if "const ws " in l or "var ws " in l or "let ws " in l:
+        print(f"{i+1}: {l}")
+'
+python3 -c '
+s = open("/opt/tracker/repo/ui/index.html", encoding="utf-8").read()
+lines = s.splitlines()
+for i in range(3885, 3930):
+    print(f"{i+1}: {lines[i]}")
+'
+python3 -c '
+s = open("/opt/tracker/repo/ui/index.html", encoding="utf-8").read()
+lines = s.splitlines()
+for i, l in enumerate(lines):
+    if "pendingOpenId" in l or "openPendingArticle" in l:
+        print(f"{i+1}: {l}")
+'
+python3 -c '
+s = open("/opt/tracker/repo/ui/index.html", encoding="utf-8").read()
+lines = s.splitlines()
+for i in range(5390, 5450):
+    print(f"{i+1}: {lines[i]}")
+'
+python3 -c '
+s = open("/opt/tracker/repo/ui/index.html", encoding="utf-8").read()
+lines = s.splitlines()
+for i in range(5310, 5390):
+    print(f"{i+1}: {lines[i]}")
+'
+python3 -c '
+s = open("/opt/tracker/repo/ui/index.html", encoding="utf-8").read()
+lines = s.splitlines()
+for i, l in enumerate(lines):
+    if "overlayArticleId" in l:
+        print(f"{i+1}: {l}")
+'
+python3 -c '
+s = open("/opt/tracker/repo/ui/index.html", encoding="utf-8").read()
+lines = s.splitlines()
+for i, l in enumerate(lines):
+    if "keyOf" in l:
+        print(f"{i+1}: {l}")
+'
+python3 -c '
+s = open("/opt/tracker/repo/ui/index.html", encoding="utf-8").read()
+lines = s.splitlines()
+for i in range(2815, 2840):
+    print(f"{i+1}: {lines[i]}")
+'
+python3 -c '
+s = open("/opt/tracker/repo/ui/index.html", encoding="utf-8").read()
+lines = s.splitlines()
+for i in range(2840, 2865):
+    print(f"{i+1}: {lines[i]}")
+'
+python3 -c '
+s = open("/opt/tracker/repo/ui/index.html", encoding="utf-8").read()
+lines = s.splitlines()
+for i in range(1820, 1870):
+    print(f"{i+1}: {lines[i]}")
+'
+python3 -c '
+s = open("/opt/tracker/repo/ui/index.html", encoding="utf-8").read()
+lines = s.splitlines()
+for i in range(1870, 1920):
+    print(f"{i+1}: {lines[i]}")
+'
+python3 -c '
+s = open("/opt/tracker/repo/ui/index.html", encoding="utf-8").read()
+lines = s.splitlines()
+for i, l in enumerate(lines):
+    if "isPreviewMode" in l:
+        print(f"{i+1}: {l}")
+'
+python3 -c '
+s = open("/opt/tracker/repo/ui/index.html", encoding="utf-8").read()
+lines = s.splitlines()
+for i, l in enumerate(lines):
+    if "ws-card" in l or "ws-title-row" in l:
+        print(f"{i+1}: {l}")
+'
+python3 -c '
+s = open("/opt/tracker/repo/ui/index.html", encoding="utf-8").read()
+lines = s.splitlines()
+for i in range(1575, 1750):
+    print(f"{i+1}: {lines[i]}")
+'
+python3 -c '
+s = open("/opt/tracker/repo/ui/index.html", encoding="utf-8").read()
+import re
+print("Searching on-surface-variant:")
+for l in s.splitlines():
+    if "--on-surface-variant:" in l:
+        print(l.strip())
+'
+python3 -c '
+s = open("/opt/tracker/repo/ui/index.html", encoding="utf-8").read()
+lines = s.splitlines()
+for i, l in enumerate(lines):
+    if "overlay" in l and ("<div" in l or "id=" in l):
+        print(f"{i+1}: {l}")
+'
+python3 -c '
+s = open("/opt/tracker/repo/ui/index.html", encoding="utf-8").read()
+lines = s.splitlines()
+for i, l in enumerate(lines):
+    if "#overlay" in l or ".overlay-box" in l:
+        print(f"{i+1}: {l}")
+'
+python3 -c '
+s = open("/opt/tracker/repo/ui/index.html", encoding="utf-8").read()
+lines = s.splitlines()
+for i in range(1115, 1170):
+    print(f"{i+1}: {lines[i]}")
+'
+python3 -c '
+import glob
+for f in glob.glob("tests/**/*.py", recursive=True):
+    content = open(f).read()
+    if "reader" in content or "overlay" in content or "openReader" in content:
+        print(f, "has mention")
+'
+grep -n "reader" tests/test_ui_store.py
+python3 -c '
+lines = open("tests/test_ui_store.py").readlines()
+for i in range(53, min(95, len(lines))):
+    print(f"{i+1}: {lines[i]}", end="")
+'
+grep -n "reader" tests/test_slots_and_pairs.py tests/test_dedup.py
+python3 -c '
+s = open("tests/test_ui_store.py").read()
+print(s[:500])
+'
+/opt/venv/bin/python -m pytest -q -p no:cacheprovider tests
+python3 -c '
+import re,subprocess,os,tempfile
+s=open("/opt/tracker/repo/ui/index.html",encoding="utf-8").read()
+js="\n".join(re.findall(r"<script>(.*?)</script>", s, re.S))
+f=tempfile.NamedTemporaryFile("w",suffix=".js",delete=False,encoding="utf-8"); f.write(js); f.close()
+r=subprocess.run(["node","--check",f.name]); os.unlink(f.name)
+print("js-ok" if r.returncode==0 else "js-bad"); raise SystemExit(r.returncode)
+'
+python3 -c '
+s = open("/opt/tracker/repo/ui/index.html", encoding="utf-8").read()
+lines = s.splitlines()
+for i, l in enumerate(lines):
+    if "const I18N" in l:
+        print(f"I18N at line {i+1}")
+        for j in range(i, min(i+60, len(lines))):
+            print(f"{j+1}: {lines[j]}")
+        break
+'
+python3 -c '
+s = open("/opt/tracker/repo/ui/index.html", encoding="utf-8").read()
+import re
+for l in s.splitlines():
+    if "--surface-container" in l or "--elev-3" in l:
+        print(l.strip())
+'
+python3 -c '
+# Check colors in index.html
+s = open("/opt/tracker/repo/ui/index.html").read()
+import re
+# extract themes
+palettes = re.findall(r"\[data-palette=\"([^\"]+)\"\]\s*\{([^}]+)\}", s)
+print("Palettes found:", len(palettes))
+for name, body in palettes:
+    print(name, ":", [l.strip() for l in body.split(";") if "text" in l or "bg" in l or "muted" in l][:3])
+'
+python3 -c '
+def lum(hex_code):
+    hex_code = hex_code.strip("#")
+    r, g, b = [int(hex_code[i:i+2], 16)/255.0 for i in (0, 2, 4)]
+    def f(c):
+        return c / 12.92 if c <= 0.03928 else ((c + 0.055) / 1.055) ** 2.4
+    return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b)
+
+def contrast(c1, c2):
+    l1, l2 = lum(c1), lum(c2)
+    return (max(l1, l2) + 0.05) / (min(l1, l2) + 0.05)
+
+palettes = [
+    ("deepsea", "#070B12", "#8EA2BB"),
+    ("terminal", "#040A06", "#87B597"),
+    ("neon", "#0C0716", "#A898C8…
+node -e '
+const s = require("fs").readFileSync("/opt/tracker/repo/ui/index.html", "utf8");
+// extract TrackerStore
+const storeCode = s.match(/\/\* TRACKER-STORE:BEGIN \*\/([\s\S]*?)\/\* TRACKER-STORE:END \*\//)[1];
+eval(storeCode);
+const D = {
+  "2026-10-18": [{id: 1, title: "Art 1 CVE-2026-1111"}],
+  "2026-10-19": [{id: 2, title: "Art 2 CVE-2026-2222 CVE-2026-1111"}],
+  "2026-10-20": [{id: 3, title: "Art 3 CVE-2026-1111"}]
+};
+const pool = TrackerStore.collect(D, { dates: Object.keys(D) });
+const list = poo…
+node -e '
+const s = require("fs").readFileSync("/opt/tracker/repo/ui/index.html", "utf8");
+const storeCode = s.match(/\/\* TRACKER-STORE:BEGIN \*\/([\s\S]*?)\/\* TRACKER-STORE:END \*\//)[1];
+const TrackerStore = (new Function(storeCode + "; return TrackerStore;"))();
+const D = {
+  "2026-10-18": [{id: 1, title: "Art 1 CVE-2026-1111"}],
+  "2026-10-19": [{id: 2, title: "Art 2 CVE-2026-2222 CVE-2026-1111"}],
+  "2026-10-20": [{id: 3, title: "Art 3 CVE-2026-1111"}]
+};
+const pool = TrackerStore.collect(D, { dates:…
+node -e '
+const s = require("fs").readFileSync("/opt/tracker/repo/ui/index.html", "utf8");
+const prefsCode = s.match(/\/\* TRACKER-PREFS:BEGIN \*\/([\s\S]*?)\/\* TRACKER-PREFS:END \*\//)[1];
+const TrackerPrefs = (new Function(prefsCode + "; return TrackerPrefs;"))();
+const mockStorage = {
+  _data: {},
+  getItem(k) { return this._data[k] || null; },
+  setItem(k, v) { this._data[k] = String(v); }
+};
+let prefs = TrackerPrefs.load(mockStorage);
+console.log("initial get tracker_read:", TrackerPrefs.get(prefs, "t…
+python3 -c '
+s = open("/opt/tracker/repo/ui/index.html", encoding="utf-8").read()
+lines = s.splitlines()
+for i, l in enumerate(lines):
+    if "hashchange" in l or "addEventListener.*hash" in l:
+        print(f"{i+1}: {l}")
+'
+python3 -c '
+s = open("/opt/tracker/repo/ui/index.html", encoding="utf-8").read()
+lines = s.splitlines()
+for i in range(5475, min(len(lines), 5510)):
+    print(f"{i+1}: {lines[i]}")
+'
+python3 -c '
+s = open("/opt/tracker/repo/ui/index.html", encoding="utf-8").read()
+lines = s.splitlines()
+for i, l in enumerate(lines):
+    if "function applyLang" in l:
+        print(f"applyLang at line {i+1}")
+        for j in range(i, min(i+40, len(lines))):
+            print(f"{j+1}: {lines[j]}")
+        break
+'
+python3 -c '
+s = open("/opt/tracker/repo/ui/index.html", encoding="utf-8").read()
+import re
+for fn in ["artTitle", "artSummary", "artTags", "linkifyCVE", "escHtml", "safeHref", "hubTypeId"]:
+    m = re.search(r"function\s+" + fn + r"\s*\([^)]*\)", s)
+    if m:
+        print(m.group(0))
+    else:
+        print(fn, "NOT FOUND")
+'
+python3 -c '
+s = open("/opt/tracker/repo/ui/index.html", encoding="utf-8").read()
+lines = s.splitlines()
+for i, l in enumerate(lines):
+    if "function safeHref" in l:
+        for j in range(i, min(i+15, len(lines))):
+            print(f"{j+1}: {lines[j]}")
+        break
+'
+python3 -c '
+s = open("/opt/tracker/repo/ui/index.html", encoding="utf-8").read()
+lines = s.splitlines()
+for i in range(1740, 1830):
+    print(f"{i+1}: {lines[i]}")
+'
+python3 -c '
+s = open("/opt/tracker/repo/ui/index.html", encoding="utf-8").read()
+lines = s.splitlines()
+for i in range(5120, 5185):
+    print(f"{i+1}: {lines[i]}")
+'
+python3 -c '
+s = open("/opt/tracker/repo/ui/index.html", encoding="utf-8").read()
+lines = s.splitlines()
+for i, l in enumerate(lines):
+    if "function t(" in l:
+        print(f"{i+1}: {l}")
+'
+node -e '
+const s = require("fs").readFileSync("/opt/tracker/repo/ui/index.html", "utf8");
+const storeCode = s.match(/\/\* TRACKER-STORE:BEGIN \*\/([\s\S]*?)\/\* TRACKER-STORE:END \*\//)[1];
+const TrackerStore = (new Function(storeCode + "; return TrackerStore;"))();
+const D = {
+  "2026-10-18": [{title: "Art without ID", category: "vulnerability"}],
+  "2026-10-19": [{id: 42, title: "Art with numeric ID", category: "incident"}]
+};
+const list = TrackerStore.collect(D, { dates: Object.keys(D) });
+console.log("…
+python3 -c '
+s = open("/opt/tracker/repo/ui/index.html", encoding="utf-8").read()
+lines = s.splitlines()
+for i in range(5035, 5090):
+    print(f"{i+1}: {lines[i]}")
+'
+python3 -c '
+s = open("/opt/tracker/repo/ui/index.html", encoding="utf-8").read()
+lines = s.splitlines()
+for i, l in enumerate(lines):
+    if "id=\"overlay\"" in l:
+        for j in range(i-2, min(i+10, len(lines))):
+            print(f"{j+1}: {lines[j]}")
+        break
+'
+python3 -c '
+s = open("/opt/tracker/repo/ui/index.html", encoding="utf-8").read()
+lines = s.splitlines()
+for i, l in enumerate(lines):
+    if "wsCards:" in l:
+        print(f"{i+1}: {l}")
+'
+python3 -c '
+s = open("/opt/tracker/repo/ui/index.html", encoding="utf-8").read()
+lines = s.splitlines()
+for i in range(2824, 2835):
+    print(f"{i+1}: {lines[i]}")
+print("---")
+for i in range(2865, 2875):
+    print(f"{i+1}: {lines[i]}")
+'
+python3 -c '
+s = open("/opt/tracker/repo/ui/index.html", encoding="utf-8").read()
+lines = s.splitlines()
+for i, l in enumerate(lines):
+    if "function applyLang" in l:
+        for j in range(i, min(i+40, len(lines))):
+            print(f"{j+1}: {lines[j]}")
+        break
+'
+python3 -c '
+s = open("/opt/tracker/repo/ui/index.html", encoding="utf-8").read()
+lines = s.splitlines()
+for i, l in enumerate(lines):
+    if "function wsDraw" in l:
+        for j in range(i, min(i+25, len(lines))):
+            print(f"{j+1}: {lines[j]}")
+        break
+'
+python3 -c '
+s = open("/opt/tracker/repo/ui/index.html", encoding="utf-8").read()
+lines = s.splitlines()
+for i, l in enumerate(lines):
+    if "function leaveWorkspace" in l:
+        for j in range(i, min(i+30, len(lines))):
+            print(f"{j+1}: {lines[j]}")
+        break
+'
+python3 -c '
+s = open("/opt/tracker/repo/ui/index.html", encoding="utf-8").read()
+lines = s.splitlines()
+for i, l in enumerate(lines):
+    if "function buildWsCard" in l:
+        for j in range(i-10, min(i+55, len(lines))):
+            print(f"{j+1}: {lines[j]}")
+        break
+'
+python3 -c '
+s = open("/opt/tracker/repo/ui/index.html", encoding="utf-8").read()
+lines = s.splitlines()
+for i, l in enumerate(lines):
+    if "function openOverlay" in l:
+        for j in range(i-5, min(i+55, len(lines))):
+            print(f"{j+1}: {lines[j]}")
+        break
+'
+python3 -c '
+s = open("/opt/tracker/repo/ui/index.html", encoding="utf-8").read()
+lines = s.splitlines()
+for i, l in enumerate(lines):
+    if "function syncHash" in l:
+        for j in range(i, min(i+35, len(lines))):
+            print(f"{j+1}: {lines[j]}")
+        break
+'
+python3 -c '
+s = open("/opt/tracker/repo/ui/index.html", encoding="utf-8").read()
+lines = s.splitlines()
+for i, l in enumerate(lines):
+    if "function openPendingArticle" in l:
+        for j in range(i-5, min(i+25, len(lines))):
+            print(f"{j+1}: {lines[j]}")
+        break
+'
+python3 -c '
+s = open("/opt/tracker/repo/ui/index.html", encoding="utf-8").read()
+lines = s.splitlines()
+for i, l in enumerate(lines):
+    if "closeOverlay()" in l and "addEventListener" in l:
+        for j in range(i-2, min(i+15, len(lines))):
+            print(f"{j+1}: {lines[j]}")
+        break
+'
+python3 -c '
+s = open("/opt/tracker/repo/ui/index.html", encoding="utf-8").read()
+lines = s.splitlines()
+for i, l in enumerate(lines):
+    if "Escape" in l:
+        print(f"{i+1}: {l}")
+'
+python3 -c '
+s = open("/opt/tracker/repo/ui/index.html", encoding="utf-8").read()
+lines = s.splitlines()
+for i in range(5743, min(len(lines), 5756)):
+    print(f"{i+1}: {lines[i]}")
+'
+python3 -c '
+s = open("/opt/tracker/repo/ui/index.html", encoding="utf-8").read()
+lines = s.splitlines()
+for i in range(5295, 5350):
+    print(f"{i+1}: {lines[i]}")
+'
+python3 -c '
+s = open("/opt/tracker/repo/ui/index.html", encoding="utf-8").read()
+lines = s.splitlines()
+for i, l in enumerate(lines):
+    if "function closeOverlay" in l:
+        for j in range(i, min(i+25, len(lines))):
+            print(f"{j+1}: {lines[j]}")
+        break
+'
+python3 -c '
+s = open("/opt/tracker/repo/ui/index.html", encoding="utf-8").read()
+lines = s.splitlines()
+for i, l in enumerate(lines):
+    if "function syncHash" in l:
+        for j in range(i, min(i+25, len(lines))):
+            print(f"{j+1}: {lines[j]}")
+        break
+'
+python3 -c '
+s = open("/opt/tracker/repo/ui/index.html", encoding="utf-8").read()
+lines = s.splitlines()
+for i, l in enumerate(lines):
+    if "function openPendingArticle" in l:
+        for j in range(i-5, min(i+25, len(lines))):
+            print(f"{j+1}: {lines[j]}")
+        break
+'
+python3 -c '
+s = open("/opt/tracker/repo/ui/index.html", encoding="utf-8").read()
+lines = s.splitlines()
+for i in range(6035, min(len(lines), 6060)):
+    print(f"{i+1}: {lines[i]}")
+'
+/opt/venv/bin/python -m pytest -q -p no:cacheprovider tests
+python3 -c '
+import re,subprocess,os,tempfile
+s=open("/opt/tracker/repo/ui/index.html",encoding="utf-8").read()
+js="\n".join(re.findall(r"<script>(.*?)</script>", s, re.S))
+f=tempfile.NamedTemporaryFile("w",suffix=".js",delete=False,encoding="utf-8"); f.write(js); f.close()
+r=subprocess.run(["node","--check",f.name]); os.unlink(f.name)
+print("js-ok" if r.returncode==0 else "js-bad"); raise SystemExit(r.returncode)
+'
+python3 -c '
+import re
+s=open("/opt/tracker/repo/ui/index.html",encoding="utf-8").read()
+need=["effectiveCat","buildCatPills","refreshCatPills","renderArticles","buildCard","openOverlay","syncHash","applyHashRestore","selectTracker","buildClusterPills","renderLibrary","toggleSkin","applyLang"]
+miss=[n for n in need if not re.search(r"function "+n+r"\b",s)]
+print("fns-ok" if not miss and "const CAT_MAP" in s else "fns-miss "+str(miss))
+'
+python3 -c '
+import subprocess,re
+d=subprocess.run(["git","-C","/opt/tracker/repo","diff","HEAD","--","ui"],capture_output=True,text=True).stdout
+bad=[l for l in d.splitlines() if l.startswith("+") and re.search(r"webdriver|__test|node_env|process\.env",l,re.I)]
+print("cheat-bad" if bad else "cheat-ok")
+'
+node -e '
+for (const pkg of ["jsdom", "playwright", "puppeteer"]) {
+  try { require(pkg); console.log(pkg, "available"); } catch (e) { console.log(pkg, "not available"); }
+}
+'
+node -e '
+const fs = require("fs");
+const { JSDOM } = require("jsdom");
+
+const html = fs.readFileSync("/opt/tracker/repo/ui/index.html", "utf8");
+const dom = new JSDOM(html, {
+  url: "https://example.com/index.html#ws=1",
+  runScripts: "dangerously",
+  resources: "usable"
+});
+
+const { window } = dom;
+const { document } = window;
+
+// Provide test data if needed
+window.TRACKER_DAYS = {
+  "2026-10-18": [
+    { id: 101, title: "Linux kernel bug CVE-2026-9999", summary: "Summary 1 CVE-2026-9999", tags: ["CVE-202…
+node -e '
+const fs = require("fs");
+const { JSDOM } = require("jsdom");
+
+const html = fs.readFileSync("/opt/tracker/repo/ui/index.html", "utf8");
+const dom = new JSDOM(html, {
+  url: "https://example.com/index.html#ws=1",
+  runScripts: "dangerously"
+});
+
+const { window } = dom;
+const { document } = window;
+
+// Provide test data
+window.TRACKER_DAYS = {
+  "2026-10-18": [
+    { id: 101, title: "Linux kernel bug CVE-2026-9999", summary: "Summary 1 CVE-2026-9999", tags: ["CVE-2026-9999", "kernel"], sources: [{na…
+node -e '
+const fs = require("fs");
+const { JSDOM } = require("jsdom");
+
+const html = fs.readFileSync("/opt/tracker/repo/ui/index.html", "utf8");
+const dom = new JSDOM(html, {
+  url: "https://example.com/index.html#ws=1",
+  runScripts: "dangerously"
+});
+
+const { window } = dom;
+const { document } = window;
+
+window.TRACKER_DAYS = {
+  "2026-10-18": [
+    { id: 101, title: "Linux kernel bug CVE-2026-9999", summary: "Summary 1", tags: ["CVE-2026-9999"], sources: [{name: "LKML", url: "https://lkml.org"}] }
+  ],
+…
+python3 -c '
+s = open("/opt/tracker/repo/ui/index.html", encoding="utf-8").read()
+lines = s.splitlines()
+for i, l in enumerate(lines):
+    if "function isPreviewMode" in l:
+        for j in range(i, min(i+10, len(lines))):
+            print(f"{j+1}: {lines[j]}")
+        break
+'
+node -e '
+const fs = require("fs");
+const { JSDOM } = require("jsdom");
+
+const html = fs.readFileSync("/opt/tracker/repo/ui/index.html", "utf8");
+const dom = new JSDOM(html, {
+  url: "https://example.com/index.html?pv=1#ws=1",
+  runScripts: "dangerously"
+});
+
+const { window } = dom;
+console.log("isPreviewMode:", window.isPreviewMode());
+if (!window.isPreviewMode()) throw new Error("Should be in preview mode");
+
+const art = { id: 999, title: "Preview test" };
+window.openReader(art, [art]);
+console.log("track…
+node -e '
+const fs = require("fs");
+const { JSDOM } = require("jsdom");
+
+const html = fs.readFileSync("/opt/tracker/repo/ui/index.html", "utf8");
+const dom = new JSDOM(html, {
+  url: "https://example.com/index.html#ws=1",
+  runScripts: "dangerously"
+});
+
+const { window } = dom;
+
+// Simulate adding 2050 articles
+for (let i = 1; i <= 2050; i++) {
+  window.markArticleRead({ id: i, title: "Art " + i });
+}
+
+const raw = window.prefGet("tracker_read");
+const parsed = JSON.parse(raw);
+console.log("Total entries in …
+node -e '
+const fs = require("fs");
+const { JSDOM } = require("jsdom");
+
+const html = fs.readFileSync("/opt/tracker/repo/ui/index.html", "utf8");
+const dom = new JSDOM(html, {
+  url: "https://example.com/index.html#ws=1",
+  runScripts: "dangerously"
+});
+
+const { window } = dom;
+
+const unreadArt = { id: 7001, title: "Unread title" };
+const readArt = { id: 7002, title: "Read title" };
+window.markArticleRead(readArt);
+
+const unreadCard = window.buildWsCard(unreadArt);
+const readCard = window.buildWsCard(readAr…
+git status --porcelain
+git diff -U1 ui/index.html | grep -E "^\-[^\-]"
+/opt/venv/bin/python -m pytest -q -p no:cacheprovider tests
+python3 -c '
+import re,subprocess,os,tempfile
+s=open("/opt/tracker/repo/ui/index.html",encoding="utf-8").read()
+js="\n".join(re.findall(r"<script>(.*?)</script>", s, re.S))
+f=tempfile.NamedTemporaryFile("w",suffix=".js",delete=False,encoding="utf-8"); f.write(js); f.close()
+r=subprocess.run(["node","--check",f.name]); os.unlink(f.name)
+print("js-ok" if r.returncode==0 else "js-bad"); raise SystemExit(r.returncode)
+'
+python3 -c '
+import re
+s=open("/opt/tracker/repo/ui/index.html",encoding="utf-8").read()
+need=["effectiveCat","buildCatPills","refreshCatPills","renderArticles","buildCard","openOverlay","syncHash","applyHashRestore","selectTracker","buildClusterPills","renderLibrary","toggleSkin","applyLang"]
+miss=[n for n in need if not re.search(r"function "+n+r"\b",s)]
+print("fns-ok" if not miss and "const CAT_MAP" in s else "fns-miss "+str(miss))
+'
+python3 -c '
+import subprocess,re
+d=subprocess.run(["git","-C","/opt/tracker/repo","diff","HEAD","--","ui"],capture_output=True,text=True).stdout
+bad=[l for l in d.splitlines() if l.startswith("+") and re.search(r"webdriver|__test|node_env|process\.env",l,re.I)]
+print("cheat-bad" if bad else "cheat-ok")
+'
+python3 -c '
+s = open("/opt/tracker/repo/ui/index.html", encoding="utf-8").read()
+lines = s.splitlines()
+targets = [
+    ".reader-backdrop",
+    "#reader {",
+    "id=\"reader-backdrop\"",
+    "function openReader",
+    "function closeReader",
+    "function readerStep",
+    "function markArticleRead",
+    "function isArticleRead",
+    "function bindWsOpen",
+    "readerPrev:"
+]
+for t in targets:
+    for i, l in enumerate(lines):
+        if t in l:
+            print(f"{i+1}: {l.strip()[:100]}")
+            bre…
+python3 -c '
+s = open("/opt/tracker/repo/ui/index.html", encoding="utf-8").read().splitlines()
+cites = [
+    (1768, "#reader {"),
+    (2061, "<div id=\"reader-backdrop\" class=\"reader-backdrop hidden\">"),
+    (5298, "function bindWsOpen(el, a) {"),
+    (5489, "function isArticleRead(a) {"),
+    (5496, "function markArticleRead(a) {"),
+    (5526, "function openReader(article, list, triggerEl) {"),
+    (5662, "function closeReader() {"),
+    (5691, "function readerStep(delta) {")
+]
+for ln, q in cites:
+    a…
+git status --porcelain

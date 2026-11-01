@@ -1,0 +1,10 @@
+{
+  "want": "afu <lai.chunfu@gmail.com>",
+  "config_changed": [],
+  "restored": [],
+  "restore_failed": [],
+  "bad_commits": [],
+  "new_commits": 0,
+  "evaluated": true,
+  "violation": false
+}

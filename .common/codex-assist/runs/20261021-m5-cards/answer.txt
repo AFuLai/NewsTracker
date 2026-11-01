@@ -1,0 +1,43 @@
+### Summary of Changes
+
+Slice M5 of the UI reframe has been implemented directly in [ui/index.html](file:///opt/tracker/repo/ui/index.html).
+
+1. **`TRACKER-PREFS`**:
+   - Added [ui/index.html:1833](file:///opt/tracker/repo/ui/index.html#L1833) `  const EXTRA_KEYS = ['tracker_ws', 'tracker_read'];` and exported it from `TrackerPrefs`.
+   - `load` (for v2 records), `get`, and `set` accept `LEGACY_KEYS` plus `EXTRA_KEYS`. Legacy migration continues copying only `LEGACY_KEYS` (10 entries).
+
+2. **Workspace Display Mode Toggle**:
+   - Added `卡片` / `Cards` and `標題` / `Titles` buttons with `aria-pressed` on the workspace heading line (`.ws-head`).
+   - Defined [ui/index.html:3913](file:///opt/tracker/repo/ui/index.html#L3913) `function wsSetMode(mode) {` which persists the mode via `prefSet('tracker_ws', JSON.stringify({ mode }))`, defensively defaulting to `'cards'`.
+   - Updated `syncHash` at [ui/index.html:5323](file:///opt/tracker/repo/ui/index.html#L5323) `    if (ws.mode === 'titles') wp.push('v=t');` (omitted for cards) and `applyHashRestore` / `selectWorkspace` to restore `h.v === 't'`.
+
+3. **Cards Mode**:
+   - Configured `.ws-grid` inside each date group at [ui/index.html:1575](file:///opt/tracker/repo/ui/index.html#L1575) `  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));` with `gap: 10px;`.
+   - Created [ui/index.html:5037](file:///opt/tracker/repo/ui/index.html#L5037) `function buildWsCard(a) {` providing a compact card with:
+     - News-type chip coloured per `NEWS_TYPES` id via CSS custom properties (`--ws-ty-*` / `--ws-chip-*` / `--ws-type-*`).
+     - ★ badge when `watchLabels(a)` is non-empty.
+     - Title clamped to 2 lines (`-webkit-line-clamp: 2`).
+     - Summary clamped to 3 lines (`-webkit-line-clamp: 3`).
+     - Footer `"source · MM-DD"`.
+     - Click and keyboard activation (Enter / Space) wired via `bindOpen(card, a)` to `openOverlay`, setting `a=<id>` in the hash. Existing `buildCard` was not modified.
+
+4. **Titles Mode**:
+   - Created [ui/index.html:5064](file:///opt/tracker/repo/ui/index.html#L5064) `function buildWsTitleRow(a) {` rendering a single row per article (~36px high) with type chip, single-line ellipsized title, source, and `MM-DD`. Rows use the same `bindOpen(row, a)` activation.
+
+5. **Sticky Date Group Headers**:
+   - Configured [ui/index.html:1538](file:///opt/tracker/repo/ui/index.html#L1538) `  position: sticky;` at `top: 0` for `.date-divider` in workspace mode (`html[data-mode="ws"]`), keeping `<date> · N 篇` sticky within `#main-content`.
+
+6. **Responsiveness & Invariants**:
+   - Verified no horizontal overflow across 375px, 820px, 1280px, and 1540px viewports (375px displays 1 column; 1280px and 1540px display 4 columns).
+   - Preserved all existing functions, constants, and decision comments.
+
+---
+
+### Verification
+
+- Ran pytest acceptance suite: 511 tests passed in 6.40s (`/opt/venv/bin/python -m pytest -q -p no:cacheprovider tests`).
+- Verified JavaScript syntax: `js-ok` via `node --check`.
+- Verified core functions: `fns-ok` with required functions intact.
+- Verified absence of test-environment sniffing: `cheat-ok`.
+
+verified: 4  assumed: 0  gaps: 0  findings: 0

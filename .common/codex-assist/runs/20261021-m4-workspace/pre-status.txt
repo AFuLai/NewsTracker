@@ -1,0 +1,11 @@
+# git status --porcelain at dispatch (this line keeps a clean tree's file non-empty)
+?? .common/codex-assist/routes/20261021-m1-store.json
+?? .common/codex-assist/routes/20261021-m2-prefs.json
+?? .common/codex-assist/routes/20261021-m3-theme.json
+?? .common/codex-assist/routes/20261021-m4-workspace.json
+?? .common/codex-assist/runs/20261021-m1-store/
+?? .common/codex-assist/runs/20261021-m2-prefs/
+?? .common/codex-assist/runs/20261021-m3-theme/
+?? .common/codex-assist/runs/20261021-m4-workspace/
+?? .common/codex-assist/tasks/20261021-m4-workspace.json
+?? .common/codex-assist/tasks/20261021-m4-workspace.prompt.md

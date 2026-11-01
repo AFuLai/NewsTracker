@@ -1,0 +1,56 @@
+cd /opt/tracker/repo/ui && wc -l index.html && grep -n "skin-btn\|view-select\|theme-btn\|palette-btn\|watch-btn\|lang-btn\|data-skin\|saved_skin\|saved_theme\|tracker_skin\|tracker_theme\|function \(applyPalette\|setPalette\|initPalette\|buildPalettePanel\|updatePaletteUI\|openPalettePanel\|closePalettePanel\|toggleTheme\|toggleSkin\|updateViewUI\|setPreset\|init\|applyHashRestore\|applyLang\|prefGet\|prefSet\|syncHash\)\|PALETTES\|wh-dash" index.html | head -150
+cd /opt/tracker/repo/ui && sed -n 1640,1710p index.html; echo ------; sed -n 1985,2170p index.html; echo -----; sed -n 2265,2300p index.html; echo ----; sed -n 1250,1342p index.html
+cd /opt/tracker/repo/ui && sed -n 3295,3345p index.html; echo ----; sed -n 4300,4345p index.html; echo; sed -n 4410,4519p index.html; grep -n "skinBtn\|themeBtn\|paletteBtn\|palette[A-Za-z]*:" index.html | head -30
+cd /opt/tracker/repo/ui && sed -n 2040,2165p index.html; sed -n 2200,2212p index.html; sed -n 2270,2285p index.html; grep -n "skin" index.html | sed -n 1,200p | grep -v "^\(1[0-9][0-9]\|[0-9][0-9]\?\):" | cut -c1-170
+cd /opt/tracker/repo/ui && sed -n 855,885p index.html; grep -n "pal-default\|palette-grid" index.html | head -20; grep -n "view-select\|skin-btn\|theme-btn\|theme-icon\|updateViewUI\|toggleTheme\|toggleSkin" index.html | cut -c1-140
+cd /opt/tracker/repo/ui && sed -n 37,72p index.html | cut -c1-150; grep -n "wh-warn\b\|wh-warn-text\|wh-hit:" index.html | head
+cd /opt/tracker/repo/ui && python3 - <<'EOF'
+import re
+s=open('index.html',encoding='utf-8',newline='').read()
+def rep(a,b,cnt=1):
+    global s
+    assert s.count(a)==cnt,(a,s.count(a))
+    s=s.replace(a,b)
+# 1 header
+lines=s.split('\r\n')
+lines=[l for l in lines if not (l.startswith('      <button id="skin-btn"') or l.startswith('      <select id="view-select"') or l.startswith('      <button id="theme-btn"'))]
+s='\r\n'.join(lines)
+rep('aria-controls="palette-panel">配色</button>','aria-controls="palette-pan…
+cd /opt/tracker/repo/ui && cat > /tmp/ed.py <<'EOF'
+s=open('index.html',encoding='utf-8',newline='').read()
+assert '\n' not in s.replace('\r\n','')
+s=s.replace('\r\n','\n')
+def rep(a,b):
+    global s
+    assert s.count(a)==1,(a,s.count(a))
+    s=s.replace(a,b)
+lines=s.split('\n')
+n0=len(lines)
+lines=[l for l in lines if not (l.startswith('      <button id="skin-btn"') or l.startswith('      <select id="view-select"') or l.startswith('      <button id="theme-btn"'))]
+assert n0-len(lines)==3
+s='\n'.join(lines…
+cd /opt/tracker/repo/ui && python3 -c "
+s=open('index.html','rb').read()
+print(s.count(b'\r\n'), s.count(b'\n')-s.count(b'\r\n'))
+import re
+for m in list(re.finditer(rb'(?<!\r)\n',s))[:5]: print(s[:m.start()].count(b'\n')+1)
+"; git status --short | head
+cd /opt/tracker/repo/ui && cat > /tmp/ed.py <<'EOF'
+s=open('index.html',encoding='utf-8',newline='').read()
+def rep(a,b):
+    global s
+    assert s.count(a)==1,(a,s.count(a))
+    s=s.replace(a,b)
+lines=s.split('\n')
+n0=len(lines)
+lines=[l for l in lines if not (l.startswith('      <button id="skin-btn"') or l.startswith('      <select id="view-select"') or l.startswith('      <button id="theme-btn"'))]
+assert n0-len(lines)==3
+s='\n'.join(lines)
+rep('aria-controls="palette-panel">配色</button>','aria-controls=…
+cd /opt/tracker/repo/ui && python3 - <<'EOF'
+import re
+s=open('index.html',encoding='utf-8').read()
+js=re.findall(r'<script[^>]*>(.*?)</script>',s,re.S)
+open('/tmp/x.js','w').write('\n'.join(js))
+EOF
+node --check /tmp/x.js && echo ok; rm /tmp/x.js; grep -c 'id="skin-btn"\|id="view-select"\|id="theme-btn"' index.html

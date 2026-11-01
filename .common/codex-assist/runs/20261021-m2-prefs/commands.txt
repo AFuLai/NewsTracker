@@ -1,0 +1,35 @@
+cd /opt/tracker/repo/ui; wc -l index.html; grep -n "localStorage\|isPreviewMode\|function syncHash\|function parseHash\|function applyHashRestore\|function openOverlay\|function closeOverlay\|TRACKER-STORE" index.html
+cd /opt/tracker/repo/ui; sed -n 1495,1505p index.html; sed -n 1565,1580p index.html; sed -n 1992,2003p index.html; sed -n 2371,2380p index.html; sed -n 2460,2472p index.html; sed -n 2645,2660p index.html; sed -n 4095,4145p index.html; sed -n 4265,4431p index.html
+cd /opt/tracker/repo/ui; sed -n 4120,4160p index.html | cut -c1-200; echo ----; sed -n 4245,4330p index.html; git status --short | head
+cd /opt/tracker/repo/ui; grep -n "restoring = false\|_key\b\|_key =\|pendingRestore = null\|applyHashRestore()\|TRACKER_DAYS" index.html | cut -c1-170 | head -80; sed -n 3236,3300p index.html
+cd /opt/tracker/repo/ui; sed -n 3625,3670p index.html; sed -n 2395,2410p index.html; sed -n 3865,3880p index.html; grep -n "function renderArticles\|function runSearch\|function selectHub\|function selectLibrary" index.html; grep -n "removeItem" index.html
+cd /opt/tracker/repo/ui; grep -n "^const state\|^<script\|^var state\|^let state" index.html; grep -n "openOverlay(" index.html | cut -c1-160; sed -n 3429,3436p index.html
+cd /opt/tracker/repo/ui; sed -n 1476,1480p index.html; cat > /tmp/m2.py <<'EOF'
+import re
+p='/opt/tracker/repo/ui/index.html'
+s=open(p,newline='').read()
+assert '\r\n' in s
+s=s.replace('\r\n','\n')
+n0=s.count('localStorage')
+# 1. replace calls
+s,a=re.subn(r"localStorage\.getItem\((\'tracker_\w+\')\)",r"prefGet(\1)",s)
+s,b=re.subn(r"localStorage\.setItem\((\'tracker_\w+\'),",r"prefSet(\1,",s)
+old="      else localStorage.removeItem('tracker_palette');"
+assert old in s
+s=s.replace(old,"      else prefSet('tra…
+cd /opt/tracker/repo/ui; file index.html; sed -i "s/^assert '\\\\r\\\\n' in s$/pass/; s#<script>\\\\nconst state = {#<script>\\\\n// ── State#" /tmp/m2.py; sed -i "s#^s=s.replace('\\\\r\\\\n','\\\\n')#pass#; s#s.replace('\\\\n','\\\\r\\\\n')#s#" /tmp/m2.py; grep -n "State\|^pass\|write" /tmp/m2.py
+cd /opt/tracker/repo/ui; sed -i "s#+block+'const state = {')#+block+'// ── State')#" /tmp/m2.py; python3 /tmp/m2.py && git diff --stat && grep -n "localStorage" index.html | cut -c1-140
+cd /opt/tracker/repo/ui; awk 'NR>=3920 && /^function renderArticles/{f=1} f&&/^}/{print NR; exit}' index.html; git diff | grep -c $'\r'; grep -n "^function renderArticles" index.html
+cd /opt/tracker/repo/ui; sed -n 3922,3926p index.html; sed -n 3995,4015p index.html; grep -n "return;" <(sed -n 3922,4014p index.html) | head
+cd /opt/tracker/repo/ui; python3 - <<'EOF'
+p='index.html'
+s=open(p,newline='').read()
+o="  if (dateList !== undefined) state.pendingDates = dateList;\n  const dates = state.pendingDates;\n"
+assert s.count(o)==1
+s=s.replace(o,"  if (pendingOpenId !== null) setTimeout(openPendingArticle, 0);   // `a=` permalink: open once this render has finished\n"+o)
+open(p,'w',newline='').write(s)
+EOF
+python3 - <<'EOF'
+import re
+s=open('/opt/tracker/repo/ui/index.html').read()
+b=s.split('/* TRACKER-PREFS:BEGIN */')[1].spli…

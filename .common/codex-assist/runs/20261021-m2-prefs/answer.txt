@@ -1,0 +1,13 @@
+I made the M2 change in `/opt/tracker/repo/ui/index.html`, the only file I edited. I checked the prefs block under node and checked that the page script parses. I did not run the page in a browser, so the `a=` permalink restore is untested.
+
+- **`TrackerPrefs` block:** It sits between the `TRACKER-PREFS` markers, with `window.TrackerPrefs = TrackerPrefs;` right after the END marker. I ran the block alone under node. A migration from legacy keys, a `set` that removes a key and ignores a non-legacy one, a `save`, a reload of the saved value, and a `getItem` that throws all gave the expected output.
+- **Storage wiring:** I added `prefs`, `prefGet` and `prefSet` ahead of `const state`, so they are initialised before the first read. All 10 `getItem` and 11 `setItem` calls on `tracker_` keys now go through them, and the palette `removeItem` became `prefSet('tracker_palette', null)`. The existing try/catch and `pv=1` guards are kept. The remaining `localStorage` hits in the file are the initialisation, `prefSet`, and comments (checked with `grep -n localStorage`).
+- **Permalink:** `overlayArticleId` is set in `openOverlay` and cleared in `closeOverlay`, and each of them calls `syncHash`. `syncHash` appends `a=<encoded id>` to the tracker, hub and lib hash forms while the overlay is open.
+- **Restore:** `parseHash` needed no change, because it already decodes every key including `a`. `applyHashRestore` stores the id in `pendingOpenId`. `openPendingArticle` looks it up in `window.TRACKER_DAYS` with `TrackerStore.collect`, matching `_key` or `String(id)`.
+- **When it opens:** For tracker views, `renderArticles` schedules `openPendingArticle` with `setTimeout(…, 0)` so it runs after the render. I did this because `renderArticles` has many early returns. For hub and lib views it opens right after `selectHub`/`selectLibrary`, which may be too early if those load their data asynchronously. I did not check that.
+
+Hashes without `a=` are built exactly as before.
+
+I removed no function, constant or comment, and added no test files. I deleted my scratch files from `/tmp`.
+
+verified: 5  assumed: 2  gaps: 0  findings: 0
