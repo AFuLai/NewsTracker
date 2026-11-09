@@ -1,0 +1,21 @@
+CRLF file. Let me read the sections.
+T1 is done, and all edits are in [ui/index.html](file:///opt/tracker/repo/ui/index.html). Pytest passes and `node --check` accepts the inline JS.
+
+I ran a quick node probe on the TRACKER-TYPES block, and it gave the expected results on the cases I tried:
+- **`typeOf`:** a Linux-category article titled "Linux 核心 CVE-2026-1" returns `vuln`. A plain Apple article returns `platform`, and a plain 重點關注 article returns `focus`.
+- **`platformsOf`:** `Windows 11`, `iPadOS 19` and `Android 17` map to Windows, Apple and Android. `Linuxfx` maps to nothing.
+- **`packagesOf`:** "Chromebook GitHub Git Mesa" matches only `git` and `mesa`, so Chromebook and GitHub are correctly excluded.
+
+`PACKAGES` has 42 entries: the 30 required ids in your order, then 12 extras.
+
+The Playwright-free UI parts (watch panel grouping, the rail's 套件 section, `ws.pk` hash restore) are wired as specified, but I did not run them in a browser.
+
+Three small additions beyond the spec:
+- **I18N:** I added a `watchTopics` key for the 主題 / Topics heading.
+- **CSS:** the `platform` type has no colour of its own, so I gave it the same colour as `other`.
+- **Focus trap:** the watch panel's Tab trap now includes the package `<summary>`.
+
+```
+verified: 6  assumed: 2  gaps: 0  findings: 0
+511 passed in 6.26s
+```

@@ -1,0 +1,42 @@
+cd /opt/tracker/repo/ui && wc -l index.html && grep -n "NEWS_TYPES\|HUB_PLATFORMS\|newsTypeOf\|articleTags\|hubTypeId\|WATCH_RULES\|watchHits\|wsFacet\|wsBase\|wsActiveRules\|wsToggle\|wsBuildRail\|ws\.pl\|wsPlat\|wsTypes\|wsWatch\|TRACKER-PREFS\|'platform'\|\"platform\"" index.html
+cd /opt/tracker/repo/ui && sed -n '2305,2335p;2384,2415p;2440,2560p' index.html | tr -d '\r'
+cd /opt/tracker/repo/ui && sed -n '3052,3072p;3194,3216p;3268,3315p;3400,3406p;4276,4305p;4467,4512p;4606,4620p;5876,5884p' index.html | tr -d '\r'; grep -n "watch-\|wprefs\|\.watch" index.html | head -40
+cd /opt/tracker/repo/ui && sed -n '4276,4305p;4467,4488p' index.html | tr -d '\r'; sed -n '2076,2080p;2126,2130p' index.html|tr -d '\r'; grep -n "patch\b.*pl\|pl:\|\bpl=\|'pl'\|\.pl\b" index.html | head -30; grep -n "wsPlat\|watchRules:\|watchRules'" index.html; sed -n '700,704p' index.html
+cd /opt/tracker/repo/ui && sed -n '5970,5990p' index.html | tr -d '\r'; grep -n "pl:\|\.pl\b\|get('pl')\|pl=" index.html | sed -n 1,30p; grep -n "function selectWorkspace" index.html; sed -n 4146,4152p index.html; grep -n "ws-sec-h" index.html | head -3; python3 - <<'E'
+import re
+s=open('index.html','rb').read().decode()
+print(s.count('\r\n'), s.count('\n'))
+E
+cd /opt/tracker/repo/ui && grep -n "function parseHash" -A14 index.html; grep -n "wsPlat\|watchRules" index.html | head; grep -n "ws-ty-platform\|ws-ty-other\|'platform'" index.html
+cd /opt/tracker/repo/ui && cat > /tmp/edit.py <<'PYEOF'
+p='/opt/tracker/repo/ui/index.html'
+s=open(p,encoding='utf-8',newline='').read()
+def rep(old,new,cnt=1):
+    global s
+    assert s.count(old)==cnt,(old,s.count(old))
+    s=s.replace(old,new)
+
+block = r'''/* TRACKER-TYPES:BEGIN */
+// Pure type / platform / package classifier. No DOM, no storage, no globals: article -> type id,
+// platform names and well-known package ids. Platform is a facet orthogonal to the type.
+const TrackerTypes = (() => {
+  const …
+cd /opt/tracker/repo/ui && cat > /tmp/edit2.py <<'PYEOF'
+p='/opt/tracker/repo/ui/index.html'
+s=open(p,encoding='utf-8',newline='').read()
+def rep(old,new,cnt=1):
+    global s
+    assert s.count(old)==cnt,(old,s.count(old))
+    s=s.replace(old,new)
+rep("[&w=] [&pl=] [&q=]","[&w=] [&pl=] [&pk=] [&q=]")
+rep("  src: '', ty: '', w: '', pl: '',   // source tracker id / type id / watch rule id / platform ('' = no filter)",
+    "  src: '', ty: '', w: '', pl: '', pk: '',   // source tracker id / type id / watch rule…
+cd /opt/tracker/repo/ui && grep -n "pl: ''\|ws\.pl\b" index.html; grep -c $'\r' index.html; python3 - <<'E'
+import re
+s=open('/opt/tracker/repo/ui/index.html').read()
+sc=re.findall(r'<script>(.*?)</script>',s,re.S)
+open('/tmp/m.js','w').write(max(sc,key=len))
+b=s[s.index('/* TRACKER-TYPES:BEGIN */'):s.index('/* TRACKER-TYPES:END */')]
+open('/tmp/t.js','w').write(b+'''
+const T=TrackerTypes;const a=(c,t,g)=>({category:c,title:t||'',title_en:'',tags:g||[]});
+console.log(T.typeOf(a('Linux','Linux 核心 CVE-2026-1'…

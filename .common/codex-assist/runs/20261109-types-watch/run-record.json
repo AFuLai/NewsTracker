@@ -1,0 +1,124 @@
+{
+  "task_id": "20261109-types-watch",
+  "mode": "implement",
+  "project": "tracker",
+  "kind": null,
+  "kind_source": null,
+  "requested": {
+    "root": "/opt/tracker/repo",
+    "sandbox": "host-ro+root-rw",
+    "model": "claude-sonnet-5-5-medium",
+    "egress": "cloud",
+    "allow_common": false,
+    "timeout_s": 3600,
+    "inputs_glob": "ui/index.html refs/plans/20261109-source-category-review.md"
+  },
+  "actual": {
+    "engine": "agy",
+    "codex_bin": "/home/afu/.local/bin/agy",
+    "codex_version": "1.5.3",
+    "session_id": "60f4aaa1-f4d4-4f9c-aa3a-f2b71f6ddb44",
+    "model": "claude-sonnet-5-5-medium",
+    "cwd": "/opt/tracker/repo",
+    "sandbox": "host-ro+root-rw",
+    "denied_actions": [],
+    "host_fence": true,
+    "provider": "antigravity",
+    "rc": 0,
+    "elapsed_s": 109.2,
+    "tokens": 70843,
+    "usage": {
+      "fresh_input": 58498,
+      "cached_input": 254780,
+      "output": 12345,
+      "reasoning": 0,
+      "raw": {
+        "input_tokens": 58498,
+        "output_tokens": 12345,
+        "thinking_tokens": 0,
+        "cache_read_tokens": 254780,
+        "total_tokens": 70843
+      }
+    },
+    "effort": null,
+    "plan_usage": {},
+    "started_at": "2026-11-09T06:38:48Z",
+    "finished_at": "2026-11-09T06:40:37Z",
+    "ephemeral": false,
+    "commands": 9,
+    "machine": "afu-delta"
+  },
+  "role_sha256": "1cc596dacabf1cbfbcb6a8c50c4b0b0bc77d1e4528093742fbd058b591fd701f",
+  "standards": [
+    {
+      "name": "impl-probe-loop",
+      "sha256": "5aeca9b99983ea60daea9d513167d9e4bff63eb050d1ea01743e56465f263911"
+    }
+  ],
+  "sheet_sha256": null,
+  "acceptance_sha256": "8abdb3689a324113c03af39c6ef14179b93f2119cf51a02287fd20570ff0aaf6",
+  "commands_sha256": [
+    "055c85c1359f202f92ba9e6063e2d89f7ea1f88871002a4d99f6078312cf98db",
+    "832da4af0365219bf2a9037d4c1631357f6f79af1a7a3389fcd176bfab4d2749",
+    "f92e7ddb42ddf39d4e91ca552d1deccd747ea86fd812c9585e382c782dc8bcf5",
+    "ae0fca08b7643dda0bf3bcc4fb8f5de69ff5e04b1df56e892d936f7c14d395c7",
+    "809e8dfcc547cd605c4cc040b79c561d780967ae959f84353543b42da0ea7f74",
+    "0de81e0e6ec2de8f8e18fa5deabda6f984a4f861ec178109730adbb5e3965260",
+    "0facecd90dfda539f548715f99b3a60e750d9011436df16d43ab7cac7d6b2638",
+    "09095e973424227170adf6156fd61c80a6c6761972d9eab01e37199cdcda9ded",
+    "94ca9535f3b22bd40f5bc0f29b95a7e47acf9278833780d25d0888de0ffef2dd"
+  ],
+  "events_path": "/opt/tracker/repo/.common/codex-assist/runs/20261109-types-watch/events.jsonl",
+  "answer_path": "/opt/tracker/repo/.common/codex-assist/runs/20261109-types-watch/answer.txt",
+  "answer_shape": "summary-line",
+  "quote_gate": {
+    "status": "CLEAN",
+    "findings": 0
+  },
+  "verify": {
+    "touched_files": [
+      ".common/local/dispatch-ledger/afu-delta/events.jsonl",
+      "ui/index.html"
+    ],
+    "out_of_scope": [
+      ".common/local/dispatch-ledger/afu-delta/events.jsonl"
+    ],
+    "markers_removed": [],
+    "probes": [
+      {
+        "id": "tests",
+        "rc": 0,
+        "pass": true,
+        "output_path": "/opt/tracker/repo/.common/codex-assist/runs/20261109-types-watch/verify/tests.out"
+      },
+      {
+        "id": "js-syntax",
+        "rc": 0,
+        "pass": true,
+        "output_path": "/opt/tracker/repo/.common/codex-assist/runs/20261109-types-watch/verify/js-syntax.out"
+      },
+      {
+        "id": "core-fns",
+        "rc": 0,
+        "pass": true,
+        "output_path": "/opt/tracker/repo/.common/codex-assist/runs/20261109-types-watch/verify/core-fns.out"
+      },
+      {
+        "id": "no-env-sniffing",
+        "rc": 0,
+        "pass": true,
+        "output_path": "/opt/tracker/repo/.common/codex-assist/runs/20261109-types-watch/verify/no-env-sniffing.out"
+      }
+    ]
+  },
+  "verdict": "TOUCHED-OUT-OF-SCOPE",
+  "recorded_at": "2026-11-09T06:40:38Z",
+  "recorder": {
+    "name": "record.py",
+    "version": "0.13.0",
+    "sha256": "1fb1db37ced1ba6d77fa0bd10ea235ccc8d3d3e5badfec8c852d88407aea28f0"
+  },
+  "verify_result": "FAILED",
+  "defects": [],
+  "defects_spec_sha256": "1aeb306c9bda50f7ae0259815de0b19efad464d9d86eeeed1153ce5525e1df07"
+}

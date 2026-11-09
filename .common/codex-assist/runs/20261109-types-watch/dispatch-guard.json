@@ -1,0 +1,15 @@
+{
+  "task_id": "20261109-types-watch",
+  "mode": "implement",
+  "started_at": "2026-11-09T06:38:48Z",
+  "prompt_head_sha256": "9e7fcf04801e76be284d7c625bf3a590d2b90a63a77d6be1961391215706ad51",
+  "touch_allow": [
+    "ui/index.html"
+  ],
+  "finished_at": "2026-11-09T06:40:46Z",
+  "exit": 1,
+  "verdict": "TOUCHED-OUT-OF-SCOPE",
+  "verify_result": "FAILED",
+  "unusable": null,
+  "ledger_id": "eng-20261109-types-watch"
+}
