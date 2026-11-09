@@ -115,6 +115,37 @@ def _save_config(**changes) -> None:
     os.replace(tmp, CONFIG_PATH)
 
 
+#: LLM backend choices the dashboard remembers between launches (stored under
+#: "llm" in the same machine-local file). The endpoint already persists as
+#: `preferred`; without these the Summarize / Translate backend and the Gemini
+#: model fell back to the CLI default on every launch.
+LLM_KEYS = ("summarize_backend", "translate_backend", "gemini_model")
+
+
+def remembered_llm() -> dict:
+    """The remembered LLM choices: only known keys with non-empty string values."""
+    raw = _load_config().get("llm")
+    if not isinstance(raw, dict):
+        return {}
+    return {k: v.strip() for k, v in raw.items()
+            if k in LLM_KEYS and isinstance(v, str) and v.strip()}
+
+
+def remember_llm(**values) -> None:
+    """Merge LLM choices into the config file. Unknown keys and empty values are
+    ignored; never raises (a panel click must not fail on a read-only file)."""
+    cur = remembered_llm()
+    new = {k: v.strip() for k, v in values.items()
+           if k in LLM_KEYS and isinstance(v, str) and v.strip()}
+    if not new or all(cur.get(k) == v for k, v in new.items()):
+        return
+    cur.update(new)
+    try:
+        _save_config(llm=cur)
+    except OSError as exc:
+        _log.warning("could not remember LLM choice in %s (%s)", CONFIG_PATH, exc)
+
+
 def _file_urls() -> list[str]:
     urls = _load_config().get("urls")
     if not isinstance(urls, list):

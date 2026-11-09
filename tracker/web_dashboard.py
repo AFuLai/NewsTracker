@@ -203,7 +203,12 @@ def _apply_control(controller, cmd: dict, cra_job=None) -> tuple[bool, str]:
     if controller is None:
         return False, "no run to control"
     if action == "start":
-        return controller.request_start(cmd.get("config")), ""
+        ok = controller.request_start(cmd.get("config"))
+        if ok:
+            from . import ollama_hosts as hosts
+            cfg = controller.config
+            hosts.remember_llm(**{k: cfg.get(k) for k in hosts.LLM_KEYS})
+        return ok, ""
     if action == "pause":
         controller.pause(); return True, ""
     if action == "resume":
@@ -218,6 +223,9 @@ def _apply_control(controller, cmd: dict, cra_job=None) -> tuple[bool, str]:
         role, backend = cmd.get("role"), cmd.get("backend")
         if role and backend:
             controller.set_backend(role, backend)
+            if controller.backends.get(role) == backend:   # accepted (set_backend ignores unknown values)
+                from . import ollama_hosts as hosts
+                hosts.remember_llm(**{role + "_backend": backend})
             return True, ""
     if action == "close":
         controller.close(); return True, ""

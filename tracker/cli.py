@@ -672,9 +672,20 @@ def pipeline(
     import tracker.llm as _llm
     if gemini_model:
         _llm.GEMINI_MODEL = gemini_model
-    def _resolve_be(choice):
-        return _llm.resolve_default_backend() if choice == "auto" else choice
-    sum_be, tra_be = _resolve_be(summarize_llm), _resolve_be(translate_llm)
+    # "auto" (no --*-llm flag) prefers what the dashboard last chose
+    # (endpoints.json "llm"); an explicit flag always wins.
+    from . import ollama_hosts as _hosts
+    from .control import BACKENDS as _BACKENDS
+    _remembered = _hosts.remembered_llm()
+
+    def _resolve_be(choice, role):
+        if choice != "auto":
+            return choice
+        rem = _remembered.get(role + "_backend")
+        return rem if rem in _BACKENDS else _llm.resolve_default_backend()
+    sum_be, tra_be = _resolve_be(summarize_llm, "summarize"), _resolve_be(translate_llm, "translate")
+    if ui and _remembered.get("gemini_model"):
+        _llm.GEMINI_MODEL = _remembered["gemini_model"]
     console.print(f"[dim]LLM 後端：summarize={sum_be} · translate={tra_be}[/dim]")
 
     # If any source for these trackers needs a JS-rendering browser, make sure a
