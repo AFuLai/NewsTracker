@@ -700,6 +700,10 @@ html[data-mode="lib"] #drawer-toggle { display: none !important; }
 }
 #watch-panel.hidden { display: none; }
 #watch-panel h4 { font-size: 14px; margin: 0; }
+#watch-panel h5.watch-grp, #watch-panel #watch-grp-pkg { font-size: 13px; font-weight: 600; margin: 0.25rem 0 0; }
+#watch-panel #watch-grp-pkg { cursor: pointer; }
+#watch-panel #watch-grp-pkg:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+#watch-panel .watch-grid { display: flex; flex-wrap: wrap; gap: 0.4rem 1rem; margin-top: 0.4rem; }
 #watch-panel label.watch-rule { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; }
 #watch-panel input[type="checkbox"] { accent-color: var(--primary); width: 1rem; height: 1rem; }
 #watch-panel .watch-add { display: flex; gap: 0.4rem; }
@@ -1436,6 +1440,7 @@ html[data-mode="ws"] #ws-time-panel:not([hidden]) { display: block; }
 .ws-ty-emerging { --ws-fill: var(--cat-tech-fill);  --ws-on: var(--cat-tech-on); }
 .ws-ty-events { --ws-fill: var(--cra-event-fill);   --ws-on: var(--cra-event-on); }
 .ws-ty-other { --ws-fill: var(--os-apple-fill);     --ws-on: var(--os-apple-on); }
+.ws-ty-platform { --ws-fill: var(--os-apple-fill);     --ws-on: var(--os-apple-on); }
 /* time panel */
 #ws-time-panel {
   background: var(--surface-container-low); border-bottom: 1px solid var(--outline-variant);
@@ -1628,6 +1633,7 @@ html[data-mode="ws"] .date-divider {
 .ws-type-chip.ws-ty-emerging    { background: var(--ws-ty-emerging); color: var(--ws-ty-emerging-on); }
 .ws-type-chip.ws-ty-events      { background: var(--ws-ty-events); color: var(--ws-ty-events-on); }
 .ws-type-chip.ws-ty-other       { background: var(--ws-ty-other); color: var(--ws-ty-other-on); }
+.ws-type-chip.ws-ty-platform    { background: var(--ws-ty-other); color: var(--ws-ty-other-on); }
 .ws-star {
   color: var(--pal-warn, #b45309);
   font-size: 13px;
@@ -2127,6 +2133,103 @@ const TrackerPrefs = (() => {
 })();
 /* TRACKER-PREFS:END */
 window.TrackerPrefs = TrackerPrefs;
+/* TRACKER-TYPES:BEGIN */
+// Pure type / platform / package classifier. No DOM, no storage, no globals: article -> type id,
+// platform names and well-known package ids. Platform is a facet orthogonal to the type.
+const TrackerTypes = (() => {
+  const PLATFORMS = ['Linux', 'Apple', 'Android', 'Windows'];
+  const CAT_TYPE = {
+    '漏洞與威脅情報': 'vuln', '重大事件': 'incident',
+    '法規與標準': 'regulation', '法令更新': 'regulation', '合規指引': 'regulation', '調和標準': 'regulation', '亞太對應': 'regulation',
+    '供應鏈與開源安全': 'supply', '開源影響': 'supply',
+    '產業動態': 'industry', '前瞻技術': 'emerging', '研討活動': 'events'
+  };
+  const TEXT_RULES = [
+    ['vuln', /CVE-\d|漏洞|弱點|零時差|零日|0-day|zero-day|exploit|提權|權限提升|\bRCE\b|遠端程式碼執行|安全更新|安全公告|安全修補|資安更新|DSA-\d|USN-\d|RHSA|Patch Tuesday|\bKEV\b|use-after-free|vulnerabilit/i],
+    ['incident', /資料外洩|外洩事件|勒索|入侵|遭駭|駭客攻擊|網路攻擊|服務中斷|詐騙|惡意軟體|木馬|\bRAT\b|釣魚|\bAPT\b|data breach|ransomware|outage/i],
+    ['supply', /供應鏈攻擊|惡意套件|\bnpm\b|PyPI|crates\.io|supply[- ]chain attack/i]
+  ];
+  const has = (o, k) => Object.prototype.hasOwnProperty.call(o, k);
+  const tagsOf = (a) => (Array.isArray(a.tags) ? a.tags : []).filter(x => typeof x === 'string');
+  const textOf = (a) => [a.title, a.title_en].filter(x => typeof x === 'string').concat(tagsOf(a)).join('\n');
+  function typeOf(a) {
+    if (!a || typeof a !== 'object') return 'other';
+    const c = a.category;
+    if (typeof c === 'string' && has(CAT_TYPE, c)) return CAT_TYPE[c];
+    const isPlat = PLATFORMS.includes(c);
+    if (isPlat || c === '重點關注') {
+      const txt = textOf(a);
+      for (const [id, re] of TEXT_RULES) if (re.test(txt)) return id;
+      return isPlat ? 'platform' : 'focus';
+    }
+    return 'other';
+  }
+  const APPLE_RE = /^(iOS|iPadOS|macOS|watchOS|tvOS|visionOS)($|[ \d])/;
+  function platformsOf(a) {
+    if (!a || typeof a !== 'object') return [];
+    const got = new Set();
+    if (PLATFORMS.includes(a.category)) got.add(a.category);
+    tagsOf(a).forEach(t => {
+      PLATFORMS.forEach(p => {
+        if (t === p || (t.startsWith(p) && /[ \d]/.test(t.charAt(p.length)))) got.add(p);
+      });
+      if (APPLE_RE.test(t)) got.add('Apple');
+    });
+    return PLATFORMS.filter(p => got.has(p));
+  }
+  const pk = (id, name, ...match) => ({ id, name, match });
+  const PACKAGES = [
+    pk('linux-kernel', 'Linux kernel', /Linux ?(核心|kernel)/i),
+    pk('chrome', 'Chrome', /\bChrom(e|ium)\b/i),
+    pk('firefox', 'Firefox', /\bFirefox\b/i),
+    pk('openssh', 'OpenSSH', /\bOpenSSH\b/i),
+    pk('openssl', 'OpenSSL', /\bOpenSSL\b/i),
+    pk('glibc', 'glibc', /\bglibc\b/i),
+    pk('gcc', 'GCC', /\bGCC\b/i),
+    pk('llvm', 'LLVM / Clang', /\bLLVM\b/i, /\bClang\b/i),
+    pk('systemd', 'systemd', /\bsystemd\b/i),
+    pk('curl', 'curl', /\bcurl\b/i),
+    pk('git', 'Git', /\bGit\b(?!Hub|Lab)/),
+    pk('python', 'Python', /\bPython\b/i),
+    pk('nodejs', 'Node.js', /\bNode\.js\b/i, /\bNodeJS\b/i),
+    pk('php', 'PHP', /\bPHP\b/i),
+    pk('java', 'Java', /\bJava\b/i, /\bOpenJDK\b/i),
+    pk('rust', 'Rust', /\bRust\b/i),
+    pk('docker', 'Docker', /\bDocker\b/i),
+    pk('kubernetes', 'Kubernetes', /\bKubernetes\b/i, /\bk8s\b/i),
+    pk('wordpress', 'WordPress', /\bWordPress\b/i),
+    pk('npm', 'npm', /\bnpm\b/i),
+    pk('pypi', 'PyPI', /\bPyPI\b/i),
+    pk('fortinet', 'Fortinet', /Fortinet|FortiOS|FortiGate|FortiWeb/i),
+    pk('paloalto', 'Palo Alto', /Palo Alto|PAN-OS/i),
+    pk('cisco', 'Cisco', /\bCisco\b/i),
+    pk('citrix', 'Citrix', /Citrix|NetScaler/i),
+    pk('ivanti', 'Ivanti', /\bIvanti\b/i),
+    pk('vmware', 'VMware', /\bVMware\b/i),
+    pk('exchange', 'Exchange', /Exchange Server|Microsoft Exchange/i),
+    pk('sharepoint', 'SharePoint', /\bSharePoint\b/i),
+    pk('mesa', 'Mesa', /\bMesa\b/),
+    pk('sudo', 'sudo', /\bsudo\b/i),
+    pk('xz', 'xz', /\bxz\b/i, /XZ Utils/i),
+    pk('log4j', 'Log4j', /\bLog4j\b/i, /\bLog4Shell\b/i),
+    pk('qemu', 'QEMU', /\bQEMU\b/i),
+    pk('samba', 'Samba', /\bSamba\b/i),
+    pk('nginx', 'nginx', /\bnginx\b/i),
+    pk('postgresql', 'PostgreSQL', /\bPostgreSQL\b/i, /\bPostgres\b/i),
+    pk('wayland', 'Wayland', /\bWayland\b/i),
+    pk('kde', 'KDE', /\bKDE\b/),
+    pk('gnome', 'GNOME', /\bGNOME\b/i),
+    pk('perl', 'Perl', /\bPerl\b/i),
+    pk('microsoft-365', 'Microsoft 365', /Microsoft 365|Office 365|\bM365\b/i)
+  ];
+  function packagesOf(a) {
+    if (!a || typeof a !== 'object') return [];
+    const txt = textOf(a);
+    return PACKAGES.filter(p => p.match.some(re => re.test(txt))).map(p => p.id);
+  }
+  return { typeOf, platformsOf, packagesOf, PACKAGES, PLATFORMS };
+})();
+/* TRACKER-TYPES:END */
 // Module prefs (one `tracker_prefs` key, migrated from the legacy keys); initialised before any read.
 let prefs;
 try { prefs = TrackerPrefs.load(localStorage); }
@@ -2327,6 +2430,11 @@ const WATCH_RULES = [
   { id: 'nis2',       zh: 'NIS2',                   en: 'NIS2',
     match: { keywords: ['NIS2'] }, def: false }
 ];
+// Platform and well-known-package rules (appended after the topic rules; ids stay stable).
+TrackerTypes.PLATFORMS.forEach(p => WATCH_RULES.push(
+  { id: 'plat_' + p.toLowerCase(), zh: p, en: p, match: { platforms: [p] }, def: false }));
+TrackerTypes.PACKAGES.forEach(k => WATCH_RULES.push(
+  { id: 'pkg_' + k.id.replace(/-/g, '_'), zh: k.name, en: k.name, match: { packages: [k.id] }, def: false }));
 const WATCH_MAX_KW = 20;
 function isWatchRule(id) { return WATCH_RULES.some(r => r.id === id); }
 function defaultWatch() {
@@ -2407,6 +2515,8 @@ function watchHits(a, watch, tracker) {
     if (m.trackers) { parts++; if (!m.trackers.some(t0 => trackers.includes(t0) || t0 === tracker)) return; }
     if (m.categories) { parts++; if (!hasCat(m.categories)) return; }
     if (m.keywords) { parts++; if (!hasKw(m.keywords)) return; }
+    if (m.platforms) { parts++; if (!TrackerTypes.platformsOf(a).some(p => m.platforms.includes(p))) return; }
+    if (m.packages) { parts++; if (!TrackerTypes.packagesOf(a).some(p => m.packages.includes(p))) return; }
     if (parts) hits.push({ rule: r });
   });
   (Array.isArray(watch.kw) ? watch.kw : []).forEach(k => {
@@ -2451,12 +2561,16 @@ function buildWatchPanel() {
   const panel = document.getElementById('watch-panel');
   if (!panel || panel.dataset.built) return;
   panel.dataset.built = '1';
-  panel.innerHTML = '<h4 id="watch-title"></h4><div id="watch-rules"></div>' +
+  panel.innerHTML = '<h4 id="watch-title"></h4>' +
+    '<h5 class="watch-grp" id="watch-grp-topics"></h5><div id="watch-rules"></div>' +
+    '<h5 class="watch-grp" id="watch-grp-plat"></h5><div id="watch-rules-plat" class="watch-grid"></div>' +
+    '<details id="watch-pkg"><summary id="watch-grp-pkg"></summary><div id="watch-rules-pkg" class="watch-grid"></div></details>' +
     '<h4 id="watch-kw-title"></h4><div class="watch-add"><input type="text" id="watch-kw-input" maxlength="60">' +
     '<button type="button" id="watch-kw-add"></button></div><div id="watch-chips"></div>' +
     '<div><button type="button" id="watch-reset"></button></div>';
-  const box = document.getElementById('watch-rules');
   WATCH_RULES.forEach(r => {
+    const box = document.getElementById(r.id.startsWith('plat_') ? 'watch-rules-plat' :
+      r.id.startsWith('pkg_') ? 'watch-rules-pkg' : 'watch-rules');
     const lab = document.createElement('label');
     lab.className = 'watch-rule';
     const cb = document.createElement('input');
@@ -2489,7 +2603,7 @@ function buildWatchPanel() {
   });
   panel.addEventListener('keydown', e => {
     if (e.key !== 'Tab') return;
-    const f = [...panel.querySelectorAll('button, input')].filter(el => el.offsetParent !== null);
+    const f = [...panel.querySelectorAll('button, input, summary')].filter(el => el.offsetParent !== null);
     if (!f.length) return;
     if (e.shiftKey && document.activeElement === f[0]) { e.preventDefault(); f[f.length - 1].focus(); }
     else if (!e.shiftKey && document.activeElement === f[f.length - 1]) { e.preventDefault(); f[0].focus(); }
@@ -2525,6 +2639,9 @@ function updateWatchUI() {
   if (panel && panel.dataset.built) {
     panel.setAttribute('aria-label', t('watchBtn'));
     document.getElementById('watch-title').textContent = t('watchRules');
+    document.getElementById('watch-grp-topics').textContent = t('watchTopics');
+    document.getElementById('watch-grp-plat').textContent = t('wsPlat');
+    document.getElementById('watch-grp-pkg').textContent = t('wsPkg');
     document.getElementById('watch-kw-title').textContent = t('watchCustom');
     const input = document.getElementById('watch-kw-input');
     input.placeholder = t('watchKwPh');
@@ -2809,7 +2926,7 @@ const I18N = {
       clearSearch:'清除搜尋', close:'關閉',
        viewLabel:'檢視模式', srcCount:n=>n+' 個來源',
        tlOther:'其他', tlCount:n=>n+' 篇',
-        watchBtn:'關注', watchBadge:'★ 關注', watchOnly:'只看關注', watchRules:'關注規則',
+        watchBtn:'關注', watchBadge:'★ 關注', watchOnly:'只看關注', watchRules:'關注規則', watchTopics:'主題', wsPkg:'套件',
         watchCustom:'自訂關鍵字', watchKwPh:'輸入關鍵字…', watchAdd:'新增', watchReset:'恢復預設',
         watchRemove:'移除', noWatch:'沒有符合關注規則的文章',
         hubPill:'★ 總覽', srcMenu:'依來源瀏覽 ▾', hubTitle:'我的關注', hubSub:'依新聞類型分區，不分來源版面',
@@ -2851,7 +2968,7 @@ const I18N = {
       clearSearch:'Clear search', close:'Close',
        viewLabel:'View preset', srcCount:n=>n+(n===1?' source':' sources'),
        tlOther:'Other', tlCount:n=>n+(n===1?' article':' articles'),
-        watchBtn:'Watch', watchBadge:'★ Watch', watchOnly:'Watched only', watchRules:'Watch rules',
+        watchBtn:'Watch', watchBadge:'★ Watch', watchOnly:'Watched only', watchRules:'Watch rules', watchTopics:'Topics', wsPkg:'Packages',
         watchCustom:'Custom keywords', watchKwPh:'Add a keyword…', watchAdd:'Add', watchReset:'Reset',
         watchRemove:'Remove', noWatch:'No articles match your watch rules',
         hubPill:'★ Overview', srcMenu:'Browse by source ▾', hubTitle:'My Watch', hubSub:'Grouped by news type, not by source page',
@@ -3053,8 +3170,9 @@ async function ensureAllLoaded() {
 
 // ── Watch hub data layer (no UI yet) ──────────────────
 // News types for 我的關注, ordered; built from refs/plans/20261019-ux-mockups/README.md
-// (category → type table). Platform categories are NOT a type: newsTypeOf returns
-// 'platform' for them and the hub shows them as tag chips. 'other' is the catch-all.
+// (category → type table). Platform categories fall back to the 'platform' type when no
+// vuln / incident / supply keyword hits (TrackerTypes.typeOf); platform is also a separate
+// facet (TrackerTypes.platformsOf). 'other' is the catch-all.
 // NOTE: the ids and the `en` labels are provisional (README gives zh only).
 const NEWS_TYPES = [
   { id: 'vuln',      zh: '漏洞威脅',   en: 'Vulnerabilities & Threats', categories: ['漏洞與威脅情報'] },
@@ -3065,9 +3183,10 @@ const NEWS_TYPES = [
   { id: 'industry',  zh: '產業動態',   en: 'Industry',                  categories: ['產業動態'] },
   { id: 'emerging',  zh: '前瞻技術',   en: 'Emerging Tech',             categories: ['前瞻技術'] },
   { id: 'events',    zh: '研討活動',   en: 'Events',                    categories: ['研討活動'] },
-  { id: 'other',     zh: '平台與其他', en: 'Platforms & other',         categories: [] }
+  { id: 'platform',  zh: '平台更新',   en: 'Platform updates',          categories: [] },
+  { id: 'other',     zh: '其他',       en: 'Other',                     categories: [] }
 ];
-const HUB_PLATFORMS = ['Linux', 'Apple', 'Android', 'Windows'];
+const HUB_PLATFORMS = TrackerTypes.PLATFORMS;
 /* TRACKER-STORE:BEGIN */
 // Pure data layer over the TRACKER_DAYS shape ({ 'YYYY-MM-DD': [article, ...] }). No DOM, no
 // storage, no globals: anything it needs (e.g. a type function) is passed in as an argument.
@@ -3193,14 +3312,11 @@ const TrackerStore = (() => {
 })();
 /* TRACKER-STORE:END */
 window.TrackerStore = TrackerStore;
-// article → type id from its raw category; platform categories → 'platform'; unknown → 'other'.
+// article → type id (TrackerTypes.typeOf: category table, then title/tag keywords for platform / focus).
 function newsTypeOf(a) {
-  const c = a && a.category;
-  if (HUB_PLATFORMS.includes(c)) return 'platform';
-  const t = NEWS_TYPES.find(t => t.categories.includes(c));
-  return t ? t.id : 'other';
+  return TrackerTypes.typeOf(a);
 }
-// article → tags (trimmed, de-duplicated strings); a platform category adds its name.
+// article → tags (trimmed, de-duplicated strings); the platform names of platformsOf are added.
 function articleTags(a) {
   const out = [], seen = new Set();
   const add = (x) => {
@@ -3209,7 +3325,7 @@ function articleTags(a) {
     if (v && !seen.has(v)) { seen.add(v); out.push(v); }
   };
   (a && Array.isArray(a.tags) ? a.tags : []).forEach(add);
-  if (a && HUB_PLATFORMS.includes(a.category)) add(a.category);
+  TrackerTypes.platformsOf(a).forEach(add);
   return out;
 }
 
@@ -3282,11 +3398,8 @@ function buildHubModel(days, watch) {
         const { _key, ...a } = item;
         const date = item._date;
         model.total++;
-        let tid = newsTypeOf(a);
-        if (tid === 'platform') {
-          plat.set(a.category, (plat.get(a.category) || 0) + 1);
-          tid = 'other';
-        }
+        const tid = newsTypeOf(a);
+        TrackerTypes.platformsOf(a).forEach(p => plat.set(p, (plat.get(p) || 0) + 1));
         const b = buckets[tid];
         b.n++;
         const age = Math.round((Date.parse(today) - Date.parse(date)) / 86400000);
@@ -3400,8 +3513,7 @@ function hubSearch(articles, q) {
   return (articles || []).filter(a => matchesQuery(a, q));
 }
 function hubTypeId(a) {
-  const id = newsTypeOf(a);
-  return id === 'platform' ? 'other' : id;   // as buildHubModel: platform articles count under 'other'
+  return newsTypeOf(a);
 }
 function hubTypeName(ty) { return state.lang === 'en' ? ty.en : ty.zh; }
 function hubRuleLabel(id) {
@@ -4139,7 +4251,7 @@ window.addEventListener('resize', () => closeSrcMenu());
 // (selectWorkspace) and left through selectHub / selectLibrary / selectTracker (leaveWorkspace).
 // INVARIANT: while the workspace is active state.currentTracker is null (as in the hub), so
 // buildCard / watch badges show the raw category and tracker-less watch matches.
-// Hash: #ws=1 [&r=<range key, 30d omitted>] [&src=] [&ty=] [&w=] [&pl=] [&q=] [&a=<article id>].
+// Hash: #ws=1 [&r=<range key, 30d omitted>] [&src=] [&ty=] [&w=] [&pl=] [&pk=] [&q=] [&a=<article id>].
 // Range keys are TrackerStore.rangeOf's: today 7d 30d 90d year all y<YYYY> d<date> c<from>_<to>.
 const WS_QUICK = { today: 1, '7d': 7, '30d': 30, '90d': 90 };   // ranges served by ensureHubLoaded(N)
 const WS_PICKS = [['today', 'wsToday'], ['7d', 'ws7d'], ['30d', 'ws30d'], ['90d', 'ws90d'], ['year', 'wsYear'], ['all', 'wsAll']];
@@ -4147,7 +4259,7 @@ const ws = {
   mode: 'cards',    // 'cards' | 'titles'
   range: '30d',     // current range key
   prev: null,       // range to return to when the selected chart day is clicked again
-  src: '', ty: '', w: '', pl: '',   // source tracker id / type id / watch rule id / platform ('' = no filter)
+  src: '', ty: '', w: '', pl: '', pk: '',   // source tracker id / type id / watch rule id / platform / package id ('' = no filter)
   seq: 0,           // bumps on every render and on leave, so a late load never draws over another view
   loads: new Map(), // range key -> { p: promise, done: bool }
   allMonths: null,  // promise: every month manifest loaded (for the year archive day counts)
@@ -4282,7 +4394,8 @@ function wsBase(list) {
 // ... and type / watch rule / platform on top.
 function wsFacet(items) {
   return items.filter(a => (!ws.ty || hubTypeId(a) === ws.ty) &&
-    (!ws.w || watchRuleIds(a, watchPrefs).includes(ws.w)) && (!ws.pl || a.category === ws.pl));
+    (!ws.w || watchRuleIds(a, watchPrefs).includes(ws.w)) && (!ws.pl || TrackerTypes.platformsOf(a).includes(ws.pl)) &&
+    (!ws.pk || TrackerTypes.packagesOf(a).includes(ws.pk)));
 }
 function wsActiveRules() {
   const on = Array.isArray(watchPrefs.on) ? watchPrefs.on : [];
@@ -4468,12 +4581,13 @@ function wsBuildRail(base) {
   const body = document.getElementById('ws-rail-body'), strip = document.getElementById('ws-rail-strip');
   if (!body || !strip) return;
   body.innerHTML = ''; strip.innerHTML = '';
-  const tc = {}, rc = {}, pc = {};
+  const tc = {}, rc = {}, pc = {}, kc = {};
   base.forEach(a => {
     const ty = hubTypeId(a);
     tc[ty] = (tc[ty] || 0) + 1;
     watchRuleIds(a, watchPrefs).forEach(id => { rc[id] = (rc[id] || 0) + 1; });
-    if (HUB_PLATFORMS.includes(a.category)) pc[a.category] = (pc[a.category] || 0) + 1;
+    TrackerTypes.platformsOf(a).forEach(p => { pc[p] = (pc[p] || 0) + 1; });
+    TrackerTypes.packagesOf(a).forEach(k => { kc[k] = (kc[k] || 0) + 1; });
   });
   const item = (name, n, pressed, key, tyId, fn) => {
     const b = wsEl('button', 'ws-item' + (tyId ? ' ws-ty-' + tyId : ''));
@@ -4507,6 +4621,12 @@ function wsBuildRail(base) {
   }
   body.appendChild(wsEl('div', 'ws-sec-h', t('wsPlat')));
   HUB_PLATFORMS.forEach(p => item(p, pc[p] || 0, ws.pl === p, 'pl:' + p, '', () => wsToggle('pl', p, 'pl:' + p)));
+  const pkgs = TrackerTypes.PACKAGES.map((k, i) => ({ k, i, n: kc[k.id] || 0 })).filter(x => x.n > 0)
+    .sort((x, y) => y.n - x.n || x.i - y.i).slice(0, 20);
+  if (pkgs.length) {
+    body.appendChild(wsEl('div', 'ws-sec-h', t('wsPkg')));
+    pkgs.forEach(x => item(x.k.name, x.n, ws.pk === x.k.id, 'pk:' + x.k.id, '', () => wsToggle('pk', x.k.id, 'pk:' + x.k.id)));
+  }
 }
 
 // ── view ──
@@ -4613,6 +4733,7 @@ function selectWorkspace(patch) {
     ws.ty = NEWS_TYPES.some(x => x.id === patch.ty) ? patch.ty : '';
     ws.w = patch.w || '';
     ws.pl = HUB_PLATFORMS.includes(patch.pl) ? patch.pl : '';
+    ws.pk = TrackerTypes.PACKAGES.some(x => x.id === patch.pk) ? patch.pk : '';
     state.searchQuery = patch.q || '';
     if (patch.v === 't') ws.mode = 'titles';
     else if (patch.v === 'c' || patch.v === 'cards') ws.mode = 'cards';
@@ -5879,6 +6000,7 @@ function syncHash() {
     if (ws.ty) wp.push('ty=' + encodeURIComponent(ws.ty));
     if (ws.w) wp.push('w=' + encodeURIComponent(ws.w));
     if (ws.pl) wp.push('pl=' + encodeURIComponent(ws.pl));
+    if (ws.pk) wp.push('pk=' + encodeURIComponent(ws.pk));
     if (state.searchQuery) wp.push('q=' + encodeURIComponent(state.searchQuery));
     if (ws.mode === 'titles') wp.push('v=t');
     if (skinOf()) wp.push('s=' + skinOf());
@@ -5983,7 +6105,7 @@ function applyHashRestore() {
   if (h && parsePalette(h.pal) && h.pal !== palettePref) applyPalette(h.pal);
   if (h && h.ws) {           // news workspace deep-link (the filters come from the hash; not persisted)
     if (h.s === 'md3' || h.s === 'classic') document.documentElement.dataset.skin = h.s;
-    selectWorkspace({ range: h.r, src: h.src, ty: h.ty, w: h.w, pl: h.pl, q: h.q, v: h.v });
+    selectWorkspace({ range: h.r, src: h.src, ty: h.ty, w: h.w, pl: h.pl, pk: h.pk, q: h.q, v: h.v });
     openPendingArticle();
     return true;
   }
