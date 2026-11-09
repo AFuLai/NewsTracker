@@ -1,0 +1,24 @@
+Slice T2 is implemented in `ui/index.html` only. The suite passes and the inline JS passes `node --check`. I haven't run it in a browser, so first-paint time and scroll behaviour are untested.
+
+- **Loading:**
+  - `ensureHubLoaded` now takes `onProgress` as a third argument. It loads day files newest date first, 4 at a time. It reports once the newest 7 dates are in, then at most every 400 ms.
+  - `wsEnsure` and `wsLoadRange` pass progress through for the quick ranges only. Several callers of the same in-flight load all get progress.
+  - `renderWorkspace` draws on the first progress call and on every later one, and still checks `seq`. It skips the progress call that reports done = total, because the completion draw covers it.
+  - While loading, the ws-head shows the new `wsPartial` status (`載入中 d/n` / `Loading d/n`).
+- **Rendering:**
+  - `wsDraw` renders 60 articles at a time. A sentinel with an `IntersectionObserver` (800 px `rootMargin`) appends the next 60. Without `IntersectionObserver` it renders everything.
+  - A date group split across batches appends into the same grid or titles box. The date divider and header counts still use the whole `shown`.
+  - `ws.rendered` is kept by progress redraws. It resets to 60 on a range, filter, search or mode change.
+  - A progress redraw restores `scrollY` and the focused `data-ws` element.
+  - Permalinks still work because `openPendingArticle` reads from the data rather than the DOM. If the article isn't loaded yet, it retries on the next draw.
+
+I haven't tested the 7-date threshold or the scroll restore. When the first progress call lands, only a handful of days are loaded, so the first draw is short and the list grows as files arrive.
+
+The last 3 probe lines:
+```
+........................................................................ [ 96%]
+....................                                                     [100%]
+524 passed in 7.21s
+```
+
+verified: 3  assumed: 2  gaps: 0  findings: 0

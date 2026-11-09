@@ -1,0 +1,12 @@
+{
+  "removed": [],
+  "judged": [
+    "ui/index.html"
+  ],
+  "not_judged": [
+    {
+      "path": ".common/local/dispatch-ledger/afu-delta/events.jsonl",
+      "why": "dirty before the run: no committed before-state"
+    }
+  ]
+}

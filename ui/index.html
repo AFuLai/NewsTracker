@@ -1551,6 +1551,8 @@ html[data-mode="ws"] .date-divider {
 }
 .ws-head { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; padding: 0.4rem 0; font-size: 16px; font-weight: 600; }
 .ws-head .ws-sub { font-weight: 400; color: var(--on-surface-variant); }
+.ws-head .ws-partial { font-size: .8em; opacity: .8; }
+.ws-sentinel { height: 1px; }
 .ws-mode-toggle {
   margin-left: auto;
   display: inline-flex;
@@ -2941,7 +2943,7 @@ const I18N = {
         ws90d:'近 90 天', wsYear:'今年', wsAll:'全部', wsQuick:'快速選擇', wsCustom:'自訂', wsFrom:'從', wsTo:'到', wsApply:'套用',
         wsArchive:'歷年封存', wsYearName:y=>y+' 年', wsDays:n=>n+' 天', wsChart:'每日篇數', wsBar:(d,n)=>d+': '+n+' 篇',
         wsAllSrc:'全部來源', wsSrc:'依來源瀏覽', wsTypes:'新聞類型', wsWatch:'★ 我的關注', wsPlat:'平台',
-        wsCollapse:'« 收合', wsExpand:'» 展開', wsLoading:r=>'載入「'+r+'」…',
+        wsCollapse:'« 收合', wsExpand:'» 展開', wsLoading:r=>'載入「'+r+'」…', wsPartial:(d,n)=>'載入中 '+d+'/'+n,
         wsCards:'卡片', wsTitles:'標題',
         readerPrev:'‹ 上一篇', readerNext:'下一篇 ›', readerOrig:'閱讀原文', readerSameEvent:'同一事件', readerNavHint:'← → 切換・Esc 關閉',
         paletteBtn:'主題', paletteTitle:'主題', paletteDefault:'預設（跟隨系統主題）', paletteDefaultDark:'預設深色', paletteDefaultLight:'預設淺色', paletteApplied:'已套用配色主題',
@@ -2983,7 +2985,7 @@ const I18N = {
         ws90d:'Last 90 days', wsYear:'This year', wsAll:'All', wsQuick:'Quick picks', wsCustom:'Custom', wsFrom:'From', wsTo:'To', wsApply:'Apply',
         wsArchive:'Archive by year', wsYearName:y=>String(y), wsDays:n=>n+(n===1?' day':' days'), wsChart:'Articles per day', wsBar:(d,n)=>d+': '+n+(n===1?' article':' articles'),
         wsAllSrc:'All sources', wsSrc:'Browse by source', wsTypes:'News types', wsWatch:'★ My watch', wsPlat:'Platforms',
-        wsCollapse:'« Collapse', wsExpand:'» Expand', wsLoading:r=>'Loading “'+r+'”…',
+        wsCollapse:'« Collapse', wsExpand:'» Expand', wsLoading:r=>'Loading “'+r+'”…', wsPartial:(d,n)=>'Loading '+d+'/'+n,
         wsCards:'Cards', wsTitles:'Titles',
         readerPrev:'‹ Prev', readerNext:'Next ›', readerOrig:'Read original', readerSameEvent:'Same event', readerNavHint:'← → switch · Esc close',
         paletteBtn:'Theme', paletteTitle:'Theme', paletteDefault:'Default (follow system theme)', paletteDefaultDark:'Default dark', paletteDefaultLight:'Default light', paletteApplied:'Colour theme applied',
@@ -3333,7 +3335,7 @@ function articleTags(a) {
 // last `days` days (default 30, counted back from the newest date in the indexes), then the
 // union of their day files. Never touches state.currentTracker or the view; the loaded*
 // sets de-duplicate repeat loads.
-async function ensureHubLoaded(days, cb) {
+async function ensureHubLoaded(days, cb, onProgress) {
   const n = (days > 0) ? Math.floor(days) : 30;
   const all = getTrackers() || {};
   const tks = Object.keys(all).filter(k => k !== '__cra');
@@ -3359,15 +3361,46 @@ async function ensureHubLoaded(days, cb) {
   }
   if (newest) {
     const cutoff = hubShiftDate(newest, -(n - 1));
-    const files = new Set();
+    const files = new Map();   // day file -> its date
     for (const tk of tks) {
       for (const m of monthsOf[tk]) {
         if (m < cutoff.slice(0, 7)) continue;
         await loadMonth(m, tk);
-        for (const d of manifestDatesForMonth(m, tk)) if (d.date >= cutoff) files.add(d.file);
+        for (const d of manifestDatesForMonth(m, tk)) if (d.date >= cutoff) files.set(d.file, d.date);
       }
     }
-    await Promise.all([...files].map(f => new Promise(r => loadDayFile(f, r))));
+    // Newest date first, at most 4 in flight; onProgress fires once the newest 7 distinct dates
+    // are in, then at most every 400 ms while loading continues.
+    const queue = [...files.keys()].sort((a, b) => (files.get(a) < files.get(b)) ? 1 : (files.get(a) > files.get(b) ? -1 : 0));
+    const total = queue.length;
+    const firstDates = [...new Set(queue.map(f => files.get(f)))].slice(0, 7);
+    const pendingFirst = new Set(queue.filter(f => firstDates.includes(files.get(f))));
+    let done = 0, last = 0, fired = false, next = 0;
+    const report = () => {
+      if (typeof onProgress !== 'function') return;
+      if (!fired) {
+        if (pendingFirst.size) return;
+        fired = true;
+      } else if (Date.now() - last < 400) return;
+      last = Date.now();
+      try { onProgress({ done, total }); } catch (e) { console.warn(e); }
+    };
+    await new Promise(resolve => {
+      if (!total) { resolve(); return; }
+      const pump = () => {
+        while (next < queue.length && next - done < 4 && inflight < 4) {
+          const f = queue[next++];
+          inflight++;
+          loadDayFile(f, () => {
+            inflight--; done++; pendingFirst.delete(f);
+            report();
+            if (done >= total) resolve(); else pump();
+          });
+        }
+      };
+      let inflight = 0;
+      pump();
+    });
   }
   if (typeof cb === 'function') cb();
 }
@@ -4264,8 +4297,12 @@ const ws = {
   loads: new Map(), // range key -> { p: promise, done: bool }
   allMonths: null,  // promise: every month manifest loaded (for the year archive day counts)
   panelOpen: false, railCollapsed: false, railInit: false,
-  newest: '', focusKey: null
+  newest: '', focusKey: null,
+  rendered: 60,     // articles of `shown` rendered so far (incremental rendering); reset to WS_BATCH on range / filter / search / mode change
+  partial: null     // { done, total } while a quick range is still loading, else null
 };
+const WS_BATCH = 60;
+let wsObserver = null;   // IntersectionObserver of the current list's sentinel
 function wsLoadMode() {
   let raw = null;
   try { raw = prefGet('tracker_ws'); } catch (e) {}
@@ -4285,6 +4322,7 @@ function wsSetMode(mode) {
   ws.mode = mode;
   try { prefSet('tracker_ws', JSON.stringify({ mode: mode })); } catch (e) {}
   ws.focusKey = 'mode:' + mode;
+  ws.rendered = WS_BATCH;
   wsDraw();
 }
 function wsIsDay(k) { return /^d\d{4}-\d{2}-\d{2}$/.test(String(k)); }
@@ -4329,8 +4367,8 @@ async function wsLoadManifests() {
 }
 // Load the data a range needs. today / 7d / 30d / 90d: ensureHubLoaded(N). Any other range: the
 // year + month manifests and the day files of every tracker whose dates fall in the range.
-async function wsLoadRange(key) {
-  if (WS_QUICK[key]) { await ensureHubLoaded(WS_QUICK[key]); return; }
+async function wsLoadRange(key, onProgress) {
+  if (WS_QUICK[key]) { await ensureHubLoaded(WS_QUICK[key], null, onProgress); return; }
   const { tks, monthsOf } = await wsLoadManifests();
   let newest = '';
   for (const tk of tks) {
@@ -4351,11 +4389,20 @@ async function wsLoadRange(key) {
   }
   await Promise.all([...files].map(f => new Promise(r => loadDayFile(f, r))));
 }
-function wsEnsure(key) {
+function wsEnsure(key, onProgress) {
   let e = ws.loads.get(key);
-  if (e) return e.p;
-  e = { done: false };
-  e.p = Promise.resolve().then(() => wsLoadRange(key)).catch(() => {}).then(() => { e.done = true; });
+  if (e) {
+    // a load already in flight: the new caller still gets progress (latest state first)
+    if (!e.done && typeof onProgress === 'function' && WS_QUICK[key]) {
+      e.subs.push(onProgress);
+      if (e.prog) { const p = e.prog; Promise.resolve().then(() => onProgress(p)); }
+    }
+    return e.p;
+  }
+  e = { done: false, subs: [], prog: null };
+  if (typeof onProgress === 'function' && WS_QUICK[key]) e.subs.push(onProgress);
+  const fan = p => { e.prog = p; e.subs.slice().forEach(f => f(p)); };
+  e.p = Promise.resolve().then(() => wsLoadRange(key, WS_QUICK[key] ? fan : undefined)).catch(() => {}).then(() => { e.done = true; e.subs = []; });
   ws.loads.set(key, e);
   return e.p;
 }
@@ -4630,8 +4677,15 @@ function wsBuildRail(base) {
 }
 
 // ── view ──
-function wsDraw() {
+function wsDraw(keep) {
   if (!state.wsActive) return;
+  // keep (a redraw caused by loading progress): the user must not move - scroll, focus and rendered count survive
+  const keepY = keep ? window.scrollY : 0;
+  if (keep && !ws.focusKey) {
+    const ae = document.activeElement;
+    if (ae && ae.dataset && ae.dataset.ws) ws.focusKey = ae.dataset.ws;
+  }
+  if (wsObserver) { wsObserver.disconnect(); wsObserver = null; }
   const main = document.getElementById('main-content');
   document.getElementById('loading-msg').style.display = 'none';
   document.getElementById('no-data').classList.add('hidden');
@@ -4662,6 +4716,7 @@ function wsDraw() {
   const head = wsEl('h2', 'ws-head');
   head.appendChild(wsEl('span', '', wsRangeLabel(ws.range)));
   head.appendChild(wsEl('span', 'ws-sub', '· ' + t('tlCount')(shown.length)));
+  if (ws.partial) head.appendChild(wsEl('span', 'ws-sub ws-partial', t('wsPartial')(ws.partial.done, ws.partial.total)));
 
   const toggle = wsEl('span', 'ws-mode-toggle');
   const btnCards = wsEl('button', 'ws-mode-btn', t('wsCards'));
@@ -4681,37 +4736,71 @@ function wsDraw() {
   head.appendChild(toggle);
   frag.appendChild(head);
 
-  const groups = new Map();
-  shown.forEach(a => { if (!groups.has(a._date)) groups.set(a._date, []); groups.get(a._date).push(a); });
+  const counts = new Map();
+  shown.forEach(a => counts.set(a._date, (counts.get(a._date) || 0) + 1));
   const isTitles = ws.mode === 'titles';
-  groups.forEach((items, date) => {
-    const group = wsEl('section', 'ws-date-group');
-    group.appendChild(wsEl('div', 'date-divider', date + ' · ' + t('tlCount')(items.length)));
-    if (isTitles) {
-      const titles = wsEl('div', 'ws-titles');
-      items.forEach(a => titles.appendChild(buildWsTitleRow(a)));
-      group.appendChild(titles);
-    } else {
-      const grid = wsEl('div', 'ws-grid');
-      items.forEach(a => grid.appendChild(buildWsCard(a)));
-      group.appendChild(grid);
+  const sentinel = wsEl('div', 'ws-sentinel');
+  sentinel.setAttribute('aria-hidden', 'true');
+  frag.appendChild(sentinel);
+  let curDate = null, curBox = null, count = 0;
+  // Append shown[count .. count+n): a date group split across batches keeps appending into the same box.
+  const appendBatch = n => {
+    const end = Math.min(shown.length, count + n);
+    for (; count < end; count++) {
+      const a = shown[count];
+      if (a._date !== curDate) {
+        curDate = a._date;
+        const group = wsEl('section', 'ws-date-group');
+        group.appendChild(wsEl('div', 'date-divider', curDate + ' · ' + t('tlCount')(counts.get(curDate))));
+        curBox = wsEl('div', isTitles ? 'ws-titles' : 'ws-grid');
+        group.appendChild(curBox);
+        sentinel.parentNode.insertBefore(group, sentinel);
+      }
+      curBox.appendChild(isTitles ? buildWsTitleRow(a) : buildWsCard(a));
     }
-    frag.appendChild(group);
-  });
+    ws.rendered = count;
+  };
+  const lazy = typeof IntersectionObserver === 'function';
+  appendBatch(lazy ? Math.max(ws.rendered, WS_BATCH) : shown.length);
   main.appendChild(frag);
+  if (lazy) {
+    if (count >= shown.length) sentinel.remove();
+    else {
+      wsObserver = new IntersectionObserver(entries => {
+        if (!sentinel.isConnected) { wsObserver.disconnect(); wsObserver = null; return; }   // another view replaced the list
+        if (!entries.some(e => e.isIntersecting)) return;
+        appendBatch(WS_BATCH);
+        if (count >= shown.length) { wsObserver.disconnect(); wsObserver = null; sentinel.remove(); return; }
+        wsObserver.unobserve(sentinel); wsObserver.observe(sentinel);   // re-check: still within range after the append?
+      }, { rootMargin: '800px 0px' });
+      wsObserver.observe(sentinel);
+    }
+  }
+  if (keep) window.scrollTo(0, keepY);
   wsRefocus();
 }
 function renderWorkspace() {
   if (!state.wsActive) return;
   const seq = ++ws.seq;
+  ws.rendered = WS_BATCH;
+  ws.partial = null;
   wsSyncChrome();
   const key = ws.range;
   const hit = ws.loads.get(key);
   if (hit && hit.done) { wsDraw(); return; }
   showMsg(t('wsLoading')(wsRangeLabel(key)));
-  wsEnsure(key).then(() => {
+  let drew = false;   // a progress draw happened: later draws must not move the user
+  const onProg = p => {
     if (seq !== ws.seq || !state.wsActive) return;   // a late load must not draw over another view (or a newer range)
-    wsDraw();
+    if (p.done >= p.total) return;                   // the completion draw below covers it
+    ws.partial = { done: p.done, total: p.total };
+    wsDraw(drew);
+    drew = true;
+  };
+  wsEnsure(key, onProg).then(() => {
+    if (seq !== ws.seq || !state.wsActive) return;   // a late load must not draw over another view (or a newer range)
+    ws.partial = null;
+    wsDraw(drew);
   });
 }
 // patch (from a hash restore) replaces every workspace filter; without it the filters of the last

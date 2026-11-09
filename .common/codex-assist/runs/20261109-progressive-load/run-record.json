@@ -1,0 +1,122 @@
+{
+  "task_id": "20261109-progressive-load",
+  "mode": "implement",
+  "project": "tracker",
+  "kind": null,
+  "kind_source": null,
+  "requested": {
+    "root": "/opt/tracker/repo",
+    "sandbox": "host-ro+root-rw",
+    "model": "claude-sonnet-5-5-medium",
+    "egress": "cloud",
+    "allow_common": false,
+    "timeout_s": 1800,
+    "inputs_glob": "ui/index.html"
+  },
+  "actual": {
+    "engine": "agy",
+    "codex_bin": "/home/afu/.local/bin/agy",
+    "codex_version": "1.5.3",
+    "session_id": "fe63568f-a027-42bf-a184-976d589d06d8",
+    "model": "claude-sonnet-5-5-medium",
+    "cwd": "/opt/tracker/repo",
+    "sandbox": "host-ro+root-rw",
+    "denied_actions": [],
+    "host_fence": true,
+    "provider": "antigravity",
+    "rc": 0,
+    "elapsed_s": 103.8,
+    "tokens": 54302,
+    "usage": {
+      "fresh_input": 44537,
+      "cached_input": 214424,
+      "output": 9765,
+      "reasoning": 0,
+      "raw": {
+        "input_tokens": 44537,
+        "output_tokens": 9765,
+        "thinking_tokens": 0,
+        "cache_read_tokens": 214424,
+        "total_tokens": 54302
+      }
+    },
+    "effort": null,
+    "plan_usage": {},
+    "started_at": "2026-11-09T06:45:02Z",
+    "finished_at": "2026-11-09T06:46:46Z",
+    "ephemeral": false,
+    "commands": 7,
+    "machine": "afu-delta"
+  },
+  "role_sha256": "1cc596dacabf1cbfbcb6a8c50c4b0b0bc77d1e4528093742fbd058b591fd701f",
+  "standards": [
+    {
+      "name": "impl-probe-loop",
+      "sha256": "5aeca9b99983ea60daea9d513167d9e4bff63eb050d1ea01743e56465f263911"
+    }
+  ],
+  "sheet_sha256": null,
+  "acceptance_sha256": "8abdb3689a324113c03af39c6ef14179b93f2119cf51a02287fd20570ff0aaf6",
+  "commands_sha256": [
+    "25cf15cb96e325bdec2c65cddced9334be530ff094d01ef296a1e8e5fbe94cbe",
+    "078a2d9ae72e9630d5c2a640537d39f790fd106327f29d556a75f2221a8568c9",
+    "ddea1848dc6537946ef75ed127b49ea09e4081eee930a33027f066c23a237414",
+    "9fd0d5464f9396fb4e22eeed30e8a72f2ef38618fcc21fbbb8473536e70b113b",
+    "d7d31a8c767be94ca34466d8cd3b2eda349895b17c805f30f9c8dee3e02b998c",
+    "8b22d3212d80cf251bc521daf3af4dab12ce9c202db7b132620c656f414e3703",
+    "ec3ee011cd8e26421b8081bb8f4310a4644e16a1c17c8856f48580d2502a5dc8"
+  ],
+  "events_path": "/opt/tracker/repo/.common/codex-assist/runs/20261109-progressive-load/events.jsonl",
+  "answer_path": "/opt/tracker/repo/.common/codex-assist/runs/20261109-progressive-load/answer.txt",
+  "answer_shape": "summary-line",
+  "quote_gate": {
+    "status": "CLEAN",
+    "findings": 0
+  },
+  "verify": {
+    "touched_files": [
+      ".common/local/dispatch-ledger/afu-delta/events.jsonl",
+      "ui/index.html"
+    ],
+    "out_of_scope": [
+      ".common/local/dispatch-ledger/afu-delta/events.jsonl"
+    ],
+    "markers_removed": [],
+    "probes": [
+      {
+        "id": "tests",
+        "rc": 0,
+        "pass": true,
+        "output_path": "/opt/tracker/repo/.common/codex-assist/runs/20261109-progressive-load/verify/tests.out"
+      },
+      {
+        "id": "js-syntax",
+        "rc": 0,
+        "pass": true,
+        "output_path": "/opt/tracker/repo/.common/codex-assist/runs/20261109-progressive-load/verify/js-syntax.out"
+      },
+      {
+        "id": "core-fns",
+        "rc": 0,
+        "pass": true,
+        "output_path": "/opt/tracker/repo/.common/codex-assist/runs/20261109-progressive-load/verify/core-fns.out"
+      },
+      {
+        "id": "no-env-sniffing",
+        "rc": 0,
+        "pass": true,
+        "output_path": "/opt/tracker/repo/.common/codex-assist/runs/20261109-progressive-load/verify/no-env-sniffing.out"
+      }
+    ]
+  },
+  "verdict": "TOUCHED-OUT-OF-SCOPE",
+  "recorded_at": "2026-11-09T06:46:47Z",
+  "recorder": {
+    "name": "record.py",
+    "version": "0.13.0",
+    "sha256": "1fb1db37ced1ba6d77fa0bd10ea235ccc8d3d3e5badfec8c852d88407aea28f0"
+  },
+  "verify_result": "FAILED",
+  "defects": [],
+  "defects_spec_sha256": "1aeb306c9bda50f7ae0259815de0b19efad464d9d86eeeed1153ce5525e1df07"
+}

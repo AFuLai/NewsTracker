@@ -1,0 +1,3 @@
+# git status --porcelain at dispatch (this line keeps a clean tree's file non-empty)
+?? .common/codex-assist/runs/20261109-progressive-load/
+?? .common/local/

@@ -1,0 +1,21 @@
+cd /opt/tracker/repo/ui; wc -l index.html; grep -n "ensureHubLoaded\|function loadDayFile\|function injectScript\|function wsLoadRange\|function wsEnsure\|function wsDraw\|function renderWorkspace\|function buildWsCard\|function buildWsTitleRow\|function wsRefocus\|const ws = {\|wsLoading\|tlCount\|pendingOpenId\|WS_QUICK" index.html
+cd /opt/tracker/repo/ui; sed -n 3330,3375p index.html; sed -n 4256,4285p index.html; sed -n 4328,4365p index.html; sed -n 4415,4440p index.html; sed -n 4625,4720p index.html; sed -n 5878,5910p index.html; sed -n 6076,6095p index.html
+cd /opt/tracker/repo/ui; sed -n 4421,4445p index.html; sed -n 4630,4656p index.html; grep -n "wsDraw()\|ws.focusKey\|ws-sub\|ws.seq\|wsRefocus" index.html | head -50; grep -n "wsCollapse:" index.html
+cd /opt/tracker/repo/ui; sed -n 4280,4290p index.html; sed -n 4395,4412p index.html; grep -n "renderWorkspace()" index.html; file index.html; head -c 300 index.html | od -c | grep -c '\\r'
+cd /opt/tracker/repo/ui; grep -c $'\r' index.html; git status --short | head
+cd /opt/tracker/repo/ui && python3 - <<'EOF'
+p='index.html'
+s=open(p,encoding='utf-8').read()
+def rep(a,b):
+    global s
+    assert s.count(a)==1,a
+    s=s.replace(a,b)
+rep("""function wsDraw() {
+  if (!state.wsActive) return;
+  const main""","""function wsDraw(keep) {
+  if (!state.wsActive) return;
+  // keep (a redraw caused by loading progress): the user must not move - scroll, focus and rendered count survive
+  const keepY = keep ? window.scrollY : 0;
+  if (keep && !ws.focusKey) {
+    const ae = document…
+cd /opt/tracker/repo && /opt/venv/bin/python -m pytest -q -p no:cacheprovider tests 2>&1 | tail -3; git status --short

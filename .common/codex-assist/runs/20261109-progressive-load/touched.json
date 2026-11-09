@@ -1,0 +1,8 @@
+{
+  "touched_files": [
+    ".common/local/dispatch-ledger/afu-delta/events.jsonl",
+    "ui/index.html"
+  ],
+  "source": "git blob ids, pre-run snapshot vs end of run window",
+  "pre_head": "a297ef684b1029e80a31d80792c1ee50c0e9c2b6"
+}
