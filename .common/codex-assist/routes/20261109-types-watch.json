@@ -1,0 +1,64 @@
+{
+ "task_id": "20261109-types-watch",
+ "at": "2026-11-09T06:38:28Z",
+ "machine": "afu-delta",
+ "engine": "agy",
+ "model": "claude-sonnet-5-5-medium",
+ "effort": null,
+ "ab_of": null,
+ "step": 0,
+ "target_step": 0,
+ "fallback": false,
+ "rank": 3,
+ "target_rank": 2,
+ "pref": "balanced",
+ "verdict": "ROUTED",
+ "via": [
+  "SCHEDULE class implement: 3 step(s), engine order agy claude-sonnet-5-5-medium > codex gpt-6-sol/low > codex gpt-6-astra/low > agy gemini-4-argon-medium (pinned to agy)",
+  "BASE implement -> rank 2",
+  "QUOTA agy pools refreshed from `agy -p /usage` (4 readings)",
+  "QUOTA claude plan refreshed from its usage endpoint (1 readings)",
+  "LEARNED not applied under the schedule (its per-model history predates it)",
+  "SIMILAR 0 past task(s) with word overlap >= 0.60, 0 failed: no change",
+  "NPU 1 similar past task(s), 0 failed: no change (it never lowers)",
+  "SCHEDULE chose agy claude-sonnet-5-5-medium (step 0); bucket agy-claude is ON"
+ ],
+ "warnings": [],
+ "quota": {
+  "codex": "RESET",
+  "claude": "UNDER",
+  "agy": "UNDER",
+  "agy-claude": "ON"
+ },
+ "similar": {
+  "neighbours": []
+ },
+ "npu": {
+  "mode": "auto",
+  "backend": {
+   "backend": "openvino",
+   "device": "NPU"
+  },
+  "status": "RAN",
+  "device": "NPU",
+  "neighbours": [
+   {
+    "id": "20261021-m4-workspace",
+    "sim": 0.944,
+    "outcome": "ok",
+    "rank": 3
+   }
+  ]
+ },
+ "router": {
+  "name": "route.py",
+  "version": "0.12.0",
+  "sha256": "819d5fd9f05cedcde936a4274be5ebb92634999cc4fdce76927a61611caf3edc"
+ },
+ "policy_sha256": "33caff381900cbfc8deed2bf1c7b164db6edea96800c536106ab1a353ff7a9f0",
+ "task_sha256": "c30163fe22f4a71f1fcccd3fde4bc92d2384c9f9bb94e1bde3987f803e9ec2c6",
+ "rederive": "python3 tools/codex-assist/route.py /opt/tracker/repo/.common/codex-assist/tasks/20261109-types-watch.json --no-write",
+ "mode": "implement",
+ "kind": null,
+ "kind_source": null
+}
