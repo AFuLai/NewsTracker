@@ -16,6 +16,18 @@
 <h1>Tracker ChangeLog</h1>
 <p class="meta">本檔由 <code>tracker pack</code> 自動維護；每次打包前由本地 ollama 生成版本重點並 prepend 於下方。</p>
 <!-- CHANGELOG_INSERTION_POINT -->
+<section class="release" id="v2.30">
+  <h2>v2.30 — 2026-11-11</h2>
+<ul>
+    <li><strong>🚀 跨平台部署與安裝體驗大幅升級：</strong> 推出獨立的原生 Windows 安裝程式（Standalone native-Windows install），無需依賴 WSL 環境。新增了便攜式運行鎖、Task Scheduler 支援、Chrome 啟動機制，並優化了設定路徑管理，極大提升了 Windows 系統的易用性和穩定性。(<span style="color: red;">✨ 打包流程變更</span>)</li>
+    <li><strong>🧠 儀表板記憶體與 LLM 狀態管理：</strong> 強化了儀表板（Dashboard）的記憶功能，現在能夠跨啟動次數記住摘要、翻譯和 Gemini 模型等狀態，提升了用戶體驗的連貫性。(<span style="color: red;">✨ Ollama 模型</span>)</li>
+    <li><strong>⚙️ 核心設定與資料管理優化：</strong> 完善了本機設定介面，支援 HTML 輸出路徑、頁面模板、Chrome 瀏覽器設定，並新增了資料匯出/匯入功能，讓用戶能更方便地管理和遷移數據。</li>
+    <li><strong>🎨 介面渲染效能提升：</strong> 引入了漸進式（Progressive）日誌文件載入和增量工作區渲染機制，大幅改善了大型工作區的載入速度和使用者介面流暢度。</li>
+    <li><strong>🛠️ 程式碼與架構優化：</strong> 提升了核心組件的穩定性，包括優化了任務排程（Task Scheduler）邏輯、增強了資料遷移腳本（migrate_data.py）的健壯性，並優化了 CLI 介面和排程器（Orchestrator）的運行機制。</li>
+    <li><strong>🌐 來源與數據處理擴充：</strong> 擴展了對各種數據來源的支援，並優化了資料抓取和處理流程，提升了整體數據的覆蓋率和準確性。</li>
+</ul>
+</section>
+
 <section class="release" id="v2.29">
   <h2>v2.29 — 2026-08-21</h2>
 <ul>
