@@ -41,6 +41,48 @@ def _version_key(p: Path) -> tuple[int, ...]:
     return tuple(int(x) for x in re.findall(r"\d+", p.parent.parent.name)) or (0,)
 
 
+#: Google's standalone firebase CLI for Windows (bundles its own Node.js), so
+#: a portable install publishes without Node/npm. ~250 MB, fetched on demand
+#: by the console's 安裝工具 button into <home>/tools/firebase.exe.
+STANDALONE_URL = "https://firebase.tools/bin/win/latest"
+
+
+def standalone_path() -> Path | None:
+    h = settings.home()
+    return h / "tools" / "firebase.exe" if h else None
+
+
+def install_standalone(progress=None) -> Path:
+    """Download the standalone CLI to standalone_path(); progress(done, total)."""
+    import httpx
+    dest = standalone_path()
+    if dest is None:
+        raise DeployError("只在 Windows 原生版提供")
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    part = dest.with_suffix(".part")
+    try:
+        with httpx.stream("GET", STANDALONE_URL, follow_redirects=True,
+                          timeout=httpx.Timeout(30, read=120)) as r:
+            r.raise_for_status()
+            total = int(r.headers.get("content-length") or 0)
+            done = 0
+            with open(part, "wb") as fh:
+                for chunk in r.iter_bytes(1 << 20):
+                    fh.write(chunk)
+                    done += len(chunk)
+                    if progress:
+                        progress(done, total)
+        if total and done != total:
+            raise DeployError(f"下載不完整（{done}/{total} bytes）")
+        os.replace(part, dest)
+    except httpx.HTTPError as exc:
+        raise DeployError(f"下載 firebase 工具失敗：{exc}") from exc
+    finally:
+        if part.exists():
+            part.unlink(missing_ok=True)
+    return dest
+
+
 def resolve_firebase() -> Path:
     env = os.environ.get("NEWSTRACKER_FIREBASE")
     if env:
@@ -48,6 +90,9 @@ def resolve_firebase() -> Path:
         if not p.is_file():
             raise DeployError(f"NEWSTRACKER_FIREBASE={env} is not a file")
         return p
+    sa = standalone_path()
+    if sa is not None and sa.is_file():
+        return sa
     nvm = sorted(Path.home().glob(".nvm/versions/node/*/bin/firebase"), key=_version_key)
     if nvm:
         return nvm[-1]
@@ -58,7 +103,7 @@ def resolve_firebase() -> Path:
         npm_bin = Path(os.environ.get("APPDATA", "")) / "npm" / "firebase.cmd"
         if npm_bin.is_file():
             return npm_bin
-        raise DeployError("找不到 firebase-tools：請安裝 Node.js 後執行 npm install -g firebase-tools")
+        raise DeployError("找不到 firebase-tools：請按「發布」區的「安裝工具」（或安裝 Node.js 後執行 npm install -g firebase-tools）")
     raise DeployError("firebase-tools not found (set NEWSTRACKER_FIREBASE or install it under nvm)")
 
 

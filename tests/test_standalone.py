@@ -214,3 +214,29 @@ def test_firebase_json_written_once(tmp_path):
     f.write_text('{"hosting": {"public": "custom"}}', "utf-8")
     ensure_firebase_json(web, pub)
     assert json.loads(f.read_text("utf-8"))["hosting"]["public"] == "custom"
+
+
+def test_firebase_standalone_preferred(tmp_path, monkeypatch):
+    from tracker import deploy
+    monkeypatch.delenv('NEWSTRACKER_FIREBASE', raising=False)
+    monkeypatch.setattr(deploy.settings, 'home', lambda: tmp_path)
+    exe = tmp_path / 'tools' / 'firebase.exe'
+    exe.parent.mkdir()
+    exe.write_bytes(b'x')
+    assert deploy.resolve_firebase() == exe
+
+
+def test_firebase_install_downloads_atomically(tmp_path, monkeypatch):
+    import httpx
+    from tracker import deploy
+    monkeypatch.setattr(deploy.settings, 'home', lambda: tmp_path)
+    body = b'a' * (3 << 20)
+
+    def handler(req):
+        return httpx.Response(200, content=body, headers={'content-length': str(len(body))})
+    client = httpx.Client(transport=httpx.MockTransport(handler))
+    monkeypatch.setattr(httpx, 'stream', lambda m, u, **kw: client.stream(m, u))
+    seen = []
+    out = deploy.install_standalone(lambda d, t: seen.append((d, t)))
+    assert out.read_bytes() == body and seen[-1] == (len(body), len(body))
+    assert not out.with_suffix('.part').exists()

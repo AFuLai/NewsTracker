@@ -39,6 +39,31 @@ _DEPLOY: dict = {"state": "idle", "channel": "", "message": "",
                  "started_at": 0.0, "finished_at": 0.0}
 
 
+_FB_INSTALL: dict = {"state": "idle", "done": 0, "total": 0, "message": ""}
+
+
+def _fb_install_worker() -> None:
+    from . import deploy as _d
+
+    def prog(done, total):
+        _FB_INSTALL.update(done=done, total=total)
+    try:
+        path = _d.install_standalone(prog)
+        _FB_INSTALL.update(state="ok", message=f"已安裝：{path}")
+    except Exception as exc:  # reported, never swallowed
+        _FB_INSTALL.update(state="failed", message=str(exc) or type(exc).__name__)
+
+
+def _fb_tool() -> dict:
+    """Is a firebase CLI available, and how is an on-demand install going."""
+    from . import deploy as _d
+    try:
+        found = str(_d.resolve_firebase())
+    except _d.DeployError:
+        found = ""
+    return dict(_FB_INSTALL, found=found)
+
+
 def _deploy_snapshot() -> dict:
     with _DEPLOY_LOCK:
         return dict(_DEPLOY)
@@ -192,7 +217,8 @@ def _local_snapshot() -> dict | None:
         return None
     now = time.time()
     if _LOCAL_CACHE["v"] is not None and now - _LOCAL_CACHE["t"] < 10:
-        return _LOCAL_CACHE["v"]
+        # The download progress must move every poll, not every 10 s.
+        return dict(_LOCAL_CACHE["v"], firebase_tool=_fb_tool())
     from . import schedule
     v = {
         "settings": settings.load(),
@@ -200,6 +226,7 @@ def _local_snapshot() -> dict | None:
                   for k in ("home", "out", "db", "ui_html", "web_dir", "logs")},
         "task": schedule.scheduler().status(),
         "firebase_login": _FB_LOGIN["v"],
+        "firebase_tool": _fb_tool(),
         "restart_needed": _LOCAL_CACHE.get("restart", False),
     }
     _LOCAL_CACHE.update(t=now, v=v)
@@ -253,6 +280,12 @@ def _local_control(action: str, cmd: dict) -> tuple[bool, str]:
             return False, str(exc)
         _FB_LOGIN["v"] = None
         return True, "已開啟登入視窗；在瀏覽器完成後按「檢查登入」"
+    if action == "firebase-install":
+        if _FB_INSTALL["state"] == "running":
+            return False, "下載中，請稍候"
+        _FB_INSTALL.update(state="running", done=0, total=0, message="")
+        threading.Thread(target=_fb_install_worker, daemon=True, name="fb-install").start()
+        return True, "開始下載 firebase 工具（約 250 MB）"
     if action == "firebase-status":
         from .deploy import login_status
         _FB_LOGIN["v"] = login_status()
@@ -280,7 +313,8 @@ def _apply_control(controller, cmd: dict, cra_job=None) -> tuple[bool, str]:
     answering" and "the remote window is closed" are different refusals, and a
     bare red X makes the user guess which."""
     action = cmd.get("cmd")
-    if action in ("local-save", "schedule-run", "firebase-login", "firebase-status", "open-folder"):
+    if action in ("local-save", "schedule-run", "firebase-login", "firebase-status",
+                  "firebase-install", "open-folder"):
         return _local_control(action, cmd)
     if action == "cralib":
         return bool(cra_job is not None and cra_job.start()), ""
@@ -722,6 +756,7 @@ _HTML = r"""<!DOCTYPE html>
       <div class="cfgrow lc-only hidden sub" id="fbBox">
         <label class="chk"><input type="checkbox" id="lcFbOn"> 啟用 Firebase</label>
         <span class="chk">專案 <input id="lcFbProj" style="width:130px"></span>
+        <button id="lcFbInstall" class="hidden" title="下載 Google 官方免安裝版 firebase-tools-win.exe（約 250 MB，不需 Node.js）">安裝工具</button>
         <button id="lcFbLogin">登入</button>
         <button id="lcFbCheck">檢查</button>
         <span id="lcFbState" class="status"></span>
@@ -1134,6 +1169,7 @@ function row(k,v){ return `<div class="k">${k}</div><div class="v">${esc(v)}</di
 function esc(x){ return String(x==null?'':x).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 // ── 本機設定 (standalone Windows install) ───────────────────────────────
 let LC_INIT=false;
+let FB_OK_SHOWN=false;
 let LOCAL = false;
 function syncLocal(st){
   const lc = st.local;
@@ -1146,6 +1182,15 @@ function syncLocal(st){
     : '未啟用')
     + (t.last_run ? '　· 上次 ' + t.last_run + (t.last_result ? '（' + t.last_result + '）' : '') : '');
   const fl = lc.firebase_login;
+  const ft = lc.firebase_tool || {};
+  const fbRun = ft.state==='running';
+  $('lcFbInstall').classList.toggle('hidden', !!ft.found && !fbRun);
+  $('lcFbInstall').disabled = fbRun;
+  $('lcFbInstall').textContent = fbRun
+    ? ('下載中 ' + (ft.total ? Math.floor(ft.done*100/ft.total)+'%' : Math.round(ft.done/1048576)+' MB'))
+    : '安裝工具';
+  if(ft.state==='failed') $('fbMsg').textContent = ft.message;
+  else if(ft.state==='ok' && !FB_OK_SHOWN){ FB_OK_SHOWN=true; $('fbMsg').textContent = '工具已安裝，請按「登入」'; }
   if(fl!=null) $('lcFbState').textContent = !fl ? '尚未登入' : (fl.indexOf('unknown')===0 ? fl.replace(/^unknown: /,'') : '已登入 '+fl);
   if(LC_INIT) return; LC_INIT=true;
   const s = lc.settings, p = lc.paths;
@@ -1195,6 +1240,7 @@ autoSave('#sec-sched', $('schMsg'));
 autoSave('#fbBox', $('fbMsg'));
 autoSave('#sec-paths', $('pathMsg'));
 $('lcRunNow').onclick = ()=> ctlMsg({cmd:'schedule-run'}, $('schMsg'));
+$('lcFbInstall').onclick = ()=> ctlMsg({cmd:'firebase-install'}, $('fbMsg'));
 $('lcFbLogin').onclick = ()=> ctlMsg({cmd:'firebase-login'}, $('fbMsg'));
 $('lcFbCheck').onclick = ()=> { $('lcFbState').textContent='檢查中…'; ctlMsg({cmd:'firebase-status'}, $('lcFbState')); };
 document.querySelectorAll('#sec-paths [data-open]').forEach(b=> b.onclick = ()=> ctlMsg({cmd:'open-folder', which:b.dataset.open}, $('pathMsg')));
