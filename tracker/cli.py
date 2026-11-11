@@ -1541,6 +1541,8 @@ def pack(
     major: bool = typer.Option(False, "--major"),
     keep_version: bool = typer.Option(False, "--keep-version"),
     tarball_dir: Path = typer.Option(DEFAULT_TARBALL),
+    release_dir: Path = typer.Option(PROJECT_ROOT / "release", "--release-dir",
+                                     help="Where the portable zip goes"),
     portable: bool = typer.Option(True, "--portable/--no-portable",
                                   help="Also build NewsTracker-portable-<ver>.zip (bundled Python; "
                                        "needs Windows Python + internet on this machine)"),
@@ -1553,7 +1555,8 @@ def pack(
                   f"({result['size']} bytes)")
     if portable:
         try:
-            p = build_portable(Path(result["zip"]), tarball_dir)
+            release_dir.mkdir(parents=True, exist_ok=True)
+            p = build_portable(Path(result["zip"]), release_dir)
             console.print(f"[green]Portable[/green] → {p}")
         except (OSError, _sp.CalledProcessError) as exc:
             # The release itself is done; only the convenience build failed.

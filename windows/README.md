@@ -11,7 +11,7 @@
 
 不需要安裝 Python、不用跑安裝腳本，也不會改 PATH 或登錄檔。要建捷徑就自己對 `NewsTracker.cmd` 建一個。資料一樣放在 `%LOCALAPPDATA%\NewsTracker`（或 `NEWSTRACKER_HOME`）。升級時解壓新版覆蓋或換資料夾即可，資料不受影響。
 
-可攜版由 `tracker pack` 一併產生（需要建置機上有 Windows Python 3.11+ 與網路），也可以單獨建置：
+可攜版由 `tracker pack` 一併產生，放在專案資料夾的 `release\`（可用 `--release-dir` 改；需要建置機上有 Windows Python 3.11+ 與網路），也可以單獨建置：
 
 ```bat
 powershell -ExecutionPolicy Bypass -File windows\build-portable.ps1 -SourceZip Tracker-2.31.zip
