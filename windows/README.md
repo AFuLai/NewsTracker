@@ -89,10 +89,11 @@ settings.json      本機設定（控制台會寫入）
 endpoints.json     ollama 端點清單與已選的 LLM 後端
 db\articles.sqlite 資料庫（每次更新成功後，backups\ 保留最近 7 份快照）
 logs\  status.json 執行紀錄與最近一次的結果
-site\public\       產生的網站（可在設定中更改）
 site\firebase.json 第一次發布時自動產生
 chrome\            程式用的 Chrome 設定檔
 ```
+
+產生的網站預設放在**程式資料夾**下的 `html\`（`NewsTracker.cmd` 旁邊），可在設定中改到別處。換新版程式資料夾時記得帶走 `html\`，或執行一次 `NewsTracker.cmd render-all` 從資料庫重新產生。
 
 ## 常用指令
 

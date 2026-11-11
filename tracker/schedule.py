@@ -57,7 +57,8 @@ def validate(sch: dict) -> dict:
     if not 1 <= days <= 30:
         raise ScheduleError("更新天數需在 1～30")
     return {"enabled": bool(sch.get("enabled")), "mode": mode, "time": t,
-            "every_hours": every, "days": days, "deploy": bool(sch.get("deploy"))}
+            "every_hours": every, "days": days, "deploy": bool(sch.get("deploy")),
+            "cra": bool(sch.get("cra", True))}
 
 
 def next_due(sch: dict, now: datetime) -> datetime:
@@ -86,7 +87,8 @@ def command(sch: dict) -> list[str]:
     """argv of the child process for one scheduled run (pure; tested)."""
     s = validate(sch)
     return [sys.executable, "-m", "tracker.cli", "daily", "--days", str(s["days"]),
-            "--deploy" if s["deploy"] else "--no-deploy"]
+            "--deploy" if s["deploy"] else "--no-deploy",
+            "--cra" if s["cra"] else "--no-cra"]
 
 
 def _state_path() -> Path | None:

@@ -241,6 +241,9 @@ def resolve_default_backend() -> str:
     env = os.environ.get("TRACKER_LLM_BACKEND", "").strip().lower()
     if env in ("llamacpp", "ollama", "gemini"):
         return env
+    from .. import settings
+    if settings.home() is not None:
+        return "ollama"      # standalone install: LAN ollama by default
     try:
         from . import gemini
         return "gemini" if gemini.available() else "ollama"

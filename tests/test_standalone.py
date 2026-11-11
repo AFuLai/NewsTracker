@@ -31,7 +31,7 @@ def test_wsl_layout_unchanged_without_home(monkeypatch):
 def test_home_layout_defaults(home):
     p = settings.resolve()
     assert p["db"] == home / "db" / "articles.sqlite"
-    assert p["out"] == home / "site" / "public"
+    assert p["out"] == settings.INSTALL_DIR / "html"
     assert p["web_dir"] == home / "site"
     assert p["status"] == home / "status.json"
     assert p["ui_html"] == settings.INSTALL_DIR / "ui" / "index.html"
@@ -83,11 +83,25 @@ def test_schedule_next_due_daily_and_hourly():
     assert schedule.next_due(odd, D(2026, 11, 12, 4, 30)) == D(2026, 11, 12, 8, 0)
 
 
+def test_standalone_llm_defaults(home, monkeypatch):
+    from tracker import ollama_hosts as h
+    from tracker import llm
+    monkeypatch.delenv("TRACKER_OLLAMA_URLS", raising=False)
+    monkeypatch.delenv("TRACKER_OLLAMA_REMOTE_CONCURRENCY", raising=False)
+    monkeypatch.delenv("TRACKER_LLM_BACKEND", raising=False)
+    monkeypatch.setattr(h, "CONFIG_PATH", home / "endpoints.json")
+    assert h.endpoints() == h.BUILTIN_URLS + [h.LOCAL_URL]
+    assert h.endpoints()[0] == "http://10.139.180.22:11434"
+    assert h.remote_concurrency() == 20
+    assert h.label("http://10.139.180.21:11434").startswith("TWTY3PC1875")
+    assert llm.resolve_default_backend() == "ollama"
+
+
 def test_schedule_command():
     c = schedule.command({"mode": "daily", "time": "07:30", "days": 3, "deploy": True})
-    assert c[1:] == ["-m", "tracker.cli", "daily", "--days", "3", "--deploy"]
-    c = schedule.command({"mode": "daily", "time": "07:30", "days": 1})
-    assert c[-1] == "--no-deploy"
+    assert c[1:] == ["-m", "tracker.cli", "daily", "--days", "3", "--deploy", "--cra"]
+    c = schedule.command({"mode": "daily", "time": "07:30", "days": 1, "cra": False})
+    assert c[-2:] == ["--no-deploy", "--no-cra"]
 
 
 def test_scheduler_fires_once_per_slot(tmp_path, monkeypatch):

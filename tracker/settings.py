@@ -16,7 +16,7 @@ Two layouts, chosen by platform, never by guessing at runtime:
       <home>\\endpoints.json     the ollama endpoint list (as on WSL)
       <home>\\db\\articles.sqlite
       <home>\\logs\\  <home>\\backups\\  <home>\\tarball\\  <home>\\status.json
-      <home>\\site\\public\\       the generated static site (default out_dir)
+      <install>\\html\\            the generated static site (default out_dir)
       <home>\\site\\firebase.json  written on first Firebase deploy
       <home>\\chrome\\             profile of the Chrome the program starts
 
@@ -27,7 +27,8 @@ settings.json keys (all optional; missing = default):
               install's ui/index.html) — for a customised page
   firebase    {"enabled": false, "project": "afu-news", "web_dir": "<home>\\site"}
   schedule    {"enabled": false, "mode": "daily"|"hourly", "time": "07:30",
-               "every_hours": 6, "days": 3, "deploy": false}
+               "every_hours": 6, "days": 3, "deploy": false, "cra": true}
+              (cra: the periodic update also refreshes the CRA reference library)
   chrome      path to chrome.exe (default: found in the usual places)
   cdp_port    Chrome remote-debugging port (default 9999)
 
@@ -49,7 +50,7 @@ DEFAULTS: dict = {
     "ui_html": "",
     "firebase": {"enabled": False, "project": "afu-news", "web_dir": ""},
     "schedule": {"enabled": False, "mode": "daily", "time": "07:30",
-                 "every_hours": 6, "days": 3, "deploy": False},
+                 "every_hours": 6, "days": 3, "deploy": False, "cra": True},
     "chrome": "",
     "cdp_port": 9999,
 }
@@ -148,8 +149,12 @@ def resolve() -> dict:
             "web_dir": root.parent / "web",
             "chrome_profile": None,
         }
-    out = Path(s["out_dir"]).expanduser() if s["out_dir"] else h / "site" / "public"
-    web = Path(s["firebase"]["web_dir"]).expanduser() if s["firebase"]["web_dir"] else out.parent
+    # Default site output: <program folder>\html, next to NewsTracker.cmd, so
+    # the generated site is where the user runs the program from.
+    out = Path(s["out_dir"]).expanduser() if s["out_dir"] else INSTALL_DIR / "html"
+    # Firebase's deploy folder (firebase.json/.firebaserc) stays in the data
+    # folder; firebase.json points at `out` by relative or absolute path.
+    web = Path(s["firebase"]["web_dir"]).expanduser() if s["firebase"]["web_dir"] else h / "site"
     return {
         "home": h, "root": INSTALL_DIR, "project": h,
         "db": h / "db" / "articles.sqlite",

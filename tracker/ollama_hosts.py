@@ -62,6 +62,8 @@ _log = logging.getLogger("tracker.ollama_hosts")
 
 #: Where a remote stops getting faster (measured; see the module docstring).
 DEFAULT_REMOTE_CONCURRENCY = 4
+#: The standalone install's default (the user's choice, 2026-11-11).
+STANDALONE_REMOTE_CONCURRENCY = 20
 
 #: Health probe budget. Short: this runs before every pipeline, and an endpoint
 #: that cannot answer /api/tags in this long is not one we want carrying 280
@@ -147,10 +149,24 @@ def remember_llm(**values) -> None:
         _log.warning("could not remember LLM choice in %s (%s)", CONFIG_PATH, exc)
 
 
+#: Standalone (Windows) install: the known LAN hosts are built in and used by
+#: default, so a fresh machine works without touching the endpoint panel.
+#: Only applies while endpoints.json names no `urls` of its own; the WSL layout
+#: keeps the opt-in behaviour described in the module docstring.
+BUILTIN_URLS = ["http://10.139.180.22:11434", "http://10.139.180.21:11434"]
+BUILTIN_LABELS = {"http://10.139.180.21:11434": "TWTY3PC1875",
+                  "http://10.139.180.22:11434": "TWTY3PC1876"}
+
+
+def _standalone() -> bool:
+    from . import settings
+    return settings.home() is not None
+
+
 def _file_urls() -> list[str]:
     urls = _load_config().get("urls")
     if not isinstance(urls, list):
-        return []
+        return (BUILTIN_URLS + [LOCAL_URL]) if _standalone() else []
     return [str(u).strip().rstrip("/") for u in urls if str(u).strip()]
 
 
@@ -193,7 +209,10 @@ def label(url: str) -> str:
     parts = urlsplit(url)
     host = f"{parts.hostname}:{parts.port}" if parts.port else (parts.hostname or url)
     labels = _load_config().get("labels")
-    name = labels.get(url.rstrip("/")) if isinstance(labels, dict) else None
+    labels = labels if isinstance(labels, dict) else {}
+    if _standalone():
+        labels = dict(BUILTIN_LABELS, **labels)
+    name = labels.get(url.rstrip("/"))
     return f"{name} ({host})" if name else host
 
 
@@ -252,7 +271,7 @@ def remote_concurrency() -> int:
     """The remote cap: env var first, then the config file, then the default."""
     raw = (os.environ.get("TRACKER_OLLAMA_REMOTE_CONCURRENCY", "").strip()
            or _load_config().get("remote_concurrency")
-           or DEFAULT_REMOTE_CONCURRENCY)
+           or (STANDALONE_REMOTE_CONCURRENCY if _standalone() else DEFAULT_REMOTE_CONCURRENCY))
     try:
         return max(1, int(raw))
     except (TypeError, ValueError):

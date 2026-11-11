@@ -1069,6 +1069,7 @@ def daily(
     deploy_site: bool = typer.Option(True, "--deploy/--no-deploy",
                                      help="成功後部署到 Firebase Hosting（只在 afu-delta）"),
     days: int = typer.Option(3, "--days", help="更新最近 N 天（含今天）"),
+    cra: bool = typer.Option(False, "--cra/--no-cra", help="也更新 CRA 參考圖書庫"),
     trackers: str = typer.Option("all", "--tracker",
                                  help=f"{'|'.join(SEARCHINFOS)}|all (default all)"),
     db: Path = typer.Option(DEFAULT_DB),
@@ -1146,6 +1147,23 @@ def daily(
         errors.append(f"rebuild_days: {exc}")
         console.print(f"[yellow]rebuild_days failed (non-fatal): {exc}[/yellow]")
 
+    # 4b. CRA reference library (optional; the standalone periodic update turns
+    #     it on). Best-effort: the sites are third-party and may be down.
+    cra_state = "skipped"
+    if cra:
+        from .cra_library import emit_js as _cra_emit, sync as _cra_sync
+        try:
+            crep = _cra_sync(db)
+            _cra_emit(db, out)
+            cra_state = (f"ok: new {len(crep['new'])}, updated {len(crep['updated'])}, "
+                         f"gone {len(crep['removed'])}")
+            if crep["errors"]:
+                cra_state += f", errors {len(crep['errors'])}"
+            console.print(f"[dim]CRA 參考圖書庫：{cra_state}[/dim]")
+        except Exception as exc:
+            cra_state = f"failed: {exc}"
+            console.print(f"[yellow]CRA 參考圖書庫更新失敗（不影響本次更新）：{exc}[/yellow]")
+
     # 5. status.json + one summary line.
     newest_row = store.conn.execute(
         "SELECT MAX(date) FROM articles WHERE status IN ('ready','written')").fetchone()
@@ -1173,6 +1191,7 @@ def daily(
     status = {
         "command": "daily",
         "deploy": deploy_state,
+        "cra_library": cra_state,
         "snapshot": snap_state,
         "timestamp": utcnow().isoformat(),
         "days": days, "since": since, "until": until, "trackers": targets,
