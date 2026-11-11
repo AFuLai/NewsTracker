@@ -92,7 +92,7 @@ def build_portable(source_zip: Path, out_dir: Path, *, version: str | None = Non
     """Run windows/build-portable.ps1 on the release zip (from WSL via interop).
 
     Produces NewsTracker-app-<ver>.zip (and NewsTracker-runtime-<id>.zip when
-    Python or the dependencies changed) in out_dir (the project's release\): the
+    Python or the dependencies changed) in out_dir (the project's release folder): the
     program plus an embeddable Python with every dependency, so the target
     machine needs no Python. Needs Windows Python 3.11+ and internet on this
     (build) machine; raises CalledProcessError when the script fails.
