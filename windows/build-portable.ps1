@@ -70,19 +70,24 @@ if (Test-Path $work) { Retry { Remove-Item -Recurse -Force $work } }
 $app = Join-Path $work "NewsTracker"
 New-Item -ItemType Directory -Force -Path $app | Out-Null
 
-# 1. program files
+# 1. program files: an allowlist of what runs, nothing else. The checkout also
+#    holds dev/agent material (.common, CLAUDE.md, refs, ops, tests, build
+#    scripts, pyproject) that has no business on a user's machine.
 if ($SourceZip) {
   $src = Join-Path $work "src"
   Unzip $SourceZip $src
-  $top = Get-ChildItem $src | Select-Object -First 1
-  Copy-Item -Recurse -Path (Join-Path $top.FullName "*") -Destination $app
+  $srcRoot = (Get-ChildItem $src | Select-Object -First 1).FullName
 } else {
-  foreach ($item in "tracker", "ui", "searchinfo", "windows", "NewsTracker.cmd", "VERSION", "ChangeLog.html", "pyproject.toml", "README.md") {
-    $p = Join-Path $Here $item
-    if (Test-Path $p) { Copy-Item -Recurse -Path $p -Destination $app }
-  }
+  $srcRoot = $Here
 }
+foreach ($item in "tracker", "ui", "searchinfo", "NewsTracker.cmd", "VERSION") {
+  $p = Join-Path $srcRoot $item
+  if (-not (Test-Path $p)) { throw "missing from the source: $item" }
+  Copy-Item -Recurse -Path $p -Destination $app
+}
+Copy-Item -Path (Join-Path $srcRoot "windows\README.md") -Destination (Join-Path $app "README.md")
 Get-ChildItem -Path $app -Recurse -Directory -Filter "__pycache__" | Remove-Item -Recurse -Force
+Get-ChildItem -Path $app -Recurse -File -Include "*.pyc", "*.pyo" | Remove-Item -Force
 # cmd.exe misparses LF-only batch files; a WSL checkout has LF.
 Get-ChildItem -Path $app -Filter "*.cmd" | ForEach-Object {
   $f = $_.FullName
@@ -116,7 +121,7 @@ Retry { @("python$tag.zip", ".", "Lib\site-packages", "..", "import site") | Set
 # 3. dependencies, from pyproject.toml, as binary wheels for this Python
 $site = Join-Path $pyDir "Lib\site-packages"
 New-Item -ItemType Directory -Force -Path $site | Out-Null
-$deps = & $py -c "import tomllib,sys; print('\n'.join(tomllib.load(open(sys.argv[1],'rb'))['project']['dependencies']))" (Join-Path $app "pyproject.toml")
+$deps = & $py -c "import tomllib,sys; print('\n'.join(tomllib.load(open(sys.argv[1],'rb'))['project']['dependencies']))" (Join-Path $srcRoot "pyproject.toml")
 if ($LASTEXITCODE -ne 0 -or -not $deps) { throw "could not read dependencies from pyproject.toml" }
 $reqs = Join-Path $work "requirements.txt"
 $deps | Set-Content -Path $reqs -Encoding utf8
@@ -124,6 +129,8 @@ $deps | Set-Content -Path $reqs -Encoding utf8
 if ($LASTEXITCODE -ne 0) { throw "pip install failed" }
 Get-ChildItem -Path $site -Recurse -Directory -Filter "__pycache__" | Remove-Item -Recurse -Force
 Remove-Item -Recurse -Force (Join-Path $site "bin") -ErrorAction SilentlyContinue
+# Console-script launchers pip drops beside site-packages are never used here.
+Get-ChildItem -Path $site -Filter "*.exe" -File | Remove-Item -Force
 
 # 4. smoke test with the embedded interpreter only (no PATH, no user site)
 $env:PYTHONNOUSERSITE = "1"
