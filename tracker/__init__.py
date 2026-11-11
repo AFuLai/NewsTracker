@@ -20,6 +20,9 @@ def utcnow() -> datetime:
 # drvfs and none of its pitfalls); on native Windows everything lives under
 # NEWSTRACKER_HOME (see tracker/settings.py).
 from . import settings as _settings
+from . import netssl as _netssl
+
+_netssl.install()  # one TLS context for all httpx calls (Windows: 3-15 s each otherwise)
 
 IS_WINDOWS = _settings.IS_WINDOWS
 PATHS = _settings.resolve()
