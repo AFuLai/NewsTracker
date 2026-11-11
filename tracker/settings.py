@@ -30,7 +30,10 @@ settings.json keys (all optional; missing = default):
                "every_hours": 6, "days": 3, "deploy": false, "cra": true}
               (cra: the periodic update also refreshes the CRA reference library)
   chrome      path to chrome.exe (default: found in the usual places)
-  cdp_port    Chrome remote-debugging port (default 9999)
+  cdp_port    the program Chrome's remote-debugging port (default 9333). Never
+              9999 or 9998: on a Common machine those belong to the shared
+              D:/WSL/chrome-debug profile (ruling 20261007183000); a stored
+              9999 from older builds is moved to the default on load.
 
 This module imports nothing from the package (it is imported by __init__).
 """
@@ -52,8 +55,11 @@ DEFAULTS: dict = {
     "schedule": {"enabled": False, "mode": "daily", "time": "07:30",
                  "every_hours": 6, "days": 3, "deploy": False, "cra": True},
     "chrome": "",
-    "cdp_port": 9999,
+    "cdp_port": 9333,
 }
+
+#: Ports this program must never open its own Chrome on (shared debug Chrome).
+RESERVED_CDP_PORTS = (9998, 9999)
 
 
 def home() -> Path | None:
@@ -102,7 +108,10 @@ def load() -> dict:
             raw = got if isinstance(got, dict) else {}
         except (OSError, ValueError):
             raw = {}
-    return _merge(DEFAULTS, raw)
+    out = _merge(DEFAULTS, raw)
+    if out.get("cdp_port") in RESERVED_CDP_PORTS:
+        out["cdp_port"] = DEFAULTS["cdp_port"]
+    return out
 
 
 def save(changes: dict) -> dict:

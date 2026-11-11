@@ -75,7 +75,7 @@ NewsTracker.cmd render-all
 `NewsTracker.cmd` 不加參數時，會用程式自己的 Chrome 開啟控制台：
 
 - 這個 Chrome 使用獨立的設定檔（資料夾裡的 `chrome\`），不會動到你平常用的 Chrome。
-- 它同時開著除錯埠（預設 9999），需要瀏覽器的來源和 Gemini 後端都透過它運作。
+- 它同時開著除錯埠（預設 9333），需要瀏覽器的來源和 Gemini 後端都透過它運作。
 
 除了原本的執行控制、LLM 端點和發布，Windows 版多一張「本機設定」卡片：
 
@@ -118,4 +118,4 @@ NewsTracker.cmd import-data <zip> [--force]
 
 - WSL 版的路徑、排程和發布規則完全不變：只有 afu-delta 會發布到 afu-news。
 - Windows 版的發布由設定決定，不受機器名稱限制。
-- 如果同一台電腦上已經有其他 Chrome 佔用除錯埠 9999，在 `settings.json` 把 `cdp_port` 改成別的號碼即可。
+- 如果同一台電腦上已經有其他程式佔用除錯埠 9333，在 `settings.json` 把 `cdp_port` 改成別的號碼即可。

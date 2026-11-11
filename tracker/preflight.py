@@ -178,12 +178,15 @@ def start_local_daemon(*, start_timeout: int = 40, console=None) -> bool:
 
 # ── Debug Chrome (only needed for BROWSER-method sources) ────────────────────
 
-# Default Chrome DevTools remote-debugging port.
+# The shared, already-logged-in debug Chrome on the WSL layout. A standalone
+# install uses its own Chrome on settings.cdp_port (default 9333) instead.
 CDP_PORT = 9999
 
 
 def _cdp_port() -> int:
     from . import settings
+    if settings.home() is None:
+        return CDP_PORT
     try:
         return int(settings.load().get("cdp_port") or CDP_PORT)
     except (TypeError, ValueError):

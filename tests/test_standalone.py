@@ -46,7 +46,7 @@ def test_settings_merge_and_bad_values(home):
     s = settings.load()
     assert s["out_dir"] == "X:/site"
     assert "bogus" not in s
-    assert s["cdp_port"] == 9999
+    assert s["cdp_port"] == 9333
     assert s["schedule"]["enabled"] is True and s["schedule"]["days"] == 5
     assert "extra" not in s["schedule"] and s["schedule"]["time"] == "07:30"
     assert s["firebase"] == {"enabled": False, "project": "afu-news", "web_dir": ""}
@@ -297,3 +297,17 @@ def test_import_replace_with_db_open(tmp_path, monkeypatch):
     assert [tuple(r) for r in held.conn.execute('SELECT url FROM articles')] == [('https://x/1',)]
     bak = next(pb['db'].parent.glob('articles.sqlite.bak-*'))
     assert sqlite3.connect(bak).execute('SELECT COUNT(*) FROM articles').fetchone()[0] == 2
+
+
+def test_reserved_cdp_port_migrated(tmp_path, monkeypatch):
+    monkeypatch.setenv("NEWSTRACKER_HOME", str(tmp_path))
+    (tmp_path / "settings.json").write_text('{"cdp_port": 9999}', "utf-8")
+    assert settings.load()["cdp_port"] == 9333
+    (tmp_path / "settings.json").write_text('{"cdp_port": 9444}', "utf-8")
+    assert settings.load()["cdp_port"] == 9444
+
+
+def test_wsl_layout_keeps_shared_debug_chrome(monkeypatch):
+    from tracker import preflight
+    monkeypatch.setattr(settings, "home", lambda: None)
+    assert preflight._cdp_port() == 9999

@@ -55,7 +55,7 @@ def launch(url: str | None = None, *, wait_cdp: float = 15.0) -> str | None:
     from . import PATHS, settings
     from .preflight import find_browser
     s = settings.load()
-    port = int(s.get("cdp_port") or 9999)
+    port = int(s.get("cdp_port") or settings.DEFAULTS["cdp_port"])
     chrome = find_chrome(s.get("chrome", ""))
     if chrome is None:
         if url:   # still show the console, in whatever browser Windows opens
