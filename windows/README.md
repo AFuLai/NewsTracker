@@ -4,14 +4,21 @@
 
 ## 可攜版（建議：免安裝 Python）
 
-`NewsTracker-portable-<版本>.zip` 內附 Python 和所有套件。
+分成兩個 zip：
 
-1. 解壓到任意資料夾，例如 `D:\NewsTracker`（路徑可含中文或空白）。
-2. 執行裡面的 `NewsTracker.cmd`。
+| 檔案 | 內容 | 多久換一次 |
+|---|---|---|
+| `NewsTracker-runtime-<代號>.zip` | 內附的 Python 與所有套件（約 79 MB） | 只有 Python 版本或套件清單變動時 |
+| `NewsTracker-app-<版本>.zip` | 程式本身（不到 1 MB） | 每次更新 |
 
-不需要安裝 Python、不用跑安裝腳本，也不會改 PATH 或登錄檔。要建捷徑就自己對 `NewsTracker.cmd` 建一個。資料一樣放在 `%LOCALAPPDATA%\NewsTracker`（或 `NEWSTRACKER_HOME`）。升級時解壓新版覆蓋或換資料夾即可，資料不受影響。
+1. 兩個 zip 都解壓到同一個位置，例如 `D:\`，會得到 `D:\NewsTracker\`（路徑可含中文或空白）。
+2. 執行 `D:\NewsTracker\NewsTracker.cmd`。
 
-平常用 `tracker portable` 產生目前 commit 的可攜版（不升版、不打包，檔名為 `<版本>-<commit>`）；`tracker pack` 發行時也會一併產生。兩者都放在專案資料夾的 `release\`（可用 `--release-dir` 改；需要建置機上有 Windows Python 3.11+ 與網路），也可以單獨建置：
+程式更新時只要把新的 app zip 解壓覆蓋即可。若新版需要不同的執行環境，`NewsTracker.cmd` 會直接告訴你要哪一個 runtime zip。
+
+不需要安裝 Python、不用跑安裝腳本，也不會改 PATH 或登錄檔。要建捷徑就自己對 `NewsTracker.cmd` 建一個。資料放在 `%LOCALAPPDATA%\NewsTracker`（或 `NEWSTRACKER_HOME`），換版不受影響；第一次執行會自動建立新聞來源清單。
+
+平常用 `tracker portable` 產生目前 commit 的版本（不升版、不打包，app 檔名為 `<版本>-<commit>`；runtime 已存在就不重做）；`tracker pack` 發行時也會一併產生。兩者都放在專案資料夾的 `release\`（可用 `--release-dir` 改；需要建置機上有 Windows Python 3.11+ 與網路），也可以單獨建置：
 
 ```bat
 powershell -ExecutionPolicy Bypass -File windows\build-portable.ps1 -SourceZip Tracker-2.31.zip

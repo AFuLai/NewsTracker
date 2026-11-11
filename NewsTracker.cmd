@@ -8,6 +8,12 @@ setlocal
 set "HERE=%~dp0"
 rem Portable build: bundled embeddable Python in .\python (windows\build-portable.ps1).
 set "PY=%HERE%python\python.exe"
+if exist "%HERE%RUNTIME_REQUIRED" (
+  set /p NEED=<"%HERE%RUNTIME_REQUIRED"
+  if not exist "%PY%" goto :noruntime
+  set /p HAVE=<"%HERE%python\RUNTIME"
+)
+if exist "%HERE%RUNTIME_REQUIRED" if not "%HAVE%"=="%NEED%" goto :noruntime
 if exist "%PY%" (
   set PYTHONNOUSERSITE=1
   set PYTHONHOME=
@@ -27,3 +33,14 @@ if "%~1"=="" (
 )
 "%PY%" -m tracker.cli %*
 exit /b %ERRORLEVEL%
+
+:noruntime
+echo.
+echo  This NewsTracker needs the runtime package  NewsTracker-runtime-%NEED%.zip
+if defined HAVE echo  (the python folder here is runtime %HAVE%)
+echo  Unzip it into the same folder as this file, so that python\python.exe sits next to NewsTracker.cmd.
+echo.
+echo  需要執行環境 NewsTracker-runtime-%NEED%.zip：解壓到本程式同一個資料夾即可。
+echo.
+pause
+exit /b 3

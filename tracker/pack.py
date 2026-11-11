@@ -91,7 +91,8 @@ def portable_from_head(out_dir: Path) -> Path:
 def build_portable(source_zip: Path, out_dir: Path, *, version: str | None = None) -> Path:
     """Run windows/build-portable.ps1 on the release zip (from WSL via interop).
 
-    Produces NewsTracker-portable-<ver>.zip in out_dir (the project's release\): the
+    Produces NewsTracker-app-<ver>.zip (and NewsTracker-runtime-<id>.zip when
+    Python or the dependencies changed) in out_dir (the project's release\): the
     program plus an embeddable Python with every dependency, so the target
     machine needs no Python. Needs Windows Python 3.11+ and internet on this
     (build) machine; raises CalledProcessError when the script fails.
@@ -102,4 +103,6 @@ def build_portable(source_zip: Path, out_dir: Path, *, version: str | None = Non
     subprocess.run([exe, "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", _win_path(script),
                     "-SourceZip", _win_path(source_zip), "-OutDir", _win_path(out_dir),
                     "-Version", version], check=True)
-    return out_dir / f"NewsTracker-portable-{version}.zip"
+    # The runtime zip sits beside it and is rebuilt only when Python or the
+    # dependencies change (build-portable.ps1).
+    return out_dir / f"NewsTracker-app-{version}.zip"

@@ -1579,7 +1579,7 @@ def pack(
     release_dir: Path = typer.Option(PROJECT_ROOT / "release", "--release-dir",
                                      help="Where the portable zip goes"),
     portable: bool = typer.Option(True, "--portable/--no-portable",
-                                  help="Also build NewsTracker-portable-<ver>.zip (bundled Python; "
+                                  help="Also build NewsTracker-app-<ver>.zip (+ runtime zip when deps change; "
                                        "needs Windows Python + internet on this machine)"),
 ) -> None:
     """ChangeLog → commit → tag → git archive zip (+ portable Windows zip)."""
