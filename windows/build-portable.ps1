@@ -74,7 +74,8 @@ for m in z.infolist():
 function ZipTree([string]$root, [string]$out, [string]$exclude = "") {
   if (Test-Path $out) { Remove-Item -Force $out }
   & $py -c "import os,sys,zipfile
-root, out, excl = sys.argv[1], sys.argv[2], sys.argv[3]
+root, out = sys.argv[1], sys.argv[2]
+excl = sys.argv[3] if len(sys.argv) > 3 else ''   # PowerShell drops an empty arg
 base = os.path.dirname(root)
 with zipfile.ZipFile(out, 'w', zipfile.ZIP_DEFLATED, compresslevel=6) as z:
     for d, dirs, files in os.walk(root):
