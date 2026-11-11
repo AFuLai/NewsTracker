@@ -12,7 +12,8 @@
 # binary wheels pip picks match it.
 param(
   [string]$SourceZip = "",   # a `tracker pack` zip; default: this checkout
-  [string]$OutDir = ""       # default: <checkout>\dist
+  [string]$OutDir = "",      # default: <checkout>\dist
+  [string]$Version = ""      # default: the VERSION file
 )
 $ErrorActionPreference = "Stop"
 $ProgressPreference = "SilentlyContinue"   # Invoke-WebRequest is 10x slower with the bar
@@ -90,7 +91,7 @@ Get-ChildItem -Path $app -Filter "*.cmd" | ForEach-Object {
     [IO.File]::WriteAllText($f, $t, (New-Object Text.ASCIIEncoding))
   }
 }
-$ver = if (Test-Path (Join-Path $app "VERSION")) { (Get-Content (Join-Path $app "VERSION") -Raw).Trim() } else { "dev" }
+$ver = if ($Version) { $Version } elseif (Test-Path (Join-Path $app "VERSION")) { (Get-Content (Join-Path $app "VERSION") -Raw).Trim() } else { "dev" }
 Write-Host "NewsTracker version: $ver"
 
 # 2. embeddable Python (cached between builds)

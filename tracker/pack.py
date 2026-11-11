@@ -74,7 +74,21 @@ def _win_path(p: Path) -> str:
     return subprocess.check_output(["wslpath", "-w", str(p)], text=True).strip()
 
 
-def build_portable(source_zip: Path, out_dir: Path) -> Path:
+def portable_from_head(out_dir: Path) -> Path:
+    """Portable build of the current commit, without a release: no version
+    bump, no ChangeLog, no tag, no tarball. Named <VERSION>-<short sha>."""
+    import tempfile
+    sha = _git("rev-parse", "--short", "HEAD").strip()
+    m, n = read_version()
+    label = f"{m}.{n}-{sha}"
+    out_dir.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(dir=out_dir) as tmp:
+        src = Path(tmp) / f"Tracker-{label}.zip"
+        _git("archive", "--format=zip", f"--prefix=Tracker-{label}/", "-o", str(src), "HEAD")
+        return build_portable(src, out_dir, version=label)
+
+
+def build_portable(source_zip: Path, out_dir: Path, *, version: str | None = None) -> Path:
     """Run windows/build-portable.ps1 on the release zip (from WSL via interop).
 
     Produces NewsTracker-portable-<ver>.zip in out_dir (the project's release\): the
@@ -84,8 +98,8 @@ def build_portable(source_zip: Path, out_dir: Path) -> Path:
     """
     script = ROOT / "windows" / "build-portable.ps1"
     exe = "powershell" if os.name == "nt" else "powershell.exe"
+    version = version or source_zip.stem.removeprefix("Tracker-")
     subprocess.run([exe, "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", _win_path(script),
-                    "-SourceZip", _win_path(source_zip), "-OutDir", _win_path(out_dir)],
-                   check=True)
-    version = source_zip.stem.removeprefix("Tracker-")
+                    "-SourceZip", _win_path(source_zip), "-OutDir", _win_path(out_dir),
+                    "-Version", version], check=True)
     return out_dir / f"NewsTracker-portable-{version}.zip"

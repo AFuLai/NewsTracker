@@ -1565,6 +1565,16 @@ def pack(
                           "windows\\build-portable.ps1 -SourceZip <Tracker-x.y.zip>[/dim]")
 
 
+@app.command("portable")
+def portable_cmd(
+    release_dir: Path = typer.Option(PROJECT_ROOT / "release", "--release-dir"),
+) -> None:
+    """Portable Windows zip of the current commit (no release, no version bump)."""
+    from .pack import portable_from_head
+    p = portable_from_head(release_dir)
+    console.print(f"[green]Portable[/green] → {p}")
+
+
 @app.command()
 def rewrite_changelog(version: str) -> None:
     """Regenerate the section for an existing version (re-runs ollama)."""
