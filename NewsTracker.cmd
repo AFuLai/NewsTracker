@@ -1,7 +1,8 @@
 @echo off
 rem NewsTracker launcher (native Windows, no WSL).
 rem   NewsTracker.cmd             open the console (Chrome) for the last 3 days
-rem   NewsTracker.cmd daily ...   unattended update (used by Task Scheduler)
+rem   NewsTracker.cmd daily ...   one unattended update (what the periodic update runs)
+rem   NewsTracker.cmd scheduler   stay running and update per the console's schedule
 rem   NewsTracker.cmd <command>   any tracker command, e.g. export-data D:\data.zip
 setlocal
 set "HERE=%~dp0"

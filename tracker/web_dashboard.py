@@ -19,6 +19,7 @@ import os
 import threading
 import time
 from dataclasses import asdict
+from datetime import datetime
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 from pathlib import Path
@@ -185,7 +186,7 @@ _FB_LOGIN: dict = {"v": None}
 
 def _local_snapshot() -> dict | None:
     """Standalone-install settings for the 本機設定 card; None on the WSL layout.
-    The Task Scheduler read is cached for 10 s (the page polls every 800 ms)."""
+    Cached for 10 s (the page polls every 800 ms)."""
     from . import settings, PATHS
     if settings.home() is None:
         return None
@@ -197,7 +198,7 @@ def _local_snapshot() -> dict | None:
         "settings": settings.load(),
         "paths": {k: (str(PATHS[k]) if PATHS[k] is not None else "")
                   for k in ("home", "out", "db", "ui_html", "web_dir", "logs")},
-        "task": schedule.query(),
+        "task": schedule.scheduler().status(),
         "firebase_login": _FB_LOGIN["v"],
         "restart_needed": _LOCAL_CACHE.get("restart", False),
     }
@@ -230,20 +231,18 @@ def _local_control(action: str, cmd: dict) -> tuple[bool, str]:
         if moved:
             _LOCAL_CACHE["restart"] = True
         msg = "已儲存"
-        was = old["schedule"]
-        if (sch["enabled"] != bool(was["enabled"])) or \
-                (sch["enabled"] and (sch != was or not schedule.query().get("exists"))):
-            try:
-                msg += "；" + schedule.apply(sch)
-            except schedule.ScheduleError as exc:
-                return False, "已儲存，但排程設定失敗：" + str(exc)
+        if sch["enabled"]:
+            nxt = schedule.next_due(sch, datetime.now()).strftime("%m-%d %H:%M")
+            msg += f"；定期更新下次 {nxt}（程式開著時才會執行）"
+        elif old["schedule"].get("enabled"):
+            msg += "；已停用定期更新"
         if moved:
             msg += "；路徑變更在重新開啟控制台後生效"
         return True, msg
     if action == "schedule-run":
         from . import schedule
         try:
-            return True, schedule.run_now()
+            return True, schedule.scheduler().run_now()
         except schedule.ScheduleError as exc:
             return False, str(exc)
     if action == "firebase-login":
@@ -715,7 +714,7 @@ _HTML = r"""<!DOCTYPE html>
       </div>
       <div class="btnrow">
         <button id="lcSave" class="primary">儲存設定</button>
-        <button id="lcRunNow">立即執行一次排程</button>
+        <button id="lcRunNow">立即執行一次定期更新</button>
         <button data-open="home">開啟資料夾</button>
         <span id="lcMsg" style="margin-left:6px"></span>
       </div>
@@ -1096,9 +1095,11 @@ function syncLocal(st){
   $('sec-local').classList.toggle('hidden', !lc);
   if(!lc) return;
   const t = lc.task||{};
-  $('lcTask').textContent = t.exists
-    ? ('Windows 排程：下次 ' + (t.next_run||'—') + '　上次 ' + (t.last_run||'—') + (t.last_result!=null ? '（結果 '+t.last_result+'）' : ''))
-    : 'Windows 排程：未設定';
+  $('lcTask').textContent = (t.enabled
+    ? ('定期更新：下次 ' + (t.next_run||'—') + (t.running ? '　（執行中）' : ''))
+    : '定期更新：未啟用')
+    + (t.last_run ? '　上次 ' + t.last_run + (t.last_result ? '（' + t.last_result + '）' : '') : '')
+    + '　※ 由本程式執行，關閉控制台後就不會再跑';
   const fl = lc.firebase_login;
   if(fl!=null) $('lcFbState').textContent = !fl ? '尚未登入' : (fl.indexOf('unknown')===0 ? fl.replace(/^unknown: /,'') : '已登入：'+fl);
   if(LC_INIT) return; LC_INIT=true;

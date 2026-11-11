@@ -69,15 +69,56 @@ def test_save_refused_on_wsl_layout(monkeypatch):
         settings.save({"out_dir": "x"})
 
 
-def test_schedule_args_daily_and_hourly():
-    cmd = Path(r"C:\NT\NewsTracker.cmd")
-    a = schedule.create_args({"mode": "daily", "time": "07:30", "days": 3, "deploy": True}, cmd)
-    assert a == ["schtasks", "/Create", "/F", "/TN", r"NewsTracker\daily",
-                 "/TR", '"C:\\NT\\NewsTracker.cmd" daily --days 3 --deploy',
-                 "/ST", "07:30", "/SC", "DAILY"]
-    b = schedule.create_args({"mode": "hourly", "time": "00:15", "every_hours": 6, "days": 1}, cmd)
-    assert b[-4:] == ["/SC", "HOURLY", "/MO", "6"]
-    assert b[6].endswith("daily --days 1 --no-deploy")
+def test_schedule_next_due_daily_and_hourly():
+    from datetime import datetime as D
+    daily = {"mode": "daily", "time": "07:30"}
+    assert schedule.next_due(daily, D(2026, 11, 11, 6, 0)) == D(2026, 11, 11, 7, 30)
+    assert schedule.next_due(daily, D(2026, 11, 11, 7, 30)) == D(2026, 11, 12, 7, 30)
+    hourly = {"mode": "hourly", "time": "00:15", "every_hours": 6}
+    assert schedule.next_due(hourly, D(2026, 11, 11, 0, 10)) == D(2026, 11, 11, 0, 15)
+    assert schedule.next_due(hourly, D(2026, 11, 11, 13, 0)) == D(2026, 11, 11, 18, 15)
+    assert schedule.next_due(hourly, D(2026, 11, 11, 23, 0)) == D(2026, 11, 12, 0, 15)
+    odd = {"mode": "hourly", "time": "08:00", "every_hours": 5}  # 08,13,18,23,04 then 08
+    assert schedule.next_due(odd, D(2026, 11, 11, 23, 30)) == D(2026, 11, 12, 4, 0)
+    assert schedule.next_due(odd, D(2026, 11, 12, 4, 30)) == D(2026, 11, 12, 8, 0)
+
+
+def test_schedule_command():
+    c = schedule.command({"mode": "daily", "time": "07:30", "days": 3, "deploy": True})
+    assert c[1:] == ["-m", "tracker.cli", "daily", "--days", "3", "--deploy"]
+    c = schedule.command({"mode": "daily", "time": "07:30", "days": 1})
+    assert c[-1] == "--no-deploy"
+
+
+def test_scheduler_fires_once_per_slot(tmp_path, monkeypatch):
+    from datetime import datetime as D
+    import tracker
+    monkeypatch.setenv("NEWSTRACKER_HOME", str(tmp_path))
+    monkeypatch.setattr(tracker, "DEFAULT_DB", tmp_path / "db" / "a.sqlite")
+    monkeypatch.setattr(tracker, "LOGS_DIR", tmp_path / "logs")
+    settings.save({"schedule": {"enabled": True, "mode": "daily", "time": "07:30"}})
+    now = [D(2026, 11, 11, 7, 0)]
+    launched = []
+
+    class P:
+        returncode = 0
+        def poll(self):
+            return 0
+    def fake_popen(argv, **kw):
+        launched.append(argv)
+        return P()
+    s = schedule.Scheduler(popen=fake_popen, clock=lambda: now[0])
+    s.tick()                                    # arms for 07:30
+    assert s.status()["next_run"] == "2026-11-11 07:30" and not launched
+    now[0] = D(2026, 11, 11, 7, 31); s.tick()
+    assert len(launched) == 1
+    s.tick()                                    # same slot: no second run
+    assert len(launched) == 1
+    st = s.status()
+    assert st["last_result"] == "成功" and st["next_run"] == "2026-11-12 07:30"
+    settings.save({"schedule": {"enabled": False}})
+    now[0] = D(2026, 11, 12, 8, 0); s.tick()
+    assert len(launched) == 1 and s.status()["enabled"] is False
 
 
 @pytest.mark.parametrize("bad", [{"time": "7:30"}, {"time": "24:00"}, {"mode": "weekly"},

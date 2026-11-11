@@ -58,7 +58,7 @@ NewsTracker.cmd render-all
 - **網站輸出**：產生的靜態網站放在哪裡，可以設成網站根目錄或網路磁碟。
 - **頁面範本**：用自訂的 index.html 取代安裝目錄的 `ui\index.html`。
 - **Chrome**：指定 chrome.exe 的位置。空白時會自動尋找 Chrome，找不到再用 Edge。
-- **定期更新**：在 Windows 工作排程器建立 `NewsTracker\daily`。可以設每天固定時間或每 N 小時、每次更新最近幾天、完成後要不要發布。只在你登入時執行，不需要系統管理員權限。
+- **定期更新**：由程式自己執行，不使用 Windows 工作排程器。可以設每天固定時間或每 N 小時、每次更新最近幾天、完成後要不要發布；儲存後立即生效。控制台開著時就會依時間在背景更新（不必按「開始執行」），關掉控制台就停止；程式關閉期間錯過的時間不會補跑。不想開著控制台時，可改執行 `NewsTracker.cmd scheduler` 常駐（Ctrl+C 結束）。若有更新正在執行，該次排程會略過。每次的輸出在 `<home>\logs\schedule-*.log`。
 - **Firebase**：啟用發布、填專案 ID、「登入 Firebase」（會開一個視窗跑 `firebase login`，每台電腦只要做一次）、「檢查登入」。
 
 改了網站輸出或頁面範本的路徑後，要重新開啟控制台才會生效，接著再執行一次 `NewsTracker.cmd render-all`。
@@ -81,7 +81,8 @@ chrome\            程式用的 Chrome 設定檔
 
 ```bat
 NewsTracker.cmd                          開控制台（最近 3 天）
-NewsTracker.cmd daily --days 3 --deploy  無人值守更新，排程就是跑這個
+NewsTracker.cmd daily --days 3 --deploy  無人值守更新一次，定期更新就是跑這個
+NewsTracker.cmd scheduler                不開控制台，常駐依設定定期更新
 NewsTracker.cmd deploy                   只發布
 NewsTracker.cmd render-all               重新產生整個網站
 NewsTracker.cmd export-data <zip>        匯出

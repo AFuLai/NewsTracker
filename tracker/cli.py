@@ -721,6 +721,12 @@ def pipeline(
         cra_job = CraLibJob(db=db, out=out)
         reporter = WebReporter(controller, cra_job)
         httpd, used_port = _start_dashboard(reporter, port)
+        from . import settings as _settings
+        if _settings.home() is not None:
+            # Standalone install: periodic update runs inside this process for
+            # as long as the console is open (tracker/schedule.py).
+            from .schedule import scheduler as _scheduler
+            _scheduler().start()
         url = f"http://localhost:{used_port}"
         console.print(f"[bold cyan]互動控制台：[/bold cyan] [underline]{url}[/underline]")
         console.print("[dim]請在控制台確認參數後按「開始執行」；"
@@ -1198,6 +1204,37 @@ def daily(
            f"rebuilt {rebuilt}d | newest {newest or '-'} | err {len(errors)}")
     print(line)
     raise typer.Exit(0 if ok else 1)
+
+
+@app.command("scheduler")
+def scheduler_cmd() -> None:
+    """Headless periodic update: keep running and fire `daily` per settings.schedule.
+
+    For a standalone install that should update without the console open;
+    the console does the same thing in-process while it is open. Ctrl+C stops.
+    """
+    import time as _t
+    from . import settings as _settings
+    from .schedule import scheduler as _scheduler
+    if _settings.home() is None:
+        console.print("[red]只在獨立安裝版（NEWSTRACKER_HOME）提供[/red]")
+        raise typer.Exit(2)
+    s = _scheduler()
+    s.start()
+    console.print("[bold]定期更新常駐中[/bold]（依控制台「本機設定」的排程；Ctrl+C 結束）")
+    shown = None
+    try:
+        while True:
+            st = s.status()
+            line = (f"下次 {st['next_run'] or '—（未啟用）'}　上次 {st['last_run'] or '—'} "
+                    f"{st['last_result'] or ''}")
+            if line != shown:
+                console.print(f"[dim]{datetime.now():%H:%M}[/dim] {line}")
+                shown = line
+            _t.sleep(30)
+    except KeyboardInterrupt:
+        s.stop()
+        raise typer.Exit(0)
 
 
 @app.command("cross-scan")

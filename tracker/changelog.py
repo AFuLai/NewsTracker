@@ -38,6 +38,11 @@ def append_release(version: str) -> str:
     git_log = _git_log_since(_last_tag())
     if not git_log.strip():
         git_log = "(no commits since last tag)"
+    # pack/rewrite-changelog never go through preflight, so without this the
+    # LLM call falls back to localhost even when endpoints.json prefers a LAN
+    # host (and a small box cannot load the model locally).
+    from . import ollama_hosts
+    ollama_hosts.select()
     body_html = render_release_notes(version=version, git_log=git_log)
     today = date.today().isoformat()
     section = (
