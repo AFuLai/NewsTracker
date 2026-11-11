@@ -16,6 +16,18 @@
 <h1>Tracker ChangeLog</h1>
 <p class="meta">本檔由 <code>tracker pack</code> 自動維護；每次打包前由本地 ollama 生成版本重點並 prepend 於下方。</p>
 <!-- CHANGELOG_INSERTION_POINT -->
+<section class="release" id="v2.31">
+  <h2>v2.31 — 2026-11-11</h2>
+<ul>
+    <li><strong>核心架構變更：</strong> 移除了對外部 Task Scheduler 的依賴，現在的排程功能已內建於程式內部，提升了部署的簡便性。</li>
+    <li><strong>AI 模型支援：</strong> 強化了 Ollama 的端點選擇機制，現在打包的程式會自動選擇本地網路 (LAN) 的 Ollama 服務位址。 <span style="color: blue;">[特別標註：Ollama 模型]</span></li>
+    <li><strong>CLI 介面升級：</strong> 大幅擴充了 Command Line Interface (CLI) 的功能，提供更豐富的參數和操作指令，使用體驗更佳。</li>
+    <li><strong>排程邏輯優化：</strong> 針對排程模組進行了大量修補與功能新增，提升了任務執行流程的穩定性與可靠性。</li>
+    <li><strong>單體測試強化：</strong> 增加了大量獨立測試案例，提升了程式碼的健壯性，確保了單機模式 (standalone) 下的穩定運行。</li>
+    <li><strong>文件與部署更新：</strong> 更新了 Windows 平台的 README 文件，並優化了啟動腳本，使初次部署的流程更清晰。</li>
+</ul>
+</section>
+
 <section class="release" id="v2.30">
   <h2>v2.30 — 2026-11-11</h2>
 <ul>
