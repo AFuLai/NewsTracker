@@ -851,16 +851,12 @@ def _start_dashboard(reporter, port: int):
 
 
 def _open_windows_browser(url: str) -> None:
-    """Open the console URL: on native Windows in the program's own Chrome (debug
-    port on, so BROWSER sources can use it); from WSL in the Windows default
-    browser (best-effort)."""
+    """Open the console URL in the user's default browser. The debug-port Chrome
+    (tracker.chrome) is not used here: preflight starts it on demand when a
+    BROWSER source needs it; CDP is for development checks only."""
     import subprocess
     if os.name == "nt":
-        from .chrome import launch
-        try:
-            launch(url, wait_cdp=0)
-        except Exception:
-            os.startfile(url)
+        os.startfile(url)
         return
     for cmd in (["cmd.exe", "/c", "start", "", url], ["wslview", url],
                 ["xdg-open", url]):
