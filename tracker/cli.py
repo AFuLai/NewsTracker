@@ -692,6 +692,7 @@ def pipeline(
     # If any source for these trackers needs a JS-rendering browser, make sure a
     # debug Chrome is up (notify + retry/cancel), and pass its CDP base through.
     browser_base = None
+    _ensure_profiles(db)
     store_pre = Store(db)
     needs_browser = any(
         p["method"] == "BROWSER"
@@ -1113,6 +1114,7 @@ def daily(
     #    too, so this is a best-effort warm start, not a hard gate).
     console.print("[dim]checking ollama…[/dim]")
     ensure_ollama(console=console)
+    _ensure_profiles(db)
 
     # 2. Pipeline: translation deferred to step 3, summarize forced to ollama
     #    (the local, always-available backend — no debug-Chrome dependency).
@@ -1423,9 +1425,34 @@ def init_profiles(
     and unions trackers for shared domains. Existing profiles keep their
     HTTP cache / watermark / failure counters unless --rescan overwrites method.
     """
+    store = Store(db)
+    seeded, updated = _seed_profiles(store, rescan=rescan)
+    total = len(store.list_profiles())
+    console.print(f"[green]init-profiles[/green] seeded {seeded} new, "
+                  f"updated {updated}; {total} profiles total")
+    t = Table(title="Method distribution (source_profiles)")
+    t.add_column("Method"); t.add_column("Count", justify="right")
+    dist: dict[str, int] = {}
+    for p in store.list_profiles():
+        dist[p["method"]] = dist.get(p["method"], 0) + 1
+    for k, v in sorted(dist.items()):
+        t.add_row(k, str(v))
+    console.print(t)
+
+
+def _ensure_profiles(db: Path) -> None:
+    """A fresh database has no source profiles, and fetch reads only those —
+    a new install would update from 0 sources. Seed from searchinfo once."""
+    store = Store(db)
+    if store.list_profiles():
+        return
+    seeded, _ = _seed_profiles(store)
+    console.print(f"[dim]首次執行：已從 searchinfo 建立 {seeded} 個來源[/dim]")
+
+
+def _seed_profiles(store, *, rescan: bool = False) -> tuple[int, int]:
     from .methods import canonical
 
-    store = Store(db)
     seeded = updated = 0
     for tname in SEARCHINFOS:
         try:
@@ -1467,18 +1494,7 @@ def init_profiles(
                     entry=x["search_path"])
                 seeded += 0 if had else 1
                 updated += 1 if had else 0
-
-    total = len(store.list_profiles())
-    console.print(f"[green]init-profiles[/green] seeded {seeded} new, "
-                  f"updated {updated}; {total} profiles total")
-    t = Table(title="Method distribution (source_profiles)")
-    t.add_column("Method"); t.add_column("Count", justify="right")
-    dist: dict[str, int] = {}
-    for p in store.list_profiles():
-        dist[p["method"]] = dist.get(p["method"], 0) + 1
-    for k, v in sorted(dist.items()):
-        t.add_row(k, str(v))
-    console.print(t)
+    return seeded, updated
 
 
 @app.command()
