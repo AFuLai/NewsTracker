@@ -1545,16 +1545,21 @@ def export_data(
 def import_data(
     src: Path = typer.Argument(..., help="export-data 產生的 zip"),
     force: bool = typer.Option(False, "--force", help="取代既有資料庫（舊檔保留為 .bak-時間）"),
+    merge: bool = typer.Option(False, "--merge", help="更新：保留本機資料，只加入本機沒有的文章並補齊空白欄位"),
 ) -> None:
-    """匯入 export-data 的 zip 到本機資料夾（Windows 原生版）。"""
+    """匯入 export-data 的 zip 到本機資料夾（Windows 原生版）。之後用 render-all 重新產生網站。"""
     from .migrate_data import import_
     try:
-        info = import_(src, force=force)
+        info = import_(src, force=force, mode="merge" if merge else "replace")
     except (FileExistsError, ValueError, RuntimeError) as exc:
         console.print(f"[red]{exc}[/red]")
         raise typer.Exit(1)
-    console.print(f"[green]已匯入[/green] {info['articles']} 篇文章（{', '.join(info['files'])}）。"
-                  "輸出路徑等本機設定已重設為預設值，排程需在控制台重新啟用。")
+    if merge:
+        console.print(f"[green]已更新[/green] 新增 {info['added']} 篇、補齊 {info['updated']} 篇，"
+                      f"本機共 {info['articles']} 篇。")
+    else:
+        console.print(f"[green]已匯入[/green] {info['articles']} 篇文章（{', '.join(info['files'])}）。"
+                      "輸出路徑等本機設定已重設為預設值，排程需在控制台重新啟用。")
 
 
 @app.command("render-all")

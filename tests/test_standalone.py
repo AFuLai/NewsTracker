@@ -240,3 +240,60 @@ def test_firebase_install_downloads_atomically(tmp_path, monkeypatch):
     out = deploy.install_standalone(lambda d, t: seen.append((d, t)))
     assert out.read_bytes() == body and seen[-1] == (len(body), len(body))
     assert not out.with_suffix('.part').exists()
+
+
+def _store_with(path: Path, rows):
+    from tracker.dedup import Store
+    st = Store(path)
+    for url, summary, status in rows:
+        st.upsert_candidate(url=url, source='s', title=url)
+        if summary is not None:
+            st.conn.execute('UPDATE articles SET summary=?, status=? WHERE url=?',
+                            (summary, status, url))
+    st.conn.commit()
+    return st
+
+
+def test_import_merge_adds_and_fills(tmp_path, monkeypatch):
+    from tracker import migrate_data
+    monkeypatch.setenv('NEWSTRACKER_HOME', str(tmp_path / 'a'))
+    pa = settings.resolve()
+    monkeypatch.setattr(migrate_data, 'PATHS', pa)
+    _store_with(pa['db'], [('https://x/1', 'sum1', 'summarized'),
+                           ('https://x/2', 'sum2', 'summarized'),
+                           ('https://x/3', 'old', 'summarized')])
+    z = tmp_path / 'e.zip'
+    migrate_data.export(z)
+    monkeypatch.setenv('NEWSTRACKER_HOME', str(tmp_path / 'b'))
+    pb = settings.resolve()
+    monkeypatch.setattr(migrate_data, 'PATHS', pb)
+    _store_with(pb['db'], [('https://x/2', None, None),            # pending here
+                           ('https://x/3', 'mine', 'summarized'),  # keeps local text
+                           ('https://x/9', 'local', 'summarized')])
+    settings.save({'out_dir': 'D:/keep'})
+    info = migrate_data.import_(z, mode='merge')
+    assert (info['added'], info['updated'], info['articles']) == (1, 1, 4)
+    c = sqlite3.connect(pb['db'])
+    got = dict(c.execute('SELECT url, summary || "/" || status FROM articles'))
+    assert got == {'https://x/1': 'sum1/summarized', 'https://x/2': 'sum2/summarized',
+                   'https://x/3': 'mine/summarized', 'https://x/9': 'local/summarized'}
+    assert settings.load()['out_dir'] == 'D:/keep'      # merge leaves settings alone
+    assert not list(pb['db'].parent.glob('*.bak-*'))
+
+
+def test_import_replace_with_db_open(tmp_path, monkeypatch):
+    from tracker import migrate_data
+    monkeypatch.setenv('NEWSTRACKER_HOME', str(tmp_path / 'a'))
+    pa = settings.resolve()
+    monkeypatch.setattr(migrate_data, 'PATHS', pa)
+    _store_with(pa['db'], [('https://x/1', 's', 'summarized')])
+    z = tmp_path / 'e.zip'
+    migrate_data.export(z)
+    monkeypatch.setenv('NEWSTRACKER_HOME', str(tmp_path / 'b'))
+    pb = settings.resolve()
+    monkeypatch.setattr(migrate_data, 'PATHS', pb)
+    held = _store_with(pb['db'], [('https://x/7', 'a', 'summarized'), ('https://x/8', 'b', 'summarized')])
+    migrate_data.import_(z, mode='replace', force=True)   # console still holds the DB
+    assert [tuple(r) for r in held.conn.execute('SELECT url FROM articles')] == [('https://x/1',)]
+    bak = next(pb['db'].parent.glob('articles.sqlite.bak-*'))
+    assert sqlite3.connect(bak).execute('SELECT COUNT(*) FROM articles').fetchone()[0] == 2

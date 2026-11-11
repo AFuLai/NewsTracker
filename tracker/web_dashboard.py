@@ -39,6 +39,64 @@ _DEPLOY: dict = {"state": "idle", "channel": "", "message": "",
                  "started_at": 0.0, "finished_at": 0.0}
 
 
+# ── data export / import (standalone console) ──────────────────────────────
+# Import runs off the request thread: a merge plus the site re-render that
+# follows takes a while on a 100 MB DB. The page polls _DATA through /state.
+_DATA: dict = {"state": "idle", "message": ""}
+_DATA_LOCK = threading.Lock()
+
+
+def _busy_reason(reporter) -> str:
+    """Why the DB must not be swapped right now, or ''."""
+    from . import schedule
+    if reporter is not None and reporter.current and not reporter.finished \
+            and reporter.controller is not None and reporter.controller.started():
+        return "更新正在執行，請等它結束再匯入"
+    if schedule.scheduler().status().get("running"):
+        return "定期更新正在執行，請等它結束再匯入"
+    if reporter is not None and reporter.cra_job is not None and reporter.cra_job.running():
+        return "CRA 圖書庫更新中，請等它結束再匯入"
+    return ""
+
+
+def _import_worker(path: Path, mode: str) -> None:
+    from . import PATHS
+    from .migrate_data import import_
+    try:
+        info = import_(path, mode=mode, force=True)
+        with _DATA_LOCK:
+            _DATA.update(message="匯入完成，正在重新產生網站…")
+        from .dedup import Store
+        from .orchestrator import rebuild_days
+        from .render import sync_index_html
+        out = Path(PATHS["out"])
+        days = rebuild_days(Store(Path(PATHS["db"])), out, dates=None)
+        sync_index_html(out)
+        if mode == "merge":
+            msg = (f"已更新：新增 {info['added']} 篇、補齊 {info['updated']} 篇，"
+                   f"共 {info['articles']} 篇；網站已重新產生 {days} 天")
+        else:
+            msg = (f"已覆蓋：{info['articles']} 篇（舊資料庫保留為 .bak 檔）；網站已重新產生 "
+                   f"{days} 天。輸出路徑已重設為預設，定期更新需重新啟用，請重新開啟控制台")
+            _LOCAL_CACHE["restart"] = True
+        state = "ok"
+    except Exception as exc:  # reported on the page, never swallowed
+        state, msg = "failed", f"匯入失敗：{exc}"
+    finally:
+        try:
+            path.unlink(missing_ok=True)
+        except OSError:
+            pass
+    with _DATA_LOCK:
+        _DATA.update(state=state, message=msg)
+    _LOCAL_CACHE["v"] = None
+
+
+def _data_snapshot() -> dict:
+    with _DATA_LOCK:
+        return dict(_DATA)
+
+
 _FB_INSTALL: dict = {"state": "idle", "done": 0, "total": 0, "message": ""}
 
 
@@ -218,7 +276,7 @@ def _local_snapshot() -> dict | None:
     now = time.time()
     if _LOCAL_CACHE["v"] is not None and now - _LOCAL_CACHE["t"] < 10:
         # The download progress must move every poll, not every 10 s.
-        return dict(_LOCAL_CACHE["v"], firebase_tool=_fb_tool())
+        return dict(_LOCAL_CACHE["v"], firebase_tool=_fb_tool(), data=_data_snapshot())
     from . import schedule
     v = {
         "settings": settings.load(),
@@ -227,6 +285,7 @@ def _local_snapshot() -> dict | None:
         "task": schedule.scheduler().status(),
         "firebase_login": _FB_LOGIN["v"],
         "firebase_tool": _fb_tool(),
+        "data": _data_snapshot(),
         "restart_needed": _LOCAL_CACHE.get("restart", False),
     }
     _LOCAL_CACHE.update(t=now, v=v)
@@ -415,8 +474,85 @@ def serve(reporter: WebReporter, *, port: int = DEFAULT_PORT) -> ThreadingHTTPSe
             self.end_headers()
             self.wfile.write(data)
 
+        def _json(self, ok: bool, msg: str) -> None:
+            body = json.dumps({"ok": ok, "msg": msg}, ensure_ascii=False).encode("utf-8")
+            self.send_response(200 if ok else 400)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+
+        def _export_data(self):
+            """GET /export-data: the export zip as a browser download."""
+            import tempfile
+            from . import settings
+            from .migrate_data import export
+            if settings.home() is None:
+                return self._json(False, "只在 Windows 原生版提供")
+            name = f"newstracker-data-{datetime.now():%Y%m%d-%H%M}.zip"
+            with tempfile.TemporaryDirectory() as td:
+                dest = Path(td) / name
+                try:
+                    export(dest)
+                except Exception as exc:
+                    return self._json(False, f"匯出失敗：{exc}")
+                self.send_response(200)
+                self.send_header("Content-Type", "application/zip")
+                self.send_header("Content-Length", str(dest.stat().st_size))
+                self.send_header("Content-Disposition", f'attachment; filename="{name}"')
+                self.send_header("Cache-Control", "no-store")
+                self.end_headers()
+                with open(dest, "rb") as fh:
+                    while chunk := fh.read(1 << 20):
+                        self.wfile.write(chunk)
+
+        def _import_data(self):
+            """POST /import-data?mode=merge|replace, body = the export zip."""
+            import tempfile
+            from urllib.parse import parse_qs
+            from . import settings
+            if settings.home() is None:
+                return self._json(False, "只在 Windows 原生版提供")
+            mode = (parse_qs(urlsplit(self.path).query).get("mode") or [""])[0]
+            if mode not in ("merge", "replace"):
+                return self._json(False, "匯入方式不正確")
+            n = int(self.headers.get("Content-Length", 0))
+            if n <= 0:
+                return self._json(False, "沒有收到檔案")
+            busy = _busy_reason(reporter)
+            if busy:
+                return self._json(False, busy)
+            with _DATA_LOCK:
+                if _DATA["state"] == "running":
+                    return self._json(False, "已有匯入作業進行中")
+                _DATA.update(state="running", message="接收檔案中…")
+            fd, tmp = tempfile.mkstemp(suffix=".zip", prefix="nt-import-")
+            try:
+                with os.fdopen(fd, "wb") as fh:
+                    left = n
+                    while left > 0:
+                        chunk = self.rfile.read(min(left, 1 << 20))
+                        if not chunk:
+                            break
+                        fh.write(chunk)
+                        left -= len(chunk)
+                if left:
+                    raise OSError("上傳中斷")
+                with _DATA_LOCK:
+                    _DATA.update(message="匯入中…")
+                threading.Thread(target=_import_worker, args=(Path(tmp), mode),
+                                 daemon=True, name="data-import").start()
+            except Exception as exc:
+                Path(tmp).unlink(missing_ok=True)
+                with _DATA_LOCK:
+                    _DATA.update(state="failed", message=f"匯入失敗：{exc}")
+                return self._json(False, f"匯入失敗：{exc}")
+            return self._json(True, "已收到檔案，匯入中…")
+
         def do_GET(self):
-            if self.path == "/site" or self.path.startswith("/site/"):
+            if self.path.startswith("/export-data"):
+                self._export_data()
+            elif self.path == "/site" or self.path.startswith("/site/"):
                 self._serve_site()
             elif self.path.startswith("/state"):
                 body = json.dumps(reporter.snapshot(), ensure_ascii=False).encode("utf-8")
@@ -433,6 +569,8 @@ def serve(reporter: WebReporter, *, port: int = DEFAULT_PORT) -> ThreadingHTTPSe
                 self.wfile.write(body)
 
         def do_POST(self):
+            if self.path.startswith("/import-data"):
+                return self._import_data()
             ok, msg = False, ""
             if self.path.startswith("/control"):
                 try:
@@ -512,7 +650,11 @@ _HTML = r"""<!DOCTYPE html>
   button, select, input { font:inherit; font-size:13px; color:var(--txt); background:var(--soft);
           border:1px solid var(--line); border-radius:6px; padding:4px 10px; min-width:0; max-width:100%; }
   button { cursor:pointer; font-weight:600; }
-  button:hover:not(:disabled), select:hover { border-color:var(--accent); }
+  .hidden { display:none !important; }
+  a.btn { display:inline-block; font-size:13px; font-weight:600; color:var(--txt); background:var(--soft);
+          border:1px solid var(--line); border-radius:6px; padding:4px 10px; text-decoration:none; }
+  a.btn:hover { border-color:var(--accent); }
+  button:hover:not(:disabled), select:hover, a.btn:hover { border-color:var(--accent); }
   button:disabled { opacity:.45; cursor:default; }
   button.primary, #btnStart { background:var(--accent); color:var(--accent-ink);
           border-color:transparent; }
@@ -795,6 +937,17 @@ _HTML = r"""<!DOCTYPE html>
         <label>資料夾</label>
         <span class="hint path" id="lcHome"></span>
         <button data-open="home">開啟</button>
+      </div>
+      <div class="cfgrow">
+        <label>新聞資料</label>
+        <a class="btn" id="lcExport" href="/export-data" download title="資料庫＋LLM 端點＋設定打包成一個 zip，拿到另一台電腦匯入">匯出</a>
+        <select id="lcImpMode" title="更新：保留本機資料，只加入沒有的文章並補齊空白欄位&#10;覆蓋：整個換成匯入的資料（舊資料庫保留為 .bak 檔）">
+          <option value="merge">更新（合併）</option>
+          <option value="replace">覆蓋</option>
+        </select>
+        <button id="lcImport">匯入…</button>
+        <input type="file" id="lcImpFile" accept=".zip" class="hidden">
+        <span id="lcDataState" class="status"></span>
       </div>
       <details class="adv">
         <summary>進階</summary>
@@ -1191,6 +1344,12 @@ function syncLocal(st){
     : '安裝工具';
   if(ft.state==='failed') $('fbMsg').textContent = ft.message;
   else if(ft.state==='ok' && !FB_OK_SHOWN){ FB_OK_SHOWN=true; $('fbMsg').textContent = '工具已安裝，請按「登入」'; }
+  const dt = lc.data || {};
+  $('lcImport').disabled = $('lcImpMode').disabled = dt.state==='running';
+  if(dt.state && dt.state!=='idle'){
+    $('lcDataState').textContent = dt.message || '';
+    $('lcDataState').style.color = dt.state==='failed' ? 'var(--red)' : (dt.state==='ok' ? 'var(--green)' : '');
+  }
   if(fl!=null) $('lcFbState').textContent = !fl ? '尚未登入' : (fl.indexOf('unknown')===0 ? fl.replace(/^unknown: /,'') : '已登入 '+fl);
   if(LC_INIT) return; LC_INIT=true;
   const s = lc.settings, p = lc.paths;
@@ -1240,6 +1399,24 @@ autoSave('#sec-sched', $('schMsg'));
 autoSave('#fbBox', $('fbMsg'));
 autoSave('#sec-paths', $('pathMsg'));
 $('lcRunNow').onclick = ()=> ctlMsg({cmd:'schedule-run'}, $('schMsg'));
+$('lcExport').onclick = ()=>{ $('lcDataState').style.color=''; $('lcDataState').textContent = '匯出中，完成後瀏覽器會下載 zip…'; };
+$('lcImport').onclick = ()=> $('lcImpFile').click();
+$('lcImpFile').onchange = async ()=>{
+  const f = $('lcImpFile').files[0]; $('lcImpFile').value = '';
+  if(!f) return;
+  const mode = $('lcImpMode').value;
+  const what = mode==='merge'
+    ? '更新：保留本機資料，只加入本機沒有的文章並補齊空白欄位。'
+    : '覆蓋：本機資料庫整個換成匯入的資料（舊檔保留為 .bak），輸出路徑重設、定期更新停用。';
+  if(!confirm('匯入 ' + f.name + '\n\n' + what + '\n\n確定？')) return;
+  const el = $('lcDataState'); el.style.color=''; el.textContent = '上傳中…';
+  try{
+    const r = await fetch('/import-data?mode=' + mode, {method:'POST', body:f});
+    const j = await r.json();
+    el.textContent = j.msg || ''; el.style.color = j.ok ? '' : 'var(--red)';
+  }catch(e){ el.textContent = String(e); el.style.color = 'var(--red)'; }
+  poll();
+};
 $('lcFbInstall').onclick = ()=> ctlMsg({cmd:'firebase-install'}, $('fbMsg'));
 $('lcFbLogin').onclick = ()=> ctlMsg({cmd:'firebase-login'}, $('fbMsg'));
 $('lcFbCheck').onclick = ()=> { $('lcFbState').textContent='檢查中…'; ctlMsg({cmd:'firebase-status'}, $('lcFbState')); };
