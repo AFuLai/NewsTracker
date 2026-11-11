@@ -1,0 +1,1 @@
+{"schema": "warroom/1", "project": "NewsTracker", "cmd": ["python3", "/opt/tracker/repo/ops/warroom.py"], "timeout_s": 120}
