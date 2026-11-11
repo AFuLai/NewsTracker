@@ -121,7 +121,7 @@ def test_cralib_command_starts_job_and_state_shows_it():
         assert job.start() is False                            # already running
         gate.set()
         html = urllib.request.urlopen(base + "/", timeout=3).read().decode()
-        assert "更新 CRA 庫" in html and "cralib" in html
+        assert "CRA 參考圖書庫" in html and "cralib" in html
     finally:
         gate.set()
         httpd.shutdown()

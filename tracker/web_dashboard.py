@@ -541,6 +541,24 @@ _HTML = r"""<!DOCTYPE html>
   .depmeta .v { min-width:0; overflow-wrap:anywhere; }
   .depmeta a { color:var(--accent); }
   .btnrow { display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
+  .lc-only.hidden { display:none; }
+  .card > h2 { display:flex; align-items:baseline; gap:10px; }
+  .h2msg { font-weight:400; letter-spacing:0; font-size:12px; color:var(--dim); }
+  .h2msg.ok { color:var(--green); } .h2msg.err { color:var(--red); }
+  .hint, .status { color:var(--dim); font-size:12px; }
+  .card input[type=checkbox] { width:auto; min-width:0; }
+  .card .chk { color:var(--txt); display:inline-flex; align-items:center; gap:5px; }
+  .switch { font-weight:600; }
+  .cfgrow.sub { border-top:1px solid var(--line); padding-top:10px; margin:4px 0 0; }
+  .path { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; direction:rtl; text-align:left; }
+  .quick { display:inline-flex; gap:4px; margin-left:6px; }
+  .quick button { padding:2px 8px; font-size:12px; }
+  details.adv { margin:2px 0 6px; }
+  details.adv > summary { cursor:pointer; color:var(--dim); font-size:12px; margin-bottom:8px;
+                          list-style:none; user-select:none; }
+  details.adv > summary::before { content:'▸ '; }
+  details.adv[open] > summary::before { content:'▾ '; }
+  details.adv > summary::-webkit-details-marker { display:none; }
   .cra.hidden { display:none; }
   .crahead { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
   .crahead b { font-weight:600; }
@@ -619,36 +637,77 @@ _HTML = r"""<!DOCTYPE html>
 <div class="wrap">
   <div class="col">
     <section class="card" id="sec-run">
-      <h2>執行</h2>
+      <h2>立即更新</h2>
       <div class="config hidden" id="config">
         <div class="cfgrow">
           <label>日期</label>
           <input id="cfgSince" type="date"> <span style="color:var(--dim)">→</span> <input id="cfgUntil" type="date">
+          <span class="quick"><button data-days="1">今天</button><button data-days="3">近 3 天</button><button data-days="7">近 7 天</button></span>
         </div>
         <div class="cfgrow"><label>追蹤</label><span id="cfgTrackers"></span></div>
-        <div class="cfgrow">
-          <label>LLM</label>
-          <span class="chk">Summarize <select id="cfgSum"><option value="ollama">Ollama</option><option value="gemini">Gemini</option></select></span>
-          <span class="chk">Translate <select id="cfgTra"><option value="ollama">Ollama</option><option value="gemini">Gemini</option></select></span>
+        <details class="adv">
+          <summary>進階選項</summary>
+          <div class="cfgrow">
+            <label>LLM</label>
+            <span class="chk">摘要 <select id="cfgSum"><option value="ollama">Ollama</option><option value="gemini">Gemini</option></select></span>
+            <span class="chk">翻譯 <select id="cfgTra"><option value="ollama">Ollama</option><option value="gemini">Gemini</option></select></span>
+          </div>
+          <div class="cfgrow">
+            <label>步驟</label>
+            <label class="chk"><input type="checkbox" id="cfgGate"> 相關性過濾</label>
+            <label class="chk"><input type="checkbox" id="cfgTranslate"> 英文翻譯</label>
+            <label class="chk"><input type="checkbox" id="cfgCleanup"> 跨追蹤清理</label>
+            <label class="chk">摘要上限 <input id="cfgLimit" type="number" min="1" style="width:84px"></label>
+          </div>
+        </details>
+        <div class="btnrow" style="margin-top:10px">
+          <button id="btnStart" class="primary">▶ 開始更新</button>
+          <span id="cfgErr" style="color:var(--red)"></span>
         </div>
-        <div class="cfgrow">
-          <label>選項</label>
-          <label class="chk"><input type="checkbox" id="cfgGate"> Gate 過濾</label>
-          <label class="chk"><input type="checkbox" id="cfgTranslate"> 翻譯</label>
-          <label class="chk"><input type="checkbox" id="cfgCleanup"> Cleanup</label>
-          <label class="chk">摘要上限 <input id="cfgLimit" type="number" min="1" style="width:84px"></label>
-        </div>
-        <button id="btnStart">▶ 開始執行</button>
-        <span id="cfgErr" style="color:var(--red); margin-left:10px;"></span>
       </div>
       <div id="phases" style="margin-top:10px"></div>
       <div class="note" id="note"></div>
       <div id="summary"></div>
     </section>
+    <section class="card lc-only hidden" id="sec-sched">
+      <h2>定期更新 <span class="h2msg" id="schMsg"></span></h2>
+      <div class="cfgrow lead">
+        <label class="chk switch"><input type="checkbox" id="lcSchOn"> 啟用</label>
+        <span id="lcTask" class="status"></span>
+      </div>
+      <div class="cfgrow">
+        <label>頻率</label>
+        <select id="lcSchMode"><option value="daily">每天</option><option value="hourly">每 N 小時</option></select>
+        <span class="chk"><span id="lcTimeLbl">時間</span> <input id="lcSchTime" placeholder="07:30" style="width:64px"></span>
+        <span class="chk" id="lcEveryWrap">每 <input id="lcSchEvery" type="number" min="1" max="23" style="width:56px"> 小時</span>
+      </div>
+      <div class="cfgrow">
+        <label>內容</label>
+        <span class="chk">最近 <input id="lcSchDays" type="number" min="1" max="30" style="width:56px"> 天新聞</span>
+        <label class="chk"><input type="checkbox" id="lcSchCra"> CRA 參考圖書庫</label>
+        <label class="chk"><input type="checkbox" id="lcSchDeploy"> 完成後發布</label>
+      </div>
+      <div class="btnrow">
+        <button id="lcRunNow">立即跑一次</button>
+        <span class="hint">由本程式在背景執行；關閉控制台即停止。修改後自動儲存。</span>
+      </div>
+    </section>
+    <section class="card cra hidden" id="cra">
+        <h2>CRA 參考圖書庫</h2>
+        <div class="crahead">
+          <button id="btnCra">↻ 立即更新</button>
+          <span class="crastat" id="craStat"></span>
+        </div>
+        <div class="craprog hidden" id="craProg">
+          <div class="bar"><i id="craBar"></i></div>
+          <span class="count" id="craCount"></span>
+        </div>
+      <div class="cralist" id="craList"></div>
+    </section>
   </div>
   <div class="col">
     <section class="card" id="sec-publish">
-      <h2>發布</h2>
+      <h2>發布 <span class="h2msg" id="fbMsg"></span></h2>
       <div class="depstate idle" id="depState">閒置</div>
       <div class="depmeta">
         <span class="k">頻道</span><span class="v" id="depChan">—</span>
@@ -659,77 +718,60 @@ _HTML = r"""<!DOCTYPE html>
         <button id="btnPreview">預覽頻道發布</button>
         <button id="btnLive" class="primary">正式發布</button>
       </div>
-      <div id="depErr" style="color:var(--red); margin-top:8px; min-height:1.2em;"></div>
+      <div id="depErr" style="color:var(--red); margin-top:6px; min-height:1.2em;"></div>
+      <div class="cfgrow lc-only hidden sub" id="fbBox">
+        <label class="chk"><input type="checkbox" id="lcFbOn"> 啟用 Firebase</label>
+        <span class="chk">專案 <input id="lcFbProj" style="width:130px"></span>
+        <button id="lcFbLogin">登入</button>
+        <button id="lcFbCheck">檢查</button>
+        <span id="lcFbState" class="status"></span>
+      </div>
     </section>
     <section class="card" id="sec-llm">
-      <h2>LLM 端點</h2>
+      <h2>LLM 主機 <span class="h2msg" id="cfgEndMsg"></span></h2>
       <div class="cfgrow">
-        <label>模型端點</label>
-        <select id="cfgEnd" style="min-width:180px"></select>
-        <input id="cfgEndNew" placeholder="http://主機:11434" style="width:168px">
-        <button id="btnEndAdd" title="加入清單">＋</button>
-        <button id="btnEndDel" title="移除下拉選單目前選取的端點">✕</button>
-        <span id="cfgEndMsg" style="color:var(--dim); margin-left:8px;"></span>
+        <label>使用</label>
+        <select id="cfgEnd" style="min-width:220px"></select>
       </div>
       <div class="cfgrow">
-        <label>遠端政策</label>
-        <span class="chk">時段窗 <input id="cfgWin" placeholder="18:00-08:00（空=不限）" style="width:170px"></span>
-        <span class="chk">並發 <input id="cfgConc" type="number" min="1" style="width:70px"></span>
+        <label>遠端</label>
+        <span class="chk">並發 <input id="cfgConc" type="number" min="1" style="width:64px"></span>
+        <span class="chk">時段 <input id="cfgWin" placeholder="不限（例 18:00-08:00）" style="width:170px"></span>
         <button id="btnPolicy">套用</button>
-        <span id="cfgPolMsg" style="color:var(--dim); margin-left:8px;"></span>
+        <span id="cfgPolMsg" class="status"></span>
       </div>
+      <details class="adv">
+        <summary>管理主機清單</summary>
+        <div class="cfgrow">
+          <input id="cfgEndNew" placeholder="http://主機:11434" style="width:200px">
+          <button id="btnEndAdd">加入</button>
+          <button id="btnEndDel">移除目前選取的主機</button>
+        </div>
+      </details>
     </section>
-    <section class="card hidden" id="sec-local">
-      <h2>本機設定</h2>
+    <section class="card lc-only hidden" id="sec-paths">
+      <h2>資料與路徑 <span class="h2msg" id="pathMsg"></span></h2>
       <div class="cfgrow">
         <label>網站輸出</label>
-        <input id="lcOut" style="flex:1; min-width:260px" placeholder="html 輸出資料夾（空白＝預設）">
+        <input id="lcOut" style="flex:1; min-width:200px">
         <button data-open="out">開啟</button>
       </div>
       <div class="cfgrow">
-        <label>頁面範本</label>
-        <input id="lcUi" style="flex:1; min-width:260px" placeholder="index.html 來源（空白＝安裝目錄的 ui/index.html）">
+        <label>資料夾</label>
+        <span class="hint path" id="lcHome"></span>
+        <button data-open="home">開啟</button>
       </div>
-      <div class="cfgrow">
-        <label>Chrome</label>
-        <input id="lcChrome" style="flex:1; min-width:260px" placeholder="chrome.exe 路徑（空白＝自動尋找）">
-      </div>
-      <div class="cfgrow">
-        <label>定期更新</label>
-        <span class="chk"><input type="checkbox" id="lcSchOn"> 啟用</span>
-        <select id="lcSchMode"><option value="daily">每天</option><option value="hourly">每 N 小時</option></select>
-        <span class="chk">時間 <input id="lcSchTime" placeholder="07:30" style="width:64px"></span>
-        <span class="chk" id="lcEveryWrap">N <input id="lcSchEvery" type="number" min="1" max="23" style="width:56px"></span>
-        <span class="chk">更新最近 <input id="lcSchDays" type="number" min="1" max="30" style="width:56px"> 天</span>
-        <span class="chk"><input type="checkbox" id="lcSchDeploy"> 完成後發布</span>
-      </div>
-      <div class="cfgrow"><label></label><span id="lcTask" style="color:var(--dim)"></span></div>
-      <div class="cfgrow">
-        <label>Firebase</label>
-        <span class="chk"><input type="checkbox" id="lcFbOn"> 啟用發布</span>
-        <span class="chk">專案 ID <input id="lcFbProj" style="width:150px"></span>
-        <button id="lcFbLogin">登入 Firebase</button>
-        <button id="lcFbCheck">檢查登入</button>
-        <span id="lcFbState" style="color:var(--dim)"></span>
-      </div>
-      <div class="btnrow">
-        <button id="lcSave" class="primary">儲存設定</button>
-        <button id="lcRunNow">立即執行一次定期更新</button>
-        <button data-open="home">開啟資料夾</button>
-        <span id="lcMsg" style="margin-left:6px"></span>
-      </div>
-    </section>
-    <section class="card cra hidden" id="cra">
-        <div class="crahead">
-          <b>📚 CRA 參考圖書庫</b>
-          <button id="btnCra">↻ 更新 CRA 庫</button>
-          <span class="crastat" id="craStat"></span>
+      <details class="adv">
+        <summary>進階</summary>
+        <div class="cfgrow">
+          <label>頁面範本</label>
+          <input id="lcUi" style="flex:1; min-width:200px">
         </div>
-        <div class="craprog hidden" id="craProg">
-          <div class="bar"><i id="craBar"></i></div>
-          <span class="count" id="craCount"></span>
+        <div class="cfgrow">
+          <label>Chrome</label>
+          <input id="lcChrome" style="flex:1; min-width:200px" placeholder="自動尋找">
         </div>
-      <div class="cralist" id="craList"></div>
+      </details>
     </section>
   </div>
   <section class="card drawer collapsed" id="sec-preview">
@@ -918,7 +960,7 @@ function syncCra(st){
   $('cra').classList.remove('hidden');
   const running = c.status==='running';
   $('btnCra').disabled = running || CRA_PENDING;
-  $('btnCra').textContent = running ? '⏳ 更新中…' : '↻ 更新 CRA 庫';
+  $('btnCra').textContent = running ? '⏳ 更新中…' : '↻ 立即更新';
   $('craProg').classList.toggle('hidden', !running);
   if(running){
     const pct = c.total? Math.round(100*c.done/c.total) : 0;
@@ -939,7 +981,9 @@ function syncCra(st){
       `未變 ${r.unchanged} · 消失 ${r.removed.length}`+
       (r.errors.length? ` · 錯誤 ${r.errors.length}`:'')+`　(${fmt(c.elapsed)})`;
   } else {
-    stat.textContent = '獨立於新聞流程；更新後會重寫 data/cra_library.js';
+    stat.textContent = LOCAL ? (($('lcSchCra').checked && $('lcSchOn').checked)
+        ? '已納入定期更新' : '未納入定期更新（可在「定期更新」勾選）')
+      : '獨立於新聞流程；更新後會重寫 data/cra_library.js';
   }
   const r = c.report;
   $('craList').innerHTML = !r ? '' :
@@ -1090,39 +1134,76 @@ function row(k,v){ return `<div class="k">${k}</div><div class="v">${esc(v)}</di
 function esc(x){ return String(x==null?'':x).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 // ── 本機設定 (standalone Windows install) ───────────────────────────────
 let LC_INIT=false;
+let LOCAL = false;
 function syncLocal(st){
   const lc = st.local;
-  $('sec-local').classList.toggle('hidden', !lc);
+  LOCAL = !!lc;
+  document.querySelectorAll('.lc-only').forEach(e=> e.classList.toggle('hidden', !lc));
   if(!lc) return;
   const t = lc.task||{};
   $('lcTask').textContent = (t.enabled
-    ? ('定期更新：下次 ' + (t.next_run||'—') + (t.running ? '　（執行中）' : ''))
-    : '定期更新：未啟用')
-    + (t.last_run ? '　上次 ' + t.last_run + (t.last_result ? '（' + t.last_result + '）' : '') : '')
-    + '　※ 由本程式執行，關閉控制台後就不會再跑';
+    ? ('下次 ' + (t.next_run||'—') + (t.running ? '　· 執行中…' : ''))
+    : '未啟用')
+    + (t.last_run ? '　· 上次 ' + t.last_run + (t.last_result ? '（' + t.last_result + '）' : '') : '');
   const fl = lc.firebase_login;
-  if(fl!=null) $('lcFbState').textContent = !fl ? '尚未登入' : (fl.indexOf('unknown')===0 ? fl.replace(/^unknown: /,'') : '已登入：'+fl);
+  if(fl!=null) $('lcFbState').textContent = !fl ? '尚未登入' : (fl.indexOf('unknown')===0 ? fl.replace(/^unknown: /,'') : '已登入 '+fl);
   if(LC_INIT) return; LC_INIT=true;
   const s = lc.settings, p = lc.paths;
   $('lcOut').value = s.out_dir || ''; $('lcOut').placeholder = p.out;
   $('lcUi').value = s.ui_html || ''; $('lcUi').placeholder = p.ui_html;
   $('lcChrome').value = s.chrome || '';
+  $('lcHome').textContent = p.home; $('lcHome').title = p.home;
   $('lcSchOn').checked = !!s.schedule.enabled; $('lcSchMode').value = s.schedule.mode;
   $('lcSchTime').value = s.schedule.time; $('lcSchEvery').value = s.schedule.every_hours;
   $('lcSchDays').value = s.schedule.days; $('lcSchDeploy').checked = !!s.schedule.deploy;
+  $('lcSchCra').checked = s.schedule.cra !== false;
   $('lcFbOn').checked = !!s.firebase.enabled; $('lcFbProj').value = s.firebase.project || '';
-  $('lcEveryWrap').style.display = s.schedule.mode==='hourly' ? '' : 'none';
+  schModeUi(); fbUi();
 }
-$('lcSchMode').onchange = e=> { $('lcEveryWrap').style.display = e.target.value==='hourly' ? '' : 'none'; };
-$('lcSave').onclick = ()=> ctlMsg({cmd:'local-save', settings:{
-  out_dir:$('lcOut').value.trim(), ui_html:$('lcUi').value.trim(), chrome:$('lcChrome').value.trim(),
-  schedule:{enabled:$('lcSchOn').checked, mode:$('lcSchMode').value, time:$('lcSchTime').value.trim(),
-            every_hours:+$('lcSchEvery').value, days:+$('lcSchDays').value, deploy:$('lcSchDeploy').checked},
-  firebase:{enabled:$('lcFbOn').checked, project:$('lcFbProj').value.trim()}}}, $('lcMsg'));
-$('lcRunNow').onclick = ()=> ctlMsg({cmd:'schedule-run'}, $('lcMsg'));
-$('lcFbLogin').onclick = ()=> ctlMsg({cmd:'firebase-login'}, $('lcFbState'));
+function fbUi(){
+  const on = $('lcFbOn').checked;
+  $('lcFbProj').disabled = $('lcFbLogin').disabled = $('lcFbCheck').disabled = !on;
+}
+function schModeUi(){
+  const hourly = $('lcSchMode').value==='hourly';
+  $('lcEveryWrap').style.display = hourly ? '' : 'none';
+  $('lcTimeLbl').textContent = hourly ? '起始' : '時間';
+  const off = !$('lcSchOn').checked;
+  document.querySelectorAll('#sec-sched .cfgrow:not(.lead) :is(input,select)').forEach(e=> e.disabled = off);
+}
+// Settings save themselves: every change in a card posts the whole form and
+// reports in that card's heading. No separate 儲存 button to forget.
+function lcSettings(){
+  return { out_dir:$('lcOut').value.trim(), ui_html:$('lcUi').value.trim(), chrome:$('lcChrome').value.trim(),
+    schedule:{enabled:$('lcSchOn').checked, mode:$('lcSchMode').value, time:$('lcSchTime').value.trim(),
+              every_hours:+$('lcSchEvery').value, days:+$('lcSchDays').value,
+              deploy:$('lcSchDeploy').checked, cra:$('lcSchCra').checked},
+    firebase:{enabled:$('lcFbOn').checked, project:$('lcFbProj').value.trim()} };
+}
+function autoSave(scope, msgEl){
+  document.querySelectorAll(scope+' :is(input,select)').forEach(e=>
+    e.addEventListener('change', ()=>{
+      if(scope==='#sec-sched') schModeUi();
+      if(scope==='#fbBox') fbUi();
+      ctlMsg({cmd:'local-save', settings:lcSettings()}, msgEl).then(j=>{
+        // The server's message leads with the schedule; only that card needs it.
+        if(j && j.ok && scope==='#fbBox') msgEl.textContent = '已儲存';
+      });
+    }));
+}
+autoSave('#sec-sched', $('schMsg'));
+autoSave('#fbBox', $('fbMsg'));
+autoSave('#sec-paths', $('pathMsg'));
+$('lcRunNow').onclick = ()=> ctlMsg({cmd:'schedule-run'}, $('schMsg'));
+$('lcFbLogin').onclick = ()=> ctlMsg({cmd:'firebase-login'}, $('fbMsg'));
 $('lcFbCheck').onclick = ()=> { $('lcFbState').textContent='檢查中…'; ctlMsg({cmd:'firebase-status'}, $('lcFbState')); };
-document.querySelectorAll('#sec-local [data-open]').forEach(b=> b.onclick = ()=> ctlMsg({cmd:'open-folder', which:b.dataset.open}, $('lcMsg')));
+document.querySelectorAll('#sec-paths [data-open]').forEach(b=> b.onclick = ()=> ctlMsg({cmd:'open-folder', which:b.dataset.open}, $('pathMsg')));
+document.querySelectorAll('.quick [data-days]').forEach(b=> b.onclick = ()=>{
+  const d = new Date(), iso = x=> new Date(x.getTime()-x.getTimezoneOffset()*60000).toISOString().slice(0,10);
+  $('cfgUntil').value = iso(d);
+  d.setDate(d.getDate() - (+b.dataset.days - 1));
+  $('cfgSince').value = iso(d);
+});
 
 poll(); setInterval(poll, 800);
 </script></body></html>"""
