@@ -279,7 +279,8 @@ class RunReport:
 
 
 def _setup_logger(run_ts: str) -> logging.Logger:
-    logs_dir = Path("/opt/tracker/repo/logs")
+    from . import LOGS_DIR
+    logs_dir = Path(LOGS_DIR)
     logs_dir.mkdir(parents=True, exist_ok=True)
     logger = logging.getLogger(f"tracker.run.{run_ts}")
     logger.setLevel(logging.DEBUG)
@@ -314,13 +315,9 @@ def run_pipeline(*, since: str, until: str, trackers: list[str],
     # non-blocking flock on <db>.lock; it auto-releases when this process exits,
     # so a crash never leaves a stale lock. A loser aborts cleanly with ok=False
     # and writes nothing (no runs row, no status.json).
-    import fcntl
-    Path(db).parent.mkdir(parents=True, exist_ok=True)
-    run_lock = open(f"{db}.lock", "w")
-    try:
-        fcntl.flock(run_lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-    except OSError:
-        run_lock.close()
+    from .runlock import acquire as _acquire_lock
+    run_lock = _acquire_lock(Path(db))
+    if run_lock is None:
         log.error("another pipeline run is already active on %s — aborting", db)
         rep = RunReport(run_id=-1, since=since, until=until, trackers=list(trackers))
         rep.ok = False
@@ -1388,7 +1385,8 @@ def _finalize(store, rep, t0, log, stats0=None):
     store.finish_run(rep.run_id, stats_json=json.dumps(stats, ensure_ascii=False),
                      errors_json=json.dumps(rep.errors, ensure_ascii=False), ok=rep.ok)
     try:
-        status_path = PROJECT_ROOT / "status.json"
+        from . import STATUS_PATH
+        status_path = STATUS_PATH
         status_path.write_text(json.dumps({
             "run_id": rep.run_id, "ok": rep.ok, "one_line": rep.one_line(),
             "finished_at": utcnow().isoformat(), **stats,

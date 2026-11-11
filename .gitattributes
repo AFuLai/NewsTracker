@@ -8,3 +8,7 @@ tests/        export-ignore
 db/           export-ignore
 *.sqlite      export-ignore
 ops/          export-ignore
+
+# Windows launcher/installer must keep CRLF (cmd.exe parses LF-only .cmd unreliably).
+*.cmd text eol=crlf
+*.ps1 text eol=crlf

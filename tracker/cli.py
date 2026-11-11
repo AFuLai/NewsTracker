@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import os
 from datetime import date as _date
 from datetime import datetime
 from datetime import timedelta as _timedelta
@@ -799,7 +800,9 @@ def _deploy_site(rep, *, enabled: bool) -> str:
         return "skipped: --no-deploy"
     if rep is None or not rep.ok:
         return "skipped: run not ok"
-    from .deploy import DeployError, deploy
+    from .deploy import DeployError, deploy, config as _deploy_config
+    if not _deploy_config()["enabled"]:
+        return "skipped: publishing disabled in settings"
     try:
         last = deploy()
     except DeployError as exc:
@@ -835,8 +838,17 @@ def _start_dashboard(reporter, port: int):
 
 
 def _open_windows_browser(url: str) -> None:
-    """Open the URL in the Windows default browser from WSL (best-effort)."""
+    """Open the console URL: on native Windows in the program's own Chrome (debug
+    port on, so BROWSER sources can use it); from WSL in the Windows default
+    browser (best-effort)."""
     import subprocess
+    if os.name == "nt":
+        from .chrome import launch
+        try:
+            launch(url, wait_cdp=0)
+        except Exception:
+            os.startfile(url)
+        return
     for cmd in (["cmd.exe", "/c", "start", "", url], ["wslview", url],
                 ["xdg-open", url]):
         try:
@@ -1175,7 +1187,9 @@ def daily(
         "backends": {"summarize": "ollama", "translate": "ollama"},
         "errors": errors,
     }
-    (PROJECT_ROOT / "status.json").write_text(
+    from . import STATUS_PATH
+    STATUS_PATH.parent.mkdir(parents=True, exist_ok=True)
+    STATUS_PATH.write_text(
         json.dumps(status, ensure_ascii=False, indent=2), encoding="utf-8")
 
     line = (f"daily {status['timestamp']} {since}..{until} [{','.join(targets)}] "
@@ -1443,6 +1457,46 @@ def probe(
     if verdict.get("feed_url"):
         console.print(f"[bold]feed_url:[/bold] {verdict['feed_url']}")
     console.print(f"[dim]{verdict['note']}[/dim]")
+
+
+@app.command("export-data")
+def export_data(
+    dest: Path = typer.Argument(..., help="輸出的 zip 檔（例：D:\\newstracker-data.zip）"),
+) -> None:
+    """匯出資料庫＋端點清單（＋設定）成一個 zip，用來搬到另一台電腦。"""
+    from .migrate_data import export
+    info = export(dest)
+    console.print(f"[green]已匯出[/green] {dest}：{info['articles']} 篇文章，含 {', '.join(info['files'])}")
+
+
+@app.command("import-data")
+def import_data(
+    src: Path = typer.Argument(..., help="export-data 產生的 zip"),
+    force: bool = typer.Option(False, "--force", help="取代既有資料庫（舊檔保留為 .bak-時間）"),
+) -> None:
+    """匯入 export-data 的 zip 到本機資料夾（Windows 原生版）。"""
+    from .migrate_data import import_
+    try:
+        info = import_(src, force=force)
+    except (FileExistsError, ValueError, RuntimeError) as exc:
+        console.print(f"[red]{exc}[/red]")
+        raise typer.Exit(1)
+    console.print(f"[green]已匯入[/green] {info['articles']} 篇文章（{', '.join(info['files'])}）。"
+                  "輸出路徑等本機設定已重設為預設值，排程需在控制台重新啟用。")
+
+
+@app.command("render-all")
+def render_all(
+    out: Path = typer.Option(DEFAULT_OUT, "--out"),
+    db: Path = typer.Option(DEFAULT_DB),
+) -> None:
+    """重新產生整個網站（換了輸出路徑或剛匯入資料後用）。"""
+    from .dedup import Store
+    from .orchestrator import rebuild_days
+    from .render import sync_index_html
+    n = rebuild_days(Store(db), out, dates=None)
+    sync_index_html(out)
+    console.print(f"[green]已重新產生[/green] {n} 天 → {out}")
 
 
 @app.command()

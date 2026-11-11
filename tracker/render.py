@@ -212,7 +212,8 @@ def sync_index_html(root_html: Path) -> Path | None:
     site always matches the source. Byte-exact, skips when unchanged; both
     sides are ext4 now, so it is cheap and free of the drvfs/ADS pitfalls that
     the old manual cross-copy to /mnt/d had. Returns the dest if it changed."""
-    src = ROOT / "ui" / "index.html"
+    from . import PATHS
+    src = Path(PATHS["ui_html"])
     if not src.exists():
         return None
     dst = root_html / "index.html"

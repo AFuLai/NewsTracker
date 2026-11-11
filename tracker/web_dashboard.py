@@ -175,7 +175,104 @@ class WebReporter(NullReporter):
                 "summary": self.summary_data,
                 "control": control,
                 "deploy": _deploy_snapshot(),
+                "local": _local_snapshot(),
             }
+
+
+_LOCAL_CACHE: dict = {"t": 0.0, "v": None}
+_FB_LOGIN: dict = {"v": None}
+
+
+def _local_snapshot() -> dict | None:
+    """Standalone-install settings for the 本機設定 card; None on the WSL layout.
+    The Task Scheduler read is cached for 10 s (the page polls every 800 ms)."""
+    from . import settings, PATHS
+    if settings.home() is None:
+        return None
+    now = time.time()
+    if _LOCAL_CACHE["v"] is not None and now - _LOCAL_CACHE["t"] < 10:
+        return _LOCAL_CACHE["v"]
+    from . import schedule
+    v = {
+        "settings": settings.load(),
+        "paths": {k: (str(PATHS[k]) if PATHS[k] is not None else "")
+                  for k in ("home", "out", "db", "ui_html", "web_dir", "logs")},
+        "task": schedule.query(),
+        "firebase_login": _FB_LOGIN["v"],
+        "restart_needed": _LOCAL_CACHE.get("restart", False),
+    }
+    _LOCAL_CACHE.update(t=now, v=v)
+    return v
+
+
+def _local_control(action: str, cmd: dict) -> tuple[bool, str]:
+    from . import settings
+    if settings.home() is None:
+        return False, "只在 Windows 原生版提供"
+    _LOCAL_CACHE["v"] = None
+    if action == "local-save":
+        from . import schedule
+        new = cmd.get("settings") or {}
+        old = settings.load()
+        try:
+            sch = schedule.validate(dict(old["schedule"], **(new.get("schedule") or {})))
+        except schedule.ScheduleError as exc:
+            return False, str(exc)
+        new["schedule"] = sch
+        for k in ("out_dir", "ui_html", "chrome"):
+            v = str(new.get(k, old[k]) or "").strip()
+            if v and k != "out_dir" and not Path(v).expanduser().is_file():
+                return False, f"找不到檔案：{v}"
+            new[k] = v
+        cur = settings.save(new)
+        moved = any(cur[k] != old[k] for k in ("out_dir", "ui_html")) or \
+            cur["firebase"]["web_dir"] != old["firebase"]["web_dir"]
+        if moved:
+            _LOCAL_CACHE["restart"] = True
+        msg = "已儲存"
+        was = old["schedule"]
+        if (sch["enabled"] != bool(was["enabled"])) or \
+                (sch["enabled"] and (sch != was or not schedule.query().get("exists"))):
+            try:
+                msg += "；" + schedule.apply(sch)
+            except schedule.ScheduleError as exc:
+                return False, "已儲存，但排程設定失敗：" + str(exc)
+        if moved:
+            msg += "；路徑變更在重新開啟控制台後生效"
+        return True, msg
+    if action == "schedule-run":
+        from . import schedule
+        try:
+            return True, schedule.run_now()
+        except schedule.ScheduleError as exc:
+            return False, str(exc)
+    if action == "firebase-login":
+        from .deploy import DeployError, login
+        try:
+            login()
+        except DeployError as exc:
+            return False, str(exc)
+        _FB_LOGIN["v"] = None
+        return True, "已開啟登入視窗；在瀏覽器完成後按「檢查登入」"
+    if action == "firebase-status":
+        from .deploy import login_status
+        _FB_LOGIN["v"] = login_status()
+        v = _FB_LOGIN["v"]
+        if v.startswith("unknown"):
+            return False, v.removeprefix("unknown: ")
+        return True, ("已登入：" + v) if v else "尚未登入"
+    if action == "open-folder":
+        from . import PATHS
+        key = cmd.get("which") or "home"
+        target = PATHS.get(key)
+        if not target:
+            return False, "沒有這個資料夾"
+        target = Path(target)
+        target = target if target.is_dir() else target.parent
+        target.mkdir(parents=True, exist_ok=True)
+        os.startfile(str(target))
+        return True, ""
+    return False, "unknown command"
 
 
 def _apply_control(controller, cmd: dict, cra_job=None) -> tuple[bool, str]:
@@ -184,6 +281,8 @@ def _apply_control(controller, cmd: dict, cra_job=None) -> tuple[bool, str]:
     answering" and "the remote window is closed" are different refusals, and a
     bare red X makes the user guess which."""
     action = cmd.get("cmd")
+    if action in ("local-save", "schedule-run", "firebase-login", "firebase-status", "open-folder"):
+        return _local_control(action, cmd)
     if action == "cralib":
         return bool(cra_job is not None and cra_job.start()), ""
     if action == "deploy":
@@ -252,7 +351,9 @@ def serve(reporter: WebReporter, *, port: int = DEFAULT_PORT) -> ThreadingHTTPSe
                 return
             rel = unquote(raw[len("/site/"):])
             if rel in ("", "index.html"):
-                base, rel = Path(ROOT) / "ui", "index.html"
+                from . import PATHS
+                ui = Path(PATHS["ui_html"]) if PATHS.get("home") else Path(ROOT) / "ui" / "index.html"
+                base, rel = ui.parent, ui.name
             else:
                 base = Path(DEFAULT_OUT)
             target = None
@@ -579,6 +680,46 @@ _HTML = r"""<!DOCTYPE html>
         <span id="cfgPolMsg" style="color:var(--dim); margin-left:8px;"></span>
       </div>
     </section>
+    <section class="card hidden" id="sec-local">
+      <h2>本機設定</h2>
+      <div class="cfgrow">
+        <label>網站輸出</label>
+        <input id="lcOut" style="flex:1; min-width:260px" placeholder="html 輸出資料夾（空白＝預設）">
+        <button data-open="out">開啟</button>
+      </div>
+      <div class="cfgrow">
+        <label>頁面範本</label>
+        <input id="lcUi" style="flex:1; min-width:260px" placeholder="index.html 來源（空白＝安裝目錄的 ui/index.html）">
+      </div>
+      <div class="cfgrow">
+        <label>Chrome</label>
+        <input id="lcChrome" style="flex:1; min-width:260px" placeholder="chrome.exe 路徑（空白＝自動尋找）">
+      </div>
+      <div class="cfgrow">
+        <label>定期更新</label>
+        <span class="chk"><input type="checkbox" id="lcSchOn"> 啟用</span>
+        <select id="lcSchMode"><option value="daily">每天</option><option value="hourly">每 N 小時</option></select>
+        <span class="chk">時間 <input id="lcSchTime" placeholder="07:30" style="width:64px"></span>
+        <span class="chk" id="lcEveryWrap">N <input id="lcSchEvery" type="number" min="1" max="23" style="width:56px"></span>
+        <span class="chk">更新最近 <input id="lcSchDays" type="number" min="1" max="30" style="width:56px"> 天</span>
+        <span class="chk"><input type="checkbox" id="lcSchDeploy"> 完成後發布</span>
+      </div>
+      <div class="cfgrow"><label></label><span id="lcTask" style="color:var(--dim)"></span></div>
+      <div class="cfgrow">
+        <label>Firebase</label>
+        <span class="chk"><input type="checkbox" id="lcFbOn"> 啟用發布</span>
+        <span class="chk">專案 ID <input id="lcFbProj" style="width:150px"></span>
+        <button id="lcFbLogin">登入 Firebase</button>
+        <button id="lcFbCheck">檢查登入</button>
+        <span id="lcFbState" style="color:var(--dim)"></span>
+      </div>
+      <div class="btnrow">
+        <button id="lcSave" class="primary">儲存設定</button>
+        <button id="lcRunNow">立即執行一次排程</button>
+        <button data-open="home">開啟資料夾</button>
+        <span id="lcMsg" style="margin-left:6px"></span>
+      </div>
+    </section>
     <section class="card cra hidden" id="cra">
         <div class="crahead">
           <b>📚 CRA 參考圖書庫</b>
@@ -839,6 +980,7 @@ async function poll(){
   syncControl(st);
   syncCra(st);            // usable before Start and after a run finishes
   syncDeploy(st);
+  syncLocal(st);
   syncHero(st);
   $('title').textContent = st.title || '';
   if(st.control && !st.control.started){   // config mode: nothing is running yet
@@ -947,5 +1089,39 @@ function syncHero(st){
 }
 function row(k,v){ return `<div class="k">${k}</div><div class="v">${esc(v)}</div>`; }
 function esc(x){ return String(x==null?'':x).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+// ── 本機設定 (standalone Windows install) ───────────────────────────────
+let LC_INIT=false;
+function syncLocal(st){
+  const lc = st.local;
+  $('sec-local').classList.toggle('hidden', !lc);
+  if(!lc) return;
+  const t = lc.task||{};
+  $('lcTask').textContent = t.exists
+    ? ('Windows 排程：下次 ' + (t.next_run||'—') + '　上次 ' + (t.last_run||'—') + (t.last_result!=null ? '（結果 '+t.last_result+'）' : ''))
+    : 'Windows 排程：未設定';
+  const fl = lc.firebase_login;
+  if(fl!=null) $('lcFbState').textContent = !fl ? '尚未登入' : (fl.indexOf('unknown')===0 ? fl.replace(/^unknown: /,'') : '已登入：'+fl);
+  if(LC_INIT) return; LC_INIT=true;
+  const s = lc.settings, p = lc.paths;
+  $('lcOut').value = s.out_dir || ''; $('lcOut').placeholder = p.out;
+  $('lcUi').value = s.ui_html || ''; $('lcUi').placeholder = p.ui_html;
+  $('lcChrome').value = s.chrome || '';
+  $('lcSchOn').checked = !!s.schedule.enabled; $('lcSchMode').value = s.schedule.mode;
+  $('lcSchTime').value = s.schedule.time; $('lcSchEvery').value = s.schedule.every_hours;
+  $('lcSchDays').value = s.schedule.days; $('lcSchDeploy').checked = !!s.schedule.deploy;
+  $('lcFbOn').checked = !!s.firebase.enabled; $('lcFbProj').value = s.firebase.project || '';
+  $('lcEveryWrap').style.display = s.schedule.mode==='hourly' ? '' : 'none';
+}
+$('lcSchMode').onchange = e=> { $('lcEveryWrap').style.display = e.target.value==='hourly' ? '' : 'none'; };
+$('lcSave').onclick = ()=> ctlMsg({cmd:'local-save', settings:{
+  out_dir:$('lcOut').value.trim(), ui_html:$('lcUi').value.trim(), chrome:$('lcChrome').value.trim(),
+  schedule:{enabled:$('lcSchOn').checked, mode:$('lcSchMode').value, time:$('lcSchTime').value.trim(),
+            every_hours:+$('lcSchEvery').value, days:+$('lcSchDays').value, deploy:$('lcSchDeploy').checked},
+  firebase:{enabled:$('lcFbOn').checked, project:$('lcFbProj').value.trim()}}}, $('lcMsg'));
+$('lcRunNow').onclick = ()=> ctlMsg({cmd:'schedule-run'}, $('lcMsg'));
+$('lcFbLogin').onclick = ()=> ctlMsg({cmd:'firebase-login'}, $('lcFbState'));
+$('lcFbCheck').onclick = ()=> { $('lcFbState').textContent='檢查中…'; ctlMsg({cmd:'firebase-status'}, $('lcFbState')); };
+document.querySelectorAll('#sec-local [data-open]').forEach(b=> b.onclick = ()=> ctlMsg({cmd:'open-folder', which:b.dataset.open}, $('lcMsg')));
+
 poll(); setInterval(poll, 800);
 </script></body></html>"""

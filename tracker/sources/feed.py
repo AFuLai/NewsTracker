@@ -59,7 +59,7 @@ async def fetch_all(feeds: list[tuple[str, str]], *, since: _date, until: _date,
                     concurrency: int = 8) -> dict[str, list[FeedItem]]:
     """feeds = [(source_name, feed_url), ...]"""
     sem = asyncio.Semaphore(concurrency)
-    async with aiohttp.ClientSession(headers={"User-Agent": "tracker/0.x (+wsl)"}) as session:
+    async with aiohttp.ClientSession(headers={"User-Agent": "tracker/0.x "}) as session:
         async def bound(src: str, url: str):
             async with sem:
                 return await _fetch_one(session, src, url)

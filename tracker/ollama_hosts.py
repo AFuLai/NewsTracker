@@ -87,7 +87,8 @@ _refreshing = False
 #: The dashboard-editable endpoint list. Machine-local (the LAN addresses it
 #: names mean nothing on another network), so it sits next to the code and
 #: stays out of git.
-CONFIG_PATH = Path(__file__).resolve().parent.parent / "endpoints.json"
+from . import PATHS as _PATHS
+CONFIG_PATH = Path(_PATHS["endpoints"])
 
 
 def _load_config() -> dict:

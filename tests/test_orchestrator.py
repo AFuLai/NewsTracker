@@ -158,10 +158,10 @@ def test_preflight_skipped_for_write_only_restart(monkeypatch, tmp_path):
 def test_pipeline_aborts_when_db_lock_held(tmp_path):
     # F-CONC-1: a second run started while another holds the DB lock aborts
     # cleanly (ok=False, run_id=-1) and journals nothing.
-    import fcntl
+    from tracker.runlock import acquire
     db = tmp_path / "t.sqlite"
-    holder = open(str(db) + ".lock", "w")
-    fcntl.flock(holder, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    holder = acquire(db)   # flock on POSIX, msvcrt.locking on Windows
+    assert holder is not None
     try:
         rep = run_pipeline(since="2026-06-01", until="2026-06-02",
                            trackers=["security"], db=db, out=tmp_path,
@@ -170,7 +170,6 @@ def test_pipeline_aborts_when_db_lock_held(tmp_path):
         assert rep.run_id == -1
         assert any("already active" in e for e in rep.errors)
     finally:
-        fcntl.flock(holder, fcntl.LOCK_UN)
         holder.close()
 
 

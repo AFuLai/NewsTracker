@@ -15,7 +15,8 @@ from pathlib import Path
 
 from . import ROOT
 
-SNAP_DIR = ROOT.parent / "state" / "backups"
+from . import PATHS as _PATHS
+SNAP_DIR = Path(_PATHS["backups"])
 KEEP = 7
 
 

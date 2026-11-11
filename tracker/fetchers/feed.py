@@ -17,7 +17,7 @@ from . import (Candidate, DateWindow, FetchResult, Profile, effective_filter,
                register)
 from ..dedup import content_hash
 
-UA = "tracker/2.x (+wsl; conditional-get)"
+UA = "tracker/2.x (conditional-get)"
 
 
 @register

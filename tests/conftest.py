@@ -27,6 +27,11 @@ def _isolate_endpoint_config(tmp_path, monkeypatch):
 def _isolate_project_root(tmp_path, monkeypatch):
     monkeypatch.setattr(orchestrator, "PROJECT_ROOT", tmp_path)
     monkeypatch.setattr(cli, "PROJECT_ROOT", tmp_path)
+    # Writers read these package-level paths at call time (tracker/settings.py):
+    # status.json and run logs must never land in the operator's real folders.
+    import tracker
+    monkeypatch.setattr(tracker, "STATUS_PATH", tmp_path / "status.json")
+    monkeypatch.setattr(tracker, "LOGS_DIR", tmp_path / "logs")
 
 
 @pytest.fixture(autouse=True)

@@ -14,17 +14,22 @@ def utcnow() -> datetime:
     """
     return datetime.now(timezone.utc).replace(tzinfo=None)
 
-ROOT = Path("/opt/tracker/repo")
-PROJECT_ROOT = Path("/mnt/d/Claude/Tool/NewsTracker")
-# Static site output lives on ext4 (native to render.py): ~90x faster small-file
-# writes than drvfs(/mnt/d) and none of the cross-write pitfalls (drvfs speed
-# tax, 777/CRLF git noise, AV locking, ADS streams). The tarball stays on /mnt/d
-# for Windows-side distribution.
-# Rendered straight into the Firebase deploy dir (was repo/html behind a
-# web/public symlink until 2026-10-19).
-DEFAULT_OUT = ROOT.parent / "web" / "public"
-DEFAULT_TARBALL = PROJECT_ROOT / "tarball"
-DEFAULT_DB = ROOT / "db" / "articles.sqlite"
+# Every path comes from settings.resolve(): on WSL it returns the original
+# constants unchanged (ROOT=/opt/tracker/repo, PROJECT_ROOT=/mnt/d/..., site in
+# /opt/tracker/web/public — ext4 on purpose: ~90x faster small-file writes than
+# drvfs and none of its pitfalls); on native Windows everything lives under
+# NEWSTRACKER_HOME (see tracker/settings.py).
+from . import settings as _settings
+
+IS_WINDOWS = _settings.IS_WINDOWS
+PATHS = _settings.resolve()
+ROOT = PATHS["root"]
+PROJECT_ROOT = PATHS["project"]
+DEFAULT_OUT = PATHS["out"]
+DEFAULT_TARBALL = PATHS["tarball"]
+DEFAULT_DB = PATHS["db"]
+LOGS_DIR = PATHS["logs"]
+STATUS_PATH = PATHS["status"]
 OLLAMA_URL = "http://localhost:11434"
 OLLAMA_MODEL = "gemma4:e4b"
 

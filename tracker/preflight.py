@@ -182,15 +182,26 @@ def start_local_daemon(*, start_timeout: int = 40, console=None) -> bool:
 CDP_PORT = 9999
 
 
+def _cdp_port() -> int:
+    from . import settings
+    try:
+        return int(settings.load().get("cdp_port") or CDP_PORT)
+    except (TypeError, ValueError):
+        return CDP_PORT
+
+
 def _candidate_cdp_bases() -> list[str]:
-    bases = [f"http://localhost:{CDP_PORT}", f"http://127.0.0.1:{CDP_PORT}"]
+    port = _cdp_port()
+    bases = [f"http://localhost:{port}", f"http://127.0.0.1:{port}"]
+    if os.name == "nt":   # native Windows: the Chrome is local, there is no WSL gateway
+        return bases
     # WSL → Windows host (where the user's debug Chrome usually runs)
     try:
         out = subprocess.run(["ip", "route"], capture_output=True, text=True).stdout
         for line in out.splitlines():
             if line.startswith("default"):
                 gw = line.split()[2]
-                bases.append(f"http://{gw}:{CDP_PORT}")
+                bases.append(f"http://{gw}:{port}")
                 break
     except Exception:
         pass
@@ -217,6 +228,12 @@ def ensure_browser(*, interactive: bool = True, console=None) -> str | None:
     base = find_browser()
     if base:
         return base
+    if os.name == "nt":
+        from .chrome import launch
+        base = launch(None)
+        if base:
+            _say("[green]已啟動 Chrome（除錯埠）。[/green]" if console else "已啟動 Chrome（除錯埠）。")
+            return base
     _say("\n[yellow]需要除錯模式的 Chrome（debug Chrome）來處理需 JavaScript 渲染的來源，"
          "但目前偵測不到。[/yellow]" if console else
          "需要除錯模式的 Chrome（debug Chrome）來處理需 JS 渲染的來源，但目前偵測不到。")
