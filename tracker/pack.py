@@ -1,6 +1,7 @@
 """Version bump + git commit/tag + git archive zip output."""
 from __future__ import annotations
 
+import os
 import subprocess
 from pathlib import Path
 
@@ -65,3 +66,26 @@ def pack(*, major: bool = False, keep: bool = False,
     size = out_zip.stat().st_size
     return {"version": version, "zip": str(out_zip), "size": size,
             "section_chars": len(section)}
+
+
+def _win_path(p: Path) -> str:
+    if os.name == "nt":
+        return str(p)
+    return subprocess.check_output(["wslpath", "-w", str(p)], text=True).strip()
+
+
+def build_portable(source_zip: Path, out_dir: Path) -> Path:
+    """Run windows/build-portable.ps1 on the release zip (from WSL via interop).
+
+    Produces NewsTracker-portable-<ver>.zip next to the release zip: the
+    program plus an embeddable Python with every dependency, so the target
+    machine needs no Python. Needs Windows Python 3.11+ and internet on this
+    (build) machine; raises CalledProcessError when the script fails.
+    """
+    script = ROOT / "windows" / "build-portable.ps1"
+    exe = "powershell" if os.name == "nt" else "powershell.exe"
+    subprocess.run([exe, "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", _win_path(script),
+                    "-SourceZip", _win_path(source_zip), "-OutDir", _win_path(out_dir)],
+                   check=True)
+    version = source_zip.stem.removeprefix("Tracker-")
+    return out_dir / f"NewsTracker-portable-{version}.zip"

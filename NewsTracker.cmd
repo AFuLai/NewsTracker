@@ -6,7 +6,15 @@ rem   NewsTracker.cmd scheduler   stay running and update per the console's sche
 rem   NewsTracker.cmd <command>   any tracker command, e.g. export-data D:\data.zip
 setlocal
 set "HERE=%~dp0"
-set "PY=%HERE%.venv\Scripts\python.exe"
+rem Portable build: bundled embeddable Python in .\python (windows\build-portable.ps1).
+set "PY=%HERE%python\python.exe"
+if exist "%PY%" (
+  set PYTHONNOUSERSITE=1
+  set PYTHONHOME=
+  set PYTHONPATH=
+) else (
+  set "PY=%HERE%.venv\Scripts\python.exe"
+)
 if not exist "%PY%" (
   echo NewsTracker is not installed yet. Run:  powershell -ExecutionPolicy Bypass -File "%HERE%windows\install.ps1"
   exit /b 2

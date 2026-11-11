@@ -2,11 +2,28 @@
 
 同一份程式碼。在 Windows 上，所有寫入的資料都放在一個資料夾裡，所以搬到另一台電腦只要搬那個資料夾，或用匯出／匯入。
 
+## 可攜版（建議：免安裝 Python）
+
+`NewsTracker-portable-<版本>.zip` 內附 Python 和所有套件。
+
+1. 解壓到任意資料夾，例如 `D:\NewsTracker`（路徑可含中文或空白）。
+2. 執行裡面的 `NewsTracker.cmd`。
+
+不需要安裝 Python、不用跑安裝腳本，也不會改 PATH 或登錄檔。要建捷徑就自己對 `NewsTracker.cmd` 建一個。資料一樣放在 `%LOCALAPPDATA%\NewsTracker`（或 `NEWSTRACKER_HOME`）。升級時解壓新版覆蓋或換資料夾即可，資料不受影響。
+
+可攜版由 `tracker pack` 一併產生（需要建置機上有 Windows Python 3.11+ 與網路），也可以單獨建置：
+
+```bat
+powershell -ExecutionPolicy Bypass -File windows\build-portable.ps1 -SourceZip Tracker-2.31.zip
+```
+
+以下「需要什麼」與「安裝」是用 Python 自行安裝的方式；用可攜版可以跳過 Python 那一列和安裝步驟。
+
 ## 需要什麼
 
 | 項目 | 用途 | 必要？ |
 |---|---|---|
-| Python 3.11 以上 | 執行程式（安裝腳本找不到時會提議用 winget 安裝） | 必要 |
+| Python 3.11 以上 | 執行程式（安裝腳本找不到時會提議用 winget 安裝）；可攜版不需要 | 必要 |
 | Google Chrome（或 Edge） | 控制台頁面，以及需要 JavaScript 的來源 | 建議 |
 | 區網內的 ollama 主機（`gemma4:e4b`） | 摘要、翻譯 | 必要 |
 | Node.js ＋ firebase-tools | 發布到 Firebase Hosting | 選用 |

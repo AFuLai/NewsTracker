@@ -1541,11 +1541,25 @@ def pack(
     major: bool = typer.Option(False, "--major"),
     keep_version: bool = typer.Option(False, "--keep-version"),
     tarball_dir: Path = typer.Option(DEFAULT_TARBALL),
+    portable: bool = typer.Option(True, "--portable/--no-portable",
+                                  help="Also build NewsTracker-portable-<ver>.zip (bundled Python; "
+                                       "needs Windows Python + internet on this machine)"),
 ) -> None:
-    """ChangeLog → commit → tag → git archive zip."""
+    """ChangeLog → commit → tag → git archive zip (+ portable Windows zip)."""
+    import subprocess as _sp
+    from .pack import build_portable
     result = run_pack(major=major, keep=keep_version, tarball_dir=tarball_dir)
     console.print(f"[green]Packed[/green] v{result['version']} → {result['zip']} "
                   f"({result['size']} bytes)")
+    if portable:
+        try:
+            p = build_portable(Path(result["zip"]), tarball_dir)
+            console.print(f"[green]Portable[/green] → {p}")
+        except (OSError, _sp.CalledProcessError) as exc:
+            # The release itself is done; only the convenience build failed.
+            console.print(f"[yellow]可攜版建置失敗（發行 zip 已完成）：{exc}[/yellow]\n"
+                          "[dim]可稍後手動：powershell -ExecutionPolicy Bypass -File "
+                          "windows\\build-portable.ps1 -SourceZip <Tracker-x.y.zip>[/dim]")
 
 
 @app.command()
