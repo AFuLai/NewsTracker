@@ -728,7 +728,13 @@ def pipeline(
             # as long as the console is open (tracker/schedule.py).
             from .schedule import scheduler as _scheduler
             _scheduler().start()
-        url = f"http://localhost:{used_port}"
+        # Standalone Windows: 127.0.0.1, not localhost. The server binds IPv4
+        # only, and Windows tries ::1 first, so every new connection to
+        # "localhost" waited ~0.3 s for that to fail (measured: the site's first
+        # screen took 5.5 s instead of 1.4 s). WSL keeps localhost, which is
+        # what WSL2's forwarding to the Windows browser answers on.
+        host = "127.0.0.1" if _settings.home() is not None else "localhost"
+        url = f"http://{host}:{used_port}"
         console.print(f"[bold cyan]互動控制台：[/bold cyan] [underline]{url}[/underline]")
         console.print("[dim]請在控制台確認參數後按「開始執行」；"
                       "CRA 圖書庫可隨時按「更新 CRA 庫」單獨更新。[/dim]")

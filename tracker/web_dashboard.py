@@ -426,6 +426,11 @@ def _apply_control(controller, cmd: dict, cra_job=None) -> tuple[bool, str]:
 def serve(reporter: WebReporter, *, port: int = DEFAULT_PORT) -> ThreadingHTTPServer:
     """Start the dashboard HTTP server in a daemon thread. Returns the server."""
     class Handler(BaseHTTPRequestHandler):
+        # Headers and body go out as separate writes; with Nagle on, the body
+        # waited for the client's delayed ACK (~0.2-0.5 s per response on
+        # Windows, measured on the 280 KB site page and the console page).
+        disable_nagle_algorithm = True
+
         def log_message(self, *a):  # silence access logs
             pass
 
@@ -593,6 +598,9 @@ def serve(reporter: WebReporter, *, port: int = DEFAULT_PORT) -> ThreadingHTTPSe
     # deliberate LAN deployment sets TRACKER_DASHBOARD_HOST=0.0.0.0.
     host = os.environ.get("TRACKER_DASHBOARD_HOST", "127.0.0.1").strip() or "127.0.0.1"
     httpd = ThreadingHTTPServer((host, port), Handler)
+    # mimetypes reads the Windows registry on first use (~0.3 s): pay it now,
+    # off the request path, not on the site's first page load.
+    threading.Thread(target=mimetypes.init, daemon=True, name="mimetypes-warm").start()
     t = threading.Thread(target=httpd.serve_forever, daemon=True)
     t.start()
     return httpd
