@@ -1308,6 +1308,7 @@ function syncControl(st){
   // A finished run: the form comes back (prefilled with the last parameters) behind
   // 「重新設定並開始新的更新」; while a run is live it stays hidden.
   if(!st.finished) NEW_RUN_FORM = false;
+  buildConfig(st.control.config||{});   // a page opened after the start still needs the form filled (once)
   $('config').classList.toggle('hidden', !(st.finished && NEW_RUN_FORM));
   $('btnStart').textContent = '▶ 開始新的更新';
   $('btnNewRun').classList.toggle('hidden', !st.finished || NEW_RUN_FORM);
