@@ -122,6 +122,7 @@ Get-ChildItem -Path $app -Filter "*.cmd" | ForEach-Object {
 }
 $ver = if ($Version) { $Version } elseif (Test-Path (Join-Path $app "VERSION")) { (Get-Content (Join-Path $app "VERSION") -Raw).Trim() } else { "dev" }
 Write-Host "NewsTracker version: $ver"
+Retry { Set-Content -Path (Join-Path $app "BUILD") -Value $ver -Encoding ascii -NoNewline }   # shown in the console header (tracker/version.py)
 
 # 2. runtime identity: Python version + the dependency list. Same inputs, same id.
 $deps = & $py -c "import tomllib,sys; print('\n'.join(sorted(tomllib.load(open(sys.argv[1],'rb'))['project']['dependencies'])))" (Join-Path $srcRoot "pyproject.toml")

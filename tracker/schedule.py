@@ -208,7 +208,8 @@ class Scheduler:
             log = None
         kw = {"cwd": str(settings.INSTALL_DIR), "stdin": subprocess.DEVNULL,
               "stdout": log or subprocess.DEVNULL, "stderr": subprocess.STDOUT,
-              "env": dict(os.environ, PYTHONUTF8="1", PYTHONIOENCODING="utf-8")}
+              "env": dict(os.environ, PYTHONUTF8="1", PYTHONIOENCODING="utf-8",
+                          NEWSTRACKER_TRIGGER="schedule")}
         if os.name == "nt":
             kw["creationflags"] = getattr(subprocess, "CREATE_NO_WINDOW", 0)
         try:

@@ -246,7 +246,9 @@ class WebReporter(NullReporter):
             control = self.controller.snapshot() if self.controller is not None else None
             cralib = self.cra_job.snapshot() if self.cra_job is not None else None
             from . import ollama_hosts as hosts
+            from .version import version
             return {
+                "version": version(),
                 "ollama": hosts.overview(),
                 "cralib": cralib,
                 "title": self.title,
@@ -261,6 +263,46 @@ class WebReporter(NullReporter):
                 "deploy": _deploy_snapshot(),
                 "local": _local_snapshot(),
             }
+
+
+def run_history(db=None, limit: int = 50) -> list[dict]:
+    """The newest `limit` rows of the runs journal, cut to what the console's
+    更新紀錄 table shows. Read-only; [] when the DB is missing or unreadable."""
+    import sqlite3
+    if db is None:
+        from . import DEFAULT_DB as db
+    db = Path(db)
+    if not db.is_file():
+        return []
+    try:
+        conn = sqlite3.connect(db.as_uri() + "?mode=ro", uri=True, timeout=2)
+        try:
+            rows = conn.execute("SELECT run_id, started_at, finished_at, args, stats, errors, ok "
+                                "FROM runs ORDER BY run_id DESC LIMIT ?", (int(limit),)).fetchall()
+        finally:
+            conn.close()
+    except sqlite3.Error:
+        return []
+    out = []
+    for rid, started, finished, args, stats, errors, ok in rows:
+        def _j(x, d):
+            try:
+                v = json.loads(x) if x else d
+                return v if isinstance(v, type(d)) else d
+            except ValueError:
+                return d
+        a, st, er = _j(args, {}), _j(stats, {}), _j(errors, [])
+        out.append({
+            "run_id": rid, "started_at": started or "", "finished_at": finished or "",
+            "trigger": a.get("trigger") or "", "since": a.get("since") or "",
+            "until": a.get("until") or "", "trackers": a.get("trackers") or [],
+            "ok": None if ok is None else bool(ok),
+            "elapsed_s": st.get("elapsed_s"), "fetch_new": st.get("fetch_new"),
+            "fetch_failed": st.get("fetch_failed"), "summarized": st.get("summarized"),
+            "gated_out": st.get("gated_out"), "days_written": st.get("days_written"),
+            "errors": [str(e)[:300] for e in er][:20],
+        })
+    return out
 
 
 _LOCAL_CACHE: dict = {"t": 0.0, "v": None}
@@ -366,7 +408,7 @@ def _local_control(action: str, cmd: dict) -> tuple[bool, str]:
     return False, "unknown command"
 
 
-def _apply_control(controller, cmd: dict, cra_job=None) -> tuple[bool, str]:
+def _apply_control(controller, cmd: dict, cra_job=None, reporter=None) -> tuple[bool, str]:
     """Apply one command. Returns (ok, message) — the message is what the page
     shows the user, and endpoint selection needs one: "10.139.180.21 is not
     answering" and "the remote window is closed" are different refusals, and a
@@ -400,6 +442,13 @@ def _apply_control(controller, cmd: dict, cra_job=None) -> tuple[bool, str]:
             cfg = controller.config
             hosts.remember_llm(**{k: cfg.get(k) for k in hosts.LLM_KEYS})
         return ok, ""
+    if action == "new-run":
+        if not controller.started():
+            return False, "尚未開始第一次更新"
+        if reporter is not None and not reporter.finished:
+            return False, "更新進行中，請等這次完成"
+        ok = controller.request_new_run(cmd.get("config"))
+        return ok, "" if ok else "參數有誤（請確認日期區間與至少一個追蹤項目）"
     if action == "pause":
         controller.pause(); return True, ""
     if action == "resume":
@@ -559,8 +608,9 @@ def serve(reporter: WebReporter, *, port: int = DEFAULT_PORT) -> ThreadingHTTPSe
                 self._export_data()
             elif self.path == "/site" or self.path.startswith("/site/"):
                 self._serve_site()
-            elif self.path.startswith("/state"):
-                body = json.dumps(reporter.snapshot(), ensure_ascii=False).encode("utf-8")
+            elif self.path.startswith("/state") or self.path.startswith("/history"):
+                data = run_history() if self.path.startswith("/history") else reporter.snapshot()
+                body = json.dumps(data, ensure_ascii=False).encode("utf-8")
                 self.send_response(200)
                 self.send_header("Content-Type", "application/json; charset=utf-8")
                 self.send_header("Cache-Control", "no-store")
@@ -582,7 +632,7 @@ def serve(reporter: WebReporter, *, port: int = DEFAULT_PORT) -> ThreadingHTTPSe
                     n = int(self.headers.get("Content-Length", 0))
                     cmd = json.loads(self.rfile.read(n) or b"{}")
                     ok, msg = _apply_control(reporter.controller, cmd,
-                                             reporter.cra_job)
+                                             reporter.cra_job, reporter=reporter)
                 except Exception as exc:
                     ok, msg = False, str(exc)
             body = json.dumps({"ok": ok, "msg": msg},
@@ -730,6 +780,16 @@ _HTML = r"""<!DOCTYPE html>
   .h2msg { font-weight:400; letter-spacing:0; font-size:12px; color:var(--dim); }
   .h2msg.ok { color:var(--green); } .h2msg.err { color:var(--red); }
   .hint, .status { color:var(--dim); font-size:12px; }
+  .ver { font-weight:400; font-size:12px; color:var(--band-dim, var(--dim)); margin-left:6px; letter-spacing:0; }
+  .runlog-wrap { max-height:340px; overflow:auto; border:1px solid var(--line); border-radius:6px; }
+  table.runlog { width:100%; border-collapse:collapse; font-size:12px; font-variant-numeric:tabular-nums; }
+  table.runlog th, table.runlog td { padding:5px 8px; text-align:left; border-bottom:1px solid var(--line); white-space:nowrap; }
+  table.runlog th { position:sticky; top:0; background:var(--card, var(--bg)); color:var(--dim); font-weight:600; }
+  table.runlog td.num { text-align:right; }
+  table.runlog tr.fail td { color:var(--red); }
+  table.runlog tr.err-row td { white-space:normal; color:var(--dim); font-size:11px; }
+  table.runlog tr[data-has-err] { cursor:pointer; }
+  .rl-filter button[aria-pressed=true] { border-color:var(--accent); color:var(--accent); }
   .card input[type=checkbox] { width:auto; min-width:0; }
   .card .chk { color:var(--txt); display:inline-flex; align-items:center; gap:5px; }
   .switch { font-weight:600; }
@@ -788,7 +848,7 @@ _HTML = r"""<!DOCTYPE html>
 </style></head>
 <body>
 <section class="hero" id="hero">
-  <div class="brand">NewsTracker 控制台</div>
+  <div class="brand">NewsTracker 控制台<span class="ver" id="ver"></span></div>
   <span class="pill"><span class="dot off" id="live"></span><span class="state" id="heroState">待命</span></span>
   <span class="sub" id="title"></span>
   <span class="clock">已過 <b id="elapsed">0:00</b><span class="eta" id="eta"></span></span>
@@ -846,9 +906,11 @@ _HTML = r"""<!DOCTYPE html>
         </details>
         <div class="btnrow" style="margin-top:10px">
           <button id="btnStart" class="primary">▶ 開始更新</button>
+          <button id="btnCancelNew" class="hidden">取消</button>
           <span id="cfgErr" style="color:var(--red)"></span>
         </div>
       </div>
+      <div class="btnrow" style="margin-top:10px"><button id="btnNewRun" class="primary hidden">⚙ 重新設定並開始新的更新</button></div>
       <div id="phases" style="margin-top:10px"></div>
       <div class="note" id="note"></div>
       <div id="summary"></div>
@@ -875,6 +937,25 @@ _HTML = r"""<!DOCTYPE html>
         <button id="lcRunNow">立即跑一次</button>
         <span class="hint">由本程式在背景執行；關閉控制台即停止。修改後自動儲存。</span>
       </div>
+    </section>
+    <section class="card" id="sec-runlog">
+      <h2>更新紀錄 <span class="h2msg" id="rlMsg"></span></h2>
+      <div class="btnrow rl-filter" style="margin-bottom:8px">
+        <button data-rl="all" aria-pressed="true">全部</button>
+        <button data-rl="schedule" aria-pressed="false">定期</button>
+        <button data-rl="manual" aria-pressed="false">手動</button>
+        <button data-rl="fail" aria-pressed="false">失敗</button>
+        <span class="grow"></span>
+        <button id="rlRefresh" title="重新讀取">↻</button>
+      </div>
+      <div class="runlog-wrap">
+        <table class="runlog">
+          <thead><tr><th>#</th><th>開始</th><th>來源</th><th>新聞區間</th><th>結果</th>
+            <th class="num">新文章</th><th class="num">摘要</th><th class="num">耗時</th></tr></thead>
+          <tbody id="rlBody"></tbody>
+        </table>
+      </div>
+      <div class="hint" style="margin-top:6px">最近 50 次；點有錯誤的列可展開錯誤訊息。</div>
     </section>
     <section class="card cra hidden" id="cra">
         <h2>CRA 參考圖書庫</h2>
@@ -1101,7 +1182,23 @@ function fillPolicy(ov){
 }
 $('btnRestart').onclick = ()=> ctl({cmd:'restart', phase:$('reFrom').value, force:$('reForce').checked});
 $('btnClose').onclick = ()=> { ctl({cmd:'close'}); };
-let CFG_INIT=false;
+let CFG_INIT=false, NEW_RUN_FORM=false;
+$('btnNewRun').onclick = ()=>{
+  NEW_RUN_FORM = true;
+  // A new run usually means "catch up to today": move the end date forward, keep the span.
+  const today = new Date(Date.now() - new Date().getTimezoneOffset()*60000).toISOString().slice(0,10);
+  const s = $('cfgSince').value, u = $('cfgUntil').value;
+  if(s && u && u < today){
+    const span = Math.round((new Date(u) - new Date(s))/86400000);
+    const ns = new Date(new Date(today) - span*86400000).toISOString().slice(0,10);
+    $('cfgSince').value = ns; $('cfgUntil').value = today;
+  }
+  $('cfgErr').textContent=''; $('config').classList.remove('hidden');
+  $('btnNewRun').classList.add('hidden'); $('btnCancelNew').classList.remove('hidden');
+  $('config').scrollIntoView({block:'nearest'});
+};
+$('btnCancelNew').onclick = ()=>{ NEW_RUN_FORM = false; $('config').classList.add('hidden');
+  $('btnCancelNew').classList.add('hidden'); $('btnNewRun').classList.remove('hidden'); };
 function buildConfig(cfg){
   if(CFG_INIT) return; CFG_INIT=true;
   $('cfgSince').value = cfg.since||''; $('cfgUntil').value = cfg.until||'';
@@ -1125,9 +1222,13 @@ $('btnStart').onclick = async ()=>{
     summarize_backend:$('cfgSum').value, translate_backend:$('cfgTra').value,
     gate:$('cfgGate').checked, translate:$('cfgTranslate').checked,
     cleanup:$('cfgCleanup').checked, limit:parseInt($('cfgLimit').value)||300 };
+  // After a finished run the same form starts a new one (new-run) instead of the first one.
+  const cmd = (CTRL && CTRL.started) ? 'new-run' : 'start';
   const r = await fetch('/control',{method:'POST',headers:{'Content-Type':'application/json'},
-                                    body:JSON.stringify({cmd:'start',config})});
-  $('cfgErr').textContent = r.ok ? '' : '參數有誤（請確認日期區間與至少一個追蹤項目）';
+                                    body:JSON.stringify({cmd,config})});
+  let j = {}; try{ j = await r.json(); }catch(e){}
+  $('cfgErr').textContent = (r.ok && j.ok !== false) ? '' : (j.msg || '參數有誤（請確認日期區間與至少一個追蹤項目）');
+  if(r.ok && j.ok !== false && cmd === 'new-run'){ NEW_RUN_FORM = false; RL_LAST = ''; }
 };
 let CRA_PENDING = false;   // click → server ack, so a poll can't re-enable early
 $('btnCra').onclick = async ()=> {
@@ -1204,7 +1305,13 @@ function syncControl(st){
     $('control').classList.add('hidden');
     return;
   }
-  $('config').classList.add('hidden');
+  // A finished run: the form comes back (prefilled with the last parameters) behind
+  // 「重新設定並開始新的更新」; while a run is live it stays hidden.
+  if(!st.finished) NEW_RUN_FORM = false;
+  $('config').classList.toggle('hidden', !(st.finished && NEW_RUN_FORM));
+  $('btnStart').textContent = '▶ 開始新的更新';
+  $('btnNewRun').classList.toggle('hidden', !st.finished || NEW_RUN_FORM);
+  $('btnCancelNew').classList.toggle('hidden', !(st.finished && NEW_RUN_FORM));
   $('control').classList.remove('hidden');
   $('btnPause').textContent = st.control.paused ? '▶ 恢復' : '⏸ 暫停';
   $('pausedTag').innerHTML = st.control.paused ? '<span class="pausedBadge">⏸ 已暫停</span>' : '';
@@ -1214,9 +1321,58 @@ function syncControl(st){
   // pause toggle is only meaningful while a run is live
   $('btnPause').disabled = !!st.finished;
 }
+// ── 更新紀錄 (runs journal) ─────────────────────────────────────────────
+let RL_LAST = null, RL_ROWS = [], RL_FILTER = 'all';
+const RL_TRIG = {schedule:'定期', manual:'手動', '':'—'};
+async function loadRunlog(){
+  try{ RL_ROWS = await (await fetch('/history',{cache:'no-store'})).json(); }
+  catch(e){ $('rlMsg').textContent = '讀取失敗'; return; }
+  $('rlMsg').textContent = '';
+  drawRunlog();
+}
+function rlTime(iso){
+  if(!iso) return '—';
+  // runs.started_at is naive UTC (utcnow().isoformat()); show it in local time.
+  const d = new Date(/[zZ]|[+-]\d\d:\d\d$/.test(iso) ? iso : iso + 'Z');
+  if(isNaN(d)) return iso.slice(0,16).replace('T',' ');
+  const p = n=>String(n).padStart(2,'0');
+  return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
+}
+function drawRunlog(){
+  const rows = RL_ROWS.filter(r => RL_FILTER==='all' ? true
+    : RL_FILTER==='fail' ? r.ok===false
+    : RL_FILTER==='schedule' ? r.trigger==='schedule'
+    : r.trigger!=='schedule');
+  const n = v => v==null ? '—' : String(v);
+  $('rlBody').innerHTML = rows.length ? rows.map(r=>{
+    const res = r.ok===null ? (r.finished_at ? '?' : '執行中') : (r.ok ? '✅ 成功' : '❌ 失敗');
+    const errs = (r.errors||[]).length;
+    const main = `<tr class="${r.ok===false?'fail':''}" ${errs?`data-has-err="${r.run_id}" title="點一下看錯誤"`:''}>`+
+      `<td>${r.run_id}</td><td>${esc(rlTime(r.started_at))}</td><td>${esc(RL_TRIG[r.trigger] || r.trigger)}</td>`+
+      `<td>${esc((r.since||'').slice(5))} → ${esc((r.until||'').slice(5))}</td>`+
+      `<td>${res}${errs?` · ${errs} 錯誤`:''}</td>`+
+      `<td class="num">${n(r.fetch_new)}</td><td class="num">${n(r.summarized)}</td>`+
+      `<td class="num">${r.elapsed_s==null?'—':fmt(r.elapsed_s)}</td></tr>`;
+    const er = errs ? `<tr class="err-row hidden" data-err-of="${r.run_id}"><td colspan="8">${(r.errors||[]).map(esc).join('<br>')}</td></tr>` : '';
+    return main + er;
+  }).join('') : '<tr><td colspan="8" class="hint">沒有紀錄</td></tr>';
+  $('rlBody').querySelectorAll('tr[data-has-err]').forEach(tr=> tr.onclick = ()=>{
+    const e = $('rlBody').querySelector(`tr[data-err-of="${tr.dataset.hasErr}"]`); if(e) e.classList.toggle('hidden'); });
+}
+document.querySelectorAll('.rl-filter [data-rl]').forEach(b=> b.onclick = ()=>{
+  RL_FILTER = b.dataset.rl;
+  document.querySelectorAll('.rl-filter [data-rl]').forEach(x=> x.setAttribute('aria-pressed', String(x===b)));
+  drawRunlog();
+});
+$('rlRefresh').onclick = loadRunlog;
 async function poll(){
   let st; try{ st=await (await fetch('/state',{cache:'no-store'})).json(); }catch(e){ return; }
   syncControl(st);
+  if(st.version && !$('ver').textContent) $('ver').textContent = 'v' + st.version;
+  // Reload the run history when a run finishes or a scheduled run changes state.
+  const task = st.local && st.local.task;
+  const sig = [st.finished, st.summary && st.summary.run_id, task && task.last_run, task && task.running].join('|');
+  if(sig !== RL_LAST){ RL_LAST = sig; loadRunlog(); }
   syncCra(st);            // usable before Start and after a run finishes
   syncDeploy(st);
   syncLocal(st);

@@ -325,7 +325,10 @@ def run_pipeline(*, since: str, until: str, trackers: list[str],
         return rep
     store = Store(db)
     store._run_lock = run_lock
-    rid = store.start_run(json.dumps({"since": since, "until": until, "trackers": trackers}))
+    rid = store.start_run(json.dumps({"since": since, "until": until, "trackers": trackers,
+                                     # who started it (schedule.py sets it for timed runs);
+                                     # shown in the console's run history
+                                     "trigger": os.environ.get("NEWSTRACKER_TRIGGER") or "manual"}))
     rep = RunReport(run_id=rid, since=since, until=until, trackers=list(trackers))
     rep.summarize_backend, rep.translate_backend = summarize_backend, translate_backend
     stats0 = dict(llm.STATS)

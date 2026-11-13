@@ -44,6 +44,7 @@ class Controller:
         # Pre-run config gate: the UI reviews/edits these, then clicks Start.
         self.config = dict(config or {})
         self._started = threading.Event()
+        self._new_run = False
 
     # ── commands (called from the web server thread) ────────────────────────
     def pause(self):
@@ -81,6 +82,29 @@ class Controller:
     # ── pre-run config gate ─────────────────────────────────────────────────
     def request_start(self, incoming: dict | None) -> bool:
         """Validate + apply the (possibly UI-edited) config and release the run."""
+        if not self._apply_config(incoming):
+            return False
+        self._started.set()
+        return True
+
+    def request_new_run(self, incoming: dict | None) -> bool:
+        """After a run has finished: apply a new config and start over from
+        fetch. The caller (the web layer) refuses this while a run is live."""
+        if not self._started.is_set() or not self._apply_config(incoming):
+            return False
+        with self._lock:
+            self._restart_from = "fetch"
+            self._force = False
+            self._new_run = True
+        return True
+
+    def consume_new_run(self) -> bool:
+        """True once after request_new_run (the CLI re-reads the config)."""
+        with self._lock:
+            v, self._new_run = self._new_run, False
+            return v
+
+    def _apply_config(self, incoming: dict | None) -> bool:
         incoming = incoming or {}
         cfg = self.config
         since = incoming.get("since", cfg.get("since"))
@@ -109,7 +133,6 @@ class Controller:
                     pass
             self.backends["summarize"] = cfg.get("summarize_backend", "ollama")
             self.backends["translate"] = cfg.get("translate_backend", "ollama")
-        self._started.set()
         return True
 
     def wait_for_start(self):

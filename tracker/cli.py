@@ -782,6 +782,21 @@ def pipeline(
             if controller.closed:
                 break
             start_at, force = controller.consume_restart()
+            if controller.consume_new_run():
+                # 開始新的更新: the user edited the parameters after the run finished.
+                cfg = controller.config
+                since, until, targets = cfg["since"], cfg["until"], cfg["trackers"]
+                gate, translate = cfg.get("gate", gate), cfg.get("translate", translate)
+                cleanup, limit = cfg.get("cleanup", cleanup), cfg.get("limit", limit)
+                sum_be = cfg.get("summarize_backend", sum_be)
+                tra_be = cfg.get("translate_backend", tra_be)
+                if browser_base is None and any(
+                        p["method"] == "BROWSER"
+                        for tk in targets for p in store_pre.list_profiles(tracker=tk)):
+                    from .preflight import ensure_browser
+                    browser_base = ensure_browser(console=console)
+                console.print(f"[yellow]▶ 新的更新：{since}…{until} {targets}[/yellow]")
+                continue
             console.print(f"[yellow]↻ 從 {start_at} 重新來過（force={force}）[/yellow]")
         _drain_cra()
         httpd.shutdown()
