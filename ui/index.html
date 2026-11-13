@@ -1995,6 +1995,194 @@ html[data-mode="ws"] .card-title { overflow-wrap: anywhere; }
 .ws-title-row.is-read .ws-title-text {
   color: var(--on-surface-variant);
 }
+
+/* ── My pages (版面分頁), toolbar, filter panel, layouts, pager, tour ── */
+#pg-bar { display: none; align-items: center; gap: 6px; margin: 0 0 8px; border-bottom: 1px solid var(--outline-variant); }
+html[data-mode="ws"] #pg-bar { display: flex; }
+.pg-tabs { display: flex; flex: 1; min-width: 0; gap: 2px; overflow-x: auto; scrollbar-width: thin; }
+.pg-tab, .pg-add {
+  flex: none; border: none; background: none; cursor: pointer; font: inherit; font-size: 14px;
+  padding: 8px 12px; color: var(--on-surface-variant); border-bottom: 2px solid transparent; white-space: nowrap;
+}
+.pg-tab:hover, .pg-add:hover { color: var(--on-surface); background: var(--surface-container-high); }
+.pg-tab[aria-selected="true"] { color: var(--primary); border-bottom-color: var(--primary); font-weight: 600; }
+.pg-tab.pg-transient { font-style: normal; cursor: default; }
+.pg-add { color: var(--primary); }
+.pg-tab:focus-visible, .pg-add:focus-visible, .pg-menu-btn:focus-visible { outline: 2px solid var(--primary); outline-offset: -2px; }
+.pg-menu-btn {
+  flex: none; border: 1px solid var(--outline-variant); background: none; color: var(--on-surface); cursor: pointer;
+  border-radius: var(--shape-s, 6px); padding: 2px 10px; font-size: 16px; line-height: 1.4;
+}
+.pg-menu {
+  position: fixed; z-index: 130; min-width: 11rem; padding: 4px; display: flex; flex-direction: column;
+  background: var(--surface-container-high); border: 1px solid var(--outline-variant); border-radius: var(--shape-m, 8px);
+  box-shadow: var(--elev-2, 0 4px 16px rgba(0,0,0,.25));
+}
+.pg-menu-item { border: none; background: none; text-align: left; padding: 7px 10px; font: inherit; font-size: 14px; color: var(--on-surface); cursor: pointer; border-radius: 6px; }
+.pg-menu-item:hover:not([disabled]), .pg-menu-item:focus-visible { background: var(--surface-container-highest, var(--surface-container)); outline: none; }
+.pg-menu-item[disabled] { opacity: .45; cursor: default; }
+.pg-menu-sep { height: 1px; background: var(--outline-variant); margin: 4px 2px; }
+.pg-tour-btn {
+  background: none; border: 1px solid var(--outline); color: var(--on-surface); cursor: pointer;
+  border-radius: var(--shape-full); font-size: 14px; width: 2rem; height: 2rem; padding: 0; font-weight: 700;
+}
+.pg-tour-btn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+.pg-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 2px 0 8px; font-size: 13px; }
+.pg-toolbar .ws-mode-toggle { margin-left: 0; }
+.pg-layout { flex-wrap: wrap; max-width: 100%; }
+.pg-layout .ws-mode-btn { white-space: nowrap; }
+@media (max-width: 479px) { .pg-layout .ws-mode-btn { padding: 4px 9px; } }
+.pg-sel { display: inline-flex; align-items: center; gap: 6px; color: var(--on-surface-variant); }
+.pg-sel select {
+  font: inherit; font-size: 13px; color: var(--on-surface); background: var(--surface-container-low);
+  border: 1px solid var(--outline-variant); border-radius: var(--shape-s, 6px); padding: 3px 6px;
+}
+.pg-filter-btn {
+  margin-left: auto; font: inherit; font-size: 13px; cursor: pointer; padding: 4px 14px; border-radius: var(--shape-full);
+  border: 1px solid var(--outline); background: none; color: var(--on-surface);
+}
+.pg-filter-btn.on, .pg-filter-btn[aria-expanded="true"] { background: var(--primary-container); color: var(--on-primary-container); border-color: var(--primary); }
+.pg-filter-btn:focus-visible, .pg-sel select:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.pg-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 10px; }
+.pg-chip {
+  display: inline-flex; align-items: center; gap: 6px; font: inherit; font-size: 12px; cursor: pointer;
+  padding: 3px 8px 3px 10px; border-radius: var(--shape-full); border: 1px solid var(--outline-variant);
+  background: var(--surface-container); color: var(--on-surface);
+}
+.pg-chip:hover { border-color: var(--outline); }
+.pg-chip-x { color: var(--on-surface-variant); font-size: 11px; }
+.pg-chip-clear { background: none; color: var(--primary); border-style: dashed; }
+.pg-chip:focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; }
+
+.pg-pager { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin: 6px 0 12px; font-size: 13px; }
+.pg-page {
+  min-width: 2rem; padding: 4px 8px; font: inherit; font-size: 13px; cursor: pointer; color: var(--on-surface);
+  border: 1px solid var(--outline-variant); background: var(--surface-container-low); border-radius: var(--shape-s, 6px);
+}
+.pg-page.cur { background: var(--primary); color: var(--on-primary); border-color: var(--primary); font-weight: 600; }
+.pg-page[disabled] { opacity: .4; cursor: default; }
+.pg-page:focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; }
+.pg-gap { padding: 0 2px; color: var(--on-surface-variant); }
+.pg-pageof { margin-left: 8px; color: var(--on-surface-variant); }
+.pg-more {
+  font: inherit; font-size: 13px; cursor: pointer; padding: 6px 12px; color: var(--primary);
+  background: none; border: 1px dashed var(--outline-variant); border-radius: var(--shape-s, 6px);
+}
+.pg-more-wide { display: block; width: 100%; margin: 10px 0 16px; }
+
+/* compact cards: no summary, shorter */
+.ws-grid.pg-compact { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; }
+.ws-grid.pg-compact .ws-card { min-height: 0; padding: 8px 10px; gap: 4px; }
+.ws-grid.pg-compact .ws-card-summary { display: none; }
+/* magazine: a lead story, four features, then a dense grid */
+.pg-mag { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-bottom: 16px; }
+.pg-mag .ws-card { min-height: 0; }
+.pg-mag-lead { grid-column: span 2; grid-row: span 2; padding: 18px 20px; }
+.pg-mag-lead .ws-card-title { font-size: 1.35em; line-height: 1.35; }
+.pg-mag-lead .ws-card-summary { -webkit-line-clamp: 10; line-clamp: 10; font-size: 15px; }
+.pg-mag-rest .ws-card-summary { -webkit-line-clamp: 2; line-clamp: 2; }
+@media (max-width: 899px) { .pg-mag { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 559px) { .pg-mag { grid-template-columns: minmax(0, 1fr); } .pg-mag-lead { grid-column: auto; grid-row: auto; } }
+/* table */
+.pg-table-wrap { overflow-x: auto; border: 1px solid var(--outline-variant); border-radius: var(--shape-m, 8px); margin-bottom: 12px; }
+.pg-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.pg-table th { position: sticky; top: 0; background: var(--surface-container); text-align: left; font-weight: 600;
+  color: var(--on-surface-variant); padding: 7px 10px; border-bottom: 1px solid var(--outline-variant); white-space: nowrap; }
+.pg-table td { padding: 6px 10px; border-bottom: 1px solid var(--outline-variant); vertical-align: top; }
+.pg-table tbody tr { cursor: pointer; }
+.pg-table tbody tr:hover { background: var(--surface-container-high); }
+.pg-table tbody tr:focus-visible { outline: 2px solid var(--primary); outline-offset: -2px; }
+.pg-table tr.is-read .pg-td-title { color: var(--on-surface-variant); }
+.pg-td-date { white-space: nowrap; font-variant-numeric: tabular-nums; color: var(--on-surface-variant); }
+.pg-td-title { min-width: 18rem; color: var(--on-surface); line-height: 1.45; }
+.pg-td-src { white-space: nowrap; color: var(--on-surface-variant); max-width: 12rem; overflow: hidden; text-overflow: ellipsis; }
+.pg-td-tags { min-width: 10rem; }
+.pg-tag { display: inline-block; margin: 0 4px 3px 0; padding: 1px 6px; border-radius: 4px; font-size: 11px;
+  background: var(--surface-container-high); color: var(--on-surface-variant); }
+/* board: one column per news type */
+.pg-board { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(260px, 1fr); gap: 12px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 12px; }
+.pg-col { display: flex; flex-direction: column; min-width: 0; background: var(--surface-container-low);
+  border: 1px solid var(--outline-variant); border-radius: var(--shape-m, 8px); padding: 8px; }
+.pg-col-h { display: flex; align-items: center; gap: 6px; margin: 0 0 6px; font-size: 13px; }
+.pg-col-n { color: var(--on-surface-variant); font-weight: 400; }
+.pg-col-body { display: flex; flex-direction: column; gap: 2px; }
+.pg-col .ws-title-row .ws-type-chip { display: none; }
+.pg-col .pg-more { margin-top: 6px; }
+
+/* advanced filter panel */
+#pg-filter-panel {
+  position: fixed; top: 3.5rem; right: 0.75rem; z-index: 115; width: min(30rem, calc(100vw - 1.5rem)); max-height: calc(100vh - 4.5rem);
+  overflow-y: auto; background: var(--surface-container-high); color: var(--on-surface); border: 1px solid var(--outline-variant);
+  border-radius: var(--shape-m, 12px); box-shadow: var(--elev-2, 0 8px 24px rgba(0,0,0,.3)); padding: 12px 14px 16px;
+}
+.pg-fp-head { display: flex; align-items: center; gap: 8px; }
+.pg-fp-head h2 { margin: 0; font-size: 16px; flex: 1; }
+.pg-fp-sec { border-top: 1px solid var(--outline-variant); padding-top: 10px; margin-top: 10px; }
+.pg-fp-sec h3 { margin: 0 0 6px; font-size: 13px; color: var(--on-surface-variant); font-weight: 600; }
+.pg-fp-opts { display: flex; flex-wrap: wrap; gap: 6px; }
+.pg-fp-taglist { max-height: 13rem; overflow-y: auto; padding: 2px; }
+.pg-opt {
+  display: inline-flex; align-items: center; gap: 6px; font: inherit; font-size: 12.5px; cursor: pointer;
+  padding: 3px 10px; border-radius: var(--shape-full); border: 1px solid var(--outline-variant); background: var(--surface-container-low); color: var(--on-surface);
+}
+.pg-opt[aria-pressed="true"] { background: var(--primary-container); color: var(--on-primary-container); border-color: var(--primary); }
+.pg-opt.exc { background: none; color: var(--error, #d33); border-color: var(--error, #d33); text-decoration: line-through; }
+.pg-opt-n { color: var(--on-surface-variant); font-size: 11px; font-variant-numeric: tabular-nums; }
+.pg-opt[aria-pressed="true"] .pg-opt-n { color: inherit; opacity: .8; }
+.pg-opt:focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; }
+.pg-fp-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 6px; }
+.pg-fp-row input[type=search] { flex: 1; min-width: 8rem; }
+#pg-filter-panel input[type=search], #pg-filter-panel input[type=text] {
+  font: inherit; font-size: 13px; padding: 4px 8px; color: var(--on-surface); background: var(--surface);
+  border: 1px solid var(--outline-variant); border-radius: var(--shape-s, 6px);
+}
+#pg-filter-panel input:focus-visible { outline: 2px solid var(--primary); outline-offset: 0; }
+.pg-fp-kw { display: grid; grid-template-columns: 8.5rem minmax(0, 1fr); gap: 6px; align-items: center; margin-bottom: 6px; }
+.pg-fp-kwl { font-size: 12.5px; color: var(--on-surface-variant); }
+.pg-fp-kwlist { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+.pg-fp-kwlist input { flex: 1; min-width: 7rem; }
+@media (max-width: 479px) { .pg-fp-kw { grid-template-columns: minmax(0, 1fr); } }
+
+/* dialogs and buttons shared by the picker / tour */
+#pg-dialog-wrap { position: fixed; inset: 0; z-index: 140; background: rgba(0,0,0,.45); display: flex; align-items: center; justify-content: center; padding: 16px; }
+#pg-dialog { width: min(44rem, 100%); max-height: calc(100vh - 32px); overflow-y: auto; background: var(--surface-container-high);
+  color: var(--on-surface); border-radius: var(--shape-l, 16px); padding: 18px 20px; box-shadow: var(--elev-3, 0 12px 32px rgba(0,0,0,.35)); }
+.pg-dlg-h { margin: 0 0 4px; font-size: 18px; }
+.pg-dlg-hint { margin: 4px 0 8px; font-size: 12.5px; color: var(--on-surface-variant); line-height: 1.5; }
+.pg-dlg-row { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.pg-tpl-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(12.5rem, 1fr)); gap: 10px; margin-top: 10px; }
+.pg-tpl {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 4px; text-align: left; font: inherit; cursor: pointer;
+  padding: 12px; border-radius: var(--shape-m, 10px); border: 1px solid var(--outline-variant); background: var(--surface-container-low); color: var(--on-surface);
+}
+.pg-tpl:hover { border-color: var(--primary); }
+.pg-tpl:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.pg-tpl-ly { font-size: 11px; color: var(--primary); letter-spacing: .02em; }
+.pg-tpl-name { font-size: 15px; }
+.pg-tpl-desc { font-size: 12.5px; color: var(--on-surface-variant); line-height: 1.45; }
+.pg-btn {
+  font: inherit; font-size: 13px; cursor: pointer; padding: 5px 14px; border-radius: var(--shape-full);
+  border: 1px solid var(--outline); background: none; color: var(--on-surface);
+}
+.pg-btn-primary { background: var(--primary); color: var(--on-primary); border-color: var(--primary); font-weight: 600; }
+.pg-btn-quiet { border-color: transparent; color: var(--on-surface-variant); }
+.pg-btn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+#tour { position: fixed; inset: 0; z-index: 150; }
+#tour-spot { position: fixed; border-radius: 8px; box-shadow: 0 0 0 9999px rgba(0,0,0,.55); outline: 2px solid var(--primary); pointer-events: none; transition: all .2s ease; }
+#tour-card { position: fixed; background: var(--surface-container-high); color: var(--on-surface); border-radius: var(--shape-m, 12px);
+  padding: 14px 16px; box-shadow: 0 10px 30px rgba(0,0,0,.35); border: 1px solid var(--outline-variant); }
+.tour-step { font-size: 12px; color: var(--on-surface-variant); font-variant-numeric: tabular-nums; }
+.tour-h { margin: 2px 0 6px; font-size: 16px; }
+.tour-p { margin: 0; font-size: 13.5px; line-height: 1.6; }
+#tour-offer {
+  position: fixed; right: 16px; bottom: 16px; z-index: 120; display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+  max-width: calc(100vw - 32px); padding: 10px 12px; font-size: 13.5px; background: var(--surface-container-high); color: var(--on-surface);
+  border: 1px solid var(--outline-variant); border-radius: var(--shape-m, 12px); box-shadow: 0 8px 24px rgba(0,0,0,.3);
+}
+@media (prefers-reduced-motion: reduce) { #tour-spot { transition: none; } }
+#pg-dialog-wrap.hidden, #tour-offer.hidden, #tour.hidden, #pg-filter-panel.hidden { display: none; }
 </style>
 </head>
 <body>
@@ -2012,6 +2200,7 @@ html[data-mode="ws"] .card-title { overflow-wrap: anywhere; }
       <span id="last-updated"></span></span>
       <button id="watch-btn" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="watch-panel">關注</button>
       <button id="palette-btn" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="palette-panel">主題</button>
+      <button class="pg-tour-btn" type="button" title="導覽" aria-label="導覽">?</button>
       <button id="lang-btn" onclick="toggleLang()" title="Language / 語言" aria-label="切換語言"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H4v3h10.52C9.47 7.69 8.96 8.99 8.19 10H4v3h4.52c.7 1.43 1.72 2.81 2.97 3.85l-2.55 2.54.96.96c1.66-1.44 3.01-3.38 3.89-5.58h.11l-.04.04c.3-.45.51-.95.65-1.46.46 1.29.76 2.61.76 4v1h3v-1c0-1.13-.21-2.22-.62-3.26z"/></svg></button>
     </div>
   </div>
@@ -2043,6 +2232,7 @@ html[data-mode="ws"] .card-title { overflow-wrap: anywhere; }
   </aside>
   <div id="sidebar-scrim"></div>
   <main id="main-content">
+    <div id="pg-bar"></div>
     <div id="search-row">
       <div id="search-wrap">
         <span class="search-ico"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M9.5 2C5.36 2 2 5.36 2 9.5S5.36 17 9.5 17c1.89 0 3.64-.73 4.93-1.92l6.99 6.99c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41l-6.99-6.99C16.27 13.14 17 11.39 17 9.5 17 5.36 13.64 2 9.5 2zm0 2C12.54 4 15 6.46 15 9.5S12.54 15 9.5 15 4 12.54 4 9.5 6.46 4 9.5 4z"/></svg></span>
@@ -2081,6 +2271,10 @@ html[data-mode="ws"] .card-title { overflow-wrap: anywhere; }
 </div>
 
 <div id="watch-panel" class="hidden" role="dialog" aria-label="關注"></div>
+<div id="pg-filter-panel" class="hidden" role="dialog" aria-label="進階篩選"></div>
+<div id="pg-dialog-wrap" class="hidden"><div id="pg-dialog" role="dialog" aria-modal="true"></div></div>
+<div id="tour" class="hidden" role="dialog" aria-modal="true" aria-label="導覽"><div id="tour-spot"></div><div id="tour-card"></div></div>
+<div id="tour-offer" class="hidden" role="status"></div>
 <div id="palette-panel" class="hidden" role="dialog" aria-label="配色"></div>
 <script>
 /* TRACKER-PREFS:BEGIN */
@@ -2090,7 +2284,7 @@ html[data-mode="ws"] .card-title { overflow-wrap: anywhere; }
 const TrackerPrefs = (() => {
   const LEGACY_KEYS = ['tracker_lang', 'tracker_theme', 'tracker_skin', 'tracker_palette', 'tracker_nav',
     'tracker_view', 'tracker_watch', 'tracker_watch_hub', 'tracker_watch_seen', 'tracker_lib_group'];
-  const EXTRA_KEYS = ['tracker_ws', 'tracker_read'];
+  const EXTRA_KEYS = ['tracker_ws', 'tracker_read', 'tracker_pages', 'tracker_tour'];
   const KEY = 'tracker_prefs';
   const has = (o, k) => Object.prototype.hasOwnProperty.call(o, k);
   function load(storage) {
@@ -3189,6 +3383,203 @@ const NEWS_TYPES = [
   { id: 'other',     zh: '其他',       en: 'Other',                     categories: [] }
 ];
 const HUB_PLATFORMS = TrackerTypes.PLATFORMS;
+/* TRACKER-PAGES:BEGIN */
+// Pure layer of the user's own news pages (版面分頁) and the advanced filter. ONE prefs key
+// `tracker_pages` = {"v":1,"active":"<id>","pages":[page, ...]}; a page is the workspace state the
+// user built: {id, name, range, src, ty, w, pl, pk, layout, size, f}. f = the advanced filter.
+// No DOM, no storage, no globals: everything article-specific comes in through `h` (helpers).
+const TrackerPages = (() => {
+  const LAYOUTS = ['cards', 'titles', 'compact', 'magazine', 'table', 'bytype'];
+  const SIZES = [0, 20, 50, 100];                  // 0 = endless scrolling
+  const SORTS = ['newest', 'oldest', 'source', 'type'];
+  const LISTS = ['types', 'srcs', 'rules', 'plats', 'pkgs', 'tags', 'tagsNot', 'kwAll', 'kwAny', 'kwNot'];
+  const MAX_PAGES = 12, MAX_LIST = 50, MAX_STR = 80, MAX_NAME = 30;
+  const has = (o, k) => Object.prototype.hasOwnProperty.call(o, k);
+  const str = (x, n) => (typeof x === 'string' ? x.trim().slice(0, n || MAX_STR) : '');
+  function cleanList(x) {
+    const out = [], seen = new Set();
+    (Array.isArray(x) ? x : []).forEach(v => {
+      const s = str(v);
+      if (s && !seen.has(s.toLowerCase()) && out.length < MAX_LIST) { seen.add(s.toLowerCase()); out.push(s); }
+    });
+    return out;
+  }
+  function emptyFilter() {
+    const f = { tagMode: 'any', kwIn: 'all', watched: false, unread: false, sort: 'newest' };
+    LISTS.forEach(k => { f[k] = []; });
+    return f;
+  }
+  function normFilter(src) {
+    const o = (src && typeof src === 'object' && !Array.isArray(src)) ? src : {};
+    const f = emptyFilter();
+    LISTS.forEach(k => { f[k] = cleanList(o[k]); });
+    f.tagMode = o.tagMode === 'all' ? 'all' : 'any';
+    f.kwIn = o.kwIn === 'title' ? 'title' : 'all';
+    f.watched = o.watched === true;
+    f.unread = o.unread === true;
+    f.sort = SORTS.includes(o.sort) ? o.sort : 'newest';
+    return f;
+  }
+  // How many conditions the filter sets (the sort order is not a condition).
+  function filterCount(f) {
+    const n = normFilter(f);
+    return LISTS.reduce((s, k) => s + n[k].length, 0) + (n.watched ? 1 : 0) + (n.unread ? 1 : 0);
+  }
+  // Only the non-default fields (for links and storage).
+  function compactFilter(f) {
+    const n = normFilter(f), out = {};
+    LISTS.forEach(k => { if (n[k].length) out[k] = n[k]; });
+    if (n.tagMode !== 'any') out.tagMode = n.tagMode;
+    if (n.kwIn !== 'all') out.kwIn = n.kwIn;
+    if (n.watched) out.watched = true;
+    if (n.unread) out.unread = true;
+    if (n.sort !== 'newest') out.sort = n.sort;
+    return out;
+  }
+  const RANGE_RE = /^[a-z0-9_-]{1,40}$/;
+  const ID_RE = /^[a-z0-9_-]{1,24}$/;
+  function normPage(p, i) {
+    const o = (p && typeof p === 'object' && !Array.isArray(p)) ? p : {};
+    const size = Number(o.size);
+    return {
+      id: (typeof o.id === 'string' && ID_RE.test(o.id)) ? o.id : 'p' + (i || 0),
+      name: str(o.name, MAX_NAME),
+      range: (typeof o.range === 'string' && RANGE_RE.test(o.range)) ? o.range : '30d',
+      src: str(o.src), ty: str(o.ty), w: str(o.w), pl: str(o.pl), pk: str(o.pk),
+      layout: LAYOUTS.includes(o.layout) ? o.layout : 'cards',
+      size: SIZES.includes(size) ? size : 0,
+      f: compactFilter(o.f)
+    };
+  }
+  function defaultState() {
+    return { v: 1, active: 'main', pages: [normPage({ id: 'main' }, 0)] };
+  }
+  function normState(o) {
+    if (!o || typeof o !== 'object' || o.v !== 1 || !Array.isArray(o.pages)) return defaultState();
+    const pages = [], ids = new Set();
+    o.pages.slice(0, MAX_PAGES).forEach((p, i) => {
+      const n = normPage(p, i);
+      let id = n.id, k = 1;
+      while (ids.has(id)) id = (n.id.slice(0, 20) + '-' + (k++));
+      n.id = id; ids.add(id); pages.push(n);
+    });
+    if (!pages.length) return defaultState();
+    const active = ids.has(o.active) ? o.active : pages[0].id;
+    return { v: 1, active, pages };
+  }
+  function parse(s) {
+    if (typeof s !== 'string') return defaultState();
+    try { return normState(JSON.parse(s)); } catch (e) { return defaultState(); }
+  }
+  function serialize(st) { return JSON.stringify(normState(st)); }
+  function newId(st) {
+    const ids = new Set((st && st.pages || []).map(p => p.id));
+    let i = 1;
+    while (ids.has('p' + i)) i++;
+    return 'p' + i;
+  }
+  function canAdd(st) { return (st && st.pages ? st.pages.length : 0) < MAX_PAGES; }
+
+  // ── filtering ──
+  // h: { type(a) -> type id, inSrc(a, src) -> bool, rules(a) -> [rule ids], plats(a), pkgs(a), tags(a),
+  //      text(a, 'title'|'all') -> string (any case), read(a) -> bool }
+  const lc = s => String(s || '').toLowerCase();
+  function match(a, f, h) {
+    const n = (f && f._norm) ? f : normFilter(f);
+    if (n.types.length && !n.types.includes(h.type(a))) return false;
+    if (n.srcs.length && !n.srcs.some(s => h.inSrc(a, s))) return false;
+    if (n.rules.length) { const r = h.rules(a); if (!n.rules.some(x => r.includes(x))) return false; }
+    if (n.watched && !h.rules(a).length) return false;
+    if (n.plats.length) { const p = h.plats(a); if (!n.plats.some(x => p.includes(x))) return false; }
+    if (n.pkgs.length) { const p = h.pkgs(a); if (!n.pkgs.some(x => p.includes(x))) return false; }
+    if (n.tags.length || n.tagsNot.length) {
+      const tg = h.tags(a).map(lc);
+      const hit = x => tg.includes(lc(x));
+      if (n.tags.length && !(n.tagMode === 'all' ? n.tags.every(hit) : n.tags.some(hit))) return false;
+      if (n.tagsNot.some(hit)) return false;
+    }
+    if (n.kwAll.length || n.kwAny.length || n.kwNot.length) {
+      const hay = lc(h.text(a, n.kwIn));
+      const hit = k => hay.includes(lc(k));
+      if (!n.kwAll.every(hit)) return false;
+      if (n.kwAny.length && !n.kwAny.some(hit)) return false;
+      if (n.kwNot.some(hit)) return false;
+    }
+    if (n.unread && h.read(a)) return false;
+    return true;
+  }
+  // A normalised filter marked so match() skips re-normalising it per article.
+  function prepare(f) { return Object.assign(normFilter(f), { _norm: true }); }
+  function filter(list, f, h) {
+    if (!filterCount(f)) return list.slice();
+    const n = prepare(f);
+    return list.filter(a => match(a, n, h));
+  }
+  // list is newest-first already; other orders are stable re-sorts of it.
+  function sort(list, order, h) {
+    const out = list.slice();
+    if (order === 'oldest') return out.reverse();
+    if (order === 'source') {
+      const key = a => lc(h.source(a));
+      return out.map((a, i) => [a, i]).sort((x, y) => key(x[0]).localeCompare(key(y[0])) || x[1] - y[1]).map(x => x[0]);
+    }
+    if (order === 'type') {
+      const rank = id => { const i = (h.typeOrder || []).indexOf(id); return i < 0 ? 999 : i; };
+      return out.map((a, i) => [a, i]).sort((x, y) => rank(h.type(x[0])) - rank(h.type(y[0])) || x[1] - y[1]).map(x => x[0]);
+    }
+    return out;
+  }
+  // ── paging ──
+  function pages(n, size) { return size > 0 ? Math.max(1, Math.ceil(n / size)) : 1; }
+  function slice(list, size, pn) {
+    if (!(size > 0)) return { items: list, pn: 1, pages: 1 };
+    const total = pages(list.length, size);
+    const p = Math.min(Math.max(1, Math.floor(Number(pn) || 1)), total);
+    return { items: list.slice((p - 1) * size, p * size), pn: p, pages: total };
+  }
+  // Page buttons to show: first, last, current ±2, gaps as '…'.
+  function pagerWindow(pn, total) {
+    const want = new Set([1, total]);
+    for (let i = pn - 2; i <= pn + 2; i++) if (i >= 1 && i <= total) want.add(i);
+    const nums = [...want].sort((x, y) => x - y), out = [];
+    nums.forEach((v, i) => { if (i && v - nums[i - 1] > 1) out.push('…'); out.push(v); });
+    return out;
+  }
+  // Tag → count over the list, most used first (ties: alphabetical); case-insensitive merge.
+  function tagCounts(list, tagsOf, limit) {
+    const m = new Map();
+    list.forEach(a => {
+      const seen = new Set();
+      tagsOf(a).forEach(t => {
+        const k = lc(t);
+        if (!k || seen.has(k)) return;
+        seen.add(k);
+        const e = m.get(k);
+        if (e) e.n++; else m.set(k, { tag: String(t).trim(), n: 1 });
+      });
+    });
+    return [...m.values()].sort((x, y) => y.n - x.n || x.tag.localeCompare(y.tag)).slice(0, limit || 300);
+  }
+  // Page templates offered by 「＋ 新增版面」 (names / descriptions are UI text, looked up by id).
+  const TEMPLATES = [
+    { id: 'blank',      page: { range: '30d', layout: 'cards' } },
+    { id: 'briefing',   page: { range: '7d',  layout: 'magazine', f: { types: ['incident', 'vuln', 'regulation'] } } },
+    { id: 'analyst',    page: { range: '30d', layout: 'table', size: 50, f: { types: ['vuln'] } } },
+    { id: 'exploited',  page: { range: '90d', layout: 'titles', f: { rules: ['kev', 'zeroday'] } } },
+    { id: 'compliance', page: { range: '90d', layout: 'titles', f: { types: ['regulation'] } } },
+    { id: 'supply',     page: { range: '30d', layout: 'compact', f: { types: ['supply'] } } },
+    { id: 'board',      page: { range: '7d',  layout: 'bytype' } },
+    { id: 'unread',     page: { range: '7d',  layout: 'titles', size: 50, f: { unread: true } } }
+  ];
+  function fromTemplate(st, tplId, name) {
+    const tpl = TEMPLATES.find(x => x.id === tplId) || TEMPLATES[0];
+    return normPage(Object.assign({}, tpl.page, { id: newId(st), name: name || '' }), 0);
+  }
+  return { LAYOUTS, SIZES, SORTS, LISTS, MAX_PAGES, TEMPLATES, emptyFilter, normFilter, compactFilter, filterCount,
+           normPage, normState, defaultState, parse, serialize, newId, canAdd, match, filter, sort, pages, slice,
+           pagerWindow, tagCounts, fromTemplate };
+})();
+/* TRACKER-PAGES:END */
 /* TRACKER-STORE:BEGIN */
 // Pure data layer over the TRACKER_DAYS shape ({ 'YYYY-MM-DD': [article, ...] }). No DOM, no
 // storage, no globals: anything it needs (e.g. a type function) is passed in as an argument.
@@ -3865,7 +4256,7 @@ function renderWatchHub(focusFn) {
   document.getElementById('loading-msg').style.display = 'none';
   document.getElementById('no-data').classList.add('hidden');
   Array.from(main.children).forEach(c => {
-    if (c.id !== 'loading-msg' && c.id !== 'no-data' && c.id !== 'search-row') c.remove();
+    if (c.id !== 'loading-msg' && c.id !== 'no-data' && c.id !== 'search-row' && c.id !== 'pg-bar') c.remove();
   });
   const root = whEl('div', 'wh');
   root.appendChild(hubHeaderEl());
@@ -4163,6 +4554,7 @@ function init() {
   initPalette();   // localStorage tracker_palette → data-palette; a hash pal= (below) may override it
   initHubPrefs();  // localStorage tracker_watch_hub → hubPrefs; a hash hv= / hw= (below) may override it
   ws.mode = wsLoadMode();
+  pgLoad();        // localStorage tracker_pages → pgState (the user's own pages)
   if (!applyHashRestore()) selectWorkspace();   // deep-link wins; no / unknown hash → the news workspace (the home view; it was the 總覽 hub, which replaced the old default tracker wall)
   applyLang();   // sync all static labels + lang button to the active language
 }
@@ -4298,6 +4690,9 @@ const ws = {
   allMonths: null,  // promise: every month manifest loaded (for the year archive day counts)
   panelOpen: false, railCollapsed: false, railInit: false,
   newest: '', focusKey: null,
+  f: TrackerPages.normFilter({}),   // advanced filter (TrackerPages); part of the active page
+  size: 0,          // page size, 0 = endless scrolling
+  pn: 1,            // current page number when size > 0
   rendered: 60,     // articles of `shown` rendered so far (incremental rendering); reset to WS_BATCH on range / filter / search / mode change
   partial: null     // { done, total } while a quick range is still loading, else null
 };
@@ -4310,16 +4705,17 @@ function wsLoadMode() {
     try {
       const obj = JSON.parse(raw);
       if (obj && typeof obj === 'object') {
-        if (obj.mode === 'titles' || obj.mode === 'cards') return obj.mode;
+        if (TrackerPages.LAYOUTS.includes(obj.mode)) return obj.mode;
       }
     } catch (e) {}
   }
   return 'cards';
 }
 function wsSetMode(mode) {
-  if (mode !== 'titles' && mode !== 'cards') mode = 'cards';
+  if (!TrackerPages.LAYOUTS.includes(mode)) mode = 'cards';
   if (ws.mode === mode) return;
   ws.mode = mode;
+  ws.pn = 1;
   try { prefSet('tracker_ws', JSON.stringify({ mode: mode })); } catch (e) {}
   ws.focusKey = 'mode:' + mode;
   ws.rendered = WS_BATCH;
@@ -4434,9 +4830,13 @@ function wsYearDays(y) {
 
 // ── filters ──
 // range is applied by the caller; here: source + search (the base every count is taken over) ...
-function wsBase(list) {
+function wsBaseRaw(list) {
   const q = state.searchQuery;
   return list.filter(a => (!ws.src || itemBelongsToTracker(a, ws.src)) && (!q || matchesQuery(a, q)));
+}
+// ... plus the advanced filter of the active page (so the rail counts follow it too)
+function wsBase(list) {
+  return TrackerPages.filter(wsBaseRaw(list), ws.f, PG_HELP);
 }
 // ... and type / watch rule / platform on top.
 function wsFacet(items) {
@@ -4690,15 +5090,17 @@ function wsDraw(keep) {
   document.getElementById('loading-msg').style.display = 'none';
   document.getElementById('no-data').classList.add('hidden');
   Array.from(main.children).forEach(c => {
-    if (c.id !== 'loading-msg' && c.id !== 'no-data' && c.id !== 'search-row') c.remove();
+    if (c.id !== 'loading-msg' && c.id !== 'no-data' && c.id !== 'search-row' && c.id !== 'pg-bar') c.remove();
   });
   const days = window.TRACKER_DAYS || {};
   const newest = TrackerStore.newestDate(days);
   ws.newest = newest;
   const rg = TrackerStore.rangeOf(ws.range, newest);
   const base = wsBase(TrackerStore.collect(days, { fromDate: rg.from, toDate: rg.to }));
-  const shown = TrackerStore.sortNewest(wsFacet(base));
+  const shown = TrackerPages.sort(TrackerStore.sortNewest(wsFacet(base)), ws.f.sort, PG_HELP);
   ws.shown = shown;
+  if (!keep) pgCapture();
+  pgBuildBar();
   document.getElementById('article-count').textContent = shown.length;
   wsSyncChrome();
   wsBuildRail(base);
@@ -4707,8 +5109,14 @@ function wsDraw(keep) {
   if (pendingOpenId !== null) setTimeout(openPendingArticle, 0);   // `a=` permalink: open once this render has finished
   if (!shown.length) {
     const nd = document.getElementById('no-data');
+    // keep the toolbar and chips reachable, or a filter that empties the list could not be undone
+    const tbFrag = document.createDocumentFragment();
+    tbFrag.appendChild(pgToolbarEl());
+    const ch0 = pgChipsEl(); if (ch0) tbFrag.appendChild(ch0);
+    main.insertBefore(tbFrag, nd);
     nd.classList.remove('hidden');
-    nd.textContent = state.searchQuery ? L().ui.noResults(state.searchQuery) : t('noData');
+    nd.textContent = state.searchQuery ? L().ui.noResults(state.searchQuery)
+      : (TrackerPages.filterCount(ws.f) ? pt('empty') : t('noData'));
     wsRefocus();
     return;
   }
@@ -4718,41 +5126,52 @@ function wsDraw(keep) {
   head.appendChild(wsEl('span', 'ws-sub', '· ' + t('tlCount')(shown.length)));
   if (ws.partial) head.appendChild(wsEl('span', 'ws-sub ws-partial', t('wsPartial')(ws.partial.done, ws.partial.total)));
 
-  const toggle = wsEl('span', 'ws-mode-toggle');
-  const btnCards = wsEl('button', 'ws-mode-btn', t('wsCards'));
-  btnCards.type = 'button';
-  btnCards.setAttribute('aria-pressed', ws.mode === 'cards' ? 'true' : 'false');
-  btnCards.dataset.ws = 'mode:cards';
-  btnCards.onclick = () => wsSetMode('cards');
-
-  const btnTitles = wsEl('button', 'ws-mode-btn', t('wsTitles'));
-  btnTitles.type = 'button';
-  btnTitles.setAttribute('aria-pressed', ws.mode === 'titles' ? 'true' : 'false');
-  btnTitles.dataset.ws = 'mode:titles';
-  btnTitles.onclick = () => wsSetMode('titles');
-
-  toggle.appendChild(btnCards);
-  toggle.appendChild(btnTitles);
-  head.appendChild(toggle);
   frag.appendChild(head);
+  frag.appendChild(pgToolbarEl());
+  const chips = pgChipsEl(); if (chips) frag.appendChild(chips);
+  // paging: size > 0 shows one page of `shown` with a pager above and below
+  const paged = TrackerPages.slice(shown, ws.size, ws.pn);
+  ws.pn = paged.pn;
+  const list = paged.items;
+  if (ws.size > 0 && paged.pages > 1) frag.appendChild(pgPagerEl(paged));
+  const flat = { table: pgRenderTable, magazine: pgRenderMagazine, bytype: pgRenderBoard }[ws.mode];
+  if (flat) {
+    // not date-grouped; endless mode grows by WS_BATCH with a button (the table can hold thousands)
+    const endless = !(ws.size > 0);
+    const upto = endless ? Math.max(ws.rendered, WS_BATCH) : list.length;
+    frag.appendChild(flat(endless && ws.mode !== 'bytype' ? list.slice(0, upto) : list));
+    if (endless && ws.mode !== 'bytype' && list.length > upto) {
+      const more = wsEl('button', 'pg-more pg-more-wide', pt('more')(Math.min(WS_BATCH, list.length - upto)));
+      more.type = 'button';
+      more.dataset.ws = 'more';
+      more.onclick = () => { ws.rendered = upto + WS_BATCH; ws.focusKey = 'more'; wsDraw(true); };
+      frag.appendChild(more);
+    } else ws.rendered = upto;
+    if (ws.size > 0 && paged.pages > 1) frag.appendChild(pgPagerEl(paged));
+    main.appendChild(frag);
+    if (keep) window.scrollTo(0, keepY);
+    wsRefocus();
+    return;
+  }
 
   const counts = new Map();
   shown.forEach(a => counts.set(a._date, (counts.get(a._date) || 0) + 1));
   const isTitles = ws.mode === 'titles';
+  const isCompact = ws.mode === 'compact';
   const sentinel = wsEl('div', 'ws-sentinel');
   sentinel.setAttribute('aria-hidden', 'true');
   frag.appendChild(sentinel);
   let curDate = null, curBox = null, count = 0;
   // Append shown[count .. count+n): a date group split across batches keeps appending into the same box.
   const appendBatch = n => {
-    const end = Math.min(shown.length, count + n);
+    const end = Math.min(list.length, count + n);
     for (; count < end; count++) {
-      const a = shown[count];
+      const a = list[count];
       if (a._date !== curDate) {
         curDate = a._date;
         const group = wsEl('section', 'ws-date-group');
         group.appendChild(wsEl('div', 'date-divider', curDate + ' · ' + t('tlCount')(counts.get(curDate))));
-        curBox = wsEl('div', isTitles ? 'ws-titles' : 'ws-grid');
+        curBox = wsEl('div', isTitles ? 'ws-titles' : (isCompact ? 'ws-grid pg-compact' : 'ws-grid'));
         group.appendChild(curBox);
         sentinel.parentNode.insertBefore(group, sentinel);
       }
@@ -4760,17 +5179,19 @@ function wsDraw(keep) {
     }
     ws.rendered = count;
   };
-  const lazy = typeof IntersectionObserver === 'function';
-  appendBatch(lazy ? Math.max(ws.rendered, WS_BATCH) : shown.length);
+  const lazy = typeof IntersectionObserver === 'function' && !(ws.size > 0);
+  appendBatch(lazy ? Math.max(ws.rendered, WS_BATCH) : list.length);
+  if (ws.size > 0 && paged.pages > 1) frag.appendChild(pgPagerEl(paged));
   main.appendChild(frag);
+  if (!lazy) sentinel.remove();
   if (lazy) {
-    if (count >= shown.length) sentinel.remove();
+    if (count >= list.length) sentinel.remove();
     else {
       wsObserver = new IntersectionObserver(entries => {
         if (!sentinel.isConnected) { wsObserver.disconnect(); wsObserver = null; return; }   // another view replaced the list
         if (!entries.some(e => e.isIntersecting)) return;
         appendBatch(WS_BATCH);
-        if (count >= shown.length) { wsObserver.disconnect(); wsObserver = null; sentinel.remove(); return; }
+        if (count >= list.length) { wsObserver.disconnect(); wsObserver = null; sentinel.remove(); return; }
         wsObserver.unobserve(sentinel); wsObserver.observe(sentinel);   // re-check: still within range after the append?
       }, { rootMargin: '800px 0px' });
       wsObserver.observe(sentinel);
@@ -4815,6 +5236,13 @@ function selectWorkspace(patch) {
   state.filterCats = new Set();
   state.search = null;
   if (patch) {
+    // a link: with pg= it is that page (and its state is saved there); without, a transient view
+    const pg = patch.pg && pgState.pages.find(x => x.id === patch.pg);
+    pgTransient = !pg;
+    if (pg) pgState.active = pg.id;
+    ws.f = TrackerPages.normFilter(patch.f);
+    ws.size = TrackerPages.SIZES.includes(Number(patch.sz)) ? Number(patch.sz) : 0;
+    ws.pn = Math.max(1, parseInt(patch.pn, 10) || 1);
     const names = wsTrackerNames();
     ws.range = wsNormRange(patch.range);
     ws.prev = null;
@@ -4824,13 +5252,16 @@ function selectWorkspace(patch) {
     ws.pl = HUB_PLATFORMS.includes(patch.pl) ? patch.pl : '';
     ws.pk = TrackerTypes.PACKAGES.some(x => x.id === patch.pk) ? patch.pk : '';
     state.searchQuery = patch.q || '';
-    if (patch.v === 't') ws.mode = 'titles';
+    if (TrackerPages.LAYOUTS.includes(patch.ly)) ws.mode = patch.ly;
+    else if (patch.v === 't') ws.mode = 'titles';
     else if (patch.v === 'c' || patch.v === 'cards') ws.mode = 'cards';
-    else ws.mode = wsLoadMode();
+    else ws.mode = pg ? 'cards' : wsLoadMode();   // page links omit ly= only for cards
   } else if (!was) {
     state.searchQuery = '';
-    ws.mode = wsLoadMode();
+    pgTransient = false;
+    pgApply(pgActive());
   }
+  if (!was) setTimeout(tourMaybeOffer, 800);
   if (!ws.railInit) {
     ws.railInit = true;
     let pref = null;
@@ -4852,6 +5283,8 @@ function selectWorkspace(patch) {
 function leaveWorkspace() {
   if (!state.wsActive) return;
   closeReader();
+  closeFilterPanel();
+  pgCloseMenu();
   ws.seq++;
   state.wsActive = false;
   ws.panelOpen = false;
@@ -4868,6 +5301,811 @@ function leaveWorkspace() {
   if (sel) sel.addEventListener('change', () => wsSet({ src: sel.value }, null));
   const rbd = document.getElementById('reader-backdrop');
   if (rbd) rbd.addEventListener('click', e => { if (e.target === rbd) closeReader(); });
+})();
+
+// ── My pages (版面分頁), advanced filter, layouts, pager, guided tour ──────────
+// The workspace state (range, rail filters, layout, page size, advanced filter `ws.f`) belongs to
+// the ACTIVE page of TrackerPages and is saved back on every change (pgCapture). A view opened
+// from a link without `pg=` is transient (pgTransient): shown, not saved, until the user saves it.
+const PGT = {
+  zh: {
+    main: '全部新聞', newPage: '＋ 新增版面', manage: '版面管理', linkView: '連結檢視', saveAs: '存成新版面',
+    rename: '重新命名', dup: '複製', left: '左移', right: '右移', del: '刪除', exportP: '匯出版面設定', importP: '匯入版面設定',
+    delQ: n => '刪除版面「' + n + '」？', renameQ: '版面名稱', nameNew: '新版面', full: '最多 12 個版面',
+    importBad: '檔案格式不正確', imported: n => '已匯入 ' + n + ' 個版面', tplTitle: '選擇版面範本',
+    tplHint: '範本只是起點；建立後可再調整時間、篩選與版面，都會自動記住。', create: '建立', cancel: '取消',
+    tpl: {
+      blank: ['空白版面', '近 30 天全部新聞，卡片呈現'],
+      briefing: ['主管晨報', '近 7 天重大事件、漏洞與法規，雜誌式版面'],
+      analyst: ['漏洞分析', '近 30 天漏洞威脅，表格呈現、每頁 50 篇'],
+      exploited: ['已遭利用漏洞', '近 90 天 KEV 與零時差，標題列表'],
+      compliance: ['法規遵循', '近 90 天法規與標準，標題列表'],
+      supply: ['供應鏈安全', '近 30 天供應鏈與開源，精簡卡片'],
+      board: ['類型看板', '近 7 天依新聞類型分欄'],
+      unread: ['未讀待看', '近 7 天尚未讀過的文章，每頁 50 篇']
+    },
+    layout: '版面', layouts: { cards: '卡片', titles: '標題', compact: '精簡', magazine: '雜誌', table: '表格', bytype: '看板' },
+    perPage: '每頁', endless: '連續捲動', sort: '排序',
+    sorts: { newest: '最新優先', oldest: '最舊優先', source: '依來源', type: '依類型' },
+    filter: '篩選', filterN: n => '篩選 (' + n + ')', clearAll: '清除全部篩選', more: n => '再顯示 ' + n + ' 篇',
+    prev: '‹ 上一頁', next: '下一頁 ›', pageOf: (p, n) => '第 ' + p + ' / ' + n + ' 頁', jump: '跳到',
+    fTitle: '進階篩選', fHint: '條件即時套用並記在目前的版面；同一區內多選＝符合任一。',
+    fTypes: '新聞類型', fSrcs: '來源', fRules: '關注規則', fPlats: '平台', fPkgs: '套件',
+    fTags: '標籤', fTagFind: '找標籤…', fTagAny: '符合任一', fTagAll: '全部符合', fTagHint: '點一下＝包含，再點＝排除，第三下＝取消',
+    fKw: '關鍵字', fKwAll: '必須包含（全部）', fKwAny: '包含任一', fKwNot: '排除', fKwPh: '輸入後按 Enter',
+    fKwIn: '比對範圍', fKwTitle: '只比對標題', fKwAllText: '標題＋摘要＋標籤',
+    fOther: '其他', fWatched: '只看關注命中', fUnread: '只看未讀', fDate: '日期', fDateHint: '用上方「時間」選快速區間、自訂起訖或點每日長條',
+    fDone: '完成', fNoTags: '這段期間沒有標籤',
+    chip: { types: '類型', srcs: '來源', rules: '關注', plats: '平台', pkgs: '套件', tags: '標籤', tagsNot: '排除標籤',
+            kwAll: '含', kwAny: '任一', kwNot: '不含', watched: '只看關注', unread: '只看未讀' },
+    tColDate: '日期', tColType: '類型', tColTitle: '標題', tColSrc: '來源', tColTags: '標籤',
+    colMore: n => '還有 ' + n + ' 篇 ›', empty: '沒有符合的文章',
+    tour: '導覽', tourOffer: '第一次使用？花一分鐘看看操作導覽。', tourStart: '開始導覽', tourLater: '以後再說',
+    tourPrev: '上一步', tourNext: '下一步', tourEnd: '結束', tourDone: '完成',
+    steps: [
+      ['#pg-bar', '版面分頁', '每個分頁是你自己的新聞版面：時間、篩選、呈現方式都各自記住。按「＋ 新增版面」可從範本建立，例如主管晨報、漏洞分析。'],
+      ['#pg-bar .pg-menu-btn', '管理版面', '重新命名、複製、調整順序、刪除，或把版面設定匯出給同事、匯入到另一台電腦。'],
+      ['#ws-time-chip', '時間範圍', '快速選今天、近 7／30／90 天、今年，或自訂起訖日期；面板裡的每日長條圖點一下就只看那一天。'],
+      ['#ws-rail', '快速分類', '依新聞類型、關注規則、平台、套件快速縮小範圍，右邊數字是目前條件下的篇數。'],
+      ['#search-box', '全文搜尋', '搜尋標題、內文與標籤；可用旁邊的「範圍」限定欄位。'],
+      ['.pg-filter-btn', '進階篩選', '多選類型與來源、包含或排除標籤、必須／任一／排除關鍵字、只看未讀或關注命中。目前套用的條件會顯示成小標籤，點 ✕ 移除。'],
+      ['.pg-layout', '版面呈現', '卡片、標題、精簡、雜誌、表格、看板六種呈現；表格適合大量瀏覽，看板依類型分欄。'],
+      ['.pg-size', '分頁與排序', '選每頁 20／50／100 篇改用分頁，或連續捲動；排序可改最新、最舊、依來源或類型。'],
+      ['#watch-btn', '關注規則', '設定你在意的主題與自訂關鍵字，命中的文章會標 ★，也能在左側快速篩選。'],
+      ['#palette-btn', '主題配色', '切換配色與深淺色。'],
+      ['.pg-tour-btn', '隨時回來', '想再看一次導覽，按這裡。']
+    ]
+  },
+  en: {
+    main: 'All news', newPage: '＋ New page', manage: 'Manage pages', linkView: 'Linked view', saveAs: 'Save as page',
+    rename: 'Rename', dup: 'Duplicate', left: 'Move left', right: 'Move right', del: 'Delete', exportP: 'Export pages', importP: 'Import pages',
+    delQ: n => 'Delete page “' + n + '”?', renameQ: 'Page name', nameNew: 'New page', full: 'At most 12 pages',
+    importBad: 'Not a valid pages file', imported: n => n + ' pages imported', tplTitle: 'Pick a page template',
+    tplHint: 'A template is only a start: change the time, filters and layout afterwards; they are remembered.', create: 'Create', cancel: 'Cancel',
+    tpl: {
+      blank: ['Blank', 'All news of the last 30 days, as cards'],
+      briefing: ['Executive briefing', 'Incidents, vulnerabilities and regulation of the last 7 days, magazine layout'],
+      analyst: ['Vulnerability analyst', 'Vulnerabilities of the last 30 days as a table, 50 per page'],
+      exploited: ['Exploited in the wild', 'KEV and zero-days of the last 90 days, title list'],
+      compliance: ['Compliance', 'Regulation and standards of the last 90 days, title list'],
+      supply: ['Supply chain', 'Supply chain and open source of the last 30 days, compact cards'],
+      board: ['Type board', 'The last 7 days in one column per news type'],
+      unread: ['Unread', 'Articles of the last 7 days you have not opened, 50 per page']
+    },
+    layout: 'Layout', layouts: { cards: 'Cards', titles: 'Titles', compact: 'Compact', magazine: 'Magazine', table: 'Table', bytype: 'Board' },
+    perPage: 'Per page', endless: 'Endless', sort: 'Sort',
+    sorts: { newest: 'Newest first', oldest: 'Oldest first', source: 'By source', type: 'By type' },
+    filter: 'Filter', filterN: n => 'Filter (' + n + ')', clearAll: 'Clear all filters', more: n => 'Show ' + n + ' more',
+    prev: '‹ Prev', next: 'Next ›', pageOf: (p, n) => 'Page ' + p + ' of ' + n, jump: 'Go to',
+    fTitle: 'Advanced filter', fHint: 'Applied at once and kept on the current page; several picks in one group = any of them.',
+    fTypes: 'News types', fSrcs: 'Sources', fRules: 'Watch rules', fPlats: 'Platforms', fPkgs: 'Packages',
+    fTags: 'Tags', fTagFind: 'Find a tag…', fTagAny: 'Any', fTagAll: 'All', fTagHint: 'Click = include, again = exclude, third = off',
+    fKw: 'Keywords', fKwAll: 'Must contain (all)', fKwAny: 'Contains any', fKwNot: 'Exclude', fKwPh: 'Type, then Enter',
+    fKwIn: 'Match in', fKwTitle: 'Title only', fKwAllText: 'Title + summary + tags',
+    fOther: 'Other', fWatched: 'Watch hits only', fUnread: 'Unread only', fDate: 'Date', fDateHint: 'Use “Time” above: quick ranges, custom dates, or a day bar',
+    fDone: 'Done', fNoTags: 'No tags in this period',
+    chip: { types: 'Type', srcs: 'Source', rules: 'Watch', plats: 'Platform', pkgs: 'Package', tags: 'Tag', tagsNot: 'Not tag',
+            kwAll: 'Has', kwAny: 'Any', kwNot: 'Not', watched: 'Watch hits', unread: 'Unread' },
+    tColDate: 'Date', tColType: 'Type', tColTitle: 'Title', tColSrc: 'Source', tColTags: 'Tags',
+    colMore: n => n + ' more ›', empty: 'No matching articles',
+    tour: 'Tour', tourOffer: 'New here? Take the one-minute tour.', tourStart: 'Start tour', tourLater: 'Later',
+    tourPrev: 'Back', tourNext: 'Next', tourEnd: 'Close', tourDone: 'Done',
+    steps: [
+      ['#pg-bar', 'Pages', 'Each tab is your own news page: time, filters and layout are remembered per page. “＋ New page” starts from a template such as an executive briefing.'],
+      ['#pg-bar .pg-menu-btn', 'Manage pages', 'Rename, duplicate, reorder, delete, or export the page setup for a colleague or another computer.'],
+      ['#ws-time-chip', 'Time range', 'Today, the last 7/30/90 days, this year, or custom dates; click a day bar in the panel to see only that day.'],
+      ['#ws-rail', 'Quick facets', 'Narrow by news type, watch rule, platform or package; the numbers count the current selection.'],
+      ['#search-box', 'Search', 'Searches titles, bodies and tags; “In” limits the fields.'],
+      ['.pg-filter-btn', 'Advanced filter', 'Several types and sources, include or exclude tags, all/any/none keywords, unread or watch hits only. Active conditions show as chips; ✕ removes one.'],
+      ['.pg-layout', 'Layouts', 'Cards, titles, compact, magazine, table and board; the table suits bulk reading, the board splits by type.'],
+      ['.pg-size', 'Paging and order', '20/50/100 per page or endless scrolling; sort by newest, oldest, source or type.'],
+      ['#watch-btn', 'Watch rules', 'Topics and keywords you care about; hits get a ★ and a quick filter on the left.'],
+      ['#palette-btn', 'Theme', 'Colours and light/dark.'],
+      ['.pg-tour-btn', 'Come back any time', 'Press here to see this tour again.']
+    ]
+  }
+};
+function pt(k) { return (PGT[state.lang] || PGT.zh)[k]; }
+
+let pgState = TrackerPages.defaultState();
+let pgTransient = false;   // a linked view (hash without pg=) is shown but not saved
+function pgLoad() {
+  let raw = null;
+  try { raw = prefGet('tracker_pages'); } catch (e) {}
+  pgState = TrackerPages.parse(raw);
+}
+function pgSave() {
+  if (isPreviewMode()) return;
+  try { prefSet('tracker_pages', TrackerPages.serialize(pgState)); } catch (e) {}
+}
+function pgActive() { return pgState.pages.find(p => p.id === pgState.active) || pgState.pages[0]; }
+function pgName(p) { return p.name || (p.id === 'main' ? pt('main') : pt('nameNew')); }
+// page → workspace
+function pgApply(p) {
+  ws.range = wsNormRange(p.range);
+  ws.prev = null;
+  const names = wsTrackerNames();
+  ws.src = names.includes(p.src) ? p.src : '';
+  ws.ty = NEWS_TYPES.some(x => x.id === p.ty) ? p.ty : '';
+  ws.w = p.w || '';
+  ws.pl = HUB_PLATFORMS.includes(p.pl) ? p.pl : '';
+  ws.pk = TrackerTypes.PACKAGES.some(x => x.id === p.pk) ? p.pk : '';
+  ws.mode = TrackerPages.LAYOUTS.includes(p.layout) ? p.layout : 'cards';
+  ws.size = p.size || 0;
+  ws.f = TrackerPages.normFilter(p.f);
+  ws.pn = 1;
+  ws.rendered = WS_BATCH;
+}
+// workspace → active page (+ save). No-op for a transient linked view.
+function pgCapture() {
+  if (pgTransient) return;
+  const p = pgActive();
+  if (!p) return;
+  const next = TrackerPages.normPage({ id: p.id, name: p.name, range: ws.range, src: ws.src, ty: ws.ty, w: ws.w,
+    pl: ws.pl, pk: ws.pk, layout: ws.mode, size: ws.size, f: ws.f }, 0);
+  if (JSON.stringify(next) === JSON.stringify(p)) return;
+  pgState.pages[pgState.pages.indexOf(p)] = next;
+  pgSave();
+}
+function pgSwitch(id) {
+  if (!pgTransient && id === pgState.active) return;
+  closeFilterPanel();
+  pgTransient = false;
+  pgState.active = id;
+  pgSave();
+  state.searchQuery = '';
+  const sb = document.getElementById('search-box'); if (sb) sb.value = '';
+  const sc = document.getElementById('search-clear'); if (sc) sc.style.display = 'none';
+  pgApply(pgActive());
+  renderWorkspace();
+}
+function pgAdd(tplId, name) {
+  if (!TrackerPages.canAdd(pgState)) { alert(pt('full')); return; }
+  const p = TrackerPages.fromTemplate(pgState, tplId, name || (pt('tpl')[tplId] || [])[0] || '');
+  pgState.pages.push(p);
+  pgSwitch(p.id);
+}
+// Save the transient linked view as a page of its own.
+function pgSaveTransient() {
+  if (!TrackerPages.canAdd(pgState)) { alert(pt('full')); return; }
+  const name = prompt(pt('renameQ'), pt('nameNew'));
+  if (name === null) return;
+  const id = TrackerPages.newId(pgState);
+  pgState.pages.push(TrackerPages.normPage({ id, name }, 0));
+  pgState.active = id;
+  pgTransient = false;
+  pgCapture();
+  pgSave();
+  renderWorkspace();
+}
+
+// ── tab bar ──
+function pgBuildBar() {
+  const bar = document.getElementById('pg-bar');
+  if (!bar) return;
+  bar.innerHTML = '';
+  bar.setAttribute('aria-label', pt('manage'));
+  const tabs = wsEl('div', 'pg-tabs');
+  tabs.setAttribute('role', 'tablist');
+  pgState.pages.forEach(p => {
+    const b = wsEl('button', 'pg-tab', pgName(p));
+    b.type = 'button';
+    b.setAttribute('role', 'tab');
+    const on = !pgTransient && p.id === pgState.active;
+    b.setAttribute('aria-selected', on ? 'true' : 'false');
+    b.dataset.ws = 'pg:' + p.id;
+    b.onclick = () => pgSwitch(p.id);
+    b.ondblclick = () => { if (on) pgRename(p.id); };
+    tabs.appendChild(b);
+  });
+  if (pgTransient) {
+    const tb = wsEl('span', 'pg-tab pg-transient', pt('linkView'));
+    tb.setAttribute('aria-selected', 'true');
+    tabs.appendChild(tb);
+    const sv = wsEl('button', 'pg-add', pt('saveAs'));
+    sv.type = 'button';
+    sv.onclick = pgSaveTransient;
+    tabs.appendChild(sv);
+  }
+  const add = wsEl('button', 'pg-add', pt('newPage'));
+  add.type = 'button';
+  add.dataset.ws = 'pg:+';
+  add.onclick = openTemplatePicker;
+  tabs.appendChild(add);
+  bar.appendChild(tabs);
+  const menuBtn = wsEl('button', 'pg-menu-btn', '⋯');
+  menuBtn.type = 'button';
+  menuBtn.title = pt('manage');
+  menuBtn.setAttribute('aria-label', pt('manage'));
+  menuBtn.setAttribute('aria-haspopup', 'menu');
+  menuBtn.onclick = e => { e.stopPropagation(); pgToggleMenu(menuBtn); };
+  bar.appendChild(menuBtn);
+}
+let pgMenuEl = null;
+function pgCloseMenu() { if (pgMenuEl) { pgMenuEl.remove(); pgMenuEl = null; } }
+function pgToggleMenu(anchor) {
+  if (pgMenuEl) { pgCloseMenu(); return; }
+  const p = pgActive(), i = pgState.pages.indexOf(p);
+  const m = wsEl('div', 'pg-menu');
+  m.setAttribute('role', 'menu');
+  const item = (label, fn, dis) => {
+    const b = wsEl('button', 'pg-menu-item', label);
+    b.type = 'button'; b.setAttribute('role', 'menuitem');
+    if (dis) b.disabled = true;
+    b.onclick = () => { pgCloseMenu(); fn(); };
+    m.appendChild(b);
+  };
+  const cur = pgTransient ? null : p;
+  item(pt('rename'), () => pgRename(p.id), !cur);
+  item(pt('dup'), () => pgDuplicate(p.id), !cur || !TrackerPages.canAdd(pgState));
+  item(pt('left'), () => pgMove(p.id, -1), !cur || i <= 0);
+  item(pt('right'), () => pgMove(p.id, 1), !cur || i >= pgState.pages.length - 1);
+  item(pt('del'), () => pgDelete(p.id), !cur || pgState.pages.length <= 1);
+  m.appendChild(wsEl('div', 'pg-menu-sep'));
+  item(pt('exportP'), pgExport);
+  item(pt('importP'), pgImport);
+  document.body.appendChild(m);
+  const r = anchor.getBoundingClientRect();
+  m.style.top = (r.bottom + 4) + 'px';
+  m.style.left = Math.max(8, Math.min(window.innerWidth - m.offsetWidth - 8, r.right - m.offsetWidth)) + 'px';
+  pgMenuEl = m;
+  const first = m.querySelector('button:not([disabled])'); if (first) first.focus();
+}
+document.addEventListener('click', e => { if (pgMenuEl && !pgMenuEl.contains(e.target)) pgCloseMenu(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && pgMenuEl) pgCloseMenu(); });
+function pgRename(id) {
+  const p = pgState.pages.find(x => x.id === id); if (!p) return;
+  const name = prompt(pt('renameQ'), pgName(p));
+  if (name === null) return;
+  p.name = String(name).trim().slice(0, 30);
+  pgSave(); pgBuildBar();
+}
+function pgDuplicate(id) {
+  const p = pgState.pages.find(x => x.id === id); if (!p || !TrackerPages.canAdd(pgState)) return;
+  const copy = TrackerPages.normPage(Object.assign({}, p, { id: TrackerPages.newId(pgState), name: pgName(p) + ' 2' }), 0);
+  pgState.pages.splice(pgState.pages.indexOf(p) + 1, 0, copy);
+  pgSwitch(copy.id);
+}
+function pgMove(id, d) {
+  const i = pgState.pages.findIndex(x => x.id === id), j = i + d;
+  if (i < 0 || j < 0 || j >= pgState.pages.length) return;
+  const [p] = pgState.pages.splice(i, 1);
+  pgState.pages.splice(j, 0, p);
+  pgSave(); pgBuildBar();
+}
+function pgDelete(id) {
+  const p = pgState.pages.find(x => x.id === id); if (!p || pgState.pages.length <= 1) return;
+  if (!confirm(pt('delQ')(pgName(p)))) return;
+  const i = pgState.pages.indexOf(p);
+  pgState.pages.splice(i, 1);
+  pgState.active = pgState.pages[Math.max(0, i - 1)].id;
+  pgSave();
+  pgApply(pgActive());
+  renderWorkspace();
+}
+function pgExport() {
+  const blob = new Blob([JSON.stringify({ kind: 'newstracker-pages', ...JSON.parse(TrackerPages.serialize(pgState)) }, null, 1)],
+    { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'newstracker-pages.json';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+function pgImport() {
+  const inp = document.createElement('input');
+  inp.type = 'file'; inp.accept = '.json,application/json';
+  inp.onchange = () => {
+    const f = inp.files && inp.files[0]; if (!f) return;
+    f.text().then(txt => {
+      let o; try { o = JSON.parse(txt); } catch (e) { alert(pt('importBad')); return; }
+      if (!o || o.v !== 1 || !Array.isArray(o.pages) || !o.pages.length) { alert(pt('importBad')); return; }
+      // Imported pages are added after the existing ones (ids renumbered), never replace them.
+      let n = 0;
+      TrackerPages.normState(o).pages.forEach(p => {
+        if (!TrackerPages.canAdd(pgState)) return;
+        pgState.pages.push(TrackerPages.normPage(Object.assign({}, p, { id: TrackerPages.newId(pgState), name: pgName(p) }), 0));
+        n++;
+      });
+      pgSave(); pgBuildBar();
+      alert(pt('imported')(n));
+    });
+  };
+  inp.click();
+}
+
+// ── template picker ──
+function openTemplatePicker() {
+  if (!TrackerPages.canAdd(pgState)) { alert(pt('full')); return; }
+  const box = document.getElementById('pg-dialog');
+  box.innerHTML = '';
+  box.appendChild(wsEl('h2', 'pg-dlg-h', pt('tplTitle')));
+  box.appendChild(wsEl('p', 'pg-dlg-hint', pt('tplHint')));
+  const grid = wsEl('div', 'pg-tpl-grid');
+  TrackerPages.TEMPLATES.forEach(tp => {
+    const [name, desc] = pt('tpl')[tp.id] || [tp.id, ''];
+    const b = wsEl('button', 'pg-tpl');
+    b.type = 'button';
+    b.appendChild(wsEl('span', 'pg-tpl-ly', pt('layouts')[tp.page.layout] || ''));
+    b.appendChild(wsEl('strong', 'pg-tpl-name', name));
+    b.appendChild(wsEl('span', 'pg-tpl-desc', desc));
+    b.onclick = () => { closePgDialog(); pgAdd(tp.id, name); };
+    grid.appendChild(b);
+  });
+  box.appendChild(grid);
+  const row = wsEl('div', 'pg-dlg-row');
+  const c = wsEl('button', 'pg-btn', pt('cancel')); c.type = 'button'; c.onclick = closePgDialog;
+  row.appendChild(c);
+  box.appendChild(row);
+  document.getElementById('pg-dialog-wrap').classList.remove('hidden');
+  const first = grid.querySelector('button'); if (first) first.focus();
+}
+function closePgDialog() { document.getElementById('pg-dialog-wrap').classList.add('hidden'); }
+
+// ── workspace toolbar (layout, page size, sort, filter button, active-filter chips) ──
+const PG_HELP = {
+  type: a => hubTypeId(a),
+  inSrc: (a, s) => itemBelongsToTracker(a, s),
+  rules: a => watchRuleIds(a, watchPrefs),
+  plats: a => TrackerTypes.platformsOf(a),
+  pkgs: a => TrackerTypes.packagesOf(a),
+  tags: a => articleTags(a).concat(Array.isArray(a.tags_en) ? a.tags_en : []),
+  text: (a, scope) => scope === 'title' ? [a.title, a.title_en].join(' ')
+    : [a.title, a.title_en, a.summary, a.summary_en, (a.tags || []).join(' '), (a.tags_en || []).join(' ')].join(' '),
+  read: a => isArticleRead(a),
+  source: a => (a.sources && a.sources[0]) ? a.sources[0].name : (a.source || ''),
+  typeOrder: NEWS_TYPES.map(x => x.id)
+};
+function pgFilterChanged() {
+  ws.pn = 1;
+  ws.rendered = WS_BATCH;
+  renderWorkspace();
+  if (pgFilterOpen) buildFilterPanel();
+}
+function pgToolbarEl() {
+  const bar = wsEl('div', 'pg-toolbar');
+  // layout
+  const ly = wsEl('span', 'pg-layout ws-mode-toggle');
+  ly.setAttribute('role', 'group');
+  ly.setAttribute('aria-label', pt('layout'));
+  TrackerPages.LAYOUTS.forEach(id => {
+    const b = wsEl('button', 'ws-mode-btn', pt('layouts')[id]);
+    b.type = 'button';
+    b.dataset.ws = 'mode:' + id;
+    b.setAttribute('aria-pressed', ws.mode === id ? 'true' : 'false');
+    b.onclick = () => wsSetMode(id);
+    ly.appendChild(b);
+  });
+  bar.appendChild(ly);
+  // page size + sort
+  const sz = wsEl('label', 'pg-size pg-sel');
+  sz.appendChild(wsEl('span', '', pt('perPage')));
+  const s1 = document.createElement('select');
+  s1.dataset.ws = 'size';
+  TrackerPages.SIZES.forEach(n => { const o = document.createElement('option'); o.value = n; o.textContent = n ? String(n) : pt('endless'); s1.appendChild(o); });
+  s1.value = String(ws.size || 0);
+  s1.onchange = () => { ws.size = Number(s1.value) || 0; ws.focusKey = 'size'; pgFilterChanged(); };
+  sz.appendChild(s1);
+  bar.appendChild(sz);
+  const so = wsEl('label', 'pg-sel');
+  so.appendChild(wsEl('span', '', pt('sort')));
+  const s2 = document.createElement('select');
+  s2.dataset.ws = 'sort';
+  TrackerPages.SORTS.forEach(k => { const o = document.createElement('option'); o.value = k; o.textContent = pt('sorts')[k]; s2.appendChild(o); });
+  s2.value = ws.f.sort;
+  s2.onchange = () => { ws.f = TrackerPages.normFilter(Object.assign({}, ws.f, { sort: s2.value })); ws.focusKey = 'sort'; pgFilterChanged(); };
+  so.appendChild(s2);
+  bar.appendChild(so);
+  // filter button
+  const n = TrackerPages.filterCount(ws.f);
+  const fb = wsEl('button', 'pg-filter-btn' + (n ? ' on' : ''), n ? pt('filterN')(n) : pt('filter'));
+  fb.type = 'button';
+  fb.dataset.ws = 'filter';
+  fb.setAttribute('aria-haspopup', 'dialog');
+  fb.setAttribute('aria-expanded', pgFilterOpen ? 'true' : 'false');
+  fb.onclick = () => (pgFilterOpen ? closeFilterPanel(true) : openFilterPanel());
+  bar.appendChild(fb);
+  return bar;
+}
+function pgChipLabel(k, v) {
+  if (k === 'types') return wsTypeName(v);
+  if (k === 'srcs') return trackerLabel(v);
+  if (k === 'rules') return hubRuleLabel(v);
+  if (k === 'pkgs') { const p = TrackerTypes.PACKAGES.find(x => x.id === v); return p ? p.name : v; }
+  return v;
+}
+function pgChipsEl() {
+  const f = ws.f, box = wsEl('div', 'pg-chips');
+  const chip = (text, remove, key) => {
+    const c = wsEl('button', 'pg-chip');
+    c.type = 'button';
+    c.dataset.ws = 'chip:' + key;
+    c.appendChild(wsEl('span', '', text));
+    c.appendChild(wsEl('span', 'pg-chip-x', '✕'));
+    c.title = '✕ ' + text;
+    c.onclick = () => { remove(); pgFilterChanged(); };
+    box.appendChild(c);
+  };
+  TrackerPages.LISTS.forEach(k => f[k].forEach(v => chip(pt('chip')[k] + (state.lang === 'en' ? ': ' : '：') + pgChipLabel(k, v), () => {
+    ws.f = TrackerPages.normFilter(Object.assign({}, ws.f, { [k]: ws.f[k].filter(x => x !== v) }));
+  }, k + ':' + v)));
+  if (f.watched) chip(pt('chip').watched, () => { ws.f = TrackerPages.normFilter(Object.assign({}, ws.f, { watched: false })); }, 'watched');
+  if (f.unread) chip(pt('chip').unread, () => { ws.f = TrackerPages.normFilter(Object.assign({}, ws.f, { unread: false })); }, 'unread');
+  if (TrackerPages.filterCount(f) > 1) {
+    const c = wsEl('button', 'pg-chip pg-chip-clear', pt('clearAll'));
+    c.type = 'button';
+    c.onclick = () => { ws.f = TrackerPages.normFilter({ sort: ws.f.sort }); pgFilterChanged(); };
+    box.appendChild(c);
+  }
+  return box.children.length ? box : null;
+}
+function pgPagerEl(pg) {
+  const nav = wsEl('nav', 'pg-pager');
+  nav.setAttribute('aria-label', pt('pageOf')(pg.pn, pg.pages));
+  const go = p => { ws.pn = p; ws.focusKey = null; wsDraw(); window.scrollTo(0, 0); };
+  const btn = (label, p, cur) => {
+    const b = wsEl('button', 'pg-page' + (cur ? ' cur' : ''), label);
+    b.type = 'button';
+    if (cur) b.setAttribute('aria-current', 'page');
+    if (p === null) b.disabled = true; else b.onclick = () => go(p);
+    nav.appendChild(b);
+  };
+  btn(pt('prev'), pg.pn > 1 ? pg.pn - 1 : null);
+  TrackerPages.pagerWindow(pg.pn, pg.pages).forEach(x => x === '…' ? nav.appendChild(wsEl('span', 'pg-gap', '…')) : btn(String(x), x, x === pg.pn));
+  btn(pt('next'), pg.pn < pg.pages ? pg.pn + 1 : null);
+  nav.appendChild(wsEl('span', 'pg-pageof', pt('pageOf')(pg.pn, pg.pages)));
+  return nav;
+}
+
+// ── layouts that are not date-grouped ──
+function pgTypeChip(a) {
+  const id = hubTypeId(a);
+  return '<span class="ws-type-chip ws-ty-' + escHtml(id) + '">' + escHtml(wsTypeName(id)) + '</span>';
+}
+function pgRenderTable(items) {
+  const wrap = wsEl('div', 'pg-table-wrap');
+  const tbl = document.createElement('table');
+  tbl.className = 'pg-table';
+  tbl.innerHTML = '<thead><tr><th>' + escHtml(pt('tColDate')) + '</th><th>' + escHtml(pt('tColType')) + '</th><th>' +
+    escHtml(pt('tColTitle')) + '</th><th>' + escHtml(pt('tColSrc')) + '</th><th>' + escHtml(pt('tColTags')) + '</th></tr></thead>';
+  const tb = document.createElement('tbody');
+  items.forEach(a => {
+    const tr = document.createElement('tr');
+    tr.className = (isArticleRead(a) ? 'is-read' : '') + (watchLabels(a).length ? ' watched' : '');
+    const id = articleIdOf(a); if (id) tr.dataset.id = id;
+    tr.innerHTML = '<td class="pg-td-date">' + escHtml(a._date || '') + '</td><td>' + pgTypeChip(a) + '</td>' +
+      '<td class="pg-td-title">' + (watchLabels(a).length ? '<span class="ws-star">★</span> ' : '') + escHtml(artTitle(a)) + '</td>' +
+      '<td class="pg-td-src">' + escHtml(PG_HELP.source(a)) + '</td>' +
+      '<td class="pg-td-tags">' + artTags(a).slice(0, 4).map(x => '<span class="pg-tag">' + escHtml(x) + '</span>').join('') + '</td>';
+    bindWsOpen(tr, a);
+    tb.appendChild(tr);
+  });
+  tbl.appendChild(tb);
+  wrap.appendChild(tbl);
+  return wrap;
+}
+function pgRenderMagazine(items) {
+  const box = wsEl('div', 'pg-mag');
+  items.forEach((a, i) => {
+    const c = buildWsCard(a);
+    c.classList.add(i === 0 ? 'pg-mag-lead' : (i < 5 ? 'pg-mag-feature' : 'pg-mag-rest'));
+    box.appendChild(c);
+  });
+  return box;
+}
+const PG_COL_MAX = 25;
+function pgRenderBoard(items) {
+  const board = wsEl('div', 'pg-board');
+  const by = new Map();
+  items.forEach(a => { const k = hubTypeId(a); if (!by.has(k)) by.set(k, []); by.get(k).push(a); });
+  NEWS_TYPES.filter(ty => by.has(ty.id)).forEach(ty => {
+    const list = by.get(ty.id);
+    const col = wsEl('section', 'pg-col');
+    const h = wsEl('h3', 'pg-col-h');
+    h.innerHTML = '<span class="ws-type-chip ws-ty-' + escHtml(ty.id) + '">' + escHtml(wsTypeName(ty.id)) + '</span> <span class="pg-col-n">' + list.length + '</span>';
+    col.appendChild(h);
+    const body = wsEl('div', 'pg-col-body');
+    const add = (from, to) => list.slice(from, to).forEach(a => body.appendChild(buildWsTitleRow(a)));
+    add(0, PG_COL_MAX);
+    col.appendChild(body);
+    if (list.length > PG_COL_MAX) {
+      const more = wsEl('button', 'pg-more', pt('colMore')(list.length - PG_COL_MAX));
+      more.type = 'button';
+      more.onclick = () => { add(PG_COL_MAX, list.length); more.remove(); };
+      col.appendChild(more);
+    }
+    board.appendChild(col);
+  });
+  return board;
+}
+
+// ── advanced filter panel ──
+let pgFilterOpen = false;
+let pgTagFind = '';
+function openFilterPanel() {
+  pgFilterOpen = true;
+  buildFilterPanel();
+  document.getElementById('pg-filter-panel').classList.remove('hidden');
+  const fb = document.querySelector('.pg-filter-btn'); if (fb) fb.setAttribute('aria-expanded', 'true');
+  const first = document.querySelector('#pg-filter-panel button, #pg-filter-panel input'); if (first) first.focus();
+}
+function closeFilterPanel(refocus) {
+  if (!pgFilterOpen) return;
+  pgFilterOpen = false;
+  const p = document.getElementById('pg-filter-panel'); if (p) p.classList.add('hidden');
+  const fb = document.querySelector('.pg-filter-btn');
+  if (fb) { fb.setAttribute('aria-expanded', 'false'); if (refocus) fb.focus(); }
+}
+function pgSetF(patch) { ws.f = TrackerPages.normFilter(Object.assign({}, ws.f, patch)); pgFilterChanged(); }
+function pgToggleIn(k, v) {
+  const cur = ws.f[k];
+  pgSetF({ [k]: cur.includes(v) ? cur.filter(x => x !== v) : cur.concat([v]) });
+}
+function buildFilterPanel() {
+  const panel = document.getElementById('pg-filter-panel');
+  if (!panel) return;
+  const ae = document.activeElement, focusKey = ae && ae.dataset ? ae.dataset.pgf : null;
+  const scrollTop = panel.scrollTop;
+  panel.innerHTML = '';
+  panel.setAttribute('aria-label', pt('fTitle'));
+  const head = wsEl('div', 'pg-fp-head');
+  head.appendChild(wsEl('h2', '', pt('fTitle')));
+  const done = wsEl('button', 'pg-btn', pt('fDone')); done.type = 'button'; done.dataset.pgf = 'done';
+  done.onclick = () => closeFilterPanel(true);
+  head.appendChild(done);
+  panel.appendChild(head);
+  panel.appendChild(wsEl('p', 'pg-dlg-hint', pt('fHint')));
+  // counts over the range + source dropdown + search (the same base as the rail)
+  const days = window.TRACKER_DAYS || {};
+  const rg = TrackerStore.rangeOf(ws.range, TrackerStore.newestDate(days));
+  const base = wsBaseRaw(TrackerStore.collect(days, { fromDate: rg.from, toDate: rg.to }));
+  const sec = (title, cls) => { const s = wsEl('section', 'pg-fp-sec ' + (cls || '')); s.appendChild(wsEl('h3', '', title)); panel.appendChild(s); return s; };
+  const toggles = (s, k, items) => {
+    const row = wsEl('div', 'pg-fp-opts');
+    items.forEach(([v, label, n]) => {
+      const b = wsEl('button', 'pg-opt');
+      b.type = 'button';
+      b.dataset.pgf = k + ':' + v;
+      const on = ws.f[k].includes(v);
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
+      b.appendChild(wsEl('span', '', label));
+      if (n !== undefined) b.appendChild(wsEl('span', 'pg-opt-n', String(n)));
+      b.onclick = () => pgToggleIn(k, v);
+      row.appendChild(b);
+    });
+    s.appendChild(row);
+  };
+  const count = fn => { const m = {}; base.forEach(a => fn(a).forEach(x => { m[x] = (m[x] || 0) + 1; })); return m; };
+  // date hint
+  const sd = sec(pt('fDate'));
+  const dr = wsEl('div', 'pg-fp-opts');
+  const chipBtn = wsEl('button', 'pg-opt', wsRangeLabel(ws.range)); chipBtn.type = 'button';
+  chipBtn.onclick = () => { closeFilterPanel(); wsToggleTimePanel(true); const c = document.getElementById('ws-time-chip'); if (c) c.focus(); };
+  dr.appendChild(chipBtn);
+  sd.appendChild(dr);
+  sd.appendChild(wsEl('p', 'pg-dlg-hint', pt('fDateHint')));
+  // types / sources
+  const tc = count(a => [hubTypeId(a)]);
+  toggles(sec(pt('fTypes')), 'types', NEWS_TYPES.map(ty => [ty.id, wsTypeName(ty.id), tc[ty.id] || 0]));
+  const names = wsTrackerNames();
+  if (names.length > 1) {
+    const sc = {}; base.forEach(a => names.forEach(nm => { if (itemBelongsToTracker(a, nm)) sc[nm] = (sc[nm] || 0) + 1; }));
+    toggles(sec(pt('fSrcs')), 'srcs', names.map(nm => [nm, trackerLabel(nm), sc[nm] || 0]));
+  }
+  // tags (include / exclude cycle)
+  const st = sec(pt('fTags'), 'pg-fp-tags');
+  const tagHead = wsEl('div', 'pg-fp-row');
+  const find = document.createElement('input');
+  find.type = 'search'; find.placeholder = pt('fTagFind'); find.value = pgTagFind; find.dataset.pgf = 'tagfind';
+  find.setAttribute('aria-label', pt('fTagFind'));
+  tagHead.appendChild(find);
+  const mode = wsEl('span', 'ws-mode-toggle');
+  [['any', pt('fTagAny')], ['all', pt('fTagAll')]].forEach(([v, l]) => {
+    const b = wsEl('button', 'ws-mode-btn', l); b.type = 'button'; b.dataset.pgf = 'tagmode:' + v;
+    b.setAttribute('aria-pressed', ws.f.tagMode === v ? 'true' : 'false');
+    b.onclick = () => pgSetF({ tagMode: v });
+    mode.appendChild(b);
+  });
+  tagHead.appendChild(mode);
+  st.appendChild(tagHead);
+  st.appendChild(wsEl('p', 'pg-dlg-hint', pt('fTagHint')));
+  const tagBox = wsEl('div', 'pg-fp-opts pg-fp-taglist');
+  const allTags = TrackerPages.tagCounts(base, PG_HELP.tags, 400);
+  const drawTags = () => {
+    tagBox.innerHTML = '';
+    const q = pgTagFind.trim().toLowerCase();
+    const lc = s => s.toLowerCase();
+    const inc = new Set(ws.f.tags.map(lc)), exc = new Set(ws.f.tagsNot.map(lc));
+    // selected ones first (even when not in this period), then the most used
+    const sel = ws.f.tags.concat(ws.f.tagsNot).map(tg => ({ tag: tg, n: (allTags.find(x => lc(x.tag) === lc(tg)) || { n: 0 }).n }));
+    const rest = allTags.filter(x => !inc.has(lc(x.tag)) && !exc.has(lc(x.tag)) && (!q || lc(x.tag).includes(q))).slice(0, q ? 120 : 60);
+    if (!sel.length && !rest.length) { tagBox.appendChild(wsEl('span', 'pg-dlg-hint', pt('fNoTags'))); return; }
+    sel.concat(rest).forEach(x => {
+      const k = lc(x.tag), st8 = inc.has(k) ? 'inc' : (exc.has(k) ? 'exc' : '');
+      const b = wsEl('button', 'pg-opt pg-tagopt' + (st8 ? ' ' + st8 : ''));
+      b.type = 'button'; b.dataset.pgf = 'tag:' + k;
+      b.setAttribute('aria-pressed', st8 ? 'true' : 'false');
+      b.appendChild(wsEl('span', '', (st8 === 'exc' ? '− ' : (st8 === 'inc' ? '+ ' : '')) + x.tag));
+      b.appendChild(wsEl('span', 'pg-opt-n', String(x.n)));
+      b.onclick = () => {
+        const drop = arr => arr.filter(v => lc(v) !== k);
+        if (st8 === 'inc') pgSetF({ tags: drop(ws.f.tags), tagsNot: ws.f.tagsNot.concat([x.tag]) });
+        else if (st8 === 'exc') pgSetF({ tagsNot: drop(ws.f.tagsNot) });
+        else pgSetF({ tags: ws.f.tags.concat([x.tag]) });
+      };
+      tagBox.appendChild(b);
+    });
+  };
+  drawTags();
+  find.oninput = () => { pgTagFind = find.value; drawTags(); };
+  st.appendChild(tagBox);
+  // keywords
+  const sk = sec(pt('fKw'));
+  [['kwAll', pt('fKwAll')], ['kwAny', pt('fKwAny')], ['kwNot', pt('fKwNot')]].forEach(([k, label]) => {
+    const row = wsEl('div', 'pg-fp-kw');
+    row.appendChild(wsEl('span', 'pg-fp-kwl', label));
+    const list = wsEl('span', 'pg-fp-kwlist');
+    ws.f[k].forEach(v => {
+      const c = wsEl('button', 'pg-chip'); c.type = 'button'; c.dataset.pgf = k + ':' + v;
+      c.appendChild(wsEl('span', '', v)); c.appendChild(wsEl('span', 'pg-chip-x', '✕'));
+      c.onclick = () => pgSetF({ [k]: ws.f[k].filter(x => x !== v) });
+      list.appendChild(c);
+    });
+    const inp = document.createElement('input');
+    inp.type = 'text'; inp.placeholder = pt('fKwPh'); inp.dataset.pgf = 'in:' + k; inp.setAttribute('aria-label', label);
+    inp.onkeydown = e => {
+      if (e.key !== 'Enter') return;
+      e.preventDefault();
+      const v = inp.value.trim();
+      if (v) pgSetF({ [k]: ws.f[k].concat([v]) });
+    };
+    list.appendChild(inp);
+    row.appendChild(list);
+    sk.appendChild(row);
+  });
+  const inRow = wsEl('div', 'pg-fp-row');
+  inRow.appendChild(wsEl('span', 'pg-fp-kwl', pt('fKwIn')));
+  const inMode = wsEl('span', 'ws-mode-toggle');
+  [['all', pt('fKwAllText')], ['title', pt('fKwTitle')]].forEach(([v, l]) => {
+    const b = wsEl('button', 'ws-mode-btn', l); b.type = 'button'; b.dataset.pgf = 'kwin:' + v;
+    b.setAttribute('aria-pressed', ws.f.kwIn === v ? 'true' : 'false');
+    b.onclick = () => pgSetF({ kwIn: v });
+    inMode.appendChild(b);
+  });
+  inRow.appendChild(inMode);
+  sk.appendChild(inRow);
+  // watch rules / platforms / packages
+  const rules = wsActiveRules().filter(id => id !== ws.w);
+  if (rules.length) {
+    const rc = count(a => watchRuleIds(a, watchPrefs));
+    toggles(sec(pt('fRules')), 'rules', rules.map(id => [id, hubRuleLabel(id), rc[id] || 0]));
+  }
+  const pc = count(a => TrackerTypes.platformsOf(a));
+  toggles(sec(pt('fPlats')), 'plats', HUB_PLATFORMS.map(p => [p, p, pc[p] || 0]));
+  const kc = count(a => TrackerTypes.packagesOf(a));
+  const pk = TrackerTypes.PACKAGES.filter(k => kc[k.id] || ws.f.pkgs.includes(k.id));
+  if (pk.length) toggles(sec(pt('fPkgs')), 'pkgs', pk.map(k => [k.id, k.name, kc[k.id] || 0]));
+  // other
+  const so = sec(pt('fOther'));
+  const orow = wsEl('div', 'pg-fp-opts');
+  [['watched', pt('fWatched')], ['unread', pt('fUnread')]].forEach(([k, l]) => {
+    const b = wsEl('button', 'pg-opt', l); b.type = 'button'; b.dataset.pgf = 'b:' + k;
+    b.setAttribute('aria-pressed', ws.f[k] ? 'true' : 'false');
+    b.onclick = () => pgSetF({ [k]: !ws.f[k] });
+    orow.appendChild(b);
+  });
+  so.appendChild(orow);
+  if (TrackerPages.filterCount(ws.f)) {
+    const clr = wsEl('button', 'pg-btn pg-btn-quiet', pt('clearAll')); clr.type = 'button'; clr.dataset.pgf = 'clear';
+    clr.onclick = () => pgSetF(TrackerPages.normFilter({ sort: ws.f.sort }));
+    panel.appendChild(clr);
+  }
+  panel.scrollTop = scrollTop;
+  if (focusKey) {
+    const el = [...panel.querySelectorAll('[data-pgf]')].find(x => x.dataset.pgf === focusKey)
+      || (focusKey.startsWith('kwAll:') || focusKey.startsWith('kwAny:') || focusKey.startsWith('kwNot:')
+          ? panel.querySelector('[data-pgf="in:' + focusKey.split(':')[0] + '"]') : null);
+    if (el) el.focus();
+  }
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && pgFilterOpen) closeFilterPanel(true); });
+document.addEventListener('mousedown', e => {
+  if (!pgFilterOpen) return;
+  const p = document.getElementById('pg-filter-panel');
+  if (p && !p.contains(e.target) && !e.target.closest('.pg-filter-btn')) closeFilterPanel();
+});
+
+// ── guided tour ──
+let tourIdx = -1, tourSteps = [];
+function tourVisible(sel) {
+  const el = document.querySelector(sel);
+  if (!el) return null;
+  const r = el.getBoundingClientRect();
+  return (r.width > 0 && r.height > 0) ? el : null;
+}
+function startTour() {
+  tourOfferClose(true);
+  if (!state.wsActive) selectWorkspace();
+  closeFilterPanel();
+  if (ws.railCollapsed && !(typeof matchMedia === 'function' && matchMedia('(max-width: 767px)').matches)) { /* rail shown collapsed: still has a box */ }
+  tourSteps = pt('steps').filter(s => tourVisible(s[0]));
+  tourIdx = 0;
+  document.getElementById('tour').classList.remove('hidden');
+  tourShow();
+}
+function tourEnd() {
+  tourIdx = -1;
+  document.getElementById('tour').classList.add('hidden');
+  try { if (!isPreviewMode()) prefSet('tracker_tour', 'seen'); } catch (e) {}
+  const b = document.querySelector('.pg-tour-btn'); if (b) b.focus();
+}
+function tourShow() {
+  const s = tourSteps[tourIdx];
+  if (!s) { tourEnd(); return; }
+  const el = tourVisible(s[0]);
+  if (!el) { tourIdx++; tourShow(); return; }
+  el.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+  const r = el.getBoundingClientRect(), pad = 6;
+  const spot = document.getElementById('tour-spot');
+  spot.style.left = (r.left - pad) + 'px'; spot.style.top = (r.top - pad) + 'px';
+  spot.style.width = (r.width + pad * 2) + 'px'; spot.style.height = (r.height + pad * 2) + 'px';
+  const card = document.getElementById('tour-card');
+  card.innerHTML = '';
+  card.appendChild(wsEl('div', 'tour-step', (tourIdx + 1) + ' / ' + tourSteps.length));
+  card.appendChild(wsEl('h2', 'tour-h', s[1]));
+  card.appendChild(wsEl('p', 'tour-p', s[2]));
+  const row = wsEl('div', 'pg-dlg-row');
+  const end = wsEl('button', 'pg-btn pg-btn-quiet', pt('tourEnd')); end.type = 'button'; end.onclick = tourEnd;
+  row.appendChild(end);
+  if (tourIdx > 0) { const pv = wsEl('button', 'pg-btn', pt('tourPrev')); pv.type = 'button'; pv.onclick = () => { tourIdx--; tourShow(); }; row.appendChild(pv); }
+  const last = tourIdx === tourSteps.length - 1;
+  const nx = wsEl('button', 'pg-btn pg-btn-primary', last ? pt('tourDone') : pt('tourNext')); nx.type = 'button';
+  nx.onclick = () => { if (last) tourEnd(); else { tourIdx++; tourShow(); } };
+  row.appendChild(nx);
+  card.appendChild(row);
+  // place the card below the target, or above when there is no room
+  const cw = Math.min(340, window.innerWidth - 24);
+  card.style.width = cw + 'px';
+  const left = Math.max(12, Math.min(window.innerWidth - cw - 12, r.left));
+  card.style.left = left + 'px';
+  const below = r.bottom + pad + 10;
+  card.style.top = '0px';
+  const ch = card.offsetHeight;
+  card.style.top = ((below + ch < window.innerHeight - 8) ? below : Math.max(8, r.top - pad - 10 - ch)) + 'px';
+  nx.focus();
+}
+document.addEventListener('keydown', e => {
+  if (tourIdx < 0) return;
+  if (e.key === 'Escape') { e.preventDefault(); tourEnd(); }
+  else if (e.key === 'ArrowRight') { e.preventDefault(); if (tourIdx < tourSteps.length - 1) { tourIdx++; tourShow(); } }
+  else if (e.key === 'ArrowLeft') { e.preventDefault(); if (tourIdx > 0) { tourIdx--; tourShow(); } }
+});
+window.addEventListener('resize', () => { if (tourIdx >= 0) tourShow(); });
+function tourOfferClose(seen) {
+  const o = document.getElementById('tour-offer');
+  if (o) o.classList.add('hidden');
+  if (seen) { try { if (!isPreviewMode()) prefSet('tracker_tour', 'seen'); } catch (e) {} }
+}
+function tourMaybeOffer() {
+  if (isPreviewMode()) return;
+  let seen = null;
+  try { seen = prefGet('tracker_tour'); } catch (e) {}
+  if (seen) return;
+  const o = document.getElementById('tour-offer');
+  if (!o) return;
+  o.innerHTML = '';
+  o.appendChild(wsEl('span', '', pt('tourOffer')));
+  const go = wsEl('button', 'pg-btn pg-btn-primary', pt('tourStart')); go.type = 'button'; go.onclick = startTour;
+  const later = wsEl('button', 'pg-btn pg-btn-quiet', pt('tourLater')); later.type = 'button'; later.onclick = () => tourOfferClose(true);
+  o.appendChild(go); o.appendChild(later);
+  o.classList.remove('hidden');
+}
+(function wirePages() {
+  const tb = document.querySelector('.pg-tour-btn');
+  if (tb) tb.addEventListener('click', startTour);
+  const wrap = document.getElementById('pg-dialog-wrap');
+  if (wrap) wrap.addEventListener('click', e => { if (e.target === wrap) closePgDialog(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && wrap && !wrap.classList.contains('hidden')) closePgDialog(); });
 })();
 
 // ── CRA reference library (special mode) ──────────────────────────────
@@ -4924,7 +6162,7 @@ function renderLibrary() {
   document.getElementById('loading-msg').style.display = 'none';
   document.getElementById('no-data').classList.add('hidden');
   Array.from(main.children).forEach(c => {
-    if (c.id !== 'loading-msg' && c.id !== 'no-data' && c.id !== 'search-row') c.remove();
+    if (c.id !== 'loading-msg' && c.id !== 'no-data' && c.id !== 'search-row' && c.id !== 'pg-bar') c.remove();
   });
   const lib = libData();
   const active = lib.topics.filter(t => t.status !== 'gone');
@@ -5348,7 +6586,7 @@ function renderArticles(dateList) {
 
   // Clear old cards (keep search row + loading/no-data divs)
   Array.from(main.children).forEach(c => {
-    if (c.id !== 'loading-msg' && c.id !== 'no-data' && c.id !== 'search-row') c.remove();
+    if (c.id !== 'loading-msg' && c.id !== 'no-data' && c.id !== 'search-row' && c.id !== 'pg-bar') c.remove();
   });
 
   if (!articles.length) {
@@ -6023,7 +7261,7 @@ function showMsg(msg) {
   el.textContent = msg;
   document.getElementById('no-data').classList.add('hidden');
   Array.from(document.getElementById('main-content').children).forEach(c => {
-    if (c.id !== 'loading-msg' && c.id !== 'no-data' && c.id !== 'search-row') c.remove();
+    if (c.id !== 'loading-msg' && c.id !== 'no-data' && c.id !== 'search-row' && c.id !== 'pg-bar') c.remove();
   });
 }
 function linkifyCVE(html) {
@@ -6091,7 +7329,13 @@ function syncHash() {
     if (ws.pl) wp.push('pl=' + encodeURIComponent(ws.pl));
     if (ws.pk) wp.push('pk=' + encodeURIComponent(ws.pk));
     if (state.searchQuery) wp.push('q=' + encodeURIComponent(state.searchQuery));
+    if (!pgTransient) wp.push('pg=' + encodeURIComponent(pgState.active));
     if (ws.mode === 'titles') wp.push('v=t');
+    else if (ws.mode !== 'cards') wp.push('ly=' + ws.mode);
+    if (ws.size) wp.push('sz=' + ws.size);
+    if (ws.size && ws.pn > 1) wp.push('pn=' + ws.pn);
+    const fc = TrackerPages.compactFilter(ws.f);
+    if (Object.keys(fc).length) wp.push('f=' + encodeURIComponent(JSON.stringify(fc)));
     if (skinOf()) wp.push('s=' + skinOf());
     if (palettePref) wp.push('pal=' + palettePref);
     wp.push('p=' + encodeURIComponent(viewPrefs.preset));
@@ -6194,7 +7438,10 @@ function applyHashRestore() {
   if (h && parsePalette(h.pal) && h.pal !== palettePref) applyPalette(h.pal);
   if (h && h.ws) {           // news workspace deep-link (the filters come from the hash; not persisted)
     if (h.s === 'md3' || h.s === 'classic') document.documentElement.dataset.skin = h.s;
-    selectWorkspace({ range: h.r, src: h.src, ty: h.ty, w: h.w, pl: h.pl, pk: h.pk, q: h.q, v: h.v });
+    let f = null;
+    try { f = h.f ? JSON.parse(h.f) : null; } catch (e) { f = null; }
+    selectWorkspace({ range: h.r, src: h.src, ty: h.ty, w: h.w, pl: h.pl, pk: h.pk, q: h.q, v: h.v,
+                      pg: h.pg, ly: h.ly, sz: h.sz, pn: h.pn, f });
     openPendingArticle();
     return true;
   }
