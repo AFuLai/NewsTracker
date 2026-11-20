@@ -35,3 +35,6 @@ html/*.bak.*
 .common/codex-assist/runs/*/verify/
 .common/codex-assist/quota/
 .common/codex-assist/panel/
+
+# Common per-project local state (LAYOUT-7)
+.common/local/

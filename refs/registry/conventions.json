@@ -45,6 +45,10 @@
     {
       "path": "ChangeLog.html",
       "reason": "release notes appended by tracker pack (tracker/changelog.py) and shipped in the release zip"
+    },
+    {
+      "path": "NewsTracker.cmd",
+      "reason": "Windows portable launcher; the app zip unpacks it at the install root and windows/install.ps1 + build-portable.ps1 expect it there"
     }
   ],
   "workarea_names": {
