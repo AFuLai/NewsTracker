@@ -588,6 +588,44 @@ def serve(reporter: WebReporter, *, port: int = DEFAULT_PORT) -> ThreadingHTTPSe
                 return self._json(False, str(exc))
             return self._json(True, "saved")
 
+        def _merge_check(self):
+            """POST /merge-check: {"action":"check","start","end"} lists days whose
+            rendered file shows more items than the current merge rules give;
+            {"action":"apply","dates":[...]} re-renders those days. JSON only,
+            like /prefs, so a cross-site page cannot trigger it."""
+            from . import PATHS
+            from . import mergecheck
+            from .dedup import Store
+            ctype = (self.headers.get("Content-Type") or "").split(";")[0].strip().lower()
+            if ctype != "application/json":
+                return self._json(False, "application/json required")
+            try:
+                n = int(self.headers.get("Content-Length", 0))
+                cmd = json.loads(self.rfile.read(n) or b"{}") if 0 < n < 65536 else {}
+                out = Path(DEFAULT_OUT)
+                store = Store(Path(PATHS["db"]))
+                if cmd.get("action") == "apply":
+                    busy = _busy_reason(reporter)
+                    if busy:
+                        return self._json(False, busy)
+                    days = mergecheck.apply(store, out, list(cmd.get("dates") or []))
+                    return self._json(True, f"已重新產生 {days} 天，請記得發布")
+                start, end = cmd.get("start"), cmd.get("end")
+                if not start or not end:
+                    start, end = mergecheck.default_range()
+                res = mergecheck.check(store, out, start, end)
+            except ValueError as exc:
+                return self._json(False, str(exc))
+            except Exception as exc:  # reported on the page, never swallowed
+                return self._json(False, f"{type(exc).__name__}: {exc}")
+            body = json.dumps({"ok": True, **res}, ensure_ascii=False).encode("utf-8")
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json; charset=utf-8")
+            self.send_header("Cache-Control", "no-store")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+
         def _export_data(self):
             """GET /export-data: the export zip as a browser download."""
             import tempfile
@@ -688,6 +726,8 @@ def serve(reporter: WebReporter, *, port: int = DEFAULT_PORT) -> ThreadingHTTPSe
                 return self._import_data()
             if urlsplit(self.path).path == "/prefs":
                 return self._save_prefs()
+            if urlsplit(self.path).path == "/merge-check":
+                return self._merge_check()
             ok, msg = False, ""
             if self.path.startswith("/control"):
                 try:
@@ -1055,6 +1095,20 @@ _HTML = r"""<!DOCTYPE html>
         <span id="lcFbState" class="status"></span>
       </div>
     </section>
+    <section class="card" id="sec-mergechk">
+      <h2>合併檢查 <span class="h2msg" id="mcMsg"></span></h2>
+      <label class="chk"><input type="checkbox" id="mcOn"> 啟用合併檢查</label>
+      <div id="mcBox" class="hidden">
+        <div class="cfgrow">
+          <span class="chk">從 <input type="date" id="mcStart"></span>
+          <span class="chk">到 <input type="date" id="mcEnd"></span>
+          <button id="mcRun">檢查</button>
+          <button id="mcApply" class="primary" disabled>重新產生需合併的日期</button>
+        </div>
+        <div class="sub" style="margin-top:4px">預設檢查最近一週。只列出網站上仍分開顯示、依現行規則應合併的同日相近報導；按「重新產生」才會改動網站檔案。</div>
+        <div id="mcOut" style="margin-top:6px"></div>
+      </div>
+    </section>
     <section class="card" id="sec-llm">
       <h2>LLM 主機 <span class="h2msg" id="cfgEndMsg"></span></h2>
       <div class="cfgrow">
@@ -1168,6 +1222,45 @@ function fmt(s){ s=Math.max(0,Math.floor(s)); const h=(s/3600|0),m=(s%3600/60|0)
           : `${m}:${String(x).padStart(2,'0')}`; }
 const ICON={pending:'○',running:'▶',done:'✓',failed:'✗'};
 let CTRL=null;
+// ── merge check (opt-in) ─────────────────────────────────────────────────
+// Off by default; the switch is remembered per browser. Dates default to the
+// last 7 days each time the panel is switched on.
+(function(){
+  const on=$('mcOn'), box=$('mcBox'), msg=$('mcMsg'), out=$('mcOut'), ap=$('mcApply');
+  let STALE=[];
+  const iso=d=>new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10);
+  function defaults(){ const t=new Date(); $('mcEnd').value=iso(t);
+    $('mcStart').value=iso(new Date(t.getTime()-6*86400000)); }
+  function show(v){ box.classList.toggle('hidden',!v); if(v&&!$('mcStart').value) defaults(); }
+  let saved=false; try{ saved=localStorage.getItem('tracker_mergecheck_on')==='1'; }catch(e){}
+  on.checked=saved; show(saved);
+  on.onchange=()=>{ try{ localStorage.setItem('tracker_mergecheck_on',on.checked?'1':'0'); }catch(e){}
+    if(on.checked) defaults(); show(on.checked); };
+  const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  async function call(body){
+    const r=await fetch('/merge-check',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(body)}); return r.json(); }
+  $('mcRun').onclick=async()=>{
+    msg.textContent='檢查中…'; msg.style.color=''; out.innerHTML=''; ap.disabled=true;
+    let j; try{ j=await call({action:'check',start:$('mcStart').value,end:$('mcEnd').value}); }
+    catch(e){ msg.textContent=String(e); msg.style.color='var(--red)'; return; }
+    if(!j.ok){ msg.textContent=j.msg||'失敗'; msg.style.color='var(--red)'; return; }
+    STALE=j.stale||[]; ap.disabled=!STALE.length;
+    msg.textContent=STALE.length?`${STALE.length} 天有未合併的相近報導`:`${j.days.length} 天都已是最新合併結果`;
+    msg.style.color=STALE.length?'var(--yellow)':'var(--green)';
+    out.innerHTML=j.days.filter(d=>d.groups.length||d.pending).map(d=>{
+      const st=d.rendered==null?'網站尚無此日':(d.pending>0?`網站 ${d.rendered} 則 → 合併後 ${d.clusters} 則`:`${d.clusters} 則（已合併）`);
+      const g=d.groups.map(x=>'<li>'+x.items.map(i=>esc(i.title)+(i.source?` <span class="sub">${esc(i.source)}</span>`:'')).join('<br>')+'</li>').join('');
+      return `<details${d.pending>0?' open':''}><summary><b>${d.date}</b> · ${st} · ${d.groups.length} 組</summary><ol style="margin:4px 0 8px 18px;padding:0">${g}</ol></details>`;
+    }).join('');
+  };
+  ap.onclick=async()=>{
+    if(!STALE.length) return; ap.disabled=true; msg.textContent='重新產生中…'; msg.style.color='';
+    let j; try{ j=await call({action:'apply',dates:STALE}); }catch(e){ j={ok:false,msg:String(e)}; }
+    msg.textContent=j.msg||(j.ok?'完成':'失敗'); msg.style.color=j.ok?'var(--green)':'var(--red)';
+    if(j.ok){ STALE=[]; out.innerHTML=''; } else ap.disabled=false;
+  };
+})();
 async function ctl(cmd){ try{ await fetch('/control',{method:'POST',
   headers:{'Content-Type':'application/json'}, body:JSON.stringify(cmd)}); }catch(e){} }
 $('btnPause').onclick = ()=> ctl({cmd:(CTRL&&CTRL.paused)?'resume':'pause'});
