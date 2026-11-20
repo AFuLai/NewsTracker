@@ -78,3 +78,29 @@ def test_same_source_still_merges_with_shared_cve():
     ]
     merged = merge_by_title(rows)
     assert len(merged) == 1  # CVE bridge overrides same-source guard
+
+
+def _kernel_row(i, cves, title, source="Ubuntu Security Notices"):
+    return {"id": i, "title": title, "summary": "s" * i, "url": f"https://u.com/USN-{i}",
+            "source": source, "trackers": "security",
+            "raw_text": "Linux kernel fixes: " + ", ".join(cves)}
+
+
+def test_same_source_advisories_with_one_cve_list_merge():
+    # Ubuntu ships one kernel fix as several USNs (generic / AWS / Oracle) the
+    # same day; translated titles differ, the CVE list in the body does not.
+    cves = [f"CVE-2026-{n}" for n in range(1000, 1010)]
+    rows = [_kernel_row(1, cves, "Ubuntu 發布 Linux 核心安全更新"),
+            _kernel_row(2, cves[:9], "Linux 核心系統修補：修復多個子系統"),
+            _kernel_row(3, cves, "Ubuntu發布Linux核心更新，修補多個子系統")]
+    out = merge_by_title(rows)
+    assert len(out) == 1
+    assert len(out[0]["sources"]) == 3
+
+
+def test_roundup_does_not_absorb_single_cve_story():
+    many = [f"CVE-2026-{n}" for n in range(2000, 2040)]
+    rows = [_kernel_row(1, many, "Monthly roundup", source="A"),
+            _kernel_row(2, many[:2], "Two flaws in product X", source="B"),
+            _kernel_row(3, ["CVE-2026-9999"], "Other advisory")]
+    assert len(merge_by_title(rows)) == 3

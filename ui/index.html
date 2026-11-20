@@ -2430,11 +2430,40 @@ const TrackerTypes = (() => {
 let prefs;
 try { prefs = TrackerPrefs.load(localStorage); }
 catch (e) { prefs = TrackerPrefs.load({ getItem() { throw new Error('storage'); }, setItem() { throw new Error('storage'); } }); }
+// Served by the local console (/site/...): the console also keeps the prefs on disk
+// (GET/POST /prefs), because localStorage is per origin and the console's port can
+// change between runs (8787 taken -> 8788), and some browsers clear it on exit.
+// The disk copy wins on load; every change is written to both.
+const PREFS_SERVER = /^\/site\//.test(location.pathname) && /^https?:$/.test(location.protocol);
+if (PREFS_SERVER) {
+  try {
+    const x = new XMLHttpRequest();
+    x.open('GET', '/prefs', false);   // sync on purpose: prefs must be in place before any read; loopback, ~1 ms
+    x.send();
+    const sp = x.status === 200 ? TrackerPrefs.load({ getItem(k) { return k === 'tracker_prefs' ? x.responseText : null; } }) : null;
+    if (sp && Object.keys(sp.values).length) {
+      prefs = sp;
+      try { if (!isPreviewMode()) TrackerPrefs.save(localStorage, prefs, false); } catch (e) {}
+    } else if (Object.keys(prefs.values).length) {
+      prefsPush();   // first run with the disk copy: seed it from this browser
+    }
+  } catch (e) {}
+}
+let prefsPushTimer = null;
+function prefsPush() {
+  if (!PREFS_SERVER || isPreviewMode()) return;
+  try {
+    fetch('/prefs', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(prefs), keepalive: true }).catch(() => {});
+  } catch (e) {}
+}
 function prefGet(key) { return TrackerPrefs.get(prefs, key); }
 function prefSet(key, value) {
   prefs = TrackerPrefs.set(prefs, key, value);
   try { TrackerPrefs.save(localStorage, prefs, isPreviewMode()); } catch (e) {}
+  if (PREFS_SERVER) { clearTimeout(prefsPushTimer); prefsPushTimer = setTimeout(prefsPush, 400); }
 }
+addEventListener('pagehide', () => { if (prefsPushTimer) { clearTimeout(prefsPushTimer); prefsPushTimer = null; prefsPush(); } });
 
 // ── State ────────────────────────────────────────────
 const state = {

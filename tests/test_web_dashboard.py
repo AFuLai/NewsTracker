@@ -203,3 +203,36 @@ def test_every_script_id_exists_in_html():
     have = set(re.findall(r'id="([^"]+)"', _HTML))
     assert used, "no $('id') references found - regex out of date?"
     assert not (used - have), f"ids used by script but missing: {sorted(used - have)}"
+
+
+def test_prefs_roundtrip_on_disk(monkeypatch, tmp_path):
+    # The site's reader prefs live beside the DB so a port change (new origin,
+    # empty localStorage) or a browser that clears storage does not lose them.
+    import http.client
+    import json as _json
+    import tracker.web_dashboard as wd
+    monkeypatch.setattr(wd, "DEFAULT_DB", tmp_path / "db" / "articles.sqlite")
+    httpd = serve(WebReporter(), port=8807)
+
+    def req(method, body=None, ctype="application/json"):
+        c = http.client.HTTPConnection("127.0.0.1", 8807, timeout=5)
+        c.request(method, "/prefs", body=body, headers={"Content-Type": ctype} if body else {})
+        r = c.getresponse()
+        data = r.read()
+        c.close()
+        return r.status, data
+
+    try:
+        assert req("GET") == (200, b"{}")
+        good = {"v": 2, "values": {"tracker_lang": "en", "tracker_pages": "{}"}}
+        assert req("POST", _json.dumps(good))[0] == 200
+        assert _json.loads(req("GET")[1]) == good
+        assert (tmp_path / "db" / "ui_prefs.json").is_file()
+        # text/plain (a cross-site form/no-cors send) and bad shapes are refused
+        assert req("POST", _json.dumps(good), ctype="text/plain")[0] == 400
+        assert req("POST", _json.dumps({"v": 1, "values": {}}))[0] == 400
+        assert req("POST", _json.dumps({"v": 2, "values": {"k": 1}}))[0] == 400
+        assert _json.loads(req("GET")[1]) == good
+    finally:
+        httpd.shutdown()
+        httpd.server_close()

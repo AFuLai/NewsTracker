@@ -20,6 +20,16 @@ THRESHOLD = 0.45
 #: and makes one of them vanish from the site. Calibrate in shadow before
 #: turning `semantic=True` on.
 SIM_THRESHOLD = 0.85
+#: Body-CVE signal: two rows whose article text cites mostly the same CVEs
+#: (Jaccard >= BODY_CVE_JACCARD, at least BODY_CVE_MIN shared) report the same
+#: event. Applies to same-source pairs too: one vendor's kernel advisories for
+#: different builds (Ubuntu USN-xxxx-1 generic / -2 AWS / Oracle ...) arrive on
+#: the same day with different translated titles but one CVE list. Set
+#: similarity, not mere overlap, so a 50-CVE roundup never absorbs a
+#: single-CVE story. Body text similarity was tried and rejected: NVD entries
+#: are templated, so distinct CVEs read alike.
+BODY_CVE_JACCARD = 0.5
+BODY_CVE_MIN = 2
 CJK_RE = re.compile(r"[㐀-鿿]")
 WORD_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9\-]*")
 CVE_RE = re.compile(r"CVE-\d{4}-\d{4,7}", re.I)
@@ -113,6 +123,7 @@ def merge_by_title(rows: list[dict[str, Any]],
 
     token_sets = [_tokens(r.get("title") or "") for r in rows]
     cve_sets = [_cves(r.get("title") or "") for r in rows]
+    body_cves = [_cves(r.get("raw_text") or "") for r in rows]
     parent = list(range(len(rows)))
     # Positional view of the embeddings, so the pair loop does not re-look-up
     # by id. None when the caller passed none — meaning "no semantic signal",
@@ -138,6 +149,11 @@ def merge_by_title(rows: list[dict[str, Any]],
             # Strong signal: shared CVE = same event regardless of language.
             if cve_sets[i] & cve_sets[j]:
                 union(i, j); continue
+            bi, bj = body_cves[i], body_cves[j]
+            if bi and bj:
+                shared = len(bi & bj)
+                if shared >= BODY_CVE_MIN and shared / len(bi | bj) >= BODY_CVE_JACCARD:
+                    union(i, j); continue
             # Skip same-source pairs unless a CVE bridges them — articles from
             # the same outlet on the same day are almost always different events.
             if rows[i].get("source") and rows[i].get("source") == rows[j].get("source"):

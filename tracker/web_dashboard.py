@@ -25,7 +25,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
 
-from . import DEFAULT_OUT, ROOT
+from . import DEFAULT_DB, DEFAULT_OUT, ROOT
 from .progress import NullReporter
 
 DEFAULT_PORT = 8787
@@ -472,6 +472,42 @@ def _apply_control(controller, cmd: dict, cra_job=None, reporter=None) -> tuple[
     return False, "unknown command"
 
 
+#: Reader preferences of the site served at /site (tracker_prefs, v2). Kept on
+#: disk beside the DB so they survive what localStorage does not: the console
+#: falling back to another port (8787 taken -> 8788 is a new origin with empty
+#: storage), a browser that clears site data on exit, or another browser.
+PREFS_MAX_BYTES = 512 * 1024
+
+
+def prefs_path() -> Path:
+    return Path(DEFAULT_DB).parent / "ui_prefs.json"
+
+
+def read_prefs() -> dict:
+    try:
+        obj = json.loads(prefs_path().read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}
+    return obj if _valid_prefs(obj) else {}
+
+
+def _valid_prefs(obj) -> bool:
+    return (isinstance(obj, dict) and obj.get("v") == 2
+            and isinstance(obj.get("values"), dict)
+            and all(isinstance(k, str) and isinstance(v, str)
+                    for k, v in obj["values"].items()))
+
+
+def write_prefs(obj) -> None:
+    if not _valid_prefs(obj):
+        raise ValueError("prefs must be {v:2, values:{str:str}}")
+    path = prefs_path()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_suffix(".json.tmp")
+    tmp.write_text(json.dumps(obj, ensure_ascii=False), encoding="utf-8")
+    os.replace(tmp, path)
+
+
 def serve(reporter: WebReporter, *, port: int = DEFAULT_PORT) -> ThreadingHTTPServer:
     """Start the dashboard HTTP server in a daemon thread. Returns the server."""
     class Handler(BaseHTTPRequestHandler):
@@ -535,6 +571,22 @@ def serve(reporter: WebReporter, *, port: int = DEFAULT_PORT) -> ThreadingHTTPSe
             self.send_header("Content-Length", str(len(body)))
             self.end_headers()
             self.wfile.write(body)
+
+        def _save_prefs(self):
+            """POST /prefs: the site's tracker_prefs. JSON content type only, so
+            a cross-site page cannot send it without a CORS preflight, which
+            this server never answers."""
+            ctype = (self.headers.get("Content-Type") or "").split(";")[0].strip().lower()
+            if ctype != "application/json":
+                return self._json(False, "application/json required")
+            try:
+                n = int(self.headers.get("Content-Length", 0))
+                if n <= 0 or n > PREFS_MAX_BYTES:
+                    return self._json(False, "bad size")
+                write_prefs(json.loads(self.rfile.read(n)))
+            except (ValueError, OSError) as exc:
+                return self._json(False, str(exc))
+            return self._json(True, "saved")
 
         def _export_data(self):
             """GET /export-data: the export zip as a browser download."""
@@ -608,6 +660,14 @@ def serve(reporter: WebReporter, *, port: int = DEFAULT_PORT) -> ThreadingHTTPSe
                 self._export_data()
             elif self.path == "/site" or self.path.startswith("/site/"):
                 self._serve_site()
+            elif urlsplit(self.path).path == "/prefs":
+                body = json.dumps(read_prefs(), ensure_ascii=False).encode("utf-8")
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json; charset=utf-8")
+                self.send_header("Cache-Control", "no-store")
+                self.send_header("Content-Length", str(len(body)))
+                self.end_headers()
+                self.wfile.write(body)
             elif self.path.startswith("/state") or self.path.startswith("/history"):
                 data = run_history() if self.path.startswith("/history") else reporter.snapshot()
                 body = json.dumps(data, ensure_ascii=False).encode("utf-8")
@@ -626,6 +686,8 @@ def serve(reporter: WebReporter, *, port: int = DEFAULT_PORT) -> ThreadingHTTPSe
         def do_POST(self):
             if self.path.startswith("/import-data"):
                 return self._import_data()
+            if urlsplit(self.path).path == "/prefs":
+                return self._save_prefs()
             ok, msg = False, ""
             if self.path.startswith("/control"):
                 try:
