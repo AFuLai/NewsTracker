@@ -2183,6 +2183,245 @@ html[data-mode="ws"] #pg-bar { display: flex; }
 }
 @media (prefers-reduced-motion: reduce) { #tour-spot { transition: none; } }
 #pg-dialog-wrap.hidden, #tour-offer.hidden, #tour.hidden, #pg-filter-panel.hidden { display: none; }
+
+/* ── 我的頭版: layout gallery, front / timeline / reading pane, display options, search suggestions,
+      greeting, wizard, tips ── */
+#prefs-btn {
+  position: relative; background: none; border: 1px solid var(--outline); color: var(--on-surface); cursor: pointer;
+  padding: 0.3rem 0.7rem; border-radius: var(--shape-full); font-size: 14px;
+}
+#prefs-btn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+#prefs-btn.nt-has-dot::after {
+  content: ''; position: absolute; top: 2px; right: 2px; width: 7px; height: 7px; border-radius: 50%; background: var(--primary);
+}
+mark.hl { background: color-mix(in srgb, var(--primary) 24%, transparent); color: inherit; border-radius: 2px; padding: 0 1px; }
+.ws-new {
+  display: inline-block; font-size: 10.5px; font-weight: 700; line-height: 1; padding: 2px 5px; border-radius: 4px;
+  background: var(--primary); color: var(--on-primary); letter-spacing: .02em; flex: none;
+}
+.pg-tab.is-home::before { content: '⌂'; margin-right: 4px; font-weight: 400; }
+.pg-tab.dragging { opacity: .45; }
+.pg-tab.drop-before { box-shadow: inset 2px 0 0 var(--primary); }
+.pg-tab.drop-after { box-shadow: inset -2px 0 0 var(--primary); }
+
+/* layout button + gallery */
+.pg-ly-btn {
+  display: inline-flex; align-items: center; gap: 8px; font: inherit; font-size: 13px; cursor: pointer; padding: 3px 10px 3px 6px;
+  border-radius: var(--shape-full); border: 1px solid var(--outline); background: var(--surface-container-low); color: var(--on-surface);
+}
+.pg-ly-btn[aria-expanded="true"] { border-color: var(--primary); background: var(--primary-container); color: var(--on-primary-container); }
+.pg-ly-btn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.pg-ly-caret { font-size: 10px; opacity: .7; }
+.pg-ly-panel {
+  position: fixed; z-index: 125; width: min(34rem, calc(100vw - 16px)); max-height: calc(100vh - 90px); overflow-y: auto;
+  padding: 12px 14px 14px; background: var(--surface-container-high); color: var(--on-surface);
+  border: 1px solid var(--outline-variant); border-radius: var(--shape-m, 12px); box-shadow: var(--elev-2, 0 8px 24px rgba(0,0,0,.3));
+}
+.pg-ly-h { font-size: 13px; font-weight: 600; color: var(--on-surface-variant); margin: 0 0 8px; }
+.pg-ly-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr)); gap: 8px; }
+.pg-ly-opt {
+  display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto auto; column-gap: 10px; align-items: center;
+  text-align: left; font: inherit; cursor: pointer; padding: 8px; border-radius: var(--shape-s, 8px);
+  border: 1px solid var(--outline-variant); background: var(--surface-container-low); color: var(--on-surface);
+}
+.pg-ly-opt .ly-thumb { grid-row: span 2; }
+.pg-ly-opt:hover { border-color: var(--outline); }
+.pg-ly-opt[aria-pressed="true"] { border-color: var(--primary); background: var(--primary-container); color: var(--on-primary-container); }
+.pg-ly-opt:focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; }
+.pg-ly-name { font-size: 13.5px; font-weight: 600; }
+.pg-ly-desc { font-size: 11.5px; line-height: 1.35; color: var(--on-surface-variant); }
+.pg-ly-opt[aria-pressed="true"] .pg-ly-desc { color: inherit; opacity: .85; }
+.pg-ly-sec { border-top: 1px solid var(--outline-variant); margin-top: 12px; padding-top: 10px; display: flex; flex-direction: column; gap: 8px; }
+.nt-seg-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; font-size: 13px; }
+.nt-seg-l { min-width: 4.5rem; color: var(--on-surface-variant); }
+.nt-seg { margin-left: 0; }
+.nt-chk-row { display: flex; flex-wrap: wrap; gap: 6px 18px; }
+.nt-chk { display: inline-flex; align-items: center; gap: 7px; font-size: 13.5px; cursor: pointer; padding: 3px 0; }
+.nt-chk input { accent-color: var(--primary); width: 16px; height: 16px; margin: 0; }
+
+/* thumbnails: small skeletons of each layout */
+.ly-thumb {
+  display: grid; width: 58px; height: 40px; gap: 3px; padding: 4px; box-sizing: border-box; flex: none;
+  border-radius: 6px; background: var(--surface-container-lowest); border: 1px solid var(--outline-variant);
+}
+.ly-thumb i { display: block; min-width: 0; min-height: 0; border-radius: 2px; background: var(--outline-variant); }
+[aria-pressed="true"] > .ly-thumb i, .pg-ly-btn[aria-expanded="true"] .ly-thumb i { background: color-mix(in srgb, var(--primary) 55%, var(--outline-variant)); }
+.ly-thumb.ly-s { width: 24px; height: 17px; padding: 2px; gap: 1.5px; border-radius: 4px; }
+.ly-thumb.ly-s i { border-radius: 1px; }
+.ly-t-cards { grid-template-columns: repeat(3, 1fr); }
+.ly-t-titles { grid-template-rows: repeat(5, 1fr); }
+.ly-t-compact { grid-template-columns: repeat(4, 1fr); }
+.ly-t-magazine { grid-template-columns: repeat(4, 1fr); grid-template-rows: 1fr 1fr; }
+.ly-t-magazine i:first-child { grid-column: span 2; grid-row: span 2; }
+.ly-t-front { grid-template-columns: 2fr 1fr; grid-template-rows: 1fr 1fr .7fr; }
+.ly-t-front i:first-child { grid-row: span 2; }
+.ly-t-front i:nth-child(6) { display: none; }
+.ly-t-timeline { grid-template-rows: repeat(4, 1fr); border-left-width: 3px; border-left-color: var(--primary); padding-left: 6px; }
+.ly-t-split { grid-template-columns: 1fr 1.4fr; grid-template-rows: repeat(4, 1fr); }
+.ly-t-split i:nth-child(5) { grid-column: 2; grid-row: 1 / span 4; }
+.ly-t-split i:nth-child(-n+4) { grid-column: 1; }
+.ly-t-table { grid-template-rows: repeat(5, 1fr); gap: 1px; }
+.ly-t-table i:first-child { background: var(--outline); }
+.ly-t-bytype { grid-template-columns: repeat(3, 1fr); }
+
+/* display options (per page): density, text size, summaries, tags */
+html[data-mode="ws"][data-fs="s"] :is(.ws-grid, .ws-titles, .pg-mag, .pg-front, .pg-tl, .pg-split-list, .pg-table-wrap, .pg-board) { zoom: 0.92; }
+html[data-mode="ws"][data-fs="l"] :is(.ws-grid, .ws-titles, .pg-mag, .pg-front, .pg-tl, .pg-split-list, .pg-table-wrap, .pg-board) { zoom: 1.12; }
+html[data-mode="ws"][data-fs="l"] .reader-body { font-size: 1.08em; }
+html[data-mode="ws"][data-dens="compact"] .ws-grid { gap: 8px; }
+html[data-mode="ws"][data-dens="compact"] .ws-card { min-height: 0; padding: 8px 10px; gap: 4px; }
+html[data-mode="ws"][data-dens="compact"] .ws-title-row:not(.pg-rr) { min-height: 30px; height: 30px; }
+html[data-mode="ws"][data-dens="compact"] .ws-title-row.pg-rr { padding-top: 6px; padding-bottom: 6px; }
+html[data-mode="ws"][data-dens="roomy"] .ws-grid { gap: 18px; }
+html[data-mode="ws"][data-dens="roomy"] .ws-card { padding: 16px 18px; gap: 9px; }
+html[data-mode="ws"][data-dens="roomy"] .ws-title-row:not(.pg-rr) { min-height: 44px; height: 44px; }
+html[data-mode="ws"][data-dens="roomy"] .ws-title-row.pg-rr { padding-top: 14px; padding-bottom: 14px; }
+html[data-mode="ws"][data-sum="0"] :is(.ws-card-summary, .pg-rr-sum) { display: none; }
+html[data-mode="ws"][data-sum="0"] .ws-card { min-height: 0; }
+.ws-card-tags { display: none; flex-wrap: wrap; gap: 0; }
+html[data-mode="ws"][data-tg="1"] .ws-card-tags { display: flex; }
+.ws-card-tags .pg-tag { margin-bottom: 0; }
+
+/* rich rows (timeline, reading pane) */
+.ws-title-row.pg-rr { display: block; height: auto; min-height: 0; padding: 10px 12px; }
+.pg-rr-top { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.pg-rr-meta { font-size: 11.5px; color: var(--on-surface-variant); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.pg-rr-title { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin: 4px 0 0;
+  font-size: 14px; font-weight: 600; line-height: 1.45; white-space: normal; }
+.pg-rr-sum { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-top: 3px;
+  font-size: 12.5px; line-height: 1.5; color: var(--on-surface-variant); }
+.ws-title-row.pg-rr.is-read .pg-rr-title { font-weight: 500; }
+
+/* front page */
+.pg-front { margin-bottom: 16px; }
+.pg-front-top { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 14px; margin-bottom: 18px; }
+.pg-front-lead { padding: 20px 22px; align-self: start; }
+.pg-front-lead .ws-card-title { font-size: 1.55em; line-height: 1.3; -webkit-line-clamp: 4; line-clamp: 4; }
+.pg-front-lead .ws-card-summary { font-size: 15px; line-height: 1.65; -webkit-line-clamp: 12; line-clamp: 12; }
+.pg-front-side { display: grid; grid-template-rows: repeat(3, auto); gap: 10px; align-content: start; }
+.pg-front-sub { min-height: 0; }
+.pg-front-sub .ws-card-summary { -webkit-line-clamp: 2; line-clamp: 2; }
+.pg-front-secs { display: grid; grid-template-columns: repeat(auto-fill, minmax(19rem, 1fr)); gap: 14px 18px; }
+.pg-front-sec { display: flex; flex-direction: column; min-width: 0; gap: 6px; }
+.pg-front-h { display: flex; align-items: center; gap: 8px; margin: 0; padding-bottom: 6px; font-size: 15px;
+  border-bottom: 1px solid var(--outline-variant); }
+.pg-front-bar { width: 4px; height: 1em; border-radius: 2px; flex: none; }
+.pg-front-seclead { min-height: 0; }
+.pg-front-list { display: flex; flex-direction: column; }
+.pg-front-list .ws-title-row { border-left: none; border-right: none; background: none; }
+.pg-front-list .ws-title-row .ws-type-chip { display: none; }
+@media (max-width: 899px) { .pg-front-top { grid-template-columns: minmax(0, 1fr); } .pg-front-lead { min-height: 0; } }
+
+/* timeline */
+.pg-tl { position: relative; max-width: 62rem; margin: 0 0 16px 6px; padding-left: 18px; border-left: 2px solid var(--outline-variant); }
+.pg-tl-day { margin-bottom: 14px; }
+.pg-tl-date { position: sticky; top: var(--sr-h, 64px); z-index: 2; display: flex; align-items: center; gap: 8px; margin: 0 0 6px;
+  padding: 6px 0; font-size: 14px; background: var(--surface); }
+.pg-tl-dot { position: absolute; left: -26px; width: 12px; height: 12px; border-radius: 50%; background: var(--primary);
+  box-shadow: 0 0 0 3px var(--surface); }
+.pg-tl-items { display: flex; flex-direction: column; background: var(--surface-container-lowest);
+  border: 1px solid var(--outline-variant); border-radius: var(--shape-m, 8px); overflow: hidden; }
+
+/* reading pane (split) */
+.pg-split { display: grid; grid-template-columns: minmax(18rem, 0.85fr) minmax(0, 1.3fr); gap: 14px; align-items: start; margin-bottom: 12px; }
+.pg-split-list { display: flex; flex-direction: column; min-width: 0; background: var(--surface-container-lowest);
+  border: 1px solid var(--outline-variant); border-radius: var(--shape-m, 8px); overflow: hidden; }
+.pg-split-row.is-current { background: var(--primary-container); color: var(--on-primary-container); box-shadow: inset 3px 0 0 var(--primary); }
+.pg-split-row.is-current .pg-rr-sum, .pg-split-row.is-current .pg-rr-meta, .pg-split-row.is-current .ws-title-text { color: inherit; }
+.pg-split-pane { position: sticky; top: calc(var(--sr-h, 64px) + 8px); height: calc(100vh - var(--sr-h, 64px) - 24px); min-height: 22rem; }
+.pg-split-pane #reader { max-width: none; width: 100%; height: 100%; max-height: none; margin: 0; box-shadow: none; }
+.pg-split-empty { height: 100%; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 4px; padding: 24px; text-align: center; color: var(--on-surface-variant); font-size: 14px;
+  border: 1px dashed var(--outline-variant); border-radius: var(--shape-l, 12px); }
+.pg-split-empty p { margin: 0; }
+.pg-split-keys { font-size: 12px; opacity: .8; }
+.pg-split-pane:has(#reader:not(.hidden)) .pg-split-empty { display: none; }
+@media (max-width: 1023px) { .pg-split { display: block; } .pg-split-pane { display: none; } }
+
+/* search suggestions */
+#search-wrap { position: relative; }
+#search-suggest {
+  position: absolute; left: 0; right: 0; top: calc(100% + 6px); z-index: 60; max-height: min(26rem, 70vh); overflow-y: auto;
+  padding: 6px; background: var(--surface-container-high); color: var(--on-surface); border: 1px solid var(--outline-variant);
+  border-radius: var(--shape-m, 12px); box-shadow: var(--elev-2, 0 8px 24px rgba(0,0,0,.3)); min-width: min(26rem, calc(100vw - 32px));
+}
+#search-suggest.hidden { display: none; }
+.sg-opt { display: flex; align-items: baseline; gap: 10px; padding: 7px 10px; border-radius: 8px; cursor: pointer; font-size: 14px; }
+.sg-opt:hover, .sg-opt[aria-selected="true"] { background: var(--surface-container-highest, var(--surface-container)); }
+.sg-opt[aria-selected="true"] { box-shadow: inset 2px 0 0 var(--primary); }
+.sg-kind { flex: none; min-width: 2.6rem; font-size: 11px; color: var(--on-surface-variant); }
+.sg-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sg-help { padding: 6px 8px 4px; }
+.sg-help-h { font-size: 12px; color: var(--on-surface-variant); margin-bottom: 6px; }
+.sg-help-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr)); gap: 2px 8px; }
+.sg-ex { display: flex; align-items: baseline; gap: 8px; text-align: left; font: inherit; font-size: 12.5px; cursor: pointer; padding: 4px 6px;
+  border: none; border-radius: 6px; background: none; color: var(--on-surface-variant); }
+.sg-ex:hover { background: var(--surface-container-highest, var(--surface-container)); color: var(--on-surface); }
+.sg-ex code { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-size: 12px; color: var(--primary); white-space: nowrap; }
+.sg-foot { display: block; width: 100%; text-align: left; font: inherit; font-size: 13px; cursor: pointer; margin-top: 4px; padding: 7px 10px;
+  border: none; border-top: 1px solid var(--outline-variant); border-radius: 0 0 8px 8px; background: none; color: var(--primary); }
+.sg-foot:hover { background: var(--surface-container-highest, var(--surface-container)); }
+.sg-clear { color: var(--on-surface-variant); font-size: 12px; }
+
+/* greeting strip and the wizard offer */
+.nt-greet { position: relative; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; margin: 0 0 12px; padding: 9px 40px 9px 14px;
+  background: var(--surface-container-low); border: 1px solid var(--outline-variant); border-radius: var(--shape-m, 12px); }
+.nt-greet-t { margin: 0; font-size: 14px; line-height: 1.55; }
+.nt-greet-t strong { font-weight: 700; }
+.nt-greet-acts { display: flex; flex-wrap: wrap; gap: 6px; }
+.nt-act { padding: 3px 10px; }
+.nt-act.on { background: var(--primary-container); color: var(--on-primary-container); border-color: var(--primary); }
+.nt-x { position: absolute; top: 6px; right: 6px; width: 28px; height: 28px; border: none; border-radius: 50%; background: none;
+  color: var(--on-surface-variant); cursor: pointer; font-size: 12px; }
+.nt-x:hover { background: var(--surface-container-high); color: var(--on-surface); }
+.nt-x:focus-visible { outline: 2px solid var(--primary); outline-offset: 0; }
+.nt-welcome { margin: 0 0 14px; padding: 16px 18px; border-radius: var(--shape-l, 16px);
+  background: var(--primary-container); color: var(--on-primary-container); border: 1px solid color-mix(in srgb, var(--primary) 35%, transparent); }
+.nt-welcome-h { margin: 0 0 4px; font-size: 17px; }
+.nt-welcome-p { margin: 0 0 12px; font-size: 13.5px; line-height: 1.6; max-width: 46rem; }
+.nt-welcome-acts { display: flex; flex-wrap: wrap; gap: 8px; }
+.nt-welcome .pg-btn:not(.pg-btn-primary) { border-color: color-mix(in srgb, var(--on-primary-container) 45%, transparent); color: inherit; }
+.nt-welcome .pg-btn-quiet { border-color: transparent; }
+
+/* settings + wizard dialogs */
+.nt-pref-sec { border-top: 1px solid var(--outline-variant); margin-top: 12px; padding-top: 10px; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
+.nt-pref-sec h3 { margin: 0 0 2px; font-size: 13px; color: var(--on-surface-variant); font-weight: 600; }
+.nt-pref-sec .pg-dlg-hint { margin: 0; }
+.nt-sel { font: inherit; font-size: 14px; color: var(--on-surface); background: var(--surface-container-low); max-width: 100%;
+  border: 1px solid var(--outline-variant); border-radius: var(--shape-s, 6px); padding: 5px 8px; }
+.nt-sel:focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; }
+.nt-btn-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.nt-wiz-top { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+.nt-wiz-dots { display: flex; gap: 6px; }
+.nt-wiz-dot { width: 22px; height: 4px; border-radius: 2px; background: var(--outline-variant); }
+.nt-wiz-dot.done { background: color-mix(in srgb, var(--primary) 50%, var(--outline-variant)); }
+.nt-wiz-dot.cur { background: var(--primary); }
+.nt-wiz-of { font-size: 12px; color: var(--on-surface-variant); font-variant-numeric: tabular-nums; }
+.nt-wiz-body { display: flex; flex-direction: column; gap: 12px; min-height: 15rem; }
+.nt-wiz-grp { display: flex; flex-direction: column; gap: 6px; }
+.nt-wiz-gh { font-size: 13px; font-weight: 600; color: var(--on-surface-variant); }
+.nt-wiz-kw input { font: inherit; font-size: 14px; padding: 6px 10px; color: var(--on-surface); background: var(--surface);
+  border: 1px solid var(--outline-variant); border-radius: var(--shape-s, 6px); max-width: 28rem; }
+.nt-wiz-kw input:focus-visible { outline: 2px solid var(--primary); outline-offset: 0; }
+.nt-wiz-ly { grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr)); }
+.nt-radios { border: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.nt-radios legend { padding: 0; margin-bottom: 4px; }
+.nt-wiz-row { align-items: center; }
+.nt-wiz-skip { margin-right: auto; }
+
+/* tips and toast */
+.nt-tip { position: fixed; z-index: 135; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; box-sizing: border-box;
+  padding: 10px 12px; font-size: 13px; line-height: 1.55; background: var(--surface-container-highest, var(--surface-container-high));
+  color: var(--on-surface); border: 1px solid var(--primary); border-radius: var(--shape-m, 12px); box-shadow: 0 8px 24px rgba(0,0,0,.28); }
+.nt-tip-ok { align-self: flex-end; padding: 3px 10px; }
+.nt-toast { position: fixed; left: 50%; bottom: 20px; z-index: 160; transform: translate(-50%, 12px); opacity: 0; pointer-events: none;
+  max-width: calc(100vw - 32px); padding: 10px 16px; font-size: 13.5px; border-radius: var(--shape-m, 12px);
+  background: var(--on-surface); color: var(--surface); box-shadow: 0 8px 24px rgba(0,0,0,.3);
+  transition: opacity var(--motion-short, .2s) var(--ease-standard, ease), transform var(--motion-short, .2s) var(--ease-standard, ease); }
+.nt-toast.show { opacity: 1; transform: translate(-50%, 0); }
+@media (prefers-reduced-motion: reduce) { .nt-toast { transition: none; } }
+@media print { .nt-greet, .nt-welcome, .nt-tip, .nt-toast, #search-suggest { display: none !important; } }
+.pg-tpl-ly { display: inline-flex; align-items: center; gap: 6px; }
 </style>
 </head>
 <body>
@@ -2200,6 +2439,7 @@ html[data-mode="ws"] #pg-bar { display: flex; }
       <span id="last-updated"></span></span>
       <button id="watch-btn" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="watch-panel">關注</button>
       <button id="palette-btn" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="palette-panel">主題</button>
+      <button id="prefs-btn" type="button" aria-haspopup="dialog">個人化</button>
       <button class="pg-tour-btn" type="button" title="導覽" aria-label="導覽">?</button>
       <button id="lang-btn" onclick="toggleLang()" title="Language / 語言" aria-label="切換語言"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H4v3h10.52C9.47 7.69 8.96 8.99 8.19 10H4v3h4.52c.7 1.43 1.72 2.81 2.97 3.85l-2.55 2.54.96.96c1.66-1.44 3.01-3.38 3.89-5.58h.11l-.04.04c.3-.45.51-.95.65-1.46.46 1.29.76 2.61.76 4v1h3v-1c0-1.13-.21-2.22-.62-3.26z"/></svg></button>
     </div>
@@ -2284,7 +2524,8 @@ html[data-mode="ws"] #pg-bar { display: flex; }
 const TrackerPrefs = (() => {
   const LEGACY_KEYS = ['tracker_lang', 'tracker_theme', 'tracker_skin', 'tracker_palette', 'tracker_nav',
     'tracker_view', 'tracker_watch', 'tracker_watch_hub', 'tracker_watch_seen', 'tracker_lib_group'];
-  const EXTRA_KEYS = ['tracker_ws', 'tracker_read', 'tracker_pages', 'tracker_tour'];
+  const EXTRA_KEYS = ['tracker_ws', 'tracker_read', 'tracker_pages', 'tracker_tour', 'tracker_personal', 'tracker_taste',
+    'tracker_visit', 'tracker_recent'];
   const KEY = 'tracker_prefs';
   const has = (o, k) => Object.prototype.hasOwnProperty.call(o, k);
   function load(storage) {
@@ -3350,11 +3591,11 @@ function termMatches(hay, term) {
   const re = new RegExp('(?:^|[^a-z0-9])' + esc + '(?:[^a-z0-9]|$)');
   return re.test(hay);
 }
+// The box text goes through TrackerSearch: plain words keep the word-boundary match above (on the
+// displayed fields of the 範圍 scope), plus "phrases", -exclude, OR and tag:/src:/type:/cve:/after:/before:/is:/in:.
 function matchesQuery(a, q) {
   if (!q) return true;
-  const hay = searchHaystack(a);
-  return q.toLowerCase().split(/\s+/).filter(Boolean)
-          .every(term => termMatches(hay, term));
+  return TrackerSearch.match(a, parsedQuery(q), SEARCH_HELP);
 }
 
 // Toggle a search-scope field (標題/內文/標籤). Keeps at least one active.
@@ -3418,11 +3659,19 @@ const HUB_PLATFORMS = TrackerTypes.PLATFORMS;
 // user built: {id, name, range, src, ty, w, pl, pk, layout, size, f}. f = the advanced filter.
 // No DOM, no storage, no globals: everything article-specific comes in through `h` (helpers).
 const TrackerPages = (() => {
-  const LAYOUTS = ['cards', 'titles', 'compact', 'magazine', 'table', 'bytype'];
+  const LAYOUTS = ['cards', 'titles', 'compact', 'magazine', 'front', 'timeline', 'split', 'table', 'bytype'];
   const SIZES = [0, 20, 50, 100];                  // 0 = endless scrolling
-  const SORTS = ['newest', 'oldest', 'source', 'type'];
+  const SORTS = ['newest', 'oldest', 'source', 'type', 'foryou'];   // foryou: h.rank (TrackerPersonal)
   const LISTS = ['types', 'srcs', 'rules', 'plats', 'pkgs', 'tags', 'tagsNot', 'kwAll', 'kwAny', 'kwNot'];
   const MAX_PAGES = 12, MAX_LIST = 50, MAX_STR = 80, MAX_NAME = 30;
+  const DENS = ['compact', 'cozy', 'roomy'], FONTS = ['s', 'm', 'l'];
+  // Display options of a page: density, text size, summaries shown, tags shown.
+  function normLook(o) {
+    const x = (o && typeof o === 'object' && !Array.isArray(o)) ? o : {};
+    return { d: DENS.includes(x.d) ? x.d : 'cozy', fs: FONTS.includes(x.fs) ? x.fs : 'm', sum: x.sum !== false, tg: x.tg === true };
+  }
+  // Start page: '' = the page used last, 'hub', 't:<tracker>', or one of the page ids.
+  const HOME_RE = /^(hub|t:[a-z0-9_-]{1,40})$/;
   const has = (o, k) => Object.prototype.hasOwnProperty.call(o, k);
   const str = (x, n) => (typeof x === 'string' ? x.trim().slice(0, n || MAX_STR) : '');
   function cleanList(x) {
@@ -3477,11 +3726,13 @@ const TrackerPages = (() => {
       src: str(o.src), ty: str(o.ty), w: str(o.w), pl: str(o.pl), pk: str(o.pk),
       layout: LAYOUTS.includes(o.layout) ? o.layout : 'cards',
       size: SIZES.includes(size) ? size : 0,
-      f: compactFilter(o.f)
+      f: compactFilter(o.f),
+      q: str(o.q, 120),           // a saved search pinned to the page (「存成版面」)
+      look: normLook(o.look)
     };
   }
   function defaultState() {
-    return { v: 1, active: 'main', pages: [normPage({ id: 'main' }, 0)] };
+    return { v: 1, active: 'main', home: '', pages: [normPage({ id: 'main' }, 0)] };
   }
   function normState(o) {
     if (!o || typeof o !== 'object' || o.v !== 1 || !Array.isArray(o.pages)) return defaultState();
@@ -3494,7 +3745,8 @@ const TrackerPages = (() => {
     });
     if (!pages.length) return defaultState();
     const active = ids.has(o.active) ? o.active : pages[0].id;
-    return { v: 1, active, pages };
+    const home = (typeof o.home === 'string' && (HOME_RE.test(o.home) || ids.has(o.home))) ? o.home : '';
+    return { v: 1, active, home, pages };
   }
   function parse(s) {
     if (typeof s !== 'string') return defaultState();
@@ -3547,6 +3799,7 @@ const TrackerPages = (() => {
   // list is newest-first already; other orders are stable re-sorts of it.
   function sort(list, order, h) {
     const out = list.slice();
+    if (order === 'foryou') return typeof h.rank === 'function' ? h.rank(out) : out;
     if (order === 'oldest') return out.reverse();
     if (order === 'source') {
       const key = a => lc(h.source(a));
@@ -3598,13 +3851,16 @@ const TrackerPages = (() => {
     { id: 'compliance', page: { range: '90d', layout: 'titles', f: { types: ['regulation'] } } },
     { id: 'supply',     page: { range: '30d', layout: 'compact', f: { types: ['supply'] } } },
     { id: 'board',      page: { range: '7d',  layout: 'bytype' } },
-    { id: 'unread',     page: { range: '7d',  layout: 'titles', size: 50, f: { unread: true } } }
+    { id: 'unread',     page: { range: '7d',  layout: 'titles', size: 50, f: { unread: true } } },
+    { id: 'foryou',     page: { range: '7d',  layout: 'front', f: { sort: 'foryou' } } },
+    { id: 'reading',    page: { range: '30d', layout: 'split' } },
+    { id: 'timeline',   page: { range: '30d', layout: 'timeline' } }
   ];
   function fromTemplate(st, tplId, name) {
     const tpl = TEMPLATES.find(x => x.id === tplId) || TEMPLATES[0];
     return normPage(Object.assign({}, tpl.page, { id: newId(st), name: name || '' }), 0);
   }
-  return { LAYOUTS, SIZES, SORTS, LISTS, MAX_PAGES, TEMPLATES, emptyFilter, normFilter, compactFilter, filterCount,
+  return { LAYOUTS, SIZES, SORTS, LISTS, MAX_PAGES, TEMPLATES, DENS, FONTS, normLook, emptyFilter, normFilter, compactFilter, filterCount,
            normPage, normState, defaultState, parse, serialize, newId, canAdd, match, filter, sort, pages, slice,
            pagerWindow, tagCounts, fromTemplate };
 })();
@@ -3734,6 +3990,324 @@ const TrackerStore = (() => {
 })();
 /* TRACKER-STORE:END */
 window.TrackerStore = TrackerStore;
+/* TRACKER-SEARCH:BEGIN */
+// Pure search-box syntax. No DOM, no storage, no globals: article facts come in through `h`.
+//   word word        every word, on word boundaries (CJK as substrings)   "exact phrase"  as typed
+//   -word            exclude                                               a OR b          either
+//   tag:x  src:x  type:x  cve:2026-1234  in:title  after:2026-11-01  before:2026-11  is:unread|read|watched|new
+// A key the parser does not know (e.g. https:) stays a plain word. Keys and values ignore case.
+const TrackerSearch = (() => {
+  const KEYS = ['tag', 'src', 'type', 'cve', 'in', 'after', 'before', 'is'];
+  const ALIAS = { tags: 'tag', '標籤': 'tag', source: 'src', site: 'src', '來源': 'src', '類型': 'type',
+                  since: 'after', until: 'before', '之後': 'after', '之前': 'before' };
+  const IS = ['unread', 'read', 'watched', 'new'];
+  const IS_ALIAS = { '未讀': 'unread', '已讀': 'read', '關注': 'watched', '新': 'new' };
+  const OPS = ['tag:', 'src:', 'type:', 'cve:', 'is:unread', 'is:watched', 'is:new', 'in:title', 'after:', 'before:'];
+  const CLOSE = { '"': '"', '“': '”', '「': '」' };
+  const WORDY = /[0-9A-Za-zÀ-￿]/;
+  const lc = s => String(s === undefined || s === null ? '' : s).toLowerCase();
+  const reEsc = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  function keyOf(k) { const x = lc(k); const y = ALIAS[x] || x; return KEYS.includes(y) ? y : ''; }
+  function tokens(q) {
+    const s = String(q || ''), out = [];
+    let i = 0;
+    while (i < s.length) {
+      while (i < s.length && /\s/.test(s[i])) i++;
+      if (i >= s.length) break;
+      let neg = false, key = '', quoted = false, val;
+      if (s[i] === '-' && i + 1 < s.length && !/\s/.test(s[i + 1])) { neg = true; i++; }
+      const m = /^([^\s:"：]+)[:：](?=\S)/.exec(s.slice(i));
+      if (m && keyOf(m[1])) { key = keyOf(m[1]); i += m[0].length; }
+      const close = CLOSE[s[i]];
+      if (close) {
+        const end = s.indexOf(close, i + 1);
+        val = end < 0 ? s.slice(i + 1) : s.slice(i + 1, end);
+        i = end < 0 ? s.length : end + 1;
+        quoted = true;
+      } else {
+        let j = i;
+        while (j < s.length && !/\s/.test(s[j])) j++;
+        val = s.slice(i, j);
+        i = j;
+      }
+      val = val.trim();
+      if (val && WORDY.test(val)) out.push({ neg, key, val, quoted });
+    }
+    return out;
+  }
+  // 'YYYY-MM-DD' | 'YYYY/M/D' | 'YYYY-MM' | 'YYYY' -> inclusive bound ('' when unreadable)
+  function dateBound(v, end) {
+    let m;
+    const p2 = x => ('0' + x).slice(-2);
+    if ((m = /^(\d{4})[-/](\d{1,2})[-/](\d{1,2})$/.exec(v))) return m[1] + '-' + p2(m[2]) + '-' + p2(m[3]);
+    if ((m = /^(\d{4})[-/](\d{1,2})$/.exec(v))) return m[1] + '-' + p2(m[2]) + (end ? '-31' : '-01');
+    if ((m = /^(\d{4})$/.exec(v))) return v + (end ? '-12-31' : '-01-01');
+    return '';
+  }
+  function parse(q) {
+    const p = { terms: [], phrases: [], any: [], not: [], tag: [], tagNot: [], src: [], srcNot: [], type: [], typeNot: [],
+                cve: [], inTitle: false, after: '', before: '', is: [], isNot: [] };
+    const plain = [];
+    tokens(q).forEach(t => {
+      if (!t.key && !t.neg && !t.quoted && t.val === 'OR') { plain.push('OR'); return; }
+      const v = lc(t.val);
+      if (!t.key) { if (t.neg) p.not.push(v); else plain.push({ v, phrase: t.quoted }); return; }
+      if (t.key === 'tag') (t.neg ? p.tagNot : p.tag).push(v);
+      else if (t.key === 'src') (t.neg ? p.srcNot : p.src).push(v);
+      else if (t.key === 'type') (t.neg ? p.typeNot : p.type).push(v);
+      else if (t.key === 'cve') { const c = v.replace(/^cve-?/, ''); if (c) p.cve.push('cve-' + c); }
+      else if (t.key === 'in') { if (v === 'title' || v === '標題') p.inTitle = !t.neg; }
+      else if (t.key === 'after') { const d = dateBound(t.val, false); if (d) p.after = d; }
+      else if (t.key === 'before') { const d = dateBound(t.val, true); if (d) p.before = d; }
+      else if (t.key === 'is') { const x = IS_ALIAS[v] || v; if (IS.includes(x)) (t.neg ? p.isNot : p.is).push(x); }
+    });
+    const groups = [];
+    let join = false;
+    plain.forEach(x => {
+      if (x === 'OR') { join = groups.length > 0; return; }
+      if (join) groups[groups.length - 1].push(x); else groups.push([x]);
+      join = false;
+    });
+    groups.forEach(g => {
+      if (g.length > 1) p.any.push(g);
+      else (g[0].phrase ? p.phrases : p.terms).push(g[0].v);
+    });
+    p.empty = !(p.terms.length || p.phrases.length || p.any.length || p.not.length || p.tag.length || p.tagNot.length ||
+      p.src.length || p.srcNot.length || p.type.length || p.typeNot.length || p.cve.length || p.after || p.before ||
+      p.is.length || p.isNot.length);
+    return p;
+  }
+  const reCache = new Map();
+  function wordHit(hay, term) {
+    let re = reCache.get(term);
+    if (!re) {
+      if (reCache.size > 200) reCache.clear();
+      re = new RegExp('(?:^|[^a-z0-9])' + reEsc(term) + '(?:[^a-z0-9]|$)');
+      reCache.set(term, re);
+    }
+    return re.test(hay);
+  }
+  // h: { text(a, titleOnly) -> string, tags(a) -> [..], source(a) -> string, type(a) -> [id, names..],
+  //      cves(a) -> [..], date(a) -> 'YYYY-MM-DD', read(a), watched(a), isNew(a) -> bool }
+  function match(a, p, h) {
+    if (!p || p.empty) return true;
+    if (p.terms.length || p.phrases.length || p.any.length || p.not.length) {
+      const hay = lc(h.text(a, p.inTitle));
+      for (const t of p.terms) if (!wordHit(hay, t)) return false;
+      for (const t of p.phrases) if (!hay.includes(t)) return false;
+      for (const g of p.any) if (!g.some(x => (x.phrase ? hay.includes(x.v) : wordHit(hay, x.v)))) return false;
+      for (const t of p.not) if (wordHit(hay, t)) return false;
+    }
+    if (p.tag.length || p.tagNot.length) {
+      const tg = (h.tags(a) || []).map(lc);
+      const hit = x => tg.some(y => y.includes(x));
+      if (!p.tag.every(hit) || p.tagNot.some(hit)) return false;
+    }
+    if (p.src.length || p.srcNot.length) {
+      const s = lc(h.source(a));
+      if (p.src.length && !p.src.some(x => s.includes(x))) return false;
+      if (p.srcNot.some(x => s.includes(x))) return false;
+    }
+    if (p.type.length || p.typeNot.length) {
+      const ty = (h.type(a) || []).map(lc);
+      const hit = x => ty.some(y => y === x || y.startsWith(x));
+      if (p.type.length && !p.type.some(hit)) return false;
+      if (p.typeNot.some(hit)) return false;
+    }
+    if (p.cve.length) {
+      const cs = (h.cves(a) || []).map(lc);
+      if (!p.cve.every(c => cs.some(x => x.startsWith(c)))) return false;
+    }
+    if (p.after || p.before) {
+      const d = String(h.date(a) || '');
+      if (!d || (p.after && d < p.after) || (p.before && d > p.before)) return false;
+    }
+    const flag = x => (x === 'unread' ? !h.read(a) : x === 'read' ? !!h.read(a) : x === 'watched' ? !!h.watched(a) : !!h.isNew(a));
+    if (!p.is.every(flag) || p.isNot.some(flag)) return false;
+    return true;
+  }
+  // Words to highlight in results: the positive words and phrases (one-letter latin words are noise).
+  function marks(p) {
+    if (!p) return [];
+    const all = p.terms.concat(p.phrases);
+    p.any.forEach(g => g.forEach(x => all.push(x.v)));
+    return [...new Set(all)].filter(x => x && !/^[a-z0-9]$/.test(x)).sort((x, y) => y.length - x.length);
+  }
+  const quoteVal = v => (/\s/.test(v) ? '"' + v + '"' : v);
+  // input: the box text. ctx: { tags: [names], srcs: [names], types: [{id, name}], recent: [queries] }.
+  // -> at most `limit` { kind: 'recent'|'tag'|'src'|'type'|'is'|'op', label, value } (value = the whole new box text)
+  function suggest(input, ctx, limit) {
+    const max = limit || 8, c = ctx || {}, out = [], seen = new Set();
+    const s = String(input || '');
+    const push = (kind, label, value) => {
+      if (out.length >= max || seen.has(value)) return;
+      seen.add(value);
+      out.push({ kind, label, value });
+    };
+    const recent = (c.recent || []).filter(r => typeof r === 'string' && r);
+    if (!s.trim()) { recent.forEach(r => push('recent', r, r)); return out; }
+    recent.filter(r => lc(r).startsWith(lc(s.trim())) && lc(r) !== lc(s.trim())).forEach(r => push('recent', r, r));
+    if (/\s$/.test(s)) return out;
+    const cut = s.search(/\S+$/);
+    const head = s.slice(0, cut), last = s.slice(cut);
+    const neg = last[0] === '-' ? '-' : '';
+    const body = neg ? last.slice(1) : last;
+    const done = v => head + v + ' ';
+    const km = /^([^\s:"：]+)[:：](.*)$/.exec(body);
+    if (km && keyOf(km[1])) {
+      const key = keyOf(km[1]), part = lc(km[2].replace(/^["“「]/, ''));
+      const want = x => lc(x).includes(part);
+      if (key === 'tag') (c.tags || []).filter(want).forEach(x => push('tag', x, done(neg + 'tag:' + quoteVal(x))));
+      else if (key === 'src') (c.srcs || []).filter(want).forEach(x => push('src', x, done(neg + 'src:' + quoteVal(x))));
+      else if (key === 'type') (c.types || []).filter(x => want(x.name) || lc(x.id).startsWith(part)).forEach(x => push('type', x.name, done(neg + 'type:' + x.id)));
+      else if (key === 'is') IS.filter(x => x.startsWith(part)).forEach(x => push('is', 'is:' + x, done(neg + 'is:' + x)));
+      else if (key === 'in') { if ('title'.startsWith(part)) push('op', 'in:title', done('in:title')); }
+      return out;
+    }
+    const part = lc(body);
+    if (!part) return out;
+    OPS.filter(o => o.startsWith(part) && o !== part).forEach(o => push('op', o, head + neg + o + (o.endsWith(':') ? '' : ' ')));
+    if (part.length >= 2 || /[^\x00-\x7f]/.test(part)) {
+      (c.types || []).filter(x => lc(x.name).includes(part) || lc(x.id).startsWith(part)).slice(0, 2)
+        .forEach(x => push('type', x.name, done(neg + 'type:' + x.id)));
+      (c.tags || []).filter(x => lc(x).includes(part)).slice(0, 4).forEach(x => push('tag', x, done(neg + 'tag:' + quoteVal(x))));
+      (c.srcs || []).filter(x => lc(x).includes(part)).slice(0, 2).forEach(x => push('src', x, done(neg + 'src:' + quoteVal(x))));
+    }
+    return out;
+  }
+  // Recent searches: newest first, case-insensitive dedupe, at most `max`.
+  function remember(list, q, max) {
+    const s = String(q || '').trim().slice(0, 120);
+    const arr = (Array.isArray(list) ? list : []).filter(x => typeof x === 'string' && x.trim() && lc(x) !== lc(s));
+    if (s) arr.unshift(s);
+    return arr.slice(0, max || 8);
+  }
+  return { KEYS, OPS, tokens, parse, match, marks, suggest, remember };
+})();
+/* TRACKER-SEARCH:END */
+window.TrackerSearch = TrackerSearch;
+/* TRACKER-PERSONAL:BEGIN */
+// Pure personalisation layer: the reading-taste profile learnt from opened articles, the 為你推薦
+// score, "new since your last visit", the start page and the greeting. No DOM, no storage, no clock:
+// `now`, the hour and dates come in as arguments.
+const TrackerPersonal = (() => {
+  const MAX_TAGS = 120, MAX_TYPES = 20, DECAY = 0.97, MIN_READS = 3, SESSION_GAP = 6 * 3600 * 1000;
+  const DAY_RE = /^\d{4}-\d{2}-\d{2}$/;
+  const num = x => ((typeof x === 'number' && isFinite(x) && x > 0) ? x : 0);
+  const lc = s => String(s === undefined || s === null ? '' : s).trim().toLowerCase();
+  const isObj = o => !!o && typeof o === 'object' && !Array.isArray(o);
+  function emptyTaste() { return { v: 1, n: 0, ty: {}, tg: {} }; }
+  function top(obj, n) {
+    const out = {};
+    Object.keys(obj).map(k => [k, obj[k]]).sort((x, y) => y[1] - x[1] || (x[0] < y[0] ? -1 : 1)).slice(0, n)
+      .forEach(([k, v]) => { const r = Math.round(v * 1000) / 1000; if (r > 0) out[k] = r; });
+    return out;
+  }
+  function clean(src, n) {
+    const m = {};
+    if (isObj(src)) Object.keys(src).forEach(k => { const key = lc(k).slice(0, 40); const v = num(src[k]); if (key && v) m[key] = (m[key] || 0) + v; });
+    return top(m, n);
+  }
+  function normTaste(o) {
+    if (!isObj(o) || o.v !== 1) return emptyTaste();
+    return { v: 1, n: Math.floor(num(o.n)), ty: clean(o.ty, MAX_TYPES), tg: clean(o.tg, MAX_TAGS) };
+  }
+  function parseTaste(s) {
+    if (typeof s !== 'string') return emptyTaste();
+    try { return normTaste(JSON.parse(s)); } catch (e) { return emptyTaste(); }
+  }
+  // One opened article: every weight decays a little, its type and (up to 8) tags gain 1.
+  function learn(taste, facts) {
+    const t = normTaste(taste), f = facts || {}, ty = {}, tg = {};
+    Object.keys(t.ty).forEach(k => { ty[k] = t.ty[k] * DECAY; });
+    Object.keys(t.tg).forEach(k => { tg[k] = t.tg[k] * DECAY; });
+    const type = lc(f.type);
+    if (type) ty[type] = (ty[type] || 0) + 1;
+    const seen = new Set();
+    (Array.isArray(f.tags) ? f.tags : []).forEach(x => {
+      const k = lc(x).slice(0, 40);
+      if (k && !seen.has(k) && seen.size < 8) { seen.add(k); tg[k] = (tg[k] || 0) + 1; }
+    });
+    return { v: 1, n: t.n + 1, ty: top(ty, MAX_TYPES), tg: top(tg, MAX_TAGS) };
+  }
+  // 0..1: how close an article is to what the reader opens; 0 until MIN_READS articles were read.
+  function affinity(taste, facts) {
+    const t = taste || emptyTaste(), f = facts || {};
+    if (!(t.n >= MIN_READS)) return 0;
+    const maxTy = Math.max(0, ...Object.values(t.ty || {})), maxTg = Math.max(0, ...Object.values(t.tg || {}));
+    const a = maxTy ? (t.ty[lc(f.type)] || 0) / maxTy : 0;
+    let b = 0;
+    (Array.isArray(f.tags) ? f.tags : []).forEach(x => { const v = maxTg ? (t.tg[lc(x)] || 0) / maxTg : 0; if (v > b) b = v; });
+    return Math.round((0.55 * a + 0.45 * b) * 1000) / 1000;
+  }
+  function dayNum(d) { return Date.UTC(+d.slice(0, 4), +d.slice(5, 7) - 1, +d.slice(8, 10)) / 86400000; }
+  // 為你推薦: fresh first, lifted by taste and watch hits; already-read articles sink.
+  function score(facts, taste, newest) {
+    const f = facts || {};
+    const age = (DAY_RE.test(String(f.date)) && DAY_RE.test(String(newest))) ? Math.max(0, dayNum(newest) - dayNum(f.date)) : 30;
+    let s = 0.45 / (1 + age / 2) + 0.35 * affinity(taste, f) + (f.watched ? 0.25 : 0) + (f.isNew ? 0.05 : 0);
+    if (f.read) s -= 0.4;
+    return Math.round(s * 10000) / 10000;
+  }
+  // Stable: equal scores keep the incoming order.
+  function rank(list, factsOf, taste, newest) {
+    return (list || []).map((a, i) => [a, i, score(factsOf(a), taste, newest)])
+      .sort((x, y) => y[2] - x[2] || x[1] - y[1]).map(x => x[0]);
+  }
+  // Visits. `since` = the newest data date the reader had already seen when this session began; it
+  // moves only when a new session starts (more than 6 h after the last one), so reloading the page
+  // does not wipe the 「新」 marks. `prev` is the stored JSON (or object); returns { since, state }.
+  function parseVisit(s) {
+    let o = null;
+    if (isObj(s)) o = s;
+    else { try { o = typeof s === 'string' ? JSON.parse(s) : null; } catch (e) { o = null; } }
+    const d = x => ((typeof x === 'string' && DAY_RE.test(x)) ? x : '');
+    return isObj(o) ? { v: 1, base: d(o.base), seen: d(o.seen), at: num(o.at) } : { v: 1, base: '', seen: '', at: 0 };
+  }
+  function visit(prev, newest, now) {
+    const p = parseVisit(prev);
+    const nw = DAY_RE.test(String(newest)) ? String(newest) : '';
+    const t = num(now);
+    const fresh = !p.at || (t - p.at) > SESSION_GAP;
+    const base = fresh ? p.seen : p.base;
+    const seen = (nw && nw > p.seen) ? nw : p.seen;
+    return { since: base, state: { v: 1, base, seen, at: fresh ? (t || p.at) : p.at } };
+  }
+  // Start page: '' / unknown -> the page used last; 'hub'; 't:<tracker>'; or a page id.
+  function homeTarget(home, pageIds, trackers) {
+    const h = typeof home === 'string' ? home : '';
+    if (h === 'hub') return { kind: 'hub' };
+    if (h.slice(0, 2) === 't:' && (trackers || []).includes(h.slice(2))) return { kind: 'tracker', name: h.slice(2) };
+    if (h && (pageIds || []).includes(h)) return { kind: 'page', id: h };
+    return { kind: 'last' };
+  }
+  function greeting(hour) {
+    const x = Number(hour);
+    if (x >= 5 && x < 11) return 'morning';
+    if (x >= 11 && x < 14) return 'noon';
+    if (x >= 14 && x < 18) return 'afternoon';
+    if (x >= 18 && x < 23) return 'evening';
+    return 'night';
+  }
+  // Settings key `tracker_personal`; every switch defaults to on, the wizard to "not offered yet".
+  function parseSettings(s) {
+    let o = null;
+    try { o = typeof s === 'string' ? JSON.parse(s) : null; } catch (e) { o = null; }
+    o = isObj(o) ? o : {};
+    const id = x => ((typeof x === 'string' && /^[a-z0-9_-]{1,24}$/.test(x)) ? x : '');
+    return {
+      v: 1, greet: o.greet !== false, learn: o.learn !== false, tips: o.tips !== false,
+      wiz: (o.wiz === 'done' || o.wiz === 'later') ? o.wiz : '',
+      wizPage: id(o.wizPage),
+      tipsSeen: [...new Set((Array.isArray(o.tipsSeen) ? o.tipsSeen : []).map(id).filter(Boolean))].slice(0, 40),
+      gearSeen: o.gearSeen === true
+    };
+  }
+  return { MIN_READS, emptyTaste, normTaste, parseTaste, learn, affinity, score, rank, parseVisit, visit,
+           homeTarget, greeting, parseSettings };
+})();
+/* TRACKER-PERSONAL:END */
+window.TrackerPersonal = TrackerPersonal;
 // article → type id (TrackerTypes.typeOf: category table, then title/tag keywords for platform / focus).
 function newsTypeOf(a) {
   return TrackerTypes.typeOf(a);
@@ -4335,7 +4909,7 @@ function renderWatchHub(focusFn) {
 // Recompute which dates (and how many articles) match the query, honouring the
 // current tracker + category filter. This is what the date menu is rebuilt from.
 function buildSearchIndex() {
-  const q = state.searchQuery.toLowerCase();
+  const q = state.searchQuery;   // TrackerSearch folds case itself (and reads OR as typed)
   const counts = {}; const years = new Set();
   const days = window.TRACKER_DAYS || {};
   for (const date in days) {
@@ -4584,7 +5158,8 @@ function init() {
   initHubPrefs();  // localStorage tracker_watch_hub → hubPrefs; a hash hv= / hw= (below) may override it
   ws.mode = wsLoadMode();
   pgLoad();        // localStorage tracker_pages → pgState (the user's own pages)
-  if (!applyHashRestore()) selectWorkspace();   // deep-link wins; no / unknown hash → the news workspace (the home view; it was the 總覽 hub, which replaced the old default tracker wall)
+  personalLoad();  // tracker_personal / tracker_taste → settings and the reading-taste profile
+  if (!applyHashRestore()) personalStart();   // no deep link: the start page the reader chose (default: the page used last)   // deep-link wins; no / unknown hash → the news workspace (the home view; it was the 總覽 hub, which replaced the old default tracker wall)
   applyLang();   // sync all static labels + lang button to the active language
 }
 
@@ -4861,7 +5436,8 @@ function wsYearDays(y) {
 // range is applied by the caller; here: source + search (the base every count is taken over) ...
 function wsBaseRaw(list) {
   const q = state.searchQuery;
-  return list.filter(a => (!ws.src || itemBelongsToTracker(a, ws.src)) && (!q || matchesQuery(a, q)));
+  return list.filter(a => (!ws.src || itemBelongsToTracker(a, ws.src)) && (!q || matchesQuery(a, q)) &&
+    (!ws.q || matchesQuery(a, ws.q)));
 }
 // ... plus the advanced filter of the active page (so the rail counts follow it too)
 function wsBase(list) {
@@ -5115,6 +5691,7 @@ function wsDraw(keep) {
     if (ae && ae.dataset && ae.dataset.ws) ws.focusKey = ae.dataset.ws;
   }
   if (wsObserver) { wsObserver.disconnect(); wsObserver = null; }
+  splitRescue();   // the docked reader must survive the redraw
   const main = document.getElementById('main-content');
   document.getElementById('loading-msg').style.display = 'none';
   document.getElementById('no-data').classList.add('hidden');
@@ -5124,6 +5701,8 @@ function wsDraw(keep) {
   const days = window.TRACKER_DAYS || {};
   const newest = TrackerStore.newestDate(days);
   ws.newest = newest;
+  personalVisit(newest);
+  applyLookAttrs();
   const rg = TrackerStore.rangeOf(ws.range, newest);
   const base = wsBase(TrackerStore.collect(days, { fromDate: rg.from, toDate: rg.to }));
   const shown = TrackerPages.sort(TrackerStore.sortNewest(wsFacet(base)), ws.f.sort, PG_HELP);
@@ -5144,6 +5723,7 @@ function wsDraw(keep) {
     const ch0 = pgChipsEl(); if (ch0) tbFrag.appendChild(ch0);
     main.insertBefore(tbFrag, nd);
     nd.classList.remove('hidden');
+    splitRestore();
     nd.textContent = state.searchQuery ? L().ui.noResults(state.searchQuery)
       : (TrackerPages.filterCount(ws.f) ? pt('empty') : t('noData'));
     wsRefocus();
@@ -5155,6 +5735,8 @@ function wsDraw(keep) {
   head.appendChild(wsEl('span', 'ws-sub', '· ' + t('tlCount')(shown.length)));
   if (ws.partial) head.appendChild(wsEl('span', 'ws-sub ws-partial', t('wsPartial')(ws.partial.done, ws.partial.total)));
 
+  const intro = personalIntroEl(base);
+  if (intro) frag.appendChild(intro);
   frag.appendChild(head);
   frag.appendChild(pgToolbarEl());
   const chips = pgChipsEl(); if (chips) frag.appendChild(chips);
@@ -5163,13 +5745,15 @@ function wsDraw(keep) {
   ws.pn = paged.pn;
   const list = paged.items;
   if (ws.size > 0 && paged.pages > 1) frag.appendChild(pgPagerEl(paged));
-  const flat = { table: pgRenderTable, magazine: pgRenderMagazine, bytype: pgRenderBoard }[ws.mode];
+  const flat = { table: pgRenderTable, magazine: pgRenderMagazine, bytype: pgRenderBoard, front: pgRenderFront,
+                 timeline: pgRenderTimeline, split: pgRenderSplit }[ws.mode];
   if (flat) {
     // not date-grouped; endless mode grows by WS_BATCH with a button (the table can hold thousands)
     const endless = !(ws.size > 0);
     const upto = endless ? Math.max(ws.rendered, WS_BATCH) : list.length;
-    frag.appendChild(flat(endless && ws.mode !== 'bytype' ? list.slice(0, upto) : list));
-    if (endless && ws.mode !== 'bytype' && list.length > upto) {
+    const whole = ws.mode === 'bytype' || ws.mode === 'front';   // sections fold their own overflow
+    frag.appendChild(flat(endless && !whole ? list.slice(0, upto) : list));
+    if (endless && !whole && list.length > upto) {
       const more = wsEl('button', 'pg-more pg-more-wide', pt('more')(Math.min(WS_BATCH, list.length - upto)));
       more.type = 'button';
       more.dataset.ws = 'more';
@@ -5178,6 +5762,7 @@ function wsDraw(keep) {
     } else ws.rendered = upto;
     if (ws.size > 0 && paged.pages > 1) frag.appendChild(pgPagerEl(paged));
     main.appendChild(frag);
+    splitRestore();
     if (keep) window.scrollTo(0, keepY);
     wsRefocus();
     return;
@@ -5212,6 +5797,7 @@ function wsDraw(keep) {
   appendBatch(lazy ? Math.max(ws.rendered, WS_BATCH) : list.length);
   if (ws.size > 0 && paged.pages > 1) frag.appendChild(pgPagerEl(paged));
   main.appendChild(frag);
+  splitRestore();
   if (!lazy) sentinel.remove();
   if (lazy) {
     if (count >= list.length) sentinel.remove();
@@ -5270,6 +5856,8 @@ function selectWorkspace(patch) {
     pgTransient = !pg;
     if (pg) pgState.active = pg.id;
     ws.f = TrackerPages.normFilter(patch.f);
+    ws.q = pg ? (pg.q || '') : '';
+    ws.look = TrackerPages.normLook(pg ? pg.look : null);
     ws.size = TrackerPages.SIZES.includes(Number(patch.sz)) ? Number(patch.sz) : 0;
     ws.pn = Math.max(1, parseInt(patch.pn, 10) || 1);
     const names = wsTrackerNames();
@@ -5290,7 +5878,6 @@ function selectWorkspace(patch) {
     pgTransient = false;
     pgApply(pgActive());
   }
-  if (!was) setTimeout(tourMaybeOffer, 800);
   if (!ws.railInit) {
     ws.railInit = true;
     let pref = null;
@@ -5314,6 +5901,7 @@ function leaveWorkspace() {
   closeReader();
   closeFilterPanel();
   pgCloseMenu();
+  ntLeaveWs();
   ws.seq++;
   state.wsActive = false;
   ws.panelOpen = false;
@@ -5462,6 +6050,8 @@ function pgApply(p) {
   ws.mode = TrackerPages.LAYOUTS.includes(p.layout) ? p.layout : 'cards';
   ws.size = p.size || 0;
   ws.f = TrackerPages.normFilter(p.f);
+  ws.q = p.q || '';
+  ws.look = TrackerPages.normLook(p.look);
   ws.pn = 1;
   ws.rendered = WS_BATCH;
 }
@@ -5471,7 +6061,7 @@ function pgCapture() {
   const p = pgActive();
   if (!p) return;
   const next = TrackerPages.normPage({ id: p.id, name: p.name, range: ws.range, src: ws.src, ty: ws.ty, w: ws.w,
-    pl: ws.pl, pk: ws.pk, layout: ws.mode, size: ws.size, f: ws.f }, 0);
+    pl: ws.pl, pk: ws.pk, layout: ws.mode, size: ws.size, f: ws.f, q: ws.q, look: ws.look }, 0);
   if (JSON.stringify(next) === JSON.stringify(p)) return;
   pgState.pages[pgState.pages.indexOf(p)] = next;
   pgSave();
@@ -5525,6 +6115,8 @@ function pgBuildBar() {
     b.dataset.ws = 'pg:' + p.id;
     b.onclick = () => pgSwitch(p.id);
     b.ondblclick = () => { if (on) pgRename(p.id); };
+    if (pgState.home === p.id) { b.classList.add('is-home'); b.title = pt('homeMark'); }
+    pgDragWire(b, p.id);
     tabs.appendChild(b);
   });
   if (pgTransient) {
@@ -5566,6 +6158,7 @@ function pgToggleMenu(anchor) {
   };
   const cur = pgTransient ? null : p;
   item(pt('rename'), () => pgRename(p.id), !cur);
+  item(cur && pgState.home === p.id ? pt('unsetHome') : pt('setHome'), () => pgToggleHome(p.id), !cur);
   item(pt('dup'), () => pgDuplicate(p.id), !cur || !TrackerPages.canAdd(pgState));
   item(pt('left'), () => pgMove(p.id, -1), !cur || i <= 0);
   item(pt('right'), () => pgMove(p.id, 1), !cur || i >= pgState.pages.length - 1);
@@ -5607,6 +6200,7 @@ function pgDelete(id) {
   if (!confirm(pt('delQ')(pgName(p)))) return;
   const i = pgState.pages.indexOf(p);
   pgState.pages.splice(i, 1);
+  if (pgState.home === id) pgState.home = '';
   pgState.active = pgState.pages[Math.max(0, i - 1)].id;
   pgSave();
   pgApply(pgActive());
@@ -5651,11 +6245,14 @@ function openTemplatePicker() {
   box.appendChild(wsEl('h2', 'pg-dlg-h', pt('tplTitle')));
   box.appendChild(wsEl('p', 'pg-dlg-hint', pt('tplHint')));
   const grid = wsEl('div', 'pg-tpl-grid');
-  TrackerPages.TEMPLATES.forEach(tp => {
+  const order = ['foryou', 'reading', 'blank', 'briefing', 'timeline', 'analyst', 'exploited', 'compliance', 'supply', 'board', 'unread'];
+  TrackerPages.TEMPLATES.slice().sort((x, y) => order.indexOf(x.id) - order.indexOf(y.id)).forEach(tp => {
     const [name, desc] = pt('tpl')[tp.id] || [tp.id, ''];
     const b = wsEl('button', 'pg-tpl');
     b.type = 'button';
-    b.appendChild(wsEl('span', 'pg-tpl-ly', pt('layouts')[tp.page.layout] || ''));
+    const lyEl = wsEl('span', 'pg-tpl-ly');
+    lyEl.innerHTML = lyThumb(tp.page.layout, true) + escHtml(pt('layouts')[tp.page.layout] || '');
+    b.appendChild(lyEl);
     b.appendChild(wsEl('strong', 'pg-tpl-name', name));
     b.appendChild(wsEl('span', 'pg-tpl-desc', desc));
     b.onclick = () => { closePgDialog(); pgAdd(tp.id, name); };
@@ -5693,19 +6290,8 @@ function pgFilterChanged() {
 }
 function pgToolbarEl() {
   const bar = wsEl('div', 'pg-toolbar');
-  // layout
-  const ly = wsEl('span', 'pg-layout ws-mode-toggle');
-  ly.setAttribute('role', 'group');
-  ly.setAttribute('aria-label', pt('layout'));
-  TrackerPages.LAYOUTS.forEach(id => {
-    const b = wsEl('button', 'ws-mode-btn', pt('layouts')[id]);
-    b.type = 'button';
-    b.dataset.ws = 'mode:' + id;
-    b.setAttribute('aria-pressed', ws.mode === id ? 'true' : 'false');
-    b.onclick = () => wsSetMode(id);
-    ly.appendChild(b);
-  });
-  bar.appendChild(ly);
+  // layout gallery + display options (a popover: nine layouts no longer fit as a button row)
+  bar.appendChild(pgLayoutBtnEl());
   // page size + sort
   const sz = wsEl('label', 'pg-size pg-sel');
   sz.appendChild(wsEl('span', '', pt('perPage')));
@@ -5755,6 +6341,7 @@ function pgChipsEl() {
     c.onclick = () => { remove(); pgFilterChanged(); };
     box.appendChild(c);
   };
+  if (ws.q) chip(pt('chipQ') + ws.q, () => { ws.q = ''; }, 'q');
   TrackerPages.LISTS.forEach(k => f[k].forEach(v => chip(pt('chip')[k] + (state.lang === 'en' ? ': ' : '：') + pgChipLabel(k, v), () => {
     ws.f = TrackerPages.normFilter(Object.assign({}, ws.f, { [k]: ws.f[k].filter(x => x !== v) }));
   }, k + ':' + v)));
@@ -5803,7 +6390,8 @@ function pgRenderTable(items) {
     tr.className = (isArticleRead(a) ? 'is-read' : '') + (watchLabels(a).length ? ' watched' : '');
     const id = articleIdOf(a); if (id) tr.dataset.id = id;
     tr.innerHTML = '<td class="pg-td-date">' + escHtml(a._date || '') + '</td><td>' + pgTypeChip(a) + '</td>' +
-      '<td class="pg-td-title">' + (watchLabels(a).length ? '<span class="ws-star">★</span> ' : '') + escHtml(artTitle(a)) + '</td>' +
+      '<td class="pg-td-title">' + (watchLabels(a).length ? '<span class="ws-star">★</span> ' : '') + newBadgeHtml(a) +
+        (personalIsNew(a) ? ' ' : '') + hl(artTitle(a)) + '</td>' +
       '<td class="pg-td-src">' + escHtml(PG_HELP.source(a)) + '</td>' +
       '<td class="pg-td-tags">' + artTags(a).slice(0, 4).map(x => '<span class="pg-tag">' + escHtml(x) + '</span>').join('') + '</td>';
     bindWsOpen(tr, a);
@@ -6135,6 +6723,1111 @@ function tourMaybeOffer() {
   const wrap = document.getElementById('pg-dialog-wrap');
   if (wrap) wrap.addEventListener('click', e => { if (e.target === wrap) closePgDialog(); });
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && wrap && !wrap.classList.contains('hidden')) closePgDialog(); });
+})();
+
+// ── 我的頭版 (personal front page) ───────────────────────────────────────────
+// Search syntax + suggestions (TrackerSearch), the front / timeline / split layouts, per-page display
+// options (`look`), the start page (`pgState.home`), 為你推薦 (TrackerPersonal), 「新」 since the last
+// visit, the greeting strip, the personalisation wizard and one-time tips. Text lives in PGT.
+Object.assign(PGT.zh, {
+  layouts: { cards: '卡片', titles: '標題', compact: '精簡', magazine: '雜誌', front: '頭版', timeline: '時間軸',
+             split: '閱讀窗格', table: '表格', bytype: '看板' },
+  layoutDesc: { cards: '圖文卡片，一眼掃過', titles: '只列標題，瀏覽最快', compact: '小卡片，一屏看更多',
+                magazine: '一則頭條加四則精選', front: '像報紙頭版：頭條、要聞、分類專欄', timeline: '依日期串成時間軸',
+                split: '左邊清單、右邊直接讀', table: '表格，適合大量比對', bytype: '依新聞類型分欄' },
+  sorts: { newest: '最新優先', oldest: '最舊優先', source: '依來源', type: '依類型', foryou: '為你推薦' },
+  lyTitle: '版面與顯示', dens: '密度', densOpts: { compact: '緊湊', cozy: '標準', roomy: '寬鬆' },
+  fs: '字級', fsOpts: { s: '小', m: '中', l: '大' }, showSum: '顯示摘要', showTags: '顯示標籤',
+  setHome: '設為開啟時的首頁', unsetHome: '取消開啟時的首頁', homeMark: '開啟網站時的首頁',
+  homeSet: n => '「' + n + '」已設為開啟時的首頁', homeUnset: '開啟時改回上次停留的版面',
+  chipQ: '搜尋：', searchPh: '搜尋新聞、標籤、CVE…（按 / 開始）', sgLabel: '搜尋建議',
+  sg: { recent: '最近', tag: '標籤', src: '來源', type: '類型', is: '狀態', op: '語法' },
+  sgSave: q => '＋ 把「' + q + '」存成版面', sgClear: '清除搜尋紀錄', sgHelpH: '搜尋語法（點一下套用）',
+  sgHelp: [['"零時差 漏洞"', '完整片語'], ['-廣告', '排除字詞'], ['勒索 OR ransomware', '符合任一'], ['tag:CVE', '依標籤'],
+           ['src:iThome', '依來源'], ['type:vuln', '依類型'], ['after:2026-11-01', '某日之後（before: 之前）'],
+           ['is:unread', '未讀（is:new、is:watched）'], ['in:title', '只比對標題']],
+  newBadge: '新', today: '今天', yesterday: '昨天', weekday: d => '週' + '日一二三四五六'[d],
+  greet: { morning: '早安', noon: '午安', afternoon: '午安', evening: '晚上好', night: '夜深了' },
+  greetLine: (day, n) => '，' + day + (/\d/.test(day) ? ' ' : '') + '有 ' + n + ' 則新聞', greetNew: n => '，自上次造訪新增 ' + n + ' 則',
+  greetWatch: (n, rl) => '；' + rl + '有 ' + n + ' 則命中你的關注', stop: '。',
+  greetOnlyNew: n => '只看新的 ' + n, greetOnlyWatch: n => '只看關注 ' + n, greetForYou: '改用「為你推薦」排序',
+  greetHide: '隱藏問候列', greetHidden: '已隱藏問候列；可在「個人化」重新開啟。',
+  prefs: '個人化', prefsTitle: '個人化設定', pPrivacy: '偏好與閱讀紀錄只存在你的瀏覽器（本機版另存一份在這台電腦），不會傳給外部服務。',
+  pHome: '開啟網站時先顯示', pHomeLast: '上次停留的版面', pHomePages: '我的版面', pHomeHub: '我的關注總覽',
+  pHomeTrackers: '單一追蹤器', pFront: '我的頭版', pGreet: '顯示問候與新消息摘要',
+  pLearn: '從閱讀紀錄學習偏好（用於「為你推薦」排序）', pLearnN: n => '已從 ' + n + ' 篇文章學習你的偏好。',
+  pForget: '清除偏好與已讀紀錄', pForgetQ: '清除閱讀偏好與已讀紀錄？這個動作無法復原。', pForgot: '已清除偏好與已讀紀錄。',
+  pGuide: '引導', pTips: '顯示一次性小提示', pWizard: '重新執行個人化精靈', pTour: '操作導覽', pData: '版面設定檔',
+  pDone: '完成',
+  wizOfferH: '讓這裡成為你的新聞頭版', wizOfferP: '回答三個小問題（約 30 秒），依你在意的主題與閱讀習慣排好版面。之後隨時能在右上角「個人化」修改。',
+  wizGo: '開始設定', wizTour: '先看操作導覽', wizNo: '不用了', wizLaterToast: '好的。想調整時，按右上角「個人化」。',
+  wizSteps: ['你在意哪些新聞？', '你習慣怎麼讀？', '每次打開，先看什麼？'], wizStepOf: (i, n) => '第 ' + i + ' / ' + n + ' 步',
+  wizS1Hint: '都不選＝全部新聞。選了的類型就是「我的新聞」的內容；平台與主題會標上 ★，「為你推薦」也會優先排它們。',
+  wizTypes: '新聞類型', wizPlats: '你用的平台', wizTopics: '特別關注', wizKw: '自訂關鍵字', wizKwPh: '以逗號分隔，例如：Fortinet, 健保',
+  wizS2Hint: '挑一種最順手的呈現；之後在工具列的「版面」隨時切換。',
+  wizRange: '預設時間範圍', wizRanges: { today: '今天', '7d': '近 7 天', '30d': '近 30 天' },
+  wizHome: '開啟網站時', wizHomes: { mine: '「我的新聞」版面', last: '上次停留的版面', hub: '我的關注總覽' },
+  wizSkip: '略過', wizBack: '上一步', wizNext: '下一步', wizFinish: '完成，開始閱讀', wizPageName: '我的新聞',
+  wizDone: '「我的新聞」已建立，依你的偏好排序。要調整，按右上角「個人化」。',
+  tips: { search: '小提示：搜尋也能用 "完整片語"、-排除、tag:、src:、after:2026-11-01；點搜尋框看全部語法。',
+          split: '小提示：← → 切換上下篇，Esc 關閉右側閱讀。',
+          foryou: '小提示：你已讀了幾篇；排序改選「為你推薦」，常讀的類型與標籤會排到前面。',
+          look: '小提示：版面選單下方還能調整密度、字級，以及要不要顯示摘要和標籤。' },
+  tipOk: '知道了', splitEmpty: '從左邊選一篇文章，在這裡閱讀。', splitKeys: '← → 切換上下篇　Esc 關閉',
+  more6: n => '這一類還有 ' + n + ' 篇 ›',
+  tpl: Object.assign({}, PGT.zh.tpl, {
+    foryou: ['為你精選', '近 7 天頭版，依你的閱讀偏好與關注排序'],
+    reading: ['閱讀模式', '左邊清單、右邊全文，像收件匣一樣一路讀完'],
+    timeline: ['時間軸', '近 30 天依日期串起來看事件發展']
+  }),
+  steps: [
+    ['#pg-bar', '版面分頁', '每個分頁是你自己的新聞版面：時間、篩選、呈現方式都各自記住。拖曳分頁可調整順序；按「＋ 新增版面」從範本建立，例如為你精選、閱讀模式。'],
+    ['#pg-bar .pg-menu-btn', '管理版面', '重新命名、複製、刪除、設為開啟時的首頁，或把版面設定匯出給同事、匯入到另一台電腦。'],
+    ['#ws-time-chip', '時間範圍', '快速選今天、近 7／30／90 天、今年，或自訂起訖日期；面板裡的每日長條圖點一下就只看那一天。'],
+    ['#ws-rail', '快速分類', '依新聞類型、關注規則、平台、套件快速縮小範圍，右邊數字是目前條件下的篇數。'],
+    ['#search-box', '搜尋', '按 / 直接開始。支援 "完整片語"、-排除、A OR B、tag:、src:、type:、after:／before: 與 is:unread；點搜尋框會列出最近搜尋與語法，也能把搜尋存成版面。'],
+    ['.pg-filter-btn', '進階篩選', '多選類型與來源、包含或排除標籤、必須／任一／排除關鍵字、只看未讀或關注命中。目前套用的條件會顯示成小標籤，點 ✕ 移除。'],
+    ['.pg-layout', '版面與顯示', '頭版、卡片、雜誌、標題、時間軸、閱讀窗格、表格、看板等九種呈現；下方還能調密度、字級與要不要顯示摘要、標籤，每個版面各自記住。'],
+    ['.pg-size', '分頁與排序', '選每頁 20／50／100 篇或連續捲動；排序可選「為你推薦」，依你常讀的類型與標籤、關注命中與新鮮度排列。'],
+    ['#watch-btn', '關注規則', '設定你在意的主題與自訂關鍵字，命中的文章會標 ★，也能在左側快速篩選。'],
+    ['#prefs-btn', '個人化', '設定開啟網站時先看哪個版面、問候列、閱讀偏好學習與小提示，也能重跑個人化精靈。'],
+    ['#palette-btn', '主題配色', '切換配色與深淺色。'],
+    ['.pg-tour-btn', '隨時回來', '想再看一次導覽，按這裡。']
+  ]
+});
+Object.assign(PGT.en, {
+  layouts: { cards: 'Cards', titles: 'Titles', compact: 'Compact', magazine: 'Magazine', front: 'Front page', timeline: 'Timeline',
+             split: 'Reading pane', table: 'Table', bytype: 'Board' },
+  layoutDesc: { cards: 'Cards with summaries, quick to scan', titles: 'Headlines only, fastest', compact: 'Small cards, more per screen',
+                magazine: 'One lead story and four features', front: 'Like a newspaper: lead, top stories, sections', timeline: 'Day by day on a timeline',
+                split: 'List on the left, read on the right', table: 'A table for bulk comparison', bytype: 'One column per news type' },
+  sorts: { newest: 'Newest first', oldest: 'Oldest first', source: 'By source', type: 'By type', foryou: 'For you' },
+  lyTitle: 'Layout and display', dens: 'Density', densOpts: { compact: 'Compact', cozy: 'Normal', roomy: 'Roomy' },
+  fs: 'Text size', fsOpts: { s: 'S', m: 'M', l: 'L' }, showSum: 'Show summaries', showTags: 'Show tags',
+  setHome: 'Open this page on start', unsetHome: 'Stop opening this page on start', homeMark: 'Opens on start',
+  homeSet: n => '“' + n + '” now opens on start', homeUnset: 'Start reverts to the page used last',
+  chipQ: 'Search: ', searchPh: 'Search news, tags, CVEs… (press /)', sgLabel: 'Search suggestions',
+  sg: { recent: 'Recent', tag: 'Tag', src: 'Source', type: 'Type', is: 'State', op: 'Syntax' },
+  sgSave: q => '＋ Save “' + q + '” as a page', sgClear: 'Clear search history', sgHelpH: 'Search syntax (click to use)',
+  sgHelp: [['"zero day"', 'exact phrase'], ['-webinar', 'exclude a word'], ['ransomware OR extortion', 'either word'], ['tag:CVE', 'by tag'],
+           ['src:BleepingComputer', 'by source'], ['type:vuln', 'by type'], ['after:2026-11-01', 'after a date (before: too)'],
+           ['is:unread', 'unread (is:new, is:watched)'], ['in:title', 'titles only']],
+  newBadge: 'New', today: 'today', yesterday: 'yesterday', weekday: d => ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][d],
+  greet: { morning: 'Good morning', noon: 'Good afternoon', afternoon: 'Good afternoon', evening: 'Good evening', night: 'Working late' },
+  greetLine: (day, n) => '. ' + n + ' articles ' + (day === 'today' || day === 'yesterday' ? day : 'on ' + day),
+  greetNew: n => ', ' + n + ' new since your last visit', greetWatch: (n, rl) => '; ' + n + ' match your watch rules (' + rl + ')', stop: '.',
+  greetOnlyNew: n => 'Only new ' + n, greetOnlyWatch: n => 'Only watched ' + n, greetForYou: 'Sort “For you”',
+  greetHide: 'Hide the greeting', greetHidden: 'Greeting hidden; turn it back on in Personalise.',
+  prefs: 'Personalise', prefsTitle: 'Personalise', pPrivacy: 'Preferences and reading history stay in your browser (the local edition also keeps a copy on this computer); nothing is sent to outside services.',
+  pHome: 'On start, open', pHomeLast: 'The page used last', pHomePages: 'My pages', pHomeHub: 'My watch overview',
+  pHomeTrackers: 'One tracker', pFront: 'My front page', pGreet: 'Show the greeting and what is new',
+  pLearn: 'Learn from what I read (for the “For you” order)', pLearnN: n => 'Learnt from ' + n + ' articles so far.',
+  pForget: 'Clear preferences and read marks', pForgetQ: 'Clear reading preferences and read marks? This cannot be undone.', pForgot: 'Preferences and read marks cleared.',
+  pGuide: 'Guidance', pTips: 'Show one-time tips', pWizard: 'Run the personalisation wizard again', pTour: 'Guided tour', pData: 'Page setup file',
+  pDone: 'Done',
+  wizOfferH: 'Make this your own front page', wizOfferP: 'Three quick questions (about 30 seconds) and the page follows the topics you care about and the way you read. Change it any time under Personalise.',
+  wizGo: 'Set it up', wizTour: 'Take the tour first', wizNo: 'No thanks', wizLaterToast: 'Fine. Personalise (top right) is there when you want it.',
+  wizSteps: ['What news do you care about?', 'How do you like to read?', 'What should open first?'], wizStepOf: (i, n) => 'Step ' + i + ' of ' + n,
+  wizS1Hint: 'Pick nothing for all news. The types you pick make up “My news”; platforms and topics get a ★ and rank higher in “For you”.',
+  wizTypes: 'News types', wizPlats: 'Platforms you use', wizTopics: 'Watch closely', wizKw: 'Own keywords', wizKwPh: 'Comma separated, e.g. Fortinet, NHS',
+  wizS2Hint: 'Pick what feels right; the toolbar’s Layout switches it any time.',
+  wizRange: 'Default time range', wizRanges: { today: 'Today', '7d': 'Last 7 days', '30d': 'Last 30 days' },
+  wizHome: 'On start', wizHomes: { mine: 'The “My news” page', last: 'The page used last', hub: 'My watch overview' },
+  wizSkip: 'Skip', wizBack: 'Back', wizNext: 'Next', wizFinish: 'Done, start reading', wizPageName: 'My news',
+  wizDone: '“My news” is ready, ordered for you. Personalise (top right) changes it.',
+  tips: { search: 'Tip: search also takes "exact phrases", -exclude, tag:, src:, after:2026-11-01; click the box for the full list.',
+          split: 'Tip: ← → move between articles, Esc closes the reading pane.',
+          foryou: 'Tip: you have read a few articles; sort by “For you” to bring your usual types and tags forward.',
+          look: 'Tip: the layout menu also sets density, text size and whether summaries and tags show.' },
+  tipOk: 'Got it', splitEmpty: 'Pick an article on the left to read it here.', splitKeys: '← → previous / next　Esc close',
+  more6: n => n + ' more in this section ›',
+  tpl: Object.assign({}, PGT.en.tpl, {
+    foryou: ['For you', 'Front page of the last 7 days, ordered by what you read and watch'],
+    reading: ['Reading mode', 'List on the left, article on the right, like an inbox'],
+    timeline: ['Timeline', 'The last 30 days day by day, to follow a story']
+  }),
+  steps: [
+    ['#pg-bar', 'Pages', 'Each tab is your own news page: time, filters and layout are remembered per page. Drag tabs to reorder; “＋ New page” starts from a template such as For you or Reading mode.'],
+    ['#pg-bar .pg-menu-btn', 'Manage pages', 'Rename, duplicate, delete, open a page on start, or export the page setup for a colleague or another computer.'],
+    ['#ws-time-chip', 'Time range', 'Today, the last 7/30/90 days, this year, or custom dates; click a day bar in the panel to see only that day.'],
+    ['#ws-rail', 'Quick facets', 'Narrow by news type, watch rule, platform or package; the numbers count the current selection.'],
+    ['#search-box', 'Search', 'Press / to start. Takes "exact phrases", -exclude, A OR B, tag:, src:, type:, after:/before: and is:unread; the box lists recent searches and the syntax, and saves a search as a page.'],
+    ['.pg-filter-btn', 'Advanced filter', 'Several types and sources, include or exclude tags, all/any/none keywords, unread or watch hits only. Active conditions show as chips; ✕ removes one.'],
+    ['.pg-layout', 'Layout and display', 'Nine layouts including front page, cards, magazine, titles, timeline, reading pane, table and board; below them density, text size, summaries and tags, all kept per page.'],
+    ['.pg-size', 'Paging and order', '20/50/100 per page or endless; sort “For you” orders by the types and tags you read, watch hits and freshness.'],
+    ['#watch-btn', 'Watch rules', 'Topics and keywords you care about; hits get a ★ and a quick filter on the left.'],
+    ['#prefs-btn', 'Personalise', 'Which page opens on start, the greeting, learning from your reading, tips, and the personalisation wizard.'],
+    ['#palette-btn', 'Theme', 'Colours and light/dark.'],
+    ['.pg-tour-btn', 'Come back any time', 'Press here to see this tour again.']
+  ]
+});
+
+ws.q = '';                                // the page's own saved search (from 「存成版面」), ANDed with the box
+ws.look = TrackerPages.normLook({});      // display options of the active page
+
+// ── personal state ──
+let personal = TrackerPersonal.parseSettings(null);
+let tasteProfile = TrackerPersonal.emptyTaste();
+let visitSince = '', visitState = null;
+function personalLoad() {
+  let s = null, t = null;
+  try { s = prefGet('tracker_personal'); } catch (e) {}
+  try { t = prefGet('tracker_taste'); } catch (e) {}
+  personal = TrackerPersonal.parseSettings(s);
+  tasteProfile = TrackerPersonal.parseTaste(t);
+  prefsDot();
+}
+function personalSave() {
+  if (isPreviewMode()) return;
+  try { prefSet('tracker_personal', JSON.stringify(personal)); } catch (e) {}
+}
+let tasteTimer = null;
+function tasteSave() {
+  if (isPreviewMode()) return;
+  clearTimeout(tasteTimer);
+  tasteTimer = setTimeout(() => { try { prefSet('tracker_taste', JSON.stringify(tasteProfile)); } catch (e) {} }, 600);
+}
+// Called once per newly read article (markArticleRead).
+function personalLearn(a) {
+  if (!personal.learn || !a || isPreviewMode()) return;
+  tasteProfile = TrackerPersonal.learn(tasteProfile, { type: hubTypeId(a), tags: articleTags(a) });
+  tasteSave();
+  if (tasteProfile.n === TrackerPersonal.MIN_READS && state.wsActive && ws.f.sort !== 'foryou') {
+    setTimeout(() => { if (!readerOpenModal()) tipMaybe('foryou', document.querySelector('[data-ws="sort"]'), pt('tips').foryou); }, 500);
+  }
+}
+// Called on every workspace draw with the newest loaded date; the first call of a page load decides
+// `visitSince`, later calls only move `seen` forward.
+function personalVisit(newest) {
+  if (!newest || isPreviewMode()) return;
+  if (!visitState) {
+    let raw = null;
+    try { raw = prefGet('tracker_visit'); } catch (e) {}
+    const r = TrackerPersonal.visit(raw, newest, Date.now());
+    visitSince = r.since;
+    visitState = r.state;
+  } else {
+    const r = TrackerPersonal.visit(visitState, newest, visitState.at);
+    if (r.state.seen === visitState.seen) return;
+    visitState = r.state;
+  }
+  try { prefSet('tracker_visit', JSON.stringify(visitState)); } catch (e) {}
+}
+function personalIsNew(a) {
+  const d = a && (a._date || a.date);
+  return !!(visitSince && d && d > visitSince);
+}
+function personalFacts(a) {
+  return { date: a._date || a.date || '', type: hubTypeId(a), tags: articleTags(a),
+           watched: watchRuleIds(a, watchPrefs).length > 0, read: isArticleRead(a), isNew: personalIsNew(a) };
+}
+PG_HELP.rank = list => TrackerPersonal.rank(list, personalFacts, personal.learn ? tasteProfile : TrackerPersonal.emptyTaste(), ws.newest);
+// No hash: open the start page the reader chose (默認 the page used last).
+function personalStart() {
+  const trackers = Object.keys(getTrackers() || {}).filter(k => k !== '__cra');
+  const tgt = TrackerPersonal.homeTarget(pgState.home, pgState.pages.map(p => p.id), trackers);
+  if (tgt.kind === 'hub') { selectHub(); return; }
+  if (tgt.kind === 'tracker') { selectTracker(tgt.name); return; }
+  if (tgt.kind === 'page') pgState.active = tgt.id;
+  selectWorkspace();
+}
+function localISO(d) {
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+function dayWord(iso) {
+  const today = localISO(new Date());
+  if (iso === today) return pt('today');
+  if (iso === TrackerStore.shiftDate(today, -1)) return pt('yesterday');
+  return iso.slice(5).replace('-', '/');
+}
+
+// ── search: syntax helpers, highlighting, suggestions, recent searches ──
+const SEARCH_HELP = {
+  text: (a, titleOnly) => (titleOnly ? artTitle(a) : searchHaystack(a)),
+  tags: a => artTags(a).concat(a.tags || [], a.tags_en || []),
+  source: a => (a.sources || []).map(s => s && s.name).concat([a.source]).filter(Boolean).join(' | '),
+  type: a => { const id = hubTypeId(a); const ty = NEWS_TYPES.find(x => x.id === id); return ty ? [id, ty.zh, ty.en] : [id]; },
+  cves: a => TrackerStore.extractCves(a),
+  date: a => a._date || a.date || '',
+  read: a => isArticleRead(a),
+  watched: a => watchRuleIds(a, watchPrefs).length > 0,
+  isNew: a => personalIsNew(a)
+};
+const searchParseCache = new Map();
+function parsedQuery(q) {
+  const k = String(q || '');
+  let p = searchParseCache.get(k);
+  if (!p) {
+    if (searchParseCache.size > 16) searchParseCache.clear();
+    p = TrackerSearch.parse(k);
+    searchParseCache.set(k, p);
+  }
+  return p;
+}
+let hlKey = null, hlRe = null;
+function hlRegex() {
+  const key = (state.searchQuery || '') + '\u0001' + (ws.q || '');
+  if (key === hlKey) return hlRe;
+  hlKey = key;
+  const marks = [...new Set(TrackerSearch.marks(parsedQuery(state.searchQuery)).concat(TrackerSearch.marks(parsedQuery(ws.q))))]
+    .sort((x, y) => y.length - x.length);
+  hlRe = marks.length ? new RegExp('(' + marks.map(m => escHtml(m).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ')', 'gi') : null;
+  return hlRe;
+}
+// Escaped text with the searched words wrapped in <mark>; entities (&amp; …) are never split.
+function hl(text) {
+  const s = escHtml(text);
+  const re = state.wsActive ? hlRegex() : null;
+  if (!re || !s) return s;
+  return s.split(/(&[a-z0-9#]+;)/i).map((part, i) => ((i % 2) ? part : part.replace(re, '<mark class="hl">$1</mark>'))).join('');
+}
+function recentSearches() {
+  let raw = null;
+  try { raw = prefGet('tracker_recent'); } catch (e) {}
+  try { const a = JSON.parse(raw || '[]'); return Array.isArray(a) ? a.filter(x => typeof x === 'string').slice(0, 8) : []; } catch (e) { return []; }
+}
+function rememberSearch(q) {
+  const s = String(q || '').trim();
+  if (s.length < 2 || isPreviewMode()) return;
+  try { prefSet('tracker_recent', JSON.stringify(TrackerSearch.remember(recentSearches(), s, 8))); } catch (e) {}
+}
+let sgCache = null, sgItems = [], sgIdx = -1;
+function sgContext() {
+  const days = window.TRACKER_DAYS || {};
+  const n = Object.keys(days).length;
+  if (!sgCache || sgCache.n !== n || sgCache.lang !== state.lang) {
+    const list = TrackerStore.collect(days, { dates: Object.keys(days) });
+    const tags = TrackerPages.tagCounts(list, a => artTags(a), 400).map(x => x.tag);
+    const sm = new Map();
+    list.forEach(a => (a.sources || []).forEach(s => { const k = s && s.name; if (k) sm.set(k, (sm.get(k) || 0) + 1); }));
+    const srcs = [...sm.entries()].sort((x, y) => y[1] - x[1]).slice(0, 80).map(x => x[0]);
+    sgCache = { n, lang: state.lang, tags, srcs };
+  }
+  return { tags: sgCache.tags, srcs: sgCache.srcs, recent: recentSearches(),
+           types: NEWS_TYPES.map(x => ({ id: x.id, name: state.lang === 'en' ? x.en : x.zh })) };
+}
+function sgBox() { return document.getElementById('search-suggest'); }
+function sgClose() {
+  const b = sgBox(), i = document.getElementById('search-box');
+  if (b) { b.classList.add('hidden'); b.innerHTML = ''; }
+  sgItems = []; sgIdx = -1;
+  if (i) { i.setAttribute('aria-expanded', 'false'); i.removeAttribute('aria-activedescendant'); }
+}
+function sgRender() {
+  const box = sgBox(), input = document.getElementById('search-box');
+  if (!box || !input || document.activeElement !== input) return;
+  const v = input.value;
+  sgItems = TrackerSearch.suggest(v, sgContext(), 8);
+  sgIdx = -1;
+  box.innerHTML = '';
+  input.removeAttribute('aria-activedescendant');
+  const kinds = pt('sg');
+  sgItems.forEach((it, i) => {
+    const o = wsEl('div', 'sg-opt');
+    o.id = 'sg-opt-' + i;
+    o.setAttribute('role', 'option');
+    o.setAttribute('aria-selected', 'false');
+    o.appendChild(wsEl('span', 'sg-kind', kinds[it.kind] || ''));
+    o.appendChild(wsEl('span', 'sg-label', it.label));
+    o.addEventListener('mousedown', e => { e.preventDefault(); sgApply(it); });
+    box.appendChild(o);
+  });
+  const foot = (cls, label, fn) => {
+    const b = wsEl('button', 'sg-foot ' + cls, label);
+    b.type = 'button'; b.tabIndex = -1;
+    b.addEventListener('mousedown', e => { e.preventDefault(); fn(); });
+    box.appendChild(b);
+  };
+  if (!v.trim()) {
+    const help = wsEl('div', 'sg-help');
+    help.appendChild(wsEl('div', 'sg-help-h', pt('sgHelpH')));
+    const grid = wsEl('div', 'sg-help-grid');
+    pt('sgHelp').forEach(([ex, desc]) => {
+      const b = wsEl('button', 'sg-ex');
+      b.type = 'button'; b.tabIndex = -1;
+      b.appendChild(wsEl('code', '', ex));
+      b.appendChild(wsEl('span', '', desc));
+      b.addEventListener('mousedown', e => { e.preventDefault(); input.value = ex + ' '; input.dispatchEvent(new Event('input')); });
+      grid.appendChild(b);
+    });
+    help.appendChild(grid);
+    box.appendChild(help);
+    if (recentSearches().length) foot('sg-clear', pt('sgClear'), () => { try { prefSet('tracker_recent', null); } catch (e) {} sgRender(); });
+  } else if (state.wsActive && TrackerPages.canAdd(pgState) && !TrackerSearch.parse(v).empty) {
+    foot('sg-save', pt('sgSave')(v.trim().slice(0, 40)), () => { sgClose(); pgSaveSearch(v.trim()); });
+  }
+  const open = box.children.length > 0;
+  box.classList.toggle('hidden', !open);
+  input.setAttribute('aria-expanded', open ? 'true' : 'false');
+}
+function sgMove(d) {
+  const n = sgItems.length;
+  if (!n) return;
+  sgIdx = d > 0 ? (sgIdx + 1 >= n ? -1 : sgIdx + 1) : (sgIdx - 1 < -1 ? n - 1 : sgIdx - 1);
+  const input = document.getElementById('search-box');
+  sgBox().querySelectorAll('.sg-opt').forEach((o, i) => {
+    o.setAttribute('aria-selected', i === sgIdx ? 'true' : 'false');
+    if (i === sgIdx) o.scrollIntoView({ block: 'nearest' });
+  });
+  if (sgIdx >= 0) input.setAttribute('aria-activedescendant', 'sg-opt-' + sgIdx);
+  else input.removeAttribute('aria-activedescendant');
+}
+function sgApply(it) {
+  const input = document.getElementById('search-box');
+  input.value = it.value;
+  if (/[:：]$/.test(it.value)) { input.focus(); sgRender(); return; }   // an operator stub: keep completing
+  sgClose();
+  rememberSearch(it.value);
+  runSearch();
+}
+// Toggle one token (e.g. is:new) in the search box and run the search.
+function searchToggleToken(tok) {
+  const sb = document.getElementById('search-box');
+  if (!sb) return;
+  const re = new RegExp('(^|\\s)' + tok.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(?=\\s|$)', 'i');
+  const v = re.test(sb.value) ? sb.value.replace(re, ' ') : sb.value.trim() + ' ' + tok;
+  sb.value = v.replace(/\s+/g, ' ').trim();
+  runSearch();
+}
+// 「存成版面」: the current view plus the search becomes a page of its own (the search is pinned to it).
+function pgSaveSearch(q) {
+  if (!TrackerPages.canAdd(pgState)) { alert(pt('full')); return; }
+  const name = prompt(pt('renameQ'), q.slice(0, 30));
+  if (name === null) return;
+  const id = TrackerPages.newId(pgState);
+  pgState.pages.push(TrackerPages.normPage({ id, name, range: ws.range, src: ws.src, ty: ws.ty, w: ws.w, pl: ws.pl, pk: ws.pk,
+    layout: ws.mode, size: ws.size, f: ws.f, look: ws.look, q: [ws.q, q].filter(Boolean).join(' ') }, 0));
+  pgSave();
+  pgSwitch(id);
+}
+(function wireSuggest() {
+  const input = document.getElementById('search-box');
+  const wrap = document.getElementById('search-wrap');
+  if (!input || !wrap) return;
+  const box = document.createElement('div');
+  box.id = 'search-suggest';
+  box.className = 'hidden';
+  box.setAttribute('role', 'listbox');
+  wrap.appendChild(box);
+  input.setAttribute('role', 'combobox');
+  input.setAttribute('aria-autocomplete', 'list');
+  input.setAttribute('aria-controls', 'search-suggest');
+  input.setAttribute('aria-expanded', 'false');
+  let tipTimer2 = null;
+  input.addEventListener('focus', sgRender);
+  input.addEventListener('input', () => {
+    sgRender();
+    clearTimeout(tipTimer2);
+    tipTimer2 = setTimeout(() => {
+      // a plain-words search that has settled: point out the syntax once
+      const p = parsedQuery(input.value);
+      const arrays = Object.keys(p).filter(k => Array.isArray(p[k]));
+      const plainOnly = p.terms.length > 0 && !p.after && !p.before && arrays.every(k => k === 'terms' || !p[k].length);
+      if (!state.wsActive || !plainOnly || personal.tipsSeen.includes('search')) return;
+      sgClose();
+      tipMaybe('search', wrap, pt('tips').search);
+    }, 2500);
+  });
+  input.addEventListener('blur', () => setTimeout(sgClose, 120));
+  input.addEventListener('keydown', e => {
+    const open = !box.classList.contains('hidden');
+    if (e.key === 'ArrowDown') { e.preventDefault(); if (!open) sgRender(); else sgMove(1); return; }
+    if (e.key === 'ArrowUp' && open) { e.preventDefault(); sgMove(-1); return; }
+    if (e.key === 'Enter') {
+      if (open && sgIdx >= 0 && sgItems[sgIdx]) { e.preventDefault(); e.stopImmediatePropagation(); sgApply(sgItems[sgIdx]); return; }
+      sgClose();
+      rememberSearch(input.value);
+      return;
+    }
+    if (e.key === 'Escape' && open) { e.preventDefault(); e.stopImmediatePropagation(); sgClose(); }
+  }, true);
+  // 「/」 or Ctrl/⌘+K: jump to the search box (not while typing or inside a dialog)
+  document.addEventListener('keydown', e => {
+    const tg = e.target, tn = tg && tg.tagName;
+    const typing = tn === 'INPUT' || tn === 'TEXTAREA' || tn === 'SELECT' || (tg && tg.isContentEditable);
+    const slash = e.key === '/' && !typing && !e.ctrlKey && !e.metaKey && !e.altKey;
+    const ck = (e.ctrlKey || e.metaKey) && !e.altKey && (e.key === 'k' || e.key === 'K');
+    if (!slash && !ck) return;
+    if (tourIdx >= 0 || readerOpenModal() || !document.getElementById('pg-dialog-wrap').classList.contains('hidden')) return;
+    const sr = document.getElementById('search-row');
+    if (sr && sr.style.display === 'none') return;
+    e.preventDefault();
+    input.focus();
+    input.select();
+  });
+})();
+
+// ── layout gallery + display options ──
+const LY_THUMB_N = { cards: 6, titles: 5, compact: 12, magazine: 5, front: 6, timeline: 4, split: 5, table: 5, bytype: 3 };
+function lyThumb(id, small) {
+  return '<span class="ly-thumb ly-t-' + id + (small ? ' ly-s' : '') + '" aria-hidden="true">' + '<i></i>'.repeat(LY_THUMB_N[id] || 4) + '</span>';
+}
+function pgLayoutBtnEl() {
+  const b = wsEl('button', 'pg-layout pg-ly-btn');
+  b.type = 'button';
+  b.dataset.ws = 'layout';
+  b.title = pt('lyTitle');
+  b.setAttribute('aria-haspopup', 'dialog');
+  b.setAttribute('aria-expanded', lyPanel ? 'true' : 'false');
+  b.innerHTML = lyThumb(ws.mode, true) + '<span>' + escHtml(pt('layouts')[ws.mode] || '') + '</span><span class="pg-ly-caret" aria-hidden="true">▾</span>';
+  b.onclick = e => { e.stopPropagation(); if (lyPanel) closeLayoutPanel(true); else openLayoutPanel(b); };
+  return b;
+}
+function segEl(label, ids, names, cur, onPick) {
+  const row = wsEl('div', 'nt-seg-row');
+  row.appendChild(wsEl('span', 'nt-seg-l', label));
+  const g = wsEl('span', 'ws-mode-toggle nt-seg');
+  g.setAttribute('role', 'group');
+  g.setAttribute('aria-label', label);
+  ids.forEach(id => {
+    const b = wsEl('button', 'ws-mode-btn', names[id] || id);
+    b.type = 'button';
+    b.setAttribute('aria-pressed', id === cur ? 'true' : 'false');
+    b.onclick = () => { g.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b ? 'true' : 'false')); onPick(id); };
+    g.appendChild(b);
+  });
+  row.appendChild(g);
+  return row;
+}
+function chkEl(label, on, onChange) {
+  const l = wsEl('label', 'nt-chk');
+  const c = document.createElement('input');
+  c.type = 'checkbox';
+  c.checked = !!on;
+  c.onchange = () => onChange(c.checked);
+  l.appendChild(c);
+  l.appendChild(wsEl('span', '', label));
+  return l;
+}
+function lyOptEl(id, pressed, onPick) {
+  const b = wsEl('button', 'pg-ly-opt');
+  b.type = 'button';
+  b.dataset.ly = id;
+  b.setAttribute('aria-pressed', pressed ? 'true' : 'false');
+  b.innerHTML = lyThumb(id) + '<span class="pg-ly-name">' + escHtml(pt('layouts')[id]) + '</span><span class="pg-ly-desc">' +
+    escHtml(pt('layoutDesc')[id] || '') + '</span>';
+  b.onclick = () => onPick(id, b);
+  return b;
+}
+let lyPanel = null;
+function closeLayoutPanel(refocus) {
+  if (!lyPanel) return;
+  lyPanel.remove();
+  lyPanel = null;
+  const b = document.querySelector('.pg-ly-btn');
+  if (b) { b.setAttribute('aria-expanded', 'false'); if (refocus) b.focus(); }
+}
+function openLayoutPanel(anchor) {
+  closeLayoutPanel();
+  const p = wsEl('div', 'pg-ly-panel');
+  p.setAttribute('role', 'dialog');
+  p.setAttribute('aria-label', pt('lyTitle'));
+  p.appendChild(wsEl('div', 'pg-ly-h', pt('lyTitle')));
+  const grid = wsEl('div', 'pg-ly-grid');
+  TrackerPages.LAYOUTS.forEach(id => grid.appendChild(lyOptEl(id, ws.mode === id, (lid, b) => {
+    grid.querySelectorAll('.pg-ly-opt').forEach(x => x.setAttribute('aria-pressed', x === b ? 'true' : 'false'));
+    wsSetMode(lid);
+  })));
+  p.appendChild(grid);
+  const sec = wsEl('div', 'pg-ly-sec');
+  sec.appendChild(segEl(pt('dens'), ['compact', 'cozy', 'roomy'], pt('densOpts'), ws.look.d, v => lookSet({ d: v })));
+  sec.appendChild(segEl(pt('fs'), ['s', 'm', 'l'], pt('fsOpts'), ws.look.fs, v => lookSet({ fs: v })));
+  const ck = wsEl('div', 'nt-chk-row');
+  ck.appendChild(chkEl(pt('showSum'), ws.look.sum, v => lookSet({ sum: v })));
+  ck.appendChild(chkEl(pt('showTags'), ws.look.tg, v => lookSet({ tg: v })));
+  sec.appendChild(ck);
+  p.appendChild(sec);
+  document.body.appendChild(p);
+  const r = anchor.getBoundingClientRect();
+  p.style.top = Math.min(r.bottom + 6, window.innerHeight - 80) + 'px';
+  p.style.left = Math.max(8, Math.min(window.innerWidth - p.offsetWidth - 8, r.left)) + 'px';
+  lyPanel = p;
+  anchor.setAttribute('aria-expanded', 'true');
+  const cur = p.querySelector('.pg-ly-opt[aria-pressed="true"]') || p.querySelector('button');
+  if (cur) cur.focus();
+}
+document.addEventListener('mousedown', e => {
+  if (lyPanel && !lyPanel.contains(e.target) && !e.target.closest('.pg-ly-btn')) closeLayoutPanel();
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && lyPanel) closeLayoutPanel(true); });
+function lookSet(patch) {
+  ws.look = TrackerPages.normLook(Object.assign({}, ws.look, patch));
+  applyLookAttrs();
+  pgCapture();
+  if (!readerOpenModal()) tipClose();
+}
+function applyLookAttrs() {
+  const r = document.documentElement, L = ws.look || TrackerPages.normLook({});
+  r.dataset.dens = L.d; r.dataset.fs = L.fs; r.dataset.sum = L.sum ? '1' : '0'; r.dataset.tg = L.tg ? '1' : '0';
+  if (ws.mode === 'split') r.dataset.split = '1'; else delete r.dataset.split;
+}
+function ntLeaveWs() {
+  closeLayoutPanel();
+  tipClose();
+  splitRescue();
+  const r = document.documentElement;
+  ['dens', 'fs', 'sum', 'tg', 'split'].forEach(k => { delete r.dataset[k]; });
+}
+
+// ── layouts: front page, timeline, reading pane ──
+function newBadgeHtml(a) { return personalIsNew(a) ? '<span class="ws-new">' + escHtml(pt('newBadge')) + '</span>' : ''; }
+function pgRichRow(a, cls) {
+  const row = document.createElement('div');
+  const wl = watchLabels(a), id = articleIdOf(a);
+  row.className = 'ws-title-row pg-rr ' + cls + (wl.length ? ' watched' : '') + (isArticleRead(a) ? ' is-read' : '');
+  if (id) row.dataset.id = id;
+  const meta = [PG_HELP.source(a), (a._date || a.date || '').replace(/^\d{4}-/, '')].filter(Boolean).join(' · ');
+  row.innerHTML = '<div class="pg-rr-top">' + pgTypeChip(a) +
+    (wl.length ? '<span class="ws-star" title="' + escHtml(wl.join(' / ')) + '">★</span>' : '') + newBadgeHtml(a) +
+    '<span class="pg-rr-meta">' + escHtml(meta) + '</span></div>' +
+    '<div class="ws-title-text pg-rr-title">' + hl(artTitle(a)) + '</div>' +
+    '<div class="pg-rr-sum">' + hl(artSummary(a)) + '</div>';
+  bindWsOpen(row, a);
+  return row;
+}
+const FRONT_SEC = 6;
+function pgRenderFront(items) {
+  const box = wsEl('div', 'pg-front');
+  if (!items.length) return box;
+  const top = wsEl('div', 'pg-front-top');
+  const lead = buildWsCard(items[0]);
+  lead.classList.add('pg-front-lead');
+  top.appendChild(lead);
+  const side = wsEl('div', 'pg-front-side');
+  items.slice(1, 4).forEach(a => { const c = buildWsCard(a); c.classList.add('pg-front-sub'); side.appendChild(c); });
+  top.appendChild(side);
+  box.appendChild(top);
+  const by = new Map();
+  items.slice(4).forEach(a => { const k = hubTypeId(a); if (!by.has(k)) by.set(k, []); by.get(k).push(a); });
+  const secs = wsEl('div', 'pg-front-secs');
+  NEWS_TYPES.filter(ty => by.has(ty.id)).forEach(ty => {
+    const list = by.get(ty.id);
+    const sec = wsEl('section', 'pg-front-sec');
+    const h = wsEl('h3', 'pg-front-h');
+    const bar = wsEl('span', 'pg-front-bar');
+    bar.style.background = 'var(--ws-ty-' + ty.id + '-on, var(--ws-ty-other-on))';
+    h.appendChild(bar);
+    h.appendChild(wsEl('span', '', wsTypeName(ty.id)));
+    h.appendChild(wsEl('span', 'pg-col-n', String(list.length)));
+    sec.appendChild(h);
+    const first = buildWsCard(list[0]);
+    first.classList.add('pg-front-seclead');
+    sec.appendChild(first);
+    const body = wsEl('div', 'pg-front-list');
+    const add = (from, to) => list.slice(from, to).forEach(a => body.appendChild(buildWsTitleRow(a)));
+    add(1, FRONT_SEC);
+    sec.appendChild(body);
+    if (list.length > FRONT_SEC) {
+      const more = wsEl('button', 'pg-more', pt('more6')(list.length - FRONT_SEC));
+      more.type = 'button';
+      more.onclick = () => { add(FRONT_SEC, list.length); more.remove(); };
+      sec.appendChild(more);
+    }
+    secs.appendChild(sec);
+  });
+  box.appendChild(secs);
+  return box;
+}
+function tlDateLabel(d) {
+  const wd = new Date(Date.UTC(+d.slice(0, 4), +d.slice(5, 7) - 1, +d.slice(8, 10))).getUTCDay();
+  const w = dayWord(d);
+  return d.slice(5).replace('-', '/') + ' ' + pt('weekday')(wd) + (/\//.test(w) ? '' : ' · ' + w);
+}
+function pgRenderTimeline(items) {
+  const box = wsEl('div', 'pg-tl');
+  const counts = TrackerStore.dateCounts(ws.shown || items);
+  // grouped by day whatever the sort; within a day the chosen order is kept
+  const asc = ws.f.sort === 'oldest';
+  const list = items.map((a, i) => [a, i]).sort((x, y) => (x[0]._date === y[0]._date ? x[1] - y[1]
+    : ((x[0]._date < y[0]._date) === asc ? -1 : 1))).map(x => x[0]);
+  let cur = null, body = null;
+  list.forEach(a => {
+    if (a._date !== cur) {
+      cur = a._date;
+      const day = wsEl('section', 'pg-tl-day');
+      const h = wsEl('h3', 'pg-tl-date');
+      h.appendChild(wsEl('span', 'pg-tl-dot'));
+      h.appendChild(wsEl('span', '', tlDateLabel(cur)));
+      h.appendChild(wsEl('span', 'pg-col-n', String(counts[cur] || '')));
+      day.appendChild(h);
+      body = wsEl('div', 'pg-tl-items');
+      day.appendChild(body);
+      box.appendChild(day);
+    }
+    body.appendChild(pgRichRow(a, 'pg-tl-item'));
+  });
+  return box;
+}
+const SPLIT_MQ = typeof matchMedia === 'function' ? matchMedia('(min-width: 1024px)') : null;
+function readerDocked() {
+  return !!(state.wsActive && ws.mode === 'split' && SPLIT_MQ && SPLIT_MQ.matches && document.getElementById('pg-split-pane'));
+}
+function readerOpenModal() {
+  const r = document.getElementById('reader');
+  return !!(r && !r.classList.contains('hidden') && !readerDocked());
+}
+function pgRenderSplit(items) {
+  const box = wsEl('div', 'pg-split');
+  const list = wsEl('div', 'pg-split-list');
+  items.forEach(a => list.appendChild(pgRichRow(a, 'pg-split-row')));
+  const pane = wsEl('aside', 'pg-split-pane');
+  pane.id = 'pg-split-pane';
+  const empty = wsEl('div', 'pg-split-empty');
+  empty.appendChild(wsEl('p', '', pt('splitEmpty')));
+  empty.appendChild(wsEl('p', 'pg-split-keys', pt('splitKeys')));
+  pane.appendChild(empty);
+  box.appendChild(list);
+  box.appendChild(pane);
+  const sr = document.getElementById('search-row');
+  if (sr) document.documentElement.style.setProperty('--sr-h', sr.offsetHeight + 'px');
+  return box;
+}
+// The reader element moves into the split pane and back: rescue it before a redraw removes the pane.
+function splitRescue() {
+  const r = document.getElementById('reader'), bd = document.getElementById('reader-backdrop');
+  if (r && bd && r.parentNode !== bd) bd.appendChild(r);
+}
+function splitRestore() {
+  const r = document.getElementById('reader'), bd = document.getElementById('reader-backdrop');
+  if (!r || !bd) return;
+  const open = !r.classList.contains('hidden');
+  if (readerDocked()) {
+    if (open) {
+      document.getElementById('pg-split-pane').appendChild(r);
+      bd.classList.add('hidden');
+      r.setAttribute('aria-modal', 'false');
+      if (readerArticleId) splitMarkCurrent(readerArticleId);
+    }
+  } else if (open && bd.classList.contains('hidden')) closeReader();
+}
+function splitMarkCurrent(id) {
+  document.querySelectorAll('.pg-split-row.is-current').forEach(x => x.classList.remove('is-current'));
+  if (!id) tipClose();   // a tip pointing at the reader goes with it
+  if (!id || !readerDocked()) return;
+  const esc = (typeof CSS !== 'undefined' && CSS.escape) ? CSS.escape(id) : String(id).replace(/"/g, '\\"');
+  let row = null;
+  try { row = document.querySelector('.pg-split-row[data-id="' + esc + '"]'); } catch (e) {}
+  if (row) { row.classList.add('is-current'); row.scrollIntoView({ block: 'nearest' }); }
+}
+if (SPLIT_MQ && SPLIT_MQ.addEventListener) {
+  SPLIT_MQ.addEventListener('change', () => { if (state.wsActive && ws.mode === 'split') wsDraw(true); });
+}
+
+// ── greeting strip and the wizard offer (top of the workspace) ──
+function wizShouldOffer() {
+  if (personal.wiz || isPreviewMode() || pgTransient) return false;
+  let seen = null;
+  try { seen = prefGet('tracker_tour'); } catch (e) {}
+  return !seen && pgState.pages.length <= 1;
+}
+function personalIntroEl(base) {
+  if (pgTransient) return null;
+  if (wizShouldOffer()) return wizOfferEl();
+  return personal.greet ? greetEl(base) : null;
+}
+function greetEl(base) {
+  const nw = ws.newest;
+  if (!nw || !base.length) return null;
+  const nDay = base.filter(a => a._date === nw).length;
+  const nNew = visitSince ? base.filter(personalIsNew).length : 0;
+  const nWatch = base.filter(a => watchRuleIds(a, watchPrefs).length).length;
+  const box = wsEl('div', 'nt-greet');
+  box.setAttribute('role', 'note');
+  const txt = wsEl('p', 'nt-greet-t');
+  txt.appendChild(wsEl('strong', '', pt('greet')[TrackerPersonal.greeting(new Date().getHours())]));
+  txt.appendChild(document.createTextNode(pt('greetLine')(dayWord(nw), nDay) + (nNew ? pt('greetNew')(nNew) : '') +
+    (nWatch ? pt('greetWatch')(nWatch, wsRangeLabel(ws.range)) : '') + pt('stop')));
+  box.appendChild(txt);
+  const acts = wsEl('div', 'nt-greet-acts');
+  const act = (label, on, fn, key) => {
+    const b = wsEl('button', 'pg-chip nt-act' + (on ? ' on' : ''), label);
+    b.type = 'button';
+    b.dataset.ws = 'greet:' + key;
+    b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    b.onclick = fn;
+    acts.appendChild(b);
+  };
+  const hasNew = /(^|\s)is:new(?=\s|$)/i.test(state.searchQuery || '');
+  if (nNew || hasNew) act(pt('greetOnlyNew')(nNew), hasNew, () => searchToggleToken('is:new'), 'new');
+  if (nWatch || ws.f.watched) act(pt('greetOnlyWatch')(nWatch), ws.f.watched, () => { ws.focusKey = 'greet:watch'; pgSetF({ watched: !ws.f.watched }); }, 'watch');
+  if (personal.learn && tasteProfile.n >= TrackerPersonal.MIN_READS && ws.f.sort !== 'foryou') {
+    act(pt('greetForYou'), false, () => { ws.f = TrackerPages.normFilter(Object.assign({}, ws.f, { sort: 'foryou' })); pgFilterChanged(); }, 'foryou');
+  }
+  if (acts.children.length) box.appendChild(acts);
+  const x = wsEl('button', 'nt-x', '✕');
+  x.type = 'button';
+  x.title = pt('greetHide');
+  x.setAttribute('aria-label', pt('greetHide'));
+  x.onclick = () => { personal.greet = false; personalSave(); box.remove(); ntToast(pt('greetHidden')); };
+  box.appendChild(x);
+  return box;
+}
+function wizOfferEl() {
+  const box = wsEl('section', 'nt-welcome');
+  const h = wsEl('h2', 'nt-welcome-h', pt('wizOfferH'));
+  h.id = 'nt-welcome-h';
+  box.setAttribute('aria-labelledby', 'nt-welcome-h');
+  box.appendChild(h);
+  box.appendChild(wsEl('p', 'nt-welcome-p', pt('wizOfferP')));
+  const row = wsEl('div', 'nt-welcome-acts');
+  const go = wsEl('button', 'pg-btn pg-btn-primary', pt('wizGo'));
+  go.type = 'button'; go.dataset.ws = 'wiz:go'; go.onclick = openWizard;
+  const tour = wsEl('button', 'pg-btn', pt('wizTour'));
+  tour.type = 'button'; tour.onclick = startTour;
+  const no = wsEl('button', 'pg-btn pg-btn-quiet', pt('wizNo'));
+  no.type = 'button';
+  no.onclick = () => { personal.wiz = 'later'; personalSave(); box.remove(); prefsDot(); ntToast(pt('wizLaterToast')); };
+  row.appendChild(go); row.appendChild(tour); row.appendChild(no);
+  box.appendChild(row);
+  return box;
+}
+
+// ── 個人化 settings dialog ──
+function prefsDot() {
+  const b = document.getElementById('prefs-btn');
+  // a quiet dot for readers who never met the wizard (it is offered only on a first visit): new things live here
+  if (b) b.classList.toggle('nt-has-dot', !personal.gearSeen && !personal.wiz && !wizShouldOffer() && !isPreviewMode());
+}
+function dlgSection(box, title) {
+  const s = wsEl('section', 'nt-pref-sec');
+  s.appendChild(wsEl('h3', '', title));
+  box.appendChild(s);
+  return s;
+}
+function dlgBtn(parent, label, fn, cls) {
+  const b = wsEl('button', 'pg-btn' + (cls ? ' ' + cls : ''), label);
+  b.type = 'button';
+  b.onclick = fn;
+  parent.appendChild(b);
+  return b;
+}
+function openPrefsDialog() {
+  closeLayoutPanel();
+  if (!personal.gearSeen) { personal.gearSeen = true; personalSave(); prefsDot(); }
+  const box = document.getElementById('pg-dialog');
+  box.innerHTML = '';
+  box.setAttribute('aria-labelledby', 'nt-prefs-h');
+  const h = wsEl('h2', 'pg-dlg-h', pt('prefsTitle'));
+  h.id = 'nt-prefs-h';
+  box.appendChild(h);
+  box.appendChild(wsEl('p', 'pg-dlg-hint', pt('pPrivacy')));
+  const s1 = dlgSection(box, pt('pHome'));
+  const sel = document.createElement('select');
+  sel.className = 'nt-sel';
+  sel.setAttribute('aria-label', pt('pHome'));
+  const opt = (parent, v, label) => { const o = document.createElement('option'); o.value = v; o.textContent = label; parent.appendChild(o); };
+  opt(sel, '', pt('pHomeLast'));
+  const g1 = document.createElement('optgroup');
+  g1.label = pt('pHomePages');
+  pgState.pages.forEach(p => opt(g1, p.id, pgName(p)));
+  sel.appendChild(g1);
+  opt(sel, 'hub', pt('pHomeHub'));
+  const trs = Object.keys(getTrackers() || {}).filter(k => k !== '__cra');
+  if (trs.length) {
+    const g2 = document.createElement('optgroup');
+    g2.label = pt('pHomeTrackers');
+    trs.forEach(n => opt(g2, 't:' + n, trackerLabel(n)));
+    sel.appendChild(g2);
+  }
+  sel.value = pgState.home || '';
+  sel.onchange = () => { pgState.home = sel.value; pgSave(); pgBuildBar(); };
+  s1.appendChild(sel);
+  const s2 = dlgSection(box, pt('pFront'));
+  s2.appendChild(chkEl(pt('pGreet'), personal.greet, v => { personal.greet = v; personalSave(); if (state.wsActive) wsDraw(true); }));
+  s2.appendChild(chkEl(pt('pLearn'), personal.learn, v => { personal.learn = v; personalSave(); if (state.wsActive && ws.f.sort === 'foryou') wsDraw(true); }));
+  const n = wsEl('p', 'pg-dlg-hint', pt('pLearnN')(tasteProfile.n));
+  s2.appendChild(n);
+  dlgBtn(s2, pt('pForget'), () => {
+    if (!confirm(pt('pForgetQ'))) return;
+    tasteProfile = TrackerPersonal.emptyTaste();
+    readSet = new Set();
+    try { prefSet('tracker_taste', null); prefSet('tracker_read', null); } catch (e) {}
+    n.textContent = pt('pLearnN')(0);
+    ntToast(pt('pForgot'));
+    if (state.wsActive) wsDraw(true);
+  });
+  const s3 = dlgSection(box, pt('pGuide'));
+  s3.appendChild(chkEl(pt('pTips'), personal.tips, v => { personal.tips = v; personalSave(); if (!v) tipClose(); }));
+  const r3 = wsEl('div', 'nt-btn-row');
+  dlgBtn(r3, pt('pWizard'), () => { closePgDialog(); openWizard(); });
+  dlgBtn(r3, pt('pTour'), () => { closePgDialog(); startTour(); });
+  s3.appendChild(r3);
+  const s4 = dlgSection(box, pt('pData'));
+  const r4 = wsEl('div', 'nt-btn-row');
+  dlgBtn(r4, pt('exportP'), pgExport);
+  dlgBtn(r4, pt('importP'), pgImport);
+  s4.appendChild(r4);
+  const row = wsEl('div', 'pg-dlg-row');
+  dlgBtn(row, pt('pDone'), closePgDialog, 'pg-btn-primary');
+  box.appendChild(row);
+  document.getElementById('pg-dialog-wrap').classList.remove('hidden');
+  sel.focus();
+}
+
+// ── personalisation wizard (three short steps; skipping is always one click) ──
+let wiz = null;
+const WIZ_LAYOUTS = ['front', 'cards', 'magazine', 'titles', 'split', 'timeline', 'table'];
+const WIZ_TOPICS = ['kev', 'zeroday', 'ransomware', 'nis2', 'cra_law', 'cra_std', 'cra_guide'];
+function openWizard() {
+  closeLayoutPanel();
+  tipClose();
+  const mine = personal.wizPage ? pgState.pages.find(p => p.id === personal.wizPage) : null;
+  const f = TrackerPages.normFilter(mine ? mine.f : {});
+  const on = Array.isArray(watchPrefs.on) ? watchPrefs.on : [];
+  wiz = {
+    step: 0,
+    types: new Set(f.types),
+    plats: new Set(on.filter(id => /^plat_/.test(id))),
+    topics: new Set(on.filter(id => WIZ_TOPICS.includes(id))),
+    kw: (Array.isArray(watchPrefs.kw) ? watchPrefs.kw : []).join(', '),
+    layout: mine ? mine.layout : 'front',
+    dens: mine ? mine.look.d : 'cozy',
+    range: mine && ['today', '7d', '30d'].includes(mine.range) ? mine.range : '7d',
+    home: !mine ? 'mine' : (pgState.home === mine.id ? 'mine' : (pgState.home === 'hub' ? 'hub' : 'last'))
+  };
+  wizRender();
+  document.getElementById('pg-dialog-wrap').classList.remove('hidden');
+}
+function wizChips(label, items, set) {
+  const sec = wsEl('div', 'nt-wiz-grp');
+  sec.appendChild(wsEl('div', 'nt-wiz-gh', label));
+  const opts = wsEl('div', 'pg-fp-opts');
+  items.forEach(([id, name]) => {
+    const b = wsEl('button', 'pg-opt', name);
+    b.type = 'button';
+    b.setAttribute('aria-pressed', set.has(id) ? 'true' : 'false');
+    b.onclick = () => { if (set.has(id)) set.delete(id); else set.add(id); b.setAttribute('aria-pressed', set.has(id) ? 'true' : 'false'); };
+    opts.appendChild(b);
+  });
+  sec.appendChild(opts);
+  return sec;
+}
+function wizRender() {
+  const box = document.getElementById('pg-dialog');
+  box.innerHTML = '';
+  box.classList.add('nt-wiz');
+  box.setAttribute('aria-labelledby', 'nt-wiz-h');
+  const N = 3;
+  const top = wsEl('div', 'nt-wiz-top');
+  const dots = wsEl('div', 'nt-wiz-dots');
+  dots.setAttribute('aria-hidden', 'true');
+  for (let i = 0; i < N; i++) dots.appendChild(wsEl('span', 'nt-wiz-dot' + (i === wiz.step ? ' cur' : (i < wiz.step ? ' done' : ''))));
+  top.appendChild(dots);
+  top.appendChild(wsEl('span', 'nt-wiz-of', pt('wizStepOf')(wiz.step + 1, N)));
+  box.appendChild(top);
+  const h = wsEl('h2', 'pg-dlg-h', pt('wizSteps')[wiz.step]);
+  h.id = 'nt-wiz-h';
+  box.appendChild(h);
+  const body = wsEl('div', 'nt-wiz-body');
+  if (wiz.step === 0) {
+    body.appendChild(wsEl('p', 'pg-dlg-hint', pt('wizS1Hint')));
+    body.appendChild(wizChips(pt('wizTypes'), NEWS_TYPES.filter(x => x.id !== 'other').map(x => [x.id, state.lang === 'en' ? x.en : x.zh]), wiz.types));
+    body.appendChild(wizChips(pt('wizPlats'), HUB_PLATFORMS.map(p => ['plat_' + p.toLowerCase(), p]), wiz.plats));
+    body.appendChild(wizChips(pt('wizTopics'), WATCH_RULES.filter(r => WIZ_TOPICS.includes(r.id)).map(r => [r.id, state.lang === 'en' ? r.en : r.zh]), wiz.topics));
+    const kl = wsEl('label', 'nt-wiz-grp nt-wiz-kw');
+    kl.appendChild(wsEl('span', 'nt-wiz-gh', pt('wizKw')));
+    const ki = document.createElement('input');
+    ki.type = 'text';
+    ki.value = wiz.kw;
+    ki.placeholder = pt('wizKwPh');
+    ki.oninput = () => { wiz.kw = ki.value; };
+    kl.appendChild(ki);
+    body.appendChild(kl);
+  } else if (wiz.step === 1) {
+    body.appendChild(wsEl('p', 'pg-dlg-hint', pt('wizS2Hint')));
+    const grid = wsEl('div', 'pg-ly-grid nt-wiz-ly');
+    WIZ_LAYOUTS.forEach(id => grid.appendChild(lyOptEl(id, wiz.layout === id, (lid, b) => {
+      wiz.layout = lid;
+      grid.querySelectorAll('.pg-ly-opt').forEach(x => x.setAttribute('aria-pressed', x === b ? 'true' : 'false'));
+    })));
+    body.appendChild(grid);
+    body.appendChild(segEl(pt('dens'), ['compact', 'cozy', 'roomy'], pt('densOpts'), wiz.dens, v => { wiz.dens = v; }));
+  } else {
+    body.appendChild(segEl(pt('wizRange'), ['today', '7d', '30d'], pt('wizRanges'), wiz.range, v => { wiz.range = v; }));
+    const fs = document.createElement('fieldset');
+    fs.className = 'nt-radios';
+    fs.appendChild(wsEl('legend', 'nt-wiz-gh', pt('wizHome')));
+    ['mine', 'last', 'hub'].forEach(k => {
+      const l = wsEl('label', 'nt-chk');
+      const r = document.createElement('input');
+      r.type = 'radio'; r.name = 'nt-wiz-home'; r.value = k; r.checked = wiz.home === k;
+      r.onchange = () => { if (r.checked) wiz.home = k; };
+      l.appendChild(r);
+      l.appendChild(wsEl('span', '', pt('wizHomes')[k]));
+      fs.appendChild(l);
+    });
+    body.appendChild(fs);
+  }
+  box.appendChild(body);
+  const row = wsEl('div', 'pg-dlg-row nt-wiz-row');
+  dlgBtn(row, pt('wizSkip'), closePgDialog, 'pg-btn-quiet nt-wiz-skip');
+  if (wiz.step > 0) dlgBtn(row, pt('wizBack'), () => { wiz.step--; wizRender(); });
+  const last = wiz.step === N - 1;
+  const nx = dlgBtn(row, last ? pt('wizFinish') : pt('wizNext'), () => { if (last) wizFinish(); else { wiz.step++; wizRender(); } }, 'pg-btn-primary');
+  box.appendChild(row);
+  const first = body.querySelector('button, input');
+  (first || nx).focus();
+}
+function wizFinish() {
+  const w = wiz;
+  const existing = personal.wizPage ? pgState.pages.find(p => p.id === personal.wizPage) : null;
+  if (!existing && !TrackerPages.canAdd(pgState)) { alert(pt('full')); return; }
+  const id = existing ? existing.id : TrackerPages.newId(pgState);
+  const page = TrackerPages.normPage({
+    id, name: existing ? existing.name : pt('wizPageName'), range: w.range, layout: w.layout, size: 0,
+    look: Object.assign({}, existing ? existing.look : {}, { d: w.dens }), q: existing ? existing.q : '',
+    f: Object.assign({}, existing ? existing.f : {}, { types: [...w.types], sort: 'foryou' })
+  }, 0);
+  if (existing) pgState.pages[pgState.pages.indexOf(existing)] = page;
+  else pgState.pages.unshift(page);
+  // the wizard owns the platform and topic rules; the other rules are kept as they were
+  const keep = (Array.isArray(watchPrefs.on) ? watchPrefs.on : []).filter(x => !/^plat_/.test(x) && !WIZ_TOPICS.includes(x));
+  watchPrefs.on = keep.concat([...w.plats], [...w.topics]);
+  watchPrefs.kw = cleanWatchKw(String(w.kw || '').split(/[,，、;；\n]/));
+  saveWatch();
+  updateWatchUI();
+  pgState.home = w.home === 'mine' ? id : (w.home === 'hub' ? 'hub' : '');
+  personal.wiz = 'done';
+  personal.wizPage = id;
+  personalSave();
+  wiz = null;
+  closePgDialog();
+  prefsDot();
+  pgTransient = false;
+  pgState.active = id;
+  pgSave();
+  state.searchQuery = '';
+  const sb = document.getElementById('search-box'); if (sb) sb.value = '';
+  const sc = document.getElementById('search-clear'); if (sc) sc.style.display = 'none';
+  if (!state.wsActive) selectWorkspace();
+  else { pgApply(pgActive()); renderWorkspace(); }
+  ntToast(pt('wizDone'));
+}
+// Closing the dialog while the wizard is up (✕, Esc, backdrop, 略過) counts as "later": never offered again.
+const ntClosePgDialogBase = closePgDialog;
+closePgDialog = function () {
+  const wasWiz = !!wiz;
+  ntClosePgDialogBase();
+  const box = document.getElementById('pg-dialog');
+  if (box) { box.classList.remove('nt-wiz'); box.removeAttribute('aria-labelledby'); }
+  if (wasWiz) {
+    wiz = null;
+    if (personal.wiz !== 'done') { personal.wiz = 'later'; personalSave(); prefsDot(); }
+    if (state.wsActive) wsDraw(true);
+  }
+};
+
+// ── one-time tips: at most one per visit, each shown once, all switchable off ──
+let tipSession = false, tipEl = null, tipTimer = null;
+function tipClose() {
+  if (tipEl) { tipEl.remove(); tipEl = null; }
+  clearTimeout(tipTimer);
+}
+function tipMaybe(id, anchor, text) {
+  if (!personal.tips || tipSession || isPreviewMode() || !anchor || !text || personal.tipsSeen.includes(id)) return;
+  if (tourIdx >= 0 || wiz || !document.getElementById('pg-dialog-wrap').classList.contains('hidden')) return;
+  const r = anchor.getBoundingClientRect();
+  if (!(r.width > 0 && r.height > 0) || r.bottom < 0 || r.top > window.innerHeight) return;
+  tipSession = true;
+  personal.tipsSeen.push(id);
+  personalSave();
+  const el = wsEl('div', 'nt-tip');
+  el.setAttribute('role', 'status');
+  el.appendChild(wsEl('span', '', text));
+  const ok = wsEl('button', 'pg-btn pg-btn-quiet nt-tip-ok', pt('tipOk'));
+  ok.type = 'button';
+  ok.onclick = tipClose;
+  el.appendChild(ok);
+  document.body.appendChild(el);
+  const w = Math.min(320, window.innerWidth - 24);
+  el.style.width = w + 'px';
+  el.style.left = Math.max(12, Math.min(window.innerWidth - w - 12, r.left)) + 'px';
+  const below = r.bottom + 8;
+  el.style.top = (below + el.offsetHeight < window.innerHeight - 8 ? below : Math.max(8, r.top - 8 - el.offsetHeight)) + 'px';
+  tipEl = el;
+  tipTimer = setTimeout(tipClose, 12000);
+}
+window.addEventListener('scroll', () => { if (tipEl) tipClose(); }, { passive: true });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && tipEl) tipClose(); });
+let toastTimer = null;
+function ntToast(msg) {
+  let el = document.getElementById('nt-toast');
+  if (!el) {
+    el = wsEl('div', 'nt-toast');
+    el.id = 'nt-toast';
+    el.setAttribute('role', 'status');
+    el.setAttribute('aria-live', 'polite');
+    document.body.appendChild(el);
+  }
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 4500);
+}
+
+// ── tabs: drag to reorder; start-page toggle ──
+let pgDragId = null;
+function pgDragWire(el, id) {
+  el.draggable = true;
+  el.addEventListener('dragstart', e => {
+    pgDragId = id;
+    el.classList.add('dragging');
+    try { e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', id); } catch (x) {}
+  });
+  el.addEventListener('dragend', () => {
+    pgDragId = null;
+    el.classList.remove('dragging');
+    document.querySelectorAll('.pg-tab.drop-before, .pg-tab.drop-after').forEach(x => x.classList.remove('drop-before', 'drop-after'));
+  });
+  el.addEventListener('dragover', e => {
+    if (!pgDragId || pgDragId === id) return;
+    e.preventDefault();
+    const r = el.getBoundingClientRect();
+    const after = e.clientX > r.left + r.width / 2;
+    el.classList.toggle('drop-after', after);
+    el.classList.toggle('drop-before', !after);
+  });
+  el.addEventListener('dragleave', () => el.classList.remove('drop-before', 'drop-after'));
+  el.addEventListener('drop', e => {
+    if (!pgDragId || pgDragId === id) return;
+    e.preventDefault();
+    const after = el.classList.contains('drop-after');
+    const from = pgState.pages.findIndex(x => x.id === pgDragId);
+    if (from < 0) return;
+    const [moved] = pgState.pages.splice(from, 1);
+    let to = pgState.pages.findIndex(x => x.id === id);
+    if (after) to++;
+    pgState.pages.splice(to, 0, moved);
+    pgDragId = null;
+    pgSave();
+    pgBuildBar();
+  });
+}
+function pgToggleHome(id) {
+  const p = pgState.pages.find(x => x.id === id);
+  if (!p) return;
+  pgState.home = pgState.home === id ? '' : id;
+  pgSave();
+  pgBuildBar();
+  ntToast(pgState.home ? pt('homeSet')(pgName(p)) : pt('homeUnset'));
+}
+
+// ── language + header button ──
+function ntApplyLang() {
+  const b = document.getElementById('prefs-btn');
+  if (b) { b.textContent = pt('prefs'); b.setAttribute('aria-label', pt('prefs')); }
+  const sb = document.getElementById('search-box');
+  if (sb) sb.placeholder = pt('searchPh');
+  const sg = document.getElementById('search-suggest');
+  if (sg) sg.setAttribute('aria-label', pt('sgLabel'));
+  sgCache = null;
+  hlKey = null;
+}
+const ntApplyLangBase = applyLang;
+applyLang = function () { ntApplyLangBase.apply(this, arguments); ntApplyLang(); };
+(function wirePersonal() {
+  const b = document.getElementById('prefs-btn');
+  if (b) b.addEventListener('click', openPrefsDialog);
 })();
 
 // ── CRA reference library (special mode) ──────────────────────────────
@@ -6805,9 +8498,11 @@ function buildWsCard(a) {
     '<div class="ws-card-top">',
       '<span class="ws-type-chip ws-ty-' + escHtml(tyId) + '">' + escHtml(tyName) + '</span>',
       (hasStar ? '<span class="ws-star" title="' + escHtml(wl.join(' / ')) + '">★</span>' : ''),
+      newBadgeHtml(a),
     '</div>',
-    '<h3 class="ws-card-title">' + escHtml(title) + '</h3>',
-    '<p class="ws-card-summary">' + escHtml(summary) + '</p>',
+    '<h3 class="ws-card-title">' + hl(title) + '</h3>',
+    '<p class="ws-card-summary">' + hl(summary) + '</p>',
+    '<div class="ws-card-tags">' + artTags(a).slice(0, 5).map(x => '<span class="pg-tag">' + escHtml(x) + '</span>').join('') + '</div>',
     '<div class="ws-card-footer">' + escHtml(footerText) + '</div>'
   ].join('');
 
@@ -6832,7 +8527,8 @@ function buildWsTitleRow(a) {
   row.innerHTML = [
     '<span class="ws-type-chip ws-ty-' + escHtml(tyId) + '">' + escHtml(tyName) + '</span>',
     (hasStar ? '<span class="ws-star" title="' + escHtml(wl.join(' / ')) + '">★</span>' : ''),
-    '<span class="ws-title-text">' + escHtml(title) + '</span>',
+    newBadgeHtml(a),
+    '<span class="ws-title-text">' + hl(title) + '</span>',
     (srcName ? '<span class="ws-title-src">' + escHtml(srcName) + '</span>' : ''),
     '<span class="ws-title-date">' + escHtml(mmdd) + '</span>'
   ].join('');
@@ -6974,10 +8670,12 @@ function markArticleRead(a) {
   if (!a) return;
   const id = articleIdOf(a);
   if (!id) return;
-  if (readSet.has(id)) {
+  const wasRead = readSet.has(id);
+  if (wasRead) {
     readSet.delete(id);
   }
   readSet.add(id);
+  if (!wasRead) personalLearn(a);   // 為你推薦 learns from newly opened articles only
   while (readSet.size > 2000) {
     const oldest = readSet.values().next().value;
     readSet.delete(oldest);
@@ -7005,6 +8703,11 @@ function openReader(article, list, triggerEl) {
   const backdrop = document.getElementById('reader-backdrop');
   const reader = document.getElementById('reader');
   if (!backdrop || !reader) return;
+  // 閱讀窗格 layout on a wide screen: the reader sits in the pane next to the list, not as a modal
+  const docked = readerDocked();
+  if (docked) document.getElementById('pg-split-pane').appendChild(reader);
+  else if (reader.parentNode !== backdrop) backdrop.appendChild(reader);
+  reader.setAttribute('aria-modal', docked ? 'false' : 'true');
 
   const wasOpen = !reader.classList.contains('hidden');
   if (!wasOpen) {
@@ -7021,6 +8724,9 @@ function openReader(article, list, triggerEl) {
   readerArticleId = artId;
   overlayArticleId = artId;
   syncHash();
+  splitMarkCurrent(artId);
+  if (state.searchQuery) rememberSearch(state.searchQuery);   // a search that led to a read is worth keeping
+  if (docked) setTimeout(() => tipMaybe('split', reader, pt('tips').split), 700);
 
   const pool = readerPool();
   const ctx = TrackerStore.getReaderContext(artId, curList, { pool: pool, typeOf: newsTypeOf });
@@ -7124,14 +8830,14 @@ function openReader(article, list, triggerEl) {
     bodyEl.scrollTop = 0;
   }
 
-  backdrop.classList.remove('hidden');
+  if (docked) backdrop.classList.add('hidden'); else backdrop.classList.remove('hidden');
   reader.classList.remove('hidden');
   reader.removeAttribute('hidden');
 
   document.removeEventListener('keydown', readerKeyHandler);
   document.addEventListener('keydown', readerKeyHandler);
 
-  if (!wasOpen && closeBtn) {
+  if (!wasOpen && closeBtn && !docked) {   // docked: focus stays on the list so ↑↓ / Tab keep working there
     closeBtn.focus();
   }
 }
@@ -7146,6 +8852,7 @@ function closeReader() {
     reader.setAttribute('hidden', '');
   }
   document.removeEventListener('keydown', readerKeyHandler);
+  splitMarkCurrent(null);
 
   let focusTarget = null;
   if (readerCurrentArticle) {
@@ -7180,6 +8887,12 @@ function readerStep(delta) {
 function readerKeyHandler(e) {
   const reader = document.getElementById('reader');
   if (!reader || reader.classList.contains('hidden')) return;
+  if (readerDocked()) {
+    // docked: not a modal, so no focus trap, and keys typed into a field or another dialog are not ours
+    const tg = e.target, tn = tg && tg.tagName;
+    if (e.key === 'Tab' || tn === 'INPUT' || tn === 'TEXTAREA' || tn === 'SELECT' || (tg && tg.isContentEditable)) return;
+    if (tourIdx >= 0 || !document.getElementById('pg-dialog-wrap').classList.contains('hidden') || lyPanel) return;
+  }
   if (e.key === 'Escape') {
     e.preventDefault();
     closeReader();

@@ -143,11 +143,15 @@ def test_templates_build_valid_pages():
     out = _run("""
       const st = TrackerPages.defaultState();
       return TrackerPages.TEMPLATES.map(t => TrackerPages.fromTemplate(st, t.id, 'x'));""")
-    assert len(out) == 8
+    assert len(out) == 11
     for p in out:
-        assert p["id"] == "p1" and p["name"] == "x" and p["layout"] in ("cards", "titles", "compact", "magazine", "table", "bytype")
+        assert p["id"] == "p1" and p["name"] == "x" and p["layout"] in (
+            "cards", "titles", "compact", "magazine", "front", "timeline", "split", "table", "bytype")
+        assert p["q"] == "" and p["look"] == {"d": "cozy", "fs": "m", "sum": True, "tg": False}
     assert out[1]["layout"] == "magazine" and out[1]["range"] == "7d" and out[1]["f"]["types"] == ["incident", "vuln", "regulation"]
     assert out[7]["f"] == {"unread": True} and out[7]["size"] == 50
+    assert out[8]["layout"] == "front" and out[8]["f"] == {"sort": "foryou"}
+    assert out[9]["layout"] == "split" and out[10]["layout"] == "timeline"
 
 
 def test_compact_filter_roundtrip():
