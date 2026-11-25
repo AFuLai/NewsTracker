@@ -65,3 +65,20 @@ def test_no_direct_tracker_storage_calls():
     s = _src()
     calls = re.findall(r"localStorage\.(?:getItem|setItem)\(\s*'tracker_", s)
     assert calls == [], calls
+
+
+def test_trial_view_says_it_does_not_save():
+    """?pv=1 never writes, so the page says so and links to the saving page,
+    instead of dropping the reader's changes silently (2026-11-25)."""
+    s = _src()
+    assert re.search(r"function pvNote\(\)\s*\{\s*if \(!isPreviewMode\(\)", s)
+    assert re.search(r"^\s*pvNote\(\);", s, re.M), "pvNote() is never called"
+    assert "searchParams.delete('pv')" in s
+
+
+def test_disk_push_keepalive_stays_under_chrome_limit():
+    """Chrome rejects a keepalive fetch body over 64 KiB, which would drop the /prefs disk copy."""
+    m = re.search(r"function prefsPush\(\)\s*\{(.*?)\n\}", _src(), re.S)
+    assert m, "prefsPush missing"
+    assert "keepalive: body.length < 60000" in m.group(1)
+    assert "keepalive: true" not in m.group(1)

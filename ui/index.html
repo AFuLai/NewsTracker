@@ -2183,6 +2183,11 @@ html[data-mode="ws"] #pg-bar { display: flex; }
 }
 @media (prefers-reduced-motion: reduce) { #tour-spot { transition: none; } }
 #pg-dialog-wrap.hidden, #tour-offer.hidden, #tour.hidden, #pg-filter-panel.hidden { display: none; }
+/* ?pv=1 trial view: one slim line, so "my settings did not stick" is never silent. */
+#pv-note { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; padding: 6px 16px; font-size: 13px;
+  background: var(--surface-container-high); color: var(--on-surface-variant); border-bottom: 1px solid var(--outline-variant); }
+#pv-note a { color: var(--primary); font-weight: 500; }
+#pv-note button { margin-left: auto; border: 0; background: none; color: inherit; font: inherit; cursor: pointer; padding: 2px 6px; }
 
 /* ── 我的頭版: layout gallery, front / timeline / reading pane, display options, search suggestions,
       greeting, wizard, tips ── */
@@ -2694,8 +2699,11 @@ let prefsPushTimer = null;
 function prefsPush() {
   if (!PREFS_SERVER || isPreviewMode()) return;
   try {
+    // keepalive lets the last change survive closing the tab, but Chrome rejects a keepalive
+    // body over 64 KiB outright, which would silently drop the disk copy once the prefs grow.
+    const body = JSON.stringify(prefs);
     fetch('/prefs', { method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(prefs), keepalive: true }).catch(() => {});
+      body, keepalive: body.length < 60000 }).catch(() => {});
   } catch (e) {}
 }
 function prefGet(key) { return TrackerPrefs.get(prefs, key); }
@@ -2802,6 +2810,34 @@ let viewPrefs = defaultView();
 // Console preview iframe (?pv=1) must never write localStorage.
 function isPreviewMode() {
   try { return new URLSearchParams(location.search).get('pv') === '1'; } catch (e) { return false; }
+}
+// The same URL without ?pv=1 (the hash is kept, minus a preset p=, which is the trial itself).
+function pvSavingUrl() {
+  const u = new URL(location.href);
+  u.searchParams.delete('pv');
+  u.hash = u.hash.replace(/(^#|&)p=[^&]*/, '$1').replace(/^#&/, '#').replace(/&$/, '');
+  return u.toString().replace(/#$/, '');
+}
+// Trial view: say so once at the top, with the way out. Dismissed for this page load only.
+function pvNote() {
+  if (!isPreviewMode() || document.getElementById('pv-note')) return;
+  const d = document.createElement('div');
+  d.id = 'pv-note';
+  d.setAttribute('role', 'note');
+  const zh = (state.lang || 'zh') !== 'en';
+  d.append(zh ? '試看模式：這裡的設定變更不會儲存。' : 'Trial view: changes here are not saved.');
+  const a = document.createElement('a');
+  a.href = pvSavingUrl();
+  a.target = '_top';
+  a.onclick = () => { a.href = pvSavingUrl(); };   // the hash changes as the reader moves around
+  a.textContent = zh ? '開啟可儲存的頁面' : 'Open the page that saves';
+  const x = document.createElement('button');
+  x.type = 'button';
+  x.setAttribute('aria-label', zh ? '關閉' : 'Close');
+  x.textContent = '×';
+  x.onclick = () => d.remove();
+  d.append(a, x);
+  document.body.prepend(d);
 }
 function saveView() {
   if (isPreviewMode()) return;
@@ -5159,6 +5195,7 @@ function init() {
   ws.mode = wsLoadMode();
   pgLoad();        // localStorage tracker_pages → pgState (the user's own pages)
   personalLoad();  // tracker_personal / tracker_taste → settings and the reading-taste profile
+  pvNote();
   if (!applyHashRestore()) personalStart();   // no deep link: the start page the reader chose (default: the page used last)   // deep-link wins; no / unknown hash → the news workspace (the home view; it was the 總覽 hub, which replaced the old default tracker wall)
   applyLang();   // sync all static labels + lang button to the active language
 }

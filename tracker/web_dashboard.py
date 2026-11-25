@@ -1188,7 +1188,8 @@ _HTML = r"""<!DOCTYPE html>
           <option value="390">390</option>
         </select>
         <button id="btnLocalPreview">本機預覽</button>
-        <a id="pvOpen" target="_blank" href="/site/index.html?pv=1">新分頁開啟</a>
+        <a id="pvOpen" target="_blank" href="/site/index.html">新分頁開啟</a>
+        <span class="sub" id="pvHint">選了版型＝試看，不儲存設定</span>
       </div>
       <div class="pvwrap"><iframe id="pvFrame"></iframe></div>
     </div>
@@ -1590,9 +1591,12 @@ async function deployCmd(cmd){
   }catch(e){ $('depErr').textContent = String(e); }
   poll();
 }
+// No preset: the real site, which saves the reader's settings (to localStorage and
+// /prefs). A preset is a trial of that look, so it opens read-only (?pv=1) and the
+// site says so; otherwise trying 快讀 would overwrite the reader's own layout.
 function pvUrl(){
   const p = $('pvPreset').value;
-  return '/site/index.html?pv=1' + (p ? '#p=' + p : '');
+  return p ? '/site/index.html?pv=1#p=' + p : '/site/index.html';
 }
 function pvWidth(){
   const w = $('pvWidth').value;

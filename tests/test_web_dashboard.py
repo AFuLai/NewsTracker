@@ -236,3 +236,17 @@ def test_prefs_roundtrip_on_disk(monkeypatch, tmp_path):
     finally:
         httpd.shutdown()
         httpd.server_close()
+
+
+def test_site_preview_without_preset_is_the_saving_page():
+    """The console's preview and 新分頁開啟 open the real site when no preset is
+    chosen: ?pv=1 makes the site read-only, so opening it there by default meant
+    the reader's settings were silently never kept (2026-11-25). A preset is a
+    trial and stays ?pv=1."""
+    import re
+    from tracker.web_dashboard import _HTML
+    m = re.search(r"function pvUrl\(\)\{(.*?)\n\}", _HTML, re.S)
+    assert m, "pvUrl missing"
+    body = m.group(1)
+    assert "p ? '/site/index.html?pv=1#p=' + p : '/site/index.html'" in body
+    assert 'id="pvOpen" target="_blank" href="/site/index.html"' in _HTML
