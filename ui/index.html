@@ -3896,9 +3896,43 @@ const TrackerPages = (() => {
     const tpl = TEMPLATES.find(x => x.id === tplId) || TEMPLATES[0];
     return normPage(Object.assign({}, tpl.page, { id: newId(st), name: name || '' }), 0);
   }
+  // ── share links (#ws=1&pgx=<code>) ──
+  // The whole page, so the link opens the same layout, filters, display options, pinned search and
+  // name in any browser: only the non-default fields, as JSON, UTF-8, base64url (no padding).
+  // The page id is not carried; it belongs to the sender's own list.
+  const SHARE_MAX = 4000;
+  function shareEncode(p) {
+    const n = normPage(p, 0), o = {}, look = normLook(null);
+    if (n.name) o.n = n.name;
+    if (n.range !== '30d') o.r = n.range;
+    ['src', 'ty', 'w', 'pl', 'pk', 'q'].forEach(k => { if (n[k]) o[k] = n[k]; });
+    if (n.layout !== 'cards') o.ly = n.layout;
+    if (n.size) o.sz = n.size;
+    if (Object.keys(n.f).length) o.f = n.f;
+    const lk = {};
+    Object.keys(look).forEach(k => { if (n.look[k] !== look[k]) lk[k] = n.look[k]; });
+    if (Object.keys(lk).length) o.lk = lk;
+    const bytes = new TextEncoder().encode(JSON.stringify(o));
+    let bin = '';
+    bytes.forEach(b => { bin += String.fromCharCode(b); });
+    return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  }
+  // code -> a normalised page with id 'shared', or null when it is not a page link.
+  function shareDecode(code) {
+    if (typeof code !== 'string' || !code || code.length > SHARE_MAX || !/^[A-Za-z0-9_-]+$/.test(code)) return null;
+    let o;
+    try {
+      const bin = atob(code.replace(/-/g, '+').replace(/_/g, '/'));
+      const bytes = Uint8Array.from(bin, c => c.charCodeAt(0));
+      o = JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(bytes));
+    } catch (e) { return null; }
+    if (!o || typeof o !== 'object' || Array.isArray(o)) return null;
+    return normPage({ id: 'shared', name: o.n, range: o.r, src: o.src, ty: o.ty, w: o.w, pl: o.pl, pk: o.pk,
+      layout: o.ly, size: o.sz, f: o.f, q: o.q, look: o.lk }, 0);
+  }
   return { LAYOUTS, SIZES, SORTS, LISTS, MAX_PAGES, TEMPLATES, DENS, FONTS, normLook, emptyFilter, normFilter, compactFilter, filterCount,
            normPage, normState, defaultState, parse, serialize, newId, canAdd, match, filter, sort, pages, slice,
-           pagerWindow, tagCounts, fromTemplate };
+           pagerWindow, tagCounts, fromTemplate, shareEncode, shareDecode };
 })();
 /* TRACKER-PAGES:END */
 /* TRACKER-STORE:BEGIN */
@@ -5887,7 +5921,14 @@ function selectWorkspace(patch) {
   state.currentDate = null; state.currentMode = null; state.pendingDates = [];
   state.filterCats = new Set();
   state.search = null;
-  if (patch) {
+  pgShared = null;
+  if (patch && patch.shared) {
+    // a page someone shared (pgx=): shown whole, as a transient view, until the reader saves it
+    pgTransient = true;
+    pgShared = patch.shared;
+    pgApply(patch.shared);
+    state.searchQuery = '';
+  } else if (patch) {
     // a link: with pg= it is that page (and its state is saved there); without, a transient view
     const pg = patch.pg && pgState.pages.find(x => x.id === patch.pg);
     pgTransient = !pg;
@@ -5965,6 +6006,8 @@ const PGT = {
   zh: {
     main: '全部新聞', newPage: '＋ 新增版面', manage: '版面管理', linkView: '連結檢視', saveAs: '存成新版面',
     rename: '重新命名', dup: '複製', left: '左移', right: '右移', del: '刪除', exportP: '匯出版面設定', importP: '匯入版面設定',
+    shareLink: '複製版面連結', shareCopied: '已複製版面連結：對方開啟後會看到同樣的版面，可存成自己的版面',
+    shareCopyQ: '複製這個版面連結', sharedView: n => '分享：' + n,
     delQ: n => '刪除版面「' + n + '」？', renameQ: '版面名稱', nameNew: '新版面', full: '最多 12 個版面',
     importBad: '檔案格式不正確', imported: n => '已匯入 ' + n + ' 個版面', tplTitle: '選擇版面範本',
     tplHint: '範本只是起點；建立後可再調整時間、篩選與版面，都會自動記住。', create: '建立', cancel: '取消',
@@ -6013,6 +6056,8 @@ const PGT = {
   en: {
     main: 'All news', newPage: '＋ New page', manage: 'Manage pages', linkView: 'Linked view', saveAs: 'Save as page',
     rename: 'Rename', dup: 'Duplicate', left: 'Move left', right: 'Move right', del: 'Delete', exportP: 'Export pages', importP: 'Import pages',
+    shareLink: 'Copy page link', shareCopied: 'Page link copied: it opens this same page, which the receiver can save as their own',
+    shareCopyQ: 'Copy this page link', sharedView: n => 'Shared: ' + n,
     delQ: n => 'Delete page “' + n + '”?', renameQ: 'Page name', nameNew: 'New page', full: 'At most 12 pages',
     importBad: 'Not a valid pages file', imported: n => n + ' pages imported', tplTitle: 'Pick a page template',
     tplHint: 'A template is only a start: change the time, filters and layout afterwards; they are remembered.', create: 'Create', cancel: 'Cancel',
@@ -6063,6 +6108,7 @@ function pt(k) { return (PGT[state.lang] || PGT.zh)[k]; }
 
 let pgState = TrackerPages.defaultState();
 let pgTransient = false;   // a linked view (hash without pg=) is shown but not saved
+let pgShared = null;       // the page a pgx= share link carried (its name labels the transient tab)
 function pgLoad() {
   let raw = null;
   try { raw = prefGet('tracker_pages'); } catch (e) {}
@@ -6124,12 +6170,13 @@ function pgAdd(tplId, name) {
 // Save the transient linked view as a page of its own.
 function pgSaveTransient() {
   if (!TrackerPages.canAdd(pgState)) { alert(pt('full')); return; }
-  const name = prompt(pt('renameQ'), pt('nameNew'));
+  const name = prompt(pt('renameQ'), (pgShared && pgShared.name) || pt('nameNew'));
   if (name === null) return;
   const id = TrackerPages.newId(pgState);
   pgState.pages.push(TrackerPages.normPage({ id, name }, 0));
   pgState.active = id;
   pgTransient = false;
+  pgShared = null;
   pgCapture();
   pgSave();
   renderWorkspace();
@@ -6157,7 +6204,7 @@ function pgBuildBar() {
     tabs.appendChild(b);
   });
   if (pgTransient) {
-    const tb = wsEl('span', 'pg-tab pg-transient', pt('linkView'));
+    const tb = wsEl('span', 'pg-tab pg-transient', pgShared ? pt('sharedView')(pgShared.name || pt('nameNew')) : pt('linkView'));
     tb.setAttribute('aria-selected', 'true');
     tabs.appendChild(tb);
     const sv = wsEl('button', 'pg-add', pt('saveAs'));
@@ -6201,6 +6248,7 @@ function pgToggleMenu(anchor) {
   item(pt('right'), () => pgMove(p.id, 1), !cur || i >= pgState.pages.length - 1);
   item(pt('del'), () => pgDelete(p.id), !cur || pgState.pages.length <= 1);
   m.appendChild(wsEl('div', 'pg-menu-sep'));
+  item(pt('shareLink'), pgCopyLink);
   item(pt('exportP'), pgExport);
   item(pt('importP'), pgImport);
   document.body.appendChild(m);
@@ -6242,6 +6290,30 @@ function pgDelete(id) {
   pgSave();
   pgApply(pgActive());
   renderWorkspace();
+}
+// The page as it is on screen now (works for a transient view too).
+function pgCurrentPage() {
+  const p = pgTransient ? (pgShared || { name: '' }) : pgActive();
+  return TrackerPages.normPage({ id: 'shared', name: pgTransient ? p.name : pgName(p), range: ws.range, src: ws.src, ty: ws.ty,
+    w: ws.w, pl: ws.pl, pk: ws.pk, layout: ws.mode, size: ws.size, f: ws.f, q: ws.q, look: ws.look }, 0);
+}
+// A link that opens this page whole in any browser; the receiver can save it as a page of their own.
+function pgShareUrl() {
+  const u = new URL(location.href);
+  u.searchParams.delete('pv');
+  u.hash = 'ws=1&pgx=' + TrackerPages.shareEncode(pgCurrentPage());
+  return u.toString();
+}
+function pgCopyLink() {
+  const url = pgShareUrl();
+  const fallback = () => { prompt(pt('shareCopyQ'), url); };
+  try {
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(url).then(() => ntToast(pt('shareCopied')), fallback);
+      return;
+    }
+  } catch (e) {}
+  fallback();
 }
 function pgExport() {
   const blob = new Blob([JSON.stringify({ kind: 'newstracker-pages', ...JSON.parse(TrackerPages.serialize(pgState)) }, null, 1)],
@@ -9109,6 +9181,7 @@ function syncHash() {
     if (ws.pk) wp.push('pk=' + encodeURIComponent(ws.pk));
     if (state.searchQuery) wp.push('q=' + encodeURIComponent(state.searchQuery));
     if (!pgTransient) wp.push('pg=' + encodeURIComponent(pgState.active));
+    else if (pgShared) wp.push('pgx=' + TrackerPages.shareEncode(pgCurrentPage()));   // a reload keeps the shared page whole
     if (ws.mode === 'titles') wp.push('v=t');
     else if (ws.mode !== 'cards') wp.push('ly=' + ws.mode);
     if (ws.size) wp.push('sz=' + ws.size);
@@ -9217,6 +9290,12 @@ function applyHashRestore() {
   if (h && parsePalette(h.pal) && h.pal !== palettePref) applyPalette(h.pal);
   if (h && h.ws) {           // news workspace deep-link (the filters come from the hash; not persisted)
     if (h.s === 'md3' || h.s === 'classic') document.documentElement.dataset.skin = h.s;
+    const shared = h.pgx ? TrackerPages.shareDecode(h.pgx) : null;   // a shared page wins over the loose params
+    if (shared) {
+      selectWorkspace({ shared });
+      openPendingArticle();
+      return true;
+    }
     let f = null;
     try { f = h.f ? JSON.parse(h.f) : null; } catch (e) { f = null; }
     selectWorkspace({ range: h.r, src: h.src, ty: h.ty, w: h.w, pl: h.pl, pk: h.pk, q: h.q, v: h.v,
