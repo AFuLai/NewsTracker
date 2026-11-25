@@ -16,6 +16,7 @@ from __future__ import annotations
 import json
 import mimetypes
 import os
+import re
 import threading
 import time
 from dataclasses import asdict
@@ -472,6 +473,27 @@ def _apply_control(controller, cmd: dict, cra_job=None, reporter=None) -> tuple[
     return False, "unknown command"
 
 
+def ui_html_path() -> Path:
+    """The site shell this console serves at /site/index.html."""
+    from . import PATHS
+    return Path(PATHS["ui_html"]) if PATHS.get("home") else Path(ROOT) / "ui" / "index.html"
+
+
+_PAGES_BLOCK_RE = re.compile(r"/\* TRACKER-PAGES:BEGIN \*/(.*?)/\* TRACKER-PAGES:END \*/", re.S)
+
+
+def pages_js() -> str:
+    """The site's TrackerPages module (its TRACKER-PAGES block), so the console
+    builds 版面分頁 share links with the very code the site decodes them with."""
+    try:
+        m = _PAGES_BLOCK_RE.search(ui_html_path().read_text(encoding="utf-8"))
+    except OSError:
+        m = None
+    if not m:
+        return "/* TRACKER-PAGES block not found */\n"
+    return m.group(1) + "\nwindow.TrackerPages = TrackerPages;\n"
+
+
 #: Reader preferences of the site served at /site (tracker_prefs, v2). Kept on
 #: disk beside the DB so they survive what localStorage does not: the console
 #: falling back to another port (8787 taken -> 8788 is a new origin with empty
@@ -533,8 +555,7 @@ def serve(reporter: WebReporter, *, port: int = DEFAULT_PORT) -> ThreadingHTTPSe
                 return
             rel = unquote(raw[len("/site/"):])
             if rel in ("", "index.html"):
-                from . import PATHS
-                ui = Path(PATHS["ui_html"]) if PATHS.get("home") else Path(ROOT) / "ui" / "index.html"
+                ui = ui_html_path()
                 base, rel = ui.parent, ui.name
             else:
                 base = Path(DEFAULT_OUT)
@@ -698,6 +719,14 @@ def serve(reporter: WebReporter, *, port: int = DEFAULT_PORT) -> ThreadingHTTPSe
                 self._export_data()
             elif self.path == "/site" or self.path.startswith("/site/"):
                 self._serve_site()
+            elif urlsplit(self.path).path == "/pages.js":
+                body = pages_js().encode("utf-8")
+                self.send_response(200)
+                self.send_header("Content-Type", "text/javascript; charset=utf-8")
+                self.send_header("Cache-Control", "no-store")
+                self.send_header("Content-Length", str(len(body)))
+                self.end_headers()
+                self.wfile.write(body)
             elif urlsplit(self.path).path == "/prefs":
                 body = json.dumps(read_prefs(), ensure_ascii=False).encode("utf-8")
                 self.send_response(200)
@@ -876,6 +905,12 @@ _HTML = r"""<!DOCTYPE html>
   .depmeta .k { color:var(--dim); }
   .depmeta .v { min-width:0; overflow-wrap:anywhere; }
   .depmeta a { color:var(--accent); }
+  .deplinks { margin:0 0 10px; }
+  .deplinks .k { color:var(--dim); margin-bottom:4px; }
+  .deplinks ul { margin:0; padding-left:18px; }
+  .deplinks li { margin:2px 0; overflow-wrap:anywhere; }
+  .deplinks a { color:var(--accent); }
+  .deplinks button { padding:1px 8px; font-size:12px; margin-left:6px; }
   .btnrow { display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
   .lc-only.hidden { display:none; }
   .card > h2 { display:flex; align-items:baseline; gap:10px; }
@@ -1081,6 +1116,10 @@ _HTML = r"""<!DOCTYPE html>
         <span class="k">訊息</span><span class="v" id="depMsg">—</span>
         <span class="k">完成時間</span><span class="v" id="depTime">—</span>
       </div>
+      <div class="deplinks hidden" id="depLinks">
+        <div class="k">分頁連結 <span id="depLinksBase"></span></div>
+        <ul id="depLinksList"></ul>
+      </div>
       <div class="btnrow">
         <button id="btnPreview">預覽頻道發布</button>
         <button id="btnLive" class="primary">正式發布</button>
@@ -1216,6 +1255,7 @@ _HTML = r"""<!DOCTYPE html>
   document.addEventListener('keydown', e=>{ if(e.key==='Escape' && d.classList.contains('fs')) setFull(false); });
 })();
 </script>
+<script src="/pages.js"></script>
 <script>
 const $ = id => document.getElementById(id);
 function fmt(s){ s=Math.max(0,Math.floor(s)); const h=(s/3600|0),m=(s%3600/60|0),x=s%60;
@@ -1632,6 +1672,48 @@ function syncDeploy(st){
   $('depChan').textContent = d.state==='idle' ? '—' : (d.channel || '正式站');
   $('depMsg').innerHTML = depMsgHtml(d.message);
   $('depTime').textContent = d.finished_at ? new Date(d.finished_at*1000).toLocaleString('zh-TW') : '—';
+  depLinksSync(d);
+}
+// Links to the reader's own 版面分頁 on the published site: each page travels in the
+// URL as #ws=1&pgx=<code> (TrackerPages.shareEncode, loaded from /pages.js, the same
+// code the site decodes with). Pages come from /prefs, saved by the local site.
+let depLinksKey = null;
+function depSiteBase(d){
+  const m = d && d.state==='ok' && /https:\/\/[^\s"'<>\[\]]+/.exec(d.message||'');
+  if(m) return m[0].replace(/\/+$/,'');
+  const proj = ($('lcFbProj') && $('lcFbProj').value.trim()) || 'afu-news';
+  return 'https://' + proj + '.web.app';
+}
+async function depLinksSync(d){
+  const base = depSiteBase(d);
+  const key = base + '|' + (d && d.finished_at || 0);
+  if(key === depLinksKey) return;
+  depLinksKey = key;
+  const box = $('depLinks'), ul = $('depLinksList');
+  if(typeof TrackerPages === 'undefined'){ box.classList.add('hidden'); return; }
+  let pages = [];
+  try{
+    const r = await fetch('/prefs', {cache:'no-store'});
+    const p = await r.json();
+    const raw = p && p.values && p.values.tracker_pages;
+    pages = raw ? TrackerPages.parse(raw).pages : [];
+  }catch(e){ pages = []; }
+  $('depLinksBase').innerHTML = `（<a href="${esc(base)}/" target="_blank" rel="noopener">${esc(base)}</a>）`;
+  if(!pages.length){
+    ul.innerHTML = '<li>尚無自訂分頁：先在本機預覽的網站建立版面分頁</li>';
+  } else {
+    ul.innerHTML = pages.map(pg => {
+      const u = base + '/#ws=1&pgx=' + TrackerPages.shareEncode(pg);
+      const name = pg.name || (pg.id==='main' ? '主版面' : pg.id);
+      return `<li><a href="${esc(u)}" title="${esc(u)}" target="_blank" rel="noopener">${esc(name)}</a> ` +
+             `<button class="deplink-copy" data-u="${esc(u)}">複製</button></li>`;
+    }).join('');
+    ul.querySelectorAll('.deplink-copy').forEach(b => b.onclick = async ()=>{
+      try{ await navigator.clipboard.writeText(b.dataset.u); b.textContent = '已複製'; }
+      catch(e){ prompt('複製這個連結', b.dataset.u); }
+    });
+  }
+  box.classList.remove('hidden');
 }
 // ── hero status ──────────────────────────────────────────────────────────
 function syncHero(st){

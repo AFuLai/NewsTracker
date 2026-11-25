@@ -197,4 +197,30 @@ def deploy(*, channel: str | None = None) -> str:
     out = (proc.stdout + proc.stderr).strip()
     if proc.returncode != 0:
         raise DeployError(f"firebase exited {proc.returncode}: {out[-800:]}")
-    return out.splitlines()[-1] if out else ""
+    return summarize_output(out)
+
+
+_ANSI_RE = re.compile(r"\x1b\[[0-9;?]*[A-Za-z]")
+#: firebase's own result lines: "Hosting URL: https://…" (live) and
+#: "Channel URL (<project>): https://… [expires …]" (preview channel).
+_URL_LINE_RE = re.compile(r"(Hosting URL|Channel URL)[^:]*:\s*(https://\S+)(.*)$")
+#: Box-drawing / decoration only (firebase's "Update available" notice box).
+_DECOR_RE = re.compile(r"^[\s─-╿││=\-*]*$")
+
+
+def summarize_output(out: str) -> str:
+    """The line of a firebase deploy's output worth showing.
+
+    The site URL line when firebase printed one; otherwise the last line that
+    is real text. The plain last line can be the bottom border of firebase's
+    "Update available" box, which says nothing about the deploy.
+    """
+    lines = [_ANSI_RE.sub("", ln).strip() for ln in (out or "").splitlines()]
+    for ln in reversed(lines):
+        m = _URL_LINE_RE.search(ln)
+        if m:
+            return f"{m.group(1)}: {m.group(2)}{m.group(3)}".strip()
+    for ln in reversed(lines):
+        if ln and not _DECOR_RE.match(ln):
+            return ln
+    return ""
