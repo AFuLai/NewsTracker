@@ -82,3 +82,33 @@ def test_disk_push_keepalive_stays_under_chrome_limit():
     assert m, "prefsPush missing"
     assert "keepalive: body.length < 60000" in m.group(1)
     assert "keepalive: true" not in m.group(1)
+
+
+def test_was_cleared_only_when_same_origin_lost_its_data():
+    """Local console: the browser holding nothing while the disk copy, written from this same
+    origin, holds settings means the browser cleared site data on exit (2026-11-26)."""
+    out = _run("""
+      const O = 'http://127.0.0.1:8787';
+      const P = v => ({ v: 2, values: v });
+      const w = TrackerPrefs.wasCleared;
+      return [
+        w(P({}), P({tracker_theme: 'dark', tracker_origin: O}), O),          // cleared
+        w(P({tracker_theme: 'dark'}), P({tracker_theme: 'dark', tracker_origin: O}), O),  // browser kept it
+        w(P({}), P({tracker_theme: 'dark', tracker_origin: 'http://127.0.0.1:8788'}), O), // port moved
+        w(P({}), P({tracker_theme: 'dark'}), O),                             // disk from before 2.34
+        w(P({}), P({tracker_origin: O}), O),                                 // nothing but the marker
+        w(P({}), P({}), O),
+        TrackerPrefs.get(TrackerPrefs.set(P({}), 'tracker_store_note', 'off'), 'tracker_store_note'),
+        TrackerPrefs.get(TrackerPrefs.set(P({}), 'tracker_origin', O), 'tracker_origin')];""")
+    assert out == [True, False, False, False, False, False, "off", "http://127.0.0.1:8787"]
+
+
+def test_store_notes_are_wired():
+    s = _src()
+    assert re.search(r"prefsCleared = TrackerPrefs\.wasCleared\(prefs, sp, location\.origin\)", s)
+    assert re.search(r"prefSet\('tracker_origin', location\.origin\)", s)
+    assert re.search(r"^\s*storeNote\(\);", s, re.M), "storeNote() is never called"
+    m = re.search(r"function storeNote\(\)\s*\{(.*?)\n\}", s, re.S)
+    assert m and "isPreviewMode()" in m.group(1) and "'tracker_store_note'" in m.group(1)
+    # the online edition (no disk copy) gets the fixed hint in 個人化 → 版面設定檔
+    assert re.search(r"if \(!PREFS_SERVER\) \{\s*// Online edition", s)

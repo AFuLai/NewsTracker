@@ -2188,6 +2188,13 @@ html[data-mode="ws"] #pg-bar { display: flex; }
   background: var(--surface-container-high); color: var(--on-surface-variant); border-bottom: 1px solid var(--outline-variant); }
 #pv-note a { color: var(--primary); font-weight: 500; }
 #pv-note button { margin-left: auto; border: 0; background: none; color: inherit; font: inherit; cursor: pointer; padding: 2px 6px; }
+/* Local console: the browser cleared site data on exit (storeNote); same slim line as #pv-note. */
+#store-note { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; padding: 6px 16px; font-size: 13px;
+  background: var(--surface-container-high); color: var(--on-surface-variant); border-bottom: 1px solid var(--outline-variant); }
+#store-note span { flex: 1 1 320px; }
+#store-note button { border: 0; background: none; color: inherit; font: inherit; cursor: pointer; padding: 2px 6px; }
+#store-note .store-copy, #store-note .store-off { color: var(--primary); font-weight: 500; }
+.nt-store-hint .store-copy { border: 0; background: none; color: var(--primary); font: inherit; font-weight: 500; cursor: pointer; padding: 0 4px; }
 
 /* ── 我的頭版: layout gallery, front / timeline / reading pane, display options, search suggestions,
       greeting, wizard, tips ── */
@@ -2530,7 +2537,7 @@ const TrackerPrefs = (() => {
   const LEGACY_KEYS = ['tracker_lang', 'tracker_theme', 'tracker_skin', 'tracker_palette', 'tracker_nav',
     'tracker_view', 'tracker_watch', 'tracker_watch_hub', 'tracker_watch_seen', 'tracker_lib_group'];
   const EXTRA_KEYS = ['tracker_ws', 'tracker_read', 'tracker_pages', 'tracker_tour', 'tracker_personal', 'tracker_taste',
-    'tracker_visit', 'tracker_recent'];
+    'tracker_visit', 'tracker_recent', 'tracker_origin', 'tracker_store_note'];
   const KEY = 'tracker_prefs';
   const has = (o, k) => Object.prototype.hasOwnProperty.call(o, k);
   function load(storage) {
@@ -2571,7 +2578,15 @@ const TrackerPrefs = (() => {
     if (preview === true) return;
     try { storage.setItem(KEY, JSON.stringify(prefs)); } catch (e) {}
   }
-  return { LEGACY_KEYS, EXTRA_KEYS, load, get, set, save };
+  // The browser lost this site's data while the disk copy (local console) kept it: the browser
+  // holds nothing, the disk holds something, and the disk was last written from this same origin.
+  // A different origin (the console moved 8787 -> 8788) is a new store, not a cleared one.
+  function wasCleared(local, disk, origin) {
+    const lv = (local && local.values) || {}, dv = (disk && disk.values) || {};
+    return Object.keys(lv).length === 0 && Object.keys(dv).some(k => k !== 'tracker_origin') &&
+      typeof origin === 'string' && dv.tracker_origin === origin;
+  }
+  return { LEGACY_KEYS, EXTRA_KEYS, load, get, set, save, wasCleared };
 })();
 /* TRACKER-PREFS:END */
 window.TrackerPrefs = TrackerPrefs;
@@ -2681,6 +2696,7 @@ catch (e) { prefs = TrackerPrefs.load({ getItem() { throw new Error('storage'); 
 // change between runs (8787 taken -> 8788), and some browsers clear it on exit.
 // The disk copy wins on load; every change is written to both.
 const PREFS_SERVER = /^\/site\//.test(location.pathname) && /^https?:$/.test(location.protocol);
+let prefsCleared = false;   // the browser dropped this site's data and the disk copy restored it (storeNote)
 if (PREFS_SERVER) {
   try {
     const x = new XMLHttpRequest();
@@ -2688,6 +2704,7 @@ if (PREFS_SERVER) {
     x.send();
     const sp = x.status === 200 ? TrackerPrefs.load({ getItem(k) { return k === 'tracker_prefs' ? x.responseText : null; } }) : null;
     if (sp && Object.keys(sp.values).length) {
+      prefsCleared = TrackerPrefs.wasCleared(prefs, sp, location.origin);
       prefs = sp;
       try { if (!isPreviewMode()) TrackerPrefs.save(localStorage, prefs, false); } catch (e) {}
     } else if (Object.keys(prefs.values).length) {
@@ -2711,6 +2728,10 @@ function prefSet(key, value) {
   prefs = TrackerPrefs.set(prefs, key, value);
   try { TrackerPrefs.save(localStorage, prefs, isPreviewMode()); } catch (e) {}
   if (PREFS_SERVER) { clearTimeout(prefsPushTimer); prefsPushTimer = setTimeout(prefsPush, 400); }
+}
+// Remember which origin wrote the disk copy, so the next load can tell "cleared" from "moved port".
+if (PREFS_SERVER && !isPreviewMode() && prefGet('tracker_origin') !== location.origin) {
+  try { prefSet('tracker_origin', location.origin); } catch (e) {}
 }
 addEventListener('pagehide', () => { if (prefsPushTimer) { clearTimeout(prefsPushTimer); prefsPushTimer = null; prefsPush(); } });
 
@@ -2837,6 +2858,52 @@ function pvNote() {
   x.textContent = '×';
   x.onclick = () => d.remove();
   d.append(a, x);
+  document.body.prepend(d);
+}
+// How to let this site keep its data in Chrome. A page cannot read the browser's clear-on-exit
+// setting, nor open chrome:// links, so this is text plus a copy button for the host.
+const STORE_SETTINGS_URL = 'chrome://settings/content/siteData';
+function storeHowTo(zh) {
+  const host = location.hostname;
+  return zh
+    ? '要讓瀏覽器也保留，請在 Chrome 的 ' + STORE_SETTINGS_URL + '（裝置上的網站資料）把「' + host + '」加入允許儲存資料的網站。'
+    : 'To keep it in the browser too, add “' + host + '” to the sites allowed to save data in Chrome at ' + STORE_SETTINGS_URL + ' (On-device site data).';
+}
+function storeCopyBtn(zh) {
+  const c = document.createElement('button');
+  c.type = 'button';
+  c.className = 'store-copy';
+  c.textContent = zh ? '複製網址' : 'Copy host';
+  c.onclick = () => {
+    const t = location.hostname;
+    const ok = () => { c.textContent = zh ? '已複製' : 'Copied'; };
+    try { navigator.clipboard.writeText(t).then(ok, () => prompt('', t)); } catch (e) { prompt('', t); }
+  };
+  return c;
+}
+// Local console: the browser dropped this site's data on exit and the disk copy restored it.
+// Say so once per load, with the way to stop it; 不再提示 is kept with the prefs (disk too).
+function storeNote() {
+  if (!prefsCleared || isPreviewMode() || document.getElementById('store-note')) return;
+  if (prefGet('tracker_store_note') === 'off') return;
+  const zh = (state.lang || 'zh') !== 'en';
+  const d = document.createElement('div');
+  d.id = 'store-note';
+  d.setAttribute('role', 'note');
+  const msg = document.createElement('span');
+  msg.textContent = (zh ? '瀏覽器關閉時清除了本站資料，設定已從這台電腦的備份還原。'
+                        : 'The browser cleared this site’s data on exit; your settings were restored from this computer’s copy. ') + storeHowTo(zh);
+  const off = document.createElement('button');
+  off.type = 'button';
+  off.className = 'store-off';
+  off.textContent = zh ? '不再提示' : 'Don’t show again';
+  off.onclick = () => { try { prefSet('tracker_store_note', 'off'); } catch (e) {} d.remove(); };
+  const x = document.createElement('button');
+  x.type = 'button';
+  x.setAttribute('aria-label', zh ? '關閉' : 'Close');
+  x.textContent = '×';
+  x.onclick = () => d.remove();
+  d.append(msg, storeCopyBtn(zh), off, x);
   document.body.prepend(d);
 }
 function saveView() {
@@ -5230,6 +5297,7 @@ function init() {
   pgLoad();        // localStorage tracker_pages → pgState (the user's own pages)
   personalLoad();  // tracker_personal / tracker_taste → settings and the reading-taste profile
   pvNote();
+  storeNote();
   if (!applyHashRestore()) personalStart();   // no deep link: the start page the reader chose (default: the page used last)   // deep-link wins; no / unknown hash → the news workspace (the home view; it was the 總覽 hub, which replaced the old default tracker wall)
   applyLang();   // sync all static labels + lang button to the active language
 }
@@ -7666,6 +7734,16 @@ function openPrefsDialog() {
   dlgBtn(r4, pt('exportP'), pgExport);
   dlgBtn(r4, pt('importP'), pgImport);
   s4.appendChild(r4);
+  if (!PREFS_SERVER) {
+    // Online edition: no disk copy, and a page cannot tell a cleared browser from a first visit.
+    const zh = (state.lang || 'zh') !== 'en';
+    const hint = wsEl('p', 'pg-dlg-hint nt-store-hint',
+      (zh ? '這些設定只存在這個瀏覽器。若 Chrome 設成「關閉所有視窗時清除網站資料」，下次開啟會回到預設。'
+          : 'These settings live only in this browser. If Chrome clears site data when all windows close, they reset next time. ')
+      + storeHowTo(zh) + (zh ? '也可以先匯出版面設定，或把分頁連結加入書籤。' : ' You can also export your pages, or bookmark a page link.'));
+    hint.appendChild(storeCopyBtn(zh));
+    s4.appendChild(hint);
+  }
   const row = wsEl('div', 'pg-dlg-row');
   dlgBtn(row, pt('pDone'), closePgDialog, 'pg-btn-primary');
   box.appendChild(row);
